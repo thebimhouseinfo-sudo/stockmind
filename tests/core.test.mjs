@@ -21,13 +21,17 @@ assert.equal(scored.length, 2);
 assert.deepEqual(scored.map(row => row.RANK).sort((a, b) => a - b), [1, 2]);
 assert.ok(scored.every(row => Number.isFinite(row.FINALSCORE)));
 assert.ok(scored.every(row => ['A+', 'A', 'B', 'C', 'D'].includes(row.GRADE)));
-assert.ok(scored.every(row => Number.isFinite(row.QUALITY_SCORE)));
-assert.ok(scored.every(row => Number.isFinite(row.MOMENTUM)));
+assert.ok(scored.every(row => Number.isFinite(row.BUSINESS_QUALITY)));
+assert.ok(scored.every(row => Number.isFinite(row.VALUATION_SCORE)));
+assert.ok(scored.every(row => Number.isFinite(row.MARKET_SCORE)));
+assert.ok(scored.every(row => ['GOOD_IN_FORM', 'GOOD_UNDERPERFORM', 'OTHER'].includes(row.SCREENING_GROUP)));
 
 const stats = buildStats(scored);
 assert.equal(stats.total, 2);
 assert.equal(stats.top10.length, 2);
 assert.equal(stats.industryCount.Banks, 1);
+assert.ok(Array.isArray(stats.cleanTop10));
+assert.ok(Array.isArray(stats.flaggedTop20));
 
 // Regression: non-positive P/E must not be treated as cheap.
 const negativePeRows = scoreStocks([
@@ -37,15 +41,24 @@ const negativePeRows = scoreStocks([
 const negativePe = negativePeRows.find(row => row.TICKER === 'AAA');
 assert.equal(negativePe.VALUATION_SCORE, 50);
 
-// Regression: a very large EPS/revenue disconnect should not increase Growth Score.
-const growthRows = scoreStocks([
+// Regression: a large EPS/revenue disconnect is flagged, not used as a separate opportunity penalty.
+const gapRows = scoreStocks([
   { TICKER: 'GOOD', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: 0.18, ROIC: 0.15, REVGROWTH: 0.25, EPSGROWTH: 0.30, DEBT: 0.5, RET1M: 0.02, RET3M: 0.05, RET6M: 0.10, RET12M: 0.15 },
-  { TICKER: 'GAP', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: 0.18, ROIC: 0.15, REVGROWTH: 0.05, EPSGROWTH: 1.00, DEBT: 0.5, RET1M: 0.02, RET3M: 0.05, RET6M: 0.10, RET12M: 0.15 },
-  { TICKER: 'MID', INDUSTRY: 'Retail', PRICE: 10, PE: 12, ROE: 0.15, ROIC: 0.12, REVGROWTH: 0.10, EPSGROWTH: 0.12, DEBT: 1.0, RET1M: 0.00, RET3M: 0.02, RET6M: 0.04, RET12M: 0.08 },
-  { TICKER: 'LOW', INDUSTRY: 'Retail', PRICE: 10, PE: 15, ROE: 0.10, ROIC: 0.08, REVGROWTH: 0.03, EPSGROWTH: 0.04, DEBT: 1.5, RET1M: -0.02, RET3M: -0.01, RET6M: 0.00, RET12M: 0.02 }
+  { TICKER: 'GAP', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: 0.18, ROIC: 0.15, REVGROWTH: 0.05, EPSGROWTH: 1.00, DEBT: 0.5, RET1M: 0.02, RET3M: 0.05, RET6M: 0.10, RET12M: 0.15 }
 ]);
-const good = growthRows.find(row => row.TICKER === 'GOOD');
-const gap = growthRows.find(row => row.TICKER === 'GAP');
-assert.ok(good.GROWTH_SCORE >= gap.GROWTH_SCORE);
+const gap = gapRows.find(row => row.TICKER === 'GAP');
+assert.ok(gap.DATA_FLAGS.includes('EARNINGS_GROWTH_DIVERGENCE'));
+assert.equal(gap.SCREENING_GROUP, 'GOOD_IN_FORM');
+
+// Regression: missing data is flagged and does not become an industry-median substitute in the row itself.
+const missingRows = scoreStocks([
+  { TICKER: 'MISS', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: null, ROIC: null, REVGROWTH: 0.05, EPSGROWTH: 0.07, DEBT: 0.8, RET1M: 0.01, RET3M: 0.02, RET6M: 0.03, RET12M: 0.05 },
+  { TICKER: 'FULL', INDUSTRY: 'Retail', PRICE: 10, PE: 12, ROE: 0.15, ROIC: 0.12, REVGROWTH: 0.08, EPSGROWTH: 0.09, DEBT: 0.8, RET1M: 0.01, RET3M: 0.02, RET6M: 0.03, RET12M: 0.05 }
+]);
+const missing = missingRows.find(row => row.TICKER === 'MISS');
+assert.equal(missing.ROE, null);
+assert.equal(missing.ROIC, null);
+assert.ok(missing.DATA_FLAGS.some(flag => flag.startsWith('MISSING_ROE')));
+assert.ok(missing.DATA_FLAGS.some(flag => flag.startsWith('MISSING_ROIC')));
 
 console.log('Core tests passed.');
