@@ -7,7 +7,11 @@ const DISCONNECT_THRESHOLD = 0.15;
 
 export async function node3(ctx) {
   const node1Output = ctx.outputs.node1 || null;
+  const userEvidence = ctx.outputs.userEvidence || null;
   const sectorType = detectSectorType(ctx.screeningContext?.industry || ctx.industry);
+  const userEvidencePrompt = userEvidence
+    ? `\n## USER-PROVIDED EVIDENCE (supplementary; do not silently override SSI data)\n${JSON.stringify(selectEvidenceForNode(userEvidence, 'node3'), null, 2)}\n\nTreat these files as user-supplied evidence. Preserve provenance. If a value conflicts with screening/market data, identify the discrepancy rather than choosing silently.`
+    : '\n## USER-PROVIDED EVIDENCE\nNone uploaded for this run.';
 
   const userPrompt = `
 # CRSM RUN — NODE 3 (Deep Fundamentals + Peer Comparison)
@@ -19,13 +23,15 @@ export async function node3(ctx) {
 - ANALYSIS_MODE: ${ctx.screeningContext ? 'SCREENED' : 'DIRECT'}
 - Node 1 JSON (financial_core_raw, cost_of_capital_raw_inputs, screening_metrics if SCREENED):
 ${JSON.stringify(node1Output, null, 2)}
+${userEvidencePrompt}
 
 ## Task
 Execute Node 3 instructions: compute capital efficiency (WACC/ROIC), earnings
 quality, sustainability, F/M scores, fair value (DCF + reverse DCF), peer
 comparison. If SCREENED, run the screening anomaly checks and fill
-screening_flags. Output ONLY the specified JSON object — no explanations, no
-markdown fences.
+screening_flags. Use relevant user evidence when it adds information, but do
+not invent values and do not treat unverified extraction as canonical market
+fact. Output ONLY the specified JSON object — no explanations, no markdown fences.
 `.trim();
 
   const result = await runLLM({
@@ -43,6 +49,21 @@ markdown fences.
   }
 
   return parsed;
+}
+
+function selectEvidenceForNode(evidence, nodeId) {
+  return {
+    source: evidence.source,
+    uploadedAt: evidence.uploadedAt,
+    documents: (evidence.documents || []).filter(doc => (doc.routing || []).includes(nodeId)).map(doc => ({
+      name: doc.name,
+      kind: doc.kind,
+      content: doc.content,
+      structure: doc.structure,
+      provenance: doc.provenance,
+      routing: doc.routing
+    }))
+  };
 }
 
 export function detectEpsRevenueDisconnect(screeningContext) {
