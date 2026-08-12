@@ -20,6 +20,8 @@ export const NODES = [
   ['node7', node7]
 ];
 
+// Backend-owned concurrency policy. Only nodes explicitly listed here may
+// share a stage; dependency order is still preserved by buildParallelStages().
 const PARALLEL_STAGES = [
   ['node2', 'node3']
 ];
@@ -67,19 +69,32 @@ export async function runPipeline({
 }
 
 function buildParallelStages(orderedIds) {
-  const remaining = new Set(orderedIds);
+  const remaining = [...orderedIds];
   const stages = [];
 
-  for (const stage of PARALLEL_STAGES) {
-    const available = stage.filter(id => remaining.has(id));
-    if (!available.length) continue;
-    stages.push(available);
-    available.forEach(id => remaining.delete(id));
-  }
+  while (remaining.length) {
+    const first = remaining.shift();
+    if (!first) continue;
 
-  orderedIds.forEach(id => {
-    if (remaining.has(id)) stages.push([id]);
-  });
+    // A parallel group is inserted at the position of its first member. This
+    // guarantees prerequisites earlier in the pipeline have already completed.
+    const group = PARALLEL_STAGES.find(stage => stage.includes(first));
+    if (!group) {
+      stages.push([first]);
+      continue;
+    }
+
+    const available = [first];
+    for (const member of group) {
+      if (member === first) continue;
+      const index = remaining.indexOf(member);
+      if (index >= 0) {
+        available.push(member);
+        remaining.splice(index, 1);
+      }
+    }
+    stages.push(available);
+  }
 
   return stages;
 }
