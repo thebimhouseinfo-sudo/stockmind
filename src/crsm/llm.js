@@ -2,6 +2,7 @@ import { resolveProviderModel } from './router.js';
 import { getProvider } from './providers/index.js';
 import { loadSettings } from './settings.js';
 import { recordUsage } from './usage.js';
+import { crsmState } from './state.js';
 
 export async function runLLM({ nodeId, prompt, systemInstruction, responseFormat = 'json', signal }) {
   if (!nodeId) throw new Error('runLLM yêu cầu nodeId.');
@@ -35,6 +36,8 @@ export async function runLLM({ nodeId, prompt, systemInstruction, responseFormat
 
   recordUsage({
     nodeId,
+    ticker: crsmState.ticker,
+    mode: crsmState.mode,
     provider: resolved.provider,
     model: resolved.model,
     inputTokens: usage.inputTokens ?? null,
