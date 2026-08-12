@@ -2,6 +2,7 @@ import { crsmState, resetState, notifyCRSM } from './state.js';
 import { runPipeline } from './pipeline.js';
 import { cacheGet, cacheSet } from './cache.js';
 import { loadSettings } from './settings.js';
+import { getPendingUserEvidence } from './user-evidence.js';
 
 export async function runCRSM({ mode, ticker, screeningContext = null, startFrom = 'node1', existingOutputs = null, bypassCache = false, onProgress, onError, onComplete } = {}) {
   const validMode = mode === 'SCREENED' || mode === 'DIRECT';
@@ -15,8 +16,9 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
   const isRetry = startFrom !== 'node1';
   const settings = loadSettings();
   const executionMode = settings.crsm.executionMode === 'parallel' ? 'parallel' : 'sequential';
+  const hasUserEvidence = Boolean(getPendingUserEvidence());
 
-  if (!isRetry && !bypassCache) {
+  if (!isRetry && !bypassCache && !hasUserEvidence) {
     const cached = cacheGet({ mode, ticker });
     if (cached) {
       hydrateFromCache({ mode, ticker, screeningContext, outputs: cached });
@@ -35,6 +37,7 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
   }
   crsmState.logRows.push(isRetry ? `↻ retry từ node ${startFrom}` : `▶ bắt đầu run ${mode}`);
   crsmState.logRows.push(`⚙ execution: ${executionMode}`);
+  if (hasUserEvidence) crsmState.logRows.push('📎 user evidence attached → deep analysis nodes');
   notifyCRSM();
 
   let result;
@@ -88,7 +91,7 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
     return { mode, ticker, failedNode: result.failedNode, error: result.error, outputs: crsmState.nodeOutputs, cachedRun: false };
   }
 
-  if (!isRetry) cacheSet({ mode, ticker }, crsmState.nodeOutputs);
+  if (!isRetry && !hasUserEvidence) cacheSet({ mode, ticker }, crsmState.nodeOutputs);
   notifyCRSM();
   onComplete?.({
     mode,
