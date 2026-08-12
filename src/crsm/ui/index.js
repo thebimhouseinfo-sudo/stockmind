@@ -10,7 +10,6 @@ import { runCRSM } from '../engine.js';
 import { ingestUserEvidence, getPendingUserEvidence } from '../user-evidence.js';
 
 const DATASET_KEY = 'stock-mind.dataset.v1';
-let crsmClickHandlerInstalled = false;
 
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
@@ -54,7 +53,6 @@ export function updateDynamicRegion() {
 }
 
 export function bindCRSMUIBindings() {
-  installCRSMClickHandler();
   bindDynamicEvents();
   bindReportEvents();
   bindEvidenceUpload();
@@ -77,90 +75,6 @@ function bindEvidenceUpload() {
     }
     event.target.value = '';
   });
-}
-
-function installCRSMClickHandler() {
-  if (crsmClickHandlerInstalled) return;
-  crsmClickHandlerInstalled = true;
-
-  document.addEventListener('click', event => {
-    const directTrigger = event.target?.closest?.('[data-crsm-direct]');
-    if (directTrigger) {
-      event.preventDefault();
-      event.stopPropagation();
-      void launchDirectFromUI();
-      return;
-    }
-
-    const trigger = event.target?.closest?.('[data-crsm]');
-    if (!trigger) return;
-
-    const ticker = String(trigger.dataset.crsm || '').trim().toUpperCase();
-    if (!ticker) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const stock = findScreeningStock(ticker);
-    if (!stock) {
-      showLaunchError(`Không tìm thấy dữ liệu screening cho mã ${ticker}.`);
-      return;
-    }
-
-    const crsmTab = document.querySelector('[data-tab="crsm"]');
-    if (!crsmTab) {
-      showLaunchError('Không tìm thấy tab CRSM để mở phiên phân tích.');
-      return;
-    }
-
-    crsmTab.click();
-    const screeningContext = buildScreeningContext(stock);
-    void runCRSM({ mode: 'SCREENED', ticker, screeningContext }).catch(error => {
-      showLaunchError(error?.message || String(error));
-    });
-  }, true);
-}
-
-async function launchDirectFromUI() {
-  const input = document.getElementById('crsmTickerInput');
-  const ticker = String(input?.value || '').trim().toUpperCase();
-  if (!ticker) {
-    showLaunchError('Hãy nhập mã cổ phiếu trước khi phân tích.');
-    input?.focus();
-    return;
-  }
-
-  const crsmTab = document.querySelector('[data-tab="crsm"]');
-  if (!crsmTab) {
-    showLaunchError('Không tìm thấy tab CRSM để chạy phiên phân tích.');
-    return;
-  }
-
-  // The direct form is already inside CRSM, but this keeps the handoff robust
-  // if the UI was re-rendered by another action.
-  crsmTab.click();
-  try {
-    await runCRSM({ mode: 'DIRECT', ticker, screeningContext: null });
-  } catch (error) {
-    showLaunchError(error?.message || String(error));
-  }
-}
-
-function findScreeningStock(ticker) {
-  try {
-    const raw = localStorage.getItem(DATASET_KEY);
-    const rows = raw ? JSON.parse(raw) : [];
-    return Array.isArray(rows) ? rows.find(row => String(row?.TICKER || '').toUpperCase() === ticker) : null;
-  } catch {
-    return null;
-  }
-}
-
-function showLaunchError(message) {
-  crsmState.isRunning = false;
-  crsmState.error = { node: null, message: String(message) };
-  crsmState.logRows = [...(crsmState.logRows || []), `✖ launch failed: ${message}`];
-  notifyCRSM();
 }
 
 export function bindDynamicEvents() {
