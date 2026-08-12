@@ -16,18 +16,24 @@ export async function generateOllamaCloud({ prompt, systemInstruction, model, ap
 
   if (structuredOutput) body.response_format = { type: 'json_object' };
 
-  const res = await fetch(OLLAMA_CLOUD_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(body),
-    signal
-  });
+  let res;
+  try {
+    res = await fetch(OLLAMA_CLOUD_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(body),
+      signal
+    });
+  } catch (error) {
+    throw new Error(`Ollama Cloud không kết nối được: ${error?.message || error}. Có thể API key, mạng hoặc CORS không hợp lệ.`);
+  }
 
+  if (res.status === 401) throw new Error('Ollama Cloud API key không hợp lệ hoặc đã hết quyền.');
+  if (res.status === 403) throw new Error('Ollama Cloud từ chối truy cập — kiểm tra quyền API key hoặc CORS.');
   if (!res.ok) throw new Error(`Ollama Cloud API lỗi ${res.status}: ${await safeMessage(res)}`);
-  if (res.status === 403) throw new Error('Ollama Cloud từ chối truy cập — có thể bị chặn CORS.');
 
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content || '';
