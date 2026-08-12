@@ -1,11 +1,13 @@
- {
+{
   "name": "stock-mind",
   "version": "0.1.0",
   "private": true,
-  "description": "Standalone TradingView paste-to-analysis stock screener.",
+  "description": "Stock Mind: TradingView screening plus CRSM deep analysis.",
   "type": "module",
   "scripts": {
     "build:prompts": "node build-prompts.js",
+    "test": "node tests/core.test.mjs",
+    "check": "npm run build:prompts && npm test",
     "dev": "npm run build:prompts && python -m http.server 4321",
     "start": "npm run build:prompts && python -m http.server 4321",
     "prebuild": "npm run build:prompts"
