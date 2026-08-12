@@ -10,7 +10,7 @@ import { runCRSM } from '../engine.js';
 import { ingestUserEvidence, getPendingUserEvidence } from '../user-evidence.js';
 
 const DATASET_KEY = 'stock-mind.dataset.v1';
-let screenedClickHandlerInstalled = false;
+let crsmClickHandlerInstalled = false;
 
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
@@ -54,7 +54,7 @@ export function updateDynamicRegion() {
 }
 
 export function bindCRSMUIBindings() {
-  installScreenedClickHandler();
+  installCRSMClickHandler();
   bindDynamicEvents();
   bindReportEvents();
   bindEvidenceUpload();
@@ -79,10 +79,19 @@ function bindEvidenceUpload() {
   });
 }
 
-function installScreenedClickHandler() {
-  if (screenedClickHandlerInstalled) return;
-  screenedClickHandlerInstalled = true;
+function installCRSMClickHandler() {
+  if (crsmClickHandlerInstalled) return;
+  crsmClickHandlerInstalled = true;
+
   document.addEventListener('click', event => {
+    const directTrigger = event.target?.closest?.('[data-crsm-direct]');
+    if (directTrigger) {
+      event.preventDefault();
+      event.stopPropagation();
+      void launchDirectFromUI();
+      return;
+    }
+
     const trigger = event.target?.closest?.('[data-crsm]');
     if (!trigger) return;
 
@@ -110,6 +119,31 @@ function installScreenedClickHandler() {
       showLaunchError(error?.message || String(error));
     });
   }, true);
+}
+
+async function launchDirectFromUI() {
+  const input = document.getElementById('crsmTickerInput');
+  const ticker = String(input?.value || '').trim().toUpperCase();
+  if (!ticker) {
+    showLaunchError('Hãy nhập mã cổ phiếu trước khi phân tích.');
+    input?.focus();
+    return;
+  }
+
+  const crsmTab = document.querySelector('[data-tab="crsm"]');
+  if (!crsmTab) {
+    showLaunchError('Không tìm thấy tab CRSM để chạy phiên phân tích.');
+    return;
+  }
+
+  // The direct form is already inside CRSM, but this keeps the handoff robust
+  // if the UI was re-rendered by another action.
+  crsmTab.click();
+  try {
+    await runCRSM({ mode: 'DIRECT', ticker, screeningContext: null });
+  } catch (error) {
+    showLaunchError(error?.message || String(error));
+  }
 }
 
 function findScreeningStock(ticker) {
