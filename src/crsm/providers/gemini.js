@@ -13,9 +13,15 @@ export async function generateGemini({ prompt, systemInstruction, model, apiKey,
   };
 
   if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
-  if (structuredOutput) {
+
+  // Gemini does not allow responseMimeType=application/json together with
+  // Google Search grounding/tool use. Nodes still validate/parse the JSON in
+  // the CRSM layer, so when web grounding is enabled we deliberately let the
+  // model return plain text JSON instead of asking the API for JSON MIME mode.
+  if (structuredOutput && !webGrounding) {
     body.generationConfig.responseMimeType = 'application/json';
   }
+
   if (webGrounding) {
     body.tools = [{ googleSearch: {} }];
   }
