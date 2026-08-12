@@ -123,81 +123,41 @@
   border-bottom: 1px solid #edf0f5;
 }
 
-.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line:last-child {
-  border-bottom: 0;
-}
-
-.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line strong {
-  flex: 0 0 auto;
-  min-width: 48px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #f1f5f9;
-  text-align: center;
-  font-size: 12px;
-}
-
+.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line:last-child { border-bottom: 0; }
+.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.main > section.grid > .grid.two > .panel:nth-child(2) .stock-line strong { flex: 0 0 auto; min-width: 48px; padding: 4px 9px; border-radius: 999px; background: #f1f5f9; text-align: center; font-size: 12px; }
 .main .crsm-link[data-detail] { display: none; }
 
+/* CRSM report workspace */
+.reports-page { display: grid; gap: 18px; }
+.reports-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 8px 2px 0; }
+.reports-head h1 { margin: 4px 0; font-size: 28px; letter-spacing: -.02em; }
+.report-dot { color: #22c55e; font-size: 8px; margin-left: 4px; vertical-align: middle; }
+.report-tabs { display: inline-flex; gap: 4px; align-self: flex-start; padding: 4px; background: #eef2f7; border: 1px solid var(--line); border-radius: 12px; width: fit-content; }
+.report-tab { appearance: none; border: 0; background: transparent; color: #64748b; font-weight: 800; font-size: 12px; padding: 9px 18px; border-radius: 9px; cursor: pointer; }
+.report-tab.active { background: #fff; color: var(--blue); box-shadow: 0 2px 10px rgba(23,32,51,.08); }
+.report-paper { min-height: 70vh; background: #dfe4eb; border: 1px solid #cfd6df; border-radius: 16px; padding: 22px; box-shadow: inset 0 1px 0 rgba(255,255,255,.7); }
+.crsm-report-frame { display:block; width:100%; min-height:78vh; border:0; border-radius: 8px; background:#fff; box-shadow:0 18px 45px rgba(23,32,51,.12); }
+
 @media (min-width: 1150px) {
-  .main > section.grid > .grid.two > .panel:first-child {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px 10px;
-  }
-
-  .main > section.grid > .grid.two > .panel:first-child .title-row {
-    grid-column: 1 / -1;
-  }
-
-  .main > section.grid > .grid.two > .panel:first-child .stock-line {
-    margin: 0;
-  }
+  .main > section.grid > .grid.two > .panel:first-child { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 10px; }
+  .main > section.grid > .grid.two > .panel:first-child .title-row { grid-column: 1 / -1; }
+  .main > section.grid > .grid.two > .panel:first-child .stock-line { margin: 0; }
 }
 
 @media (max-width: 900px) {
-  .main > section.grid > .grid.metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .main > section.grid > .grid.two {
-    grid-template-columns: 1fr;
-  }
+  .main > section.grid > .grid.metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main > section.grid > .grid.two { grid-template-columns: 1fr; }
+  .reports-head { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 600px) {
-  .main > section.grid {
-    gap: 14px;
-  }
-
-  .main > section.grid > .grid.metrics {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .main > section.grid > .grid.metrics > * {
-    min-height: 92px;
-    padding: 15px;
-  }
-
-  .main > section.grid > .grid.two > .panel {
-    padding: 16px;
-    border-radius: 14px;
-  }
-
-  .main > section.grid > .grid.two > .panel:first-child .stock-line {
-    min-height: 72px;
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    padding: 11px 12px;
-  }
-
-  .main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type strong {
-    font-size: 18px;
-  }
+  .main > section.grid { gap: 14px; }
+  .main > section.grid > .grid.metrics { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .main > section.grid > .grid.metrics > * { min-height: 92px; padding: 15px; }
+  .main > section.grid > .grid.two > .panel { padding: 16px; border-radius: 14px; }
+  .main > section.grid > .grid.two > .panel:first-child .stock-line { min-height: 72px; grid-template-columns: 30px minmax(0,1fr) auto; padding: 11px 12px; }
+  .main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type strong { font-size: 18px; }
+  .report-paper { padding: 8px; border-radius: 12px; }
+  .crsm-report-frame { min-height: 84vh; }
 }
