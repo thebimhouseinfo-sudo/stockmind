@@ -1,6 +1,7 @@
 import { crsmState, resetState, notifyCRSM } from './state.js';
 import { runPipeline } from './pipeline.js';
-import { cacheGet, cacheSet, cacheKey } from './cache.js';
+import { cacheGet, cacheSet } from './cache.js';
+import { loadSettings } from './settings.js';
 
 export async function runCRSM({ mode, ticker, screeningContext = null, startFrom = 'node1', existingOutputs = null, bypassCache = false, onProgress, onError, onComplete } = {}) {
   const validMode = mode === 'SCREENED' || mode === 'DIRECT';
@@ -12,6 +13,8 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
   if (!ticker) throw new Error('Thiếu ticker.');
 
   const isRetry = startFrom !== 'node1';
+  const settings = loadSettings();
+  const executionMode = settings.crsm.executionMode === 'parallel' ? 'parallel' : 'sequential';
 
   if (!isRetry && !bypassCache) {
     const cached = cacheGet({ mode, ticker });
@@ -31,6 +34,8 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
     });
   }
   crsmState.logRows.push(isRetry ? `↻ retry từ node ${startFrom}` : `▶ bắt đầu run ${mode}`);
+  crsmState.logRows.push(`⚙ execution: ${executionMode}`);
+  notifyCRSM();
 
   let result;
   try {
@@ -40,6 +45,7 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
       mode,
       startFrom,
       existingOutputs: crsmState.nodeOutputs,
+      executionMode,
       onNodeStart: nodeId => {
         crsmState.currentNode = nodeId;
         crsmState.nodeStatus = { ...crsmState.nodeStatus, [nodeId]: 'running' };
@@ -67,11 +73,13 @@ export async function runCRSM({ mode, ticker, screeningContext = null, startFrom
   } catch (error) {
     crsmState.isRunning = false;
     crsmState.error = { node: null, message: String(error?.message || error) };
+    crsmState.logRows.push(`✖ pipeline failed: ${error?.message || error}`);
     notifyCRSM();
     return { mode, ticker, failedNode: null, error };
   }
 
   crsmState.isRunning = false;
+  crsmState.currentNode = null;
   crsmState.finalReport = crsmState.nodeOutputs.node6a || null;
   crsmState.completedAt = new Date().toISOString();
 
