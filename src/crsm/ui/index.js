@@ -10,9 +10,8 @@ import { totalUsage } from '../usage.js';
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
   return `<section class="grid">
-    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div>
-      <div class="actions"><button class="btn" id="crsmBack">← Quay lại ranking</button><button class="btn" id="crsmOpenSettings">⚙ Settings</button></div></div>
-    ${!crsmState.mode || crsmState.mode === 'DIRECT' ? renderDirectEntry() : ''}
+    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div><div class="actions"><button class="btn" id="crsmBack">← Quay lại ranking</button><button class="btn" id="crsmOpenSettings">⚙ Settings</button></div></div>
+    ${renderDirectEntry()}
     <div id="crsmDynamic">${renderDynamicContent()}</div>
     <div id="crsmSettingsRegion"></div>
     <div id="crsmReportRegion">${report ? renderReport(report) : ''}</div>
@@ -28,7 +27,7 @@ function renderSourceBadge() {
 
 export function renderDynamicContent() {
   const hasScreening = crsmState.mode === 'SCREENED' && crsmState.screeningContext;
-  return `${hasScreening ? renderSnapshot() : ''}${renderProgress()}${renderStatusBadge()}` + renderCostStrip() + renderError();
+  return `${hasScreening ? renderSnapshot() : ''}${renderProgress()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
 }
 
 function renderCostStrip() {
@@ -72,11 +71,8 @@ export function bindReportEvents() {
   const downloadBtn = document.getElementById('crsmDownloadHtml');
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
   if (downloadBtn && report) downloadBtn.addEventListener('click', () => {
-    const blob = new Blob([report], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a'); link.href = url;
-    link.download = `CRSM_${crsmState.ticker}_${new Date().toISOString().slice(0, 10)}.html`;
-    link.click(); URL.revokeObjectURL(url);
+    const blob = new Blob([report], { type: 'text/html' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url;
+    link.download = `CRSM_${crsmState.ticker}_${new Date().toISOString().slice(0, 10)}.html`; link.click(); URL.revokeObjectURL(url);
   });
 }
 
