@@ -1,0 +1,651 @@
+<script type="text/babel">
+  /**
+   * AnalysisPage – Stock Mind HFOS v5.4 (Fixed Radar Chart Clipping)
+   */
+  const { useRef, useEffect, useMemo } = React;
+
+  /* ─────────────────────────────────────────
+     RADAR CHART — Đã sửa lỗi cắt nhãn & xuất ảnh
+  ───────────────────────────────────────── */
+  const RadarChart = ({ stock, f2 }) => {
+    // Tăng kích thước tổng thể để có chỗ cho nhãn chữ (padding)
+    const size = 360; 
+    const cx = size / 2, cy = size / 2;
+    const R = 100; // Bán kính lưới vẫn giữ nguyên để biểu đồ không bị quá to
+    const levels = 4;
+
+    const axes = [
+      { label: 'ROE',        max: 0.4,  val: parseFloat(stock.ROE        || 0) },
+      { label: 'ROIC',       max: 0.4,  val: parseFloat(stock.ROIC       || 0) },
+      { label: 'Momentum',   max: 1,    val: parseFloat(stock.MOMENTUM   || 0) },
+      { label: 'Mispricing', max: 1,    val: parseFloat(stock.MISPRICING || 0) },
+      { label: 'Micro',      max: 20,   val: parseFloat(stock.MICRO      || 0) },
+      { label: 'Rev Growth', max: 0.5,  val: parseFloat(stock.REVGROWTH  || 0) },
+    ];
+
+    const n = axes.length;
+    const step = (2 * Math.PI) / n;
+    
+    // Hàm tính tọa độ
+    const toXY = (angle, r) => ({
+      x: cx + r * Math.cos(angle - Math.PI / 2),
+      y: cy + r * Math.sin(angle - Math.PI / 2),
+    });
+
+    // Vẽ lưới nền
+    const gridPolygons = Array.from({ length: levels }, (_, l) => {
+      const r = (R / levels) * (l + 1);
+      return axes.map((_, i) => { const p = toXY(step * i, r); return `${p.x},${p.y}`; }).join(' ');
+    });
+
+    // Vẽ dữ liệu
+    const dataPts = axes.map((ax, i) => {
+      const pct = Math.max(0, Math.min(1, ax.val / ax.max));
+      const p = toXY(step * i, R * pct);
+      return `${p.x},${p.y}`;
+    });
+
+    // Tính toán vị trí nhãn và điểm trục
+    const axisData = axes.map((ax, i) => {
+      const end = toXY(step * i, R + 10);      // Điểm cuối của đường trục
+      const lab = toXY(step * i, R + 45);      // Vị trí chữ (đẩy xa ra hơn để không bị cắt)
+      const pct = Math.max(0, Math.min(1, ax.val / ax.max));
+      const dot = toXY(step * i, R * pct);     // Điểm dữ liệu
+      return { end, lab, dot, name: ax.label };
+    });
+
+    return (
+      // overflow="visible" đảm bảo không bị cắt bởi container cha
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} style={{ maxWidth: '100%', display: 'block', margin: '0 auto', overflow: 'visible' }}>
+        {/* Lưới nền */}
+        {gridPolygons.map((pts, i) => (
+          <polygon key={i} points={pts} fill={i === levels - 1 ? 'rgba(79,70,229,0.05)' : 'none'} stroke="#e2e8f0" strokeWidth="1.5" />
+        ))}
+        
+        {/* Trục */}
+        {axisData.map((a, i) => (
+          <line key={i} x1={cx} y1={cy} x2={a.end.x} y2={a.end.y} stroke="#e2e8f0" strokeWidth="1.5" />
+        ))}
+        
+        {/* Vùng dữ liệu */}
+        <polygon points={dataPts.join(' ')} fill="rgba(79,70,229,0.2)" stroke="#4f46e5" strokeWidth="2.5" strokeLinejoin="round" />
+        
+        {/* Điểm dữ liệu */}
+        {axisData.map((a, i) => (
+          <circle key={i} cx={a.dot.x} cy={a.dot.y} r="5" fill="#4f46e5" stroke="white" strokeWidth="2" />
+        ))}
+        
+        {/* Nhãn chữ */}
+        {axisData.map((a, i) => (
+          <text key={i} x={a.lab.x} y={a.lab.y} textAnchor="middle" dominantBaseline="middle" fontSize="13" fontWeight="700" fontFamily="'Space Grotesk',sans-serif" fill="#64748b">
+            {a.name}
+          </text>
+        ))}
+      </svg>
+    );
+  };
+
+  /* ─────────────────────────────────────────
+     BAR CHART
+  ───────────────────────────────────────── */
+  const BarChart = ({ stock, allData, f2 }) => {
+    const metrics = [
+      { key: 'ROE',      label: 'ROE',  factor: 100, fmt: v => `${f2(v)}%` },
+      { key: 'ROIC',     label: 'ROIC', factor: 100, fmt: v => `${f2(v)}%` },
+      { key: 'PE',       label: 'P/E',  factor: 1,   fmt: v => f2(v)        },
+      { key: 'DEBT',     label: 'D/E',  factor: 1,   fmt: v => f2(v)        },
+      { key: 'MOMENTUM', label: 'Mom',  factor: 1,   fmt: v => f2(v)        },
+    ];
+
+    const STOCK_COLOR = '#4f46e5';
+    const INDUSTRY_COLOR = '#c7d2fe';
+    const TEXT_COLOR = '#334155';
+
+    const industryAvg = useMemo(() => {
+      if (!allData || !allData.length) return null;
+      const peers = allData.filter(s => s.INDUSTRY === stock.INDUSTRY && s.TICKER !== stock.TICKER);
+      if (!peers.length) return null;
+      const avg = {};
+      metrics.forEach(m => {
+        const vals = peers.map(s => parseFloat(s[m.key] || 0) * m.factor).filter(v => isFinite(v));
+        avg[m.key] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+      });
+      return avg;
+    }, [allData, stock.INDUSTRY, stock.TICKER]);
+
+    const chartH = 180;
+    const barW = 32;
+    const pairGap = 8;
+    const groupGap = 30;
+    const groupW = industryAvg ? barW * 2 + pairGap : barW;
+    const padL = 50, padT = 10, padB = 50;
+
+    const allVals = metrics.flatMap(m => {
+      const v = parseFloat(stock[m.key] || 0) * m.factor;
+      const a = industryAvg ? (industryAvg[m.key] || 0) : 0;
+      return [v, a];
+    }).filter(v => isFinite(v) && v > 0);
+    
+    const maxVal = allVals.length > 0 ? Math.max(...allVals, 1) : 1;
+
+    const svgW = padL + metrics.length * (groupW + groupGap) - groupGap + 20;
+    const svgH = chartH + padT + padB;
+    const yTicks = [0, 0.25, 0.5, 0.75, 1];
+
+    return (
+      <div style={{ overflowX: 'auto' }}>
+        <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH} style={{ minWidth: 350, maxWidth: '100%' }}>
+          {yTicks.map((t, i) => {
+            const y = padT + chartH - t * chartH;
+            return (
+              <g key={i}>
+                <line x1={padL} y1={y} x2={svgW - 10} y2={y} stroke="#f1f5f9" strokeWidth="1.5" />
+                <text x={padL - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#94a3b8" fontFamily="'JetBrains Mono',monospace">
+                  {(t * maxVal).toFixed(t === 0 ? 0 : 1)}
+                </text>
+              </g>
+            );
+          })}
+
+          {metrics.map((m, mi) => {
+            const x0 = padL + mi * (groupW + groupGap);
+            const val = parseFloat(stock[m.key] || 0) * m.factor;
+            const valH = Math.max(3, (Math.min(Math.max(val, 0), maxVal) / maxVal) * chartH);
+            const barX = x0 + (industryAvg ? 0 : (groupW - barW) / 2);
+            
+            const avgVal = industryAvg ? (industryAvg[m.key] || 0) : 0;
+            const avgH = Math.max(3, (Math.min(Math.max(avgVal, 0), maxVal) / maxVal) * chartH);
+
+            return (
+              <g key={mi}>
+                <rect x={barX} y={padT + chartH - valH} width={barW} height={valH} rx="6" fill={STOCK_COLOR} />
+                {industryAvg && (
+                  <rect x={barX + barW + pairGap} y={padT + chartH - avgH} width={barW} height={avgH} rx="6" fill={INDUSTRY_COLOR} />
+                )}
+                <text x={barX + barW / 2} y={padT + chartH - valH - 6} textAnchor="middle" fontSize="11" fontWeight="800" fill={TEXT_COLOR} fontFamily="'JetBrains Mono',monospace">
+                  {m.fmt(val)}
+                </text>
+                <text x={x0 + groupW / 2} y={padT + chartH + 20} textAnchor="middle" fontSize="12" fontWeight="700" fill="#475569" fontFamily="'Space Grotesk',sans-serif">
+                  {m.label}
+                </text>
+              </g>
+            );
+          })}
+          
+          <line x1={padL} y1={padT + chartH} x2={svgW - 10} y2={padT + chartH} stroke="#cbd5e1" strokeWidth="2" />
+          
+          {industryAvg && (
+            <g transform={`translate(${padL}, ${padT + chartH + 35})`}>
+              <rect width="12" height="12" rx="3" fill={STOCK_COLOR} />
+              <text x="18" y="10" fontSize="11" fontWeight="700" fill="#475569" fontFamily="'Space Grotesk',sans-serif">{stock.TICKER}</text>
+              <rect x="80" width="12" height="12" rx="3" fill={INDUSTRY_COLOR} />
+              <text x="98" y="10" fontSize="11" fontWeight="700" fill="#475569" fontFamily="'Space Grotesk',sans-serif">TB Ngành</text>
+            </g>
+          )}
+        </svg>
+      </div>
+    );
+  };
+
+  /* ─────────────────────────────────────────
+     SCORE GAUGE
+  ───────────────────────────────────────── */
+  const ScoreGauge = ({ score, maxScore = 30 }) => {
+    const pct = Math.min(Math.max(score / maxScore, 0), 1);
+    const r = 45, cx = 75, cy = 60; 
+    const start = Math.PI * 0.75;
+    const end = Math.PI * 2.25;
+    const arc = end - start;
+    const toXY = a => ({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+    const path = (from, to) => {
+      const s = toXY(from), e = toXY(to);
+      const lg = to - from > Math.PI ? 1 : 0;
+      return `M ${s.x} ${s.y} A ${r} ${r} 0 ${lg} 1 ${e.x} ${e.y}`;
+    };
+    const color = pct > 0.66 ? '#10b981' : pct > 0.33 ? '#f59e0b' : '#ef4444';
+
+    return (
+      <svg viewBox="0 0 150 100" width="150" height="100" style={{overflow: 'visible', maxWidth: '100%'}}>
+        <path d={path(start, end)} fill="none" stroke="#f1f5f9" strokeWidth="12" strokeLinecap="round" />
+        <path d={path(start, start + arc * pct)} fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" />
+        <text x={cx} y={cy} textAnchor="middle" fontSize="24" fontWeight="900" fill={color} fontFamily="'JetBrains Mono',monospace" dominantBaseline="middle">
+          {score > 0 ? score.toFixed(1) : '—'}
+        </text>
+        <text x={cx} y={cy + 18} textAnchor="middle" fontSize="10" fontWeight="700" fill="#94a3b8" fontFamily="'Space Grotesk',sans-serif" letterSpacing="0.5">
+          / {maxScore} SCORE
+        </text>
+      </svg>
+    );
+  };
+
+  /* ─────────────────────────────────────────
+     MAIN PAGE
+  ───────────────────────────────────────── */
+  const AnalysisPage = ({ stock, onBack, aiContent, loadingAI, error, f2, Icon, modelName, allData }) => {
+    const reportRef = useRef(null);
+
+    useEffect(() => {
+      if (!window.html2canvas) {
+        const s = document.createElement('script');
+        s.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        s.async = true;
+        document.body.appendChild(s);
+      }
+    }, []);
+
+    const handleDownload = async () => {
+      if (!window.html2canvas || !reportRef.current) return;
+      try {
+        const canvas = await window.html2canvas(reportRef.current, {
+          scale: 3, 
+          useCORS: true,
+          backgroundColor: '#f8fafc',
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: reportRef.current.offsetWidth,
+          windowHeight: reportRef.current.offsetHeight,
+          logging: false,
+          imageTimeout: 0
+        });
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `StockMind_${stock.TICKER}_Report.png`;
+        a.click();
+      } catch (e) { console.error(e); }
+    };
+
+    const ai = aiContent || {};
+
+    const engine = useMemo(() => {
+      const bs = (stock.ROIC > 0.2 ? 3 : stock.ROIC > 0.1 ? 2 : 1) + (stock.REVGROWTH > 0.1 ? 3 : stock.REVGROWTH > 0 ? 2 : 1) + 1;
+      const fs = (stock.ROE > 0.2 ? 3 : stock.ROE > 0.1 ? 2 : 1) + (stock.DEBT < 0.5 ? 3 : stock.DEBT < 1 ? 2 : 1) + (stock.PE < 20 ? 2 : stock.PE < 35 ? 1 : 0);
+      const ms = (stock.MOMENTUM > 0.2 ? 3 : stock.MOMENTUM > 0 ? 2 : 1) + (stock.RET3M > 0 ? 2 : 1) + (stock.RET6M > stock.RET3M ? 2 : 1);
+      const mp = stock.MISPRICING > 0.5 ? 3 : stock.MISPRICING > 0 ? 2 : 1;
+      const as = (ai.risk_notes || '').toLowerCase().includes('thấp') ? 7 : 5;
+      const b  = v => (v >= 6 ? 'TÍCH CỰC' : v >= 4 ? 'TRUNG LẬP' : 'TIÊU CỰC');
+      return {
+        business:   { score: bs, bias: b(bs) },
+        financial:  { score: fs, bias: b(fs) },
+        momentum:   { score: ms, bias: b(ms) },
+        mispricing: { score: mp, bias: mp >= 2 ? 'TÍCH CỰC' : 'TIÊU CỰC' },
+        ai:         { score: as, bias: b(as) },
+      };
+    }, [stock, ai]);
+
+    const valData = useMemo(() => {
+      const price = parseFloat(stock.PRICE || 0);
+      const score = parseFloat(stock.FINALSCORE || 0);
+      const roe = parseFloat(stock.ROE || 0);
+      const fair = price * (1 + score / 30) * 0.6 + price * (roe > 0.15 ? 1.25 : 1.05) * 0.4;
+      return { fair: Math.round(fair), upside: ((fair / price) - 1) * 100, pb: stock.PE * stock.ROE };
+    }, [stock]);
+
+    const isHC = stock.FINALSCORE > 10;
+
+    return (
+      <div id="analysis-page-root" className="min-h-screen bg-slate-50 view-transition">
+        <style dangerouslySetInnerHTML={{__html:`
+          #analysis-page-root { position: relative; overflow: hidden; }
+          .ap-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:20px; box-shadow:0 2px 12px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.03); }
+          .ap-card-blue  { border-top:4px solid #4f46e5; }
+          .ap-section-tag {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:4px 12px; background:#eef2ff; color:#4338ca;
+            border-radius:999px; font-size:12px; font-weight:800;
+            text-transform:uppercase; letter-spacing:.05em; font-family:'Space Grotesk',sans-serif;
+          }
+          .eng-pos { background:#f0fdf4; border-color:#bbf7d0; }
+          .eng-neu { background:#f8fafc; border-color:#e2e8f0; }
+          .eng-neg { background:#fff1f2; border-color:#fecdd3; }
+          .badge-pos { background:#22c55e; color:#fff; }
+          .badge-neu { background:#94a3b8; color:#fff; }
+          .badge-neg { background:#ef4444; color:#fff; }
+          .eng-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+          .mchip { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px; }
+          .pb-row { display:flex; gap:18px; padding:20px 0; border-bottom:1px solid #f1f5f9; }
+          .pb-row:last-child { border-bottom:none; }
+          .pb-row:hover { background:#fafbff; border-radius:12px; padding-left:10px; padding-right:10px; margin:0 -10px; }
+          .pb-num {
+            flex-shrink:0; width:30px; height:30px; border-radius:50%;
+            background:#f8fafc; border:1.5px solid #e2e8f0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:11px; font-weight:800; color:#94a3b8;
+            font-family:'JetBrains Mono',monospace; transition:all .2s;
+          }
+          .pb-row:hover .pb-num { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+          .ex-card { border-radius:16px; padding:16px; border:1.5px solid; }
+          .ly-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:18px; padding:20px; transition:box-shadow .2s,border-color .2s; }
+          .ly-card:hover { box-shadow:0 6px 20px rgba(79,70,229,.08); border-color:#c7d2fe; }
+          .sc-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:18px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.03); }
+        `}} />
+
+        <nav className="sticky top-0 z-40 glass-nav border-b border-slate-100 px-6 py-4 bg-white/80 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={onBack} className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-bold text-sm uppercase tracking-wide transition-all">
+                <Icon name="chevron-left" className="w-5 h-5" /> Danh sách
+              </button>
+              <div className="h-5 w-px bg-slate-200" />
+              <button onClick={handleDownload} className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-bold text-sm uppercase tracking-wide transition-all">
+                <Icon name="download" className="w-4 h-4" /> Xuất ảnh HD
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <main ref={reportRef} className="max-w-7xl mx-auto p-8 md:p-12 space-y-10 bg-slate-50">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* SCORE GAUGE CARD */}
+            <div className="lg:col-span-3 ap-card ap-card-blue flex flex-col items-center p-8 gap-6">
+              <div className="text-center w-full">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{stock.INDUSTRY}</p>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{stock.TICKER}</h2>
+                <div className={`inline-block px-4 py-1.5 mt-3 rounded-full text-xs font-black uppercase tracking-widest ${isHC ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-slate-100 text-slate-500'}`}>
+                  {isHC ? '★ High Conviction' : 'Watch List'}
+                </div>
+              </div>
+
+              <div className="w-full flex justify-center py-2">
+                 <ScoreGauge score={parseFloat(stock.FINALSCORE || 0)} maxScore={30} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="mchip flex flex-col items-center justify-center p-4">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Rank</span>
+                  <span className="text-2xl font-black font-mono-custom text-slate-800">#{stock.RANK || '—'}</span>
+                </div>
+                <div className="mchip flex flex-col items-center justify-center p-4">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Grade</span>
+                  <span className={`text-2xl font-black font-mono-custom ${parseInt(stock.GRADE) >= 900 ? 'text-emerald-600' : 'text-slate-800'}`}>{stock.GRADE || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* TRADE PLAN CARD */}
+            <div className="lg:col-span-5 ap-card p-8 flex flex-col gap-6">
+              <span className="ap-section-tag"><Icon name="zap" className="w-4 h-4" />Trade Strategy</span>
+              <blockquote className="text-base font-medium text-slate-700 italic leading-relaxed flex-1 border-l-4 border-indigo-200 pl-6 bg-slate-50/50 p-4 rounded-r-xl">
+                "{ai.trade_plan?.summary || 'Đang tổng hợp chiến lược giao dịch tối ưu...'}"
+              </blockquote>
+              <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+                <div>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Confidence</p>
+                  <div className="flex items-baseline gap-1">
+                    <p className="text-5xl font-black text-indigo-600 font-mono-custom tracking-tighter leading-none">
+                      {ai.trade_plan?.confidence || '—'}
+                    </p>
+                    <span className="text-2xl text-indigo-400 font-bold">%</span>
+                  </div>
+                </div>
+                <Icon name="trending-up" className="w-16 h-16 text-indigo-50 opacity-50" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Vùng mua',  val: ai.trade_plan?.entry,          cls: 'bg-slate-50 border-slate-200 text-slate-800' },
+                  { label: 'Chốt lời', val: ai.trade_plan?.take_profit,    cls: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                  { label: 'Cắt lỗ',   val: ai.trade_plan?.stop_loss,      cls: 'bg-rose-50 border-rose-200 text-rose-700' },
+                  { label: 'Tỷ trọng',  val: ai.trade_plan?.position_size,   cls: 'bg-indigo-50 border-indigo-200 text-indigo-700' },
+                ].map((item, i) => (
+                  <div key={i} className={`rounded-xl p-4 border-2 flex flex-col gap-1.5 ${item.cls}`}>
+                    <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{item.label}</span>
+                    <span className="text-lg font-black font-mono-custom">{item.val || 'TBD'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* KEY METRICS CARD */}
+            <div className="lg:col-span-4 ap-card p-8">
+              <span className="ap-section-tag mb-6 block"><Icon name="bar-chart" className="w-4 h-4" />Chỉ số chính</span>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Giá',        val: Number(stock.PRICE).toLocaleString('vi-VN'),   cls: 'text-slate-900' },
+                  { label: 'P/E',        val: f2(stock.PE),                                cls: 'text-amber-600' },
+                  { label: 'ROE',        val: `${f2(stock.ROE * 100)}%`,                 cls: 'text-blue-600' },
+                  { label: 'ROIC',       val: `${f2(stock.ROIC * 100)}%`,                 cls: 'text-indigo-600' },
+                  { label: 'D/E Ratio',  val: f2(stock.DEBT),                               cls: parseFloat(stock.DEBT) < 1 ? 'text-emerald-600' : 'text-rose-600' },
+                  { label: 'Rev Growth', val: `${f2(stock.REVGROWTH * 100)}%`,            cls: parseFloat(stock.REVGROWTH) > 0 ? 'text-emerald-600' : 'text-rose-600' },
+                  { label: 'Momentum',   val: f2(stock.MOMENTUM),                         cls: 'text-orange-500' },
+                  { label: 'Avg Vol',    val: Number(stock.AVGVOL).toLocaleString('vi-VN'),  cls: 'text-slate-500' },
+                ].map((m, i) => (
+                  <div key={i} className="mchip">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide block mb-1">{m.label}</span>
+                    <span className={`text-xl font-black font-mono-custom ${m.cls}`}>{m.val || '—'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ENGINE BLOCKS */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+            {[
+              { title: 'Kinh doanh',   d: engine.business,   icon: 'briefcase' },
+              { title: 'Tài chính',    d: engine.financial,  icon: 'shield-check' },
+              { title: 'Momentum',     d: engine.momentum,   icon: 'zap' },
+              { title: 'Định giá sai', d: engine.mispricing, icon: 'target' },
+              { title: 'Lớp AI',       d: engine.ai,         icon: 'cpu' },
+            ].map((e, i) => <EngineBlock key={i} title={e.title} data={e.d} icon={e.icon} Icon={Icon} />)}
+          </div>
+
+          {/* ROW 2: Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-5 ap-card p-8">
+              <span className="ap-section-tag mb-6 block"><Icon name="hexagon" className="w-4 h-4" />Radar Đa chiều</span>
+              <RadarChart stock={stock} f2={f2} />
+            </div>
+            <div className="lg:col-span-7 ap-card p-8">
+              <div className="flex items-center justify-between mb-6">
+                <span className="ap-section-tag"><Icon name="bar-chart-2" className="w-4 h-4" />So sánh ngành</span>
+                <span className="text-sm font-bold text-slate-400 uppercase">{stock.INDUSTRY}</span>
+              </div>
+              <BarChart stock={stock} allData={allData} f2={f2} />
+            </div>
+          </div>
+
+          {/* INSTITUTIONAL RESEARCH */}
+          <div className="space-y-6">
+            <SecTitle icon="layers" label="Institutional Research" title="Nghiên cứu định chế" Icon={Icon} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { title: 'Macro Layer',    sub: 'Vĩ mô & Hệ quả',   data: ai.macro_layer,            icon: 'globe',   t: 'blue' },
+                { title: 'Industry Layer', sub: 'Chu kỳ & Cạnh tranh', data: ai.industry_layer,         icon: 'factory', t: 'purple' },
+                { title: 'Equity Quality', sub: 'Nội tại & Tăng trưởng', data: ai.equity_layer,       icon: 'briefcase', t: 'emerald' },
+                { title: 'Trading Intel',  sub: 'Smart Money Flow',   data: ai.trading_intelligence, icon: 'waves',   t: 'indigo' },
+              ].map((c, i) => <LayerCard key={i} {...c} Icon={Icon} />)}
+            </div>
+          </div>
+
+          {/* PLAYBOOK */}
+          <div className="space-y-6">
+            <SecTitle icon="book-open" label="Investment Playbook" title="Chiến lược đầu tư" Icon={Icon} />
+            <div className="ap-card px-10 py-8">
+              {[
+                { n: '1', q: 'Business: Công ty làm gì?',               a: ai.business },
+                { n: '2', q: 'Thesis: Vì sao mua? Market sai ở đâu?',   a: ai.thesis },
+                { n: '3', q: 'Micro: ROIC, Growth ổn?',                 a: ai.micro },
+                { n: '4', q: 'Mispricing: Panic hay Trap?',              a: ai.mispricing },
+                { n: '5', q: 'Momentum: Có outperform ngành không?',    a: ai.momentum },
+                { n: '6', q: 'Risk: Điều gì làm bạn sai?',                a: ai.risk_notes, risk: true },
+              ].map((row, i) => (
+                <div key={i} className="pb-row">
+                  <div className="pb-num">{row.n}</div>
+                  <div className="flex-1">
+                    <h4 className={`text-xs font-black uppercase tracking-widest mb-2 ${row.risk ? 'text-rose-500' : 'text-slate-400'}`}>{row.q}</h4>
+                    <p className="text-base text-slate-700 leading-relaxed font-medium">{row.a || '—'}</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="pb-row" style={{ borderBottom: 'none' }}>
+                <div className="pb-num">7</div>
+                <div className="flex-1 space-y-6">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Exit: Khi nào bán?</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { label: 'Stop Loss', price: ai.exit_strategy?.stop_loss?.price, reason: ai.exit_strategy?.stop_loss?.reason, cls: 'bg-rose-50 border-rose-200', tcls: 'text-rose-600', icon: 'shield-off' },
+                      { label: 'Take Profit 1', price: ai.exit_strategy?.tp1?.price, reason: ai.exit_strategy?.tp1?.reason, cls: 'bg-emerald-50 border-emerald-200', tcls: 'text-emerald-600', icon: 'target' },
+                      { label: 'Take Profit 2', price: ai.exit_strategy?.tp2?.price, reason: ai.exit_strategy?.tp2?.reason, cls: 'bg-indigo-50 border-indigo-200', tcls: 'text-indigo-600', icon: 'flag' },
+                    ].map((ep, i) => (
+                      <div key={i} className={`ex-card ${ep.cls}`}>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className={`text-xs font-black uppercase tracking-widest ${ep.tcls}`}>{ep.label}</span>
+                          <Icon name={ep.icon} className={`w-4 h-4 ${ep.tcls} opacity-50`} />
+                        </div>
+                        <p className={`text-3xl font-black font-mono-custom tracking-tight ${ep.tcls}`}>{ep.price || '—'}</p>
+                        <p className={`text-sm font-medium leading-snug mt-2 ${ep.tcls} opacity-80`}>{ep.reason || 'Đang tính toán...'}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-4 bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                    <Icon name="file-text" className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-base text-slate-700 leading-relaxed font-medium">{ai.exit_strategy?.summary || 'Đang tổng hợp chiến lược thoát lệnh...'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* VALUATION */}
+          <div className="space-y-6">
+            <SecTitle icon="pie-chart" label="Valuation Model" title="Định giá & Kịch bản" Icon={Icon} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { type: 'BULL', data: ai.scenarios?.bull, icon: 'trending-up',   borderC: '#10b981', tc: 'text-emerald-600', bg: 'bg-emerald-50' },
+                { type: 'BASE', data: ai.scenarios?.base, icon: 'minus',          borderC: '#4f46e5', tc: 'text-indigo-600',  bg: 'bg-indigo-50'   },
+                { type: 'BEAR', data: ai.scenarios?.bear, icon: 'trending-down', borderC: '#ef4444', tc: 'text-rose-600',    bg: 'bg-rose-50'    },
+              ].map((s, i) => (
+                <div key={i} className="sc-card flex flex-col justify-between" style={{ borderTop: `4px solid ${s.borderC}` }}>
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest ${s.tc}`}>
+                        <Icon name={s.icon} className="w-4 h-4" />{s.type}
+                      </span>
+                      <span className={`text-xs font-black px-3 py-1 rounded-full ${s.bg} ${s.tc}`}>{s.data?.prob || '—'}</span>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium mb-6 min-h-[60px]">{s.data?.notes || 'Đang phân tích...'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Target Price</p>
+                    <p className="text-3xl font-black font-mono-custom tracking-tight text-slate-900">{s.data?.target || 'TBD'}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="rounded-2xl p-8 flex flex-col justify-between text-white" style={{ background: 'linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)', boxShadow: '0 10px 30px rgba(79,70,229,.3)' }}>
+                <div>
+                  <p className="text-xs font-black text-white/70 uppercase tracking-widest mb-3">Fair Value Est.</p>
+                  <p className="text-5xl font-black font-mono-custom tracking-tighter leading-none mb-2">{valData.fair.toLocaleString('vi-VN')}</p>
+                  <p className="text-lg font-bold text-emerald-300 flex items-center gap-2">
+                    <Icon name="trending-up" className="w-5 h-5" /> {f2(valData.upside)}% Upside
+                  </p>
+                </div>
+                <div className="pt-6 mt-6 border-t border-white/20 flex justify-between text-xs">
+                  <div>
+                    <p className="text-white/60 font-bold uppercase mb-1">P/E</p>
+                    <p className="font-black font-mono-custom text-xl">{f2(stock.PE)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white/60 font-bold uppercase mb-1">P/B</p>
+                    <p className="font-black font-mono-custom text-xl">{f2(valData.pb)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {loadingAI && (
+            <div className="flex flex-col items-center py-20">
+              <div className="relative w-12 h-12 mb-6">
+                <div className="w-12 h-12 border-4 border-slate-200 rounded-full absolute"></div>
+                <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full absolute animate-spin"></div>
+              </div>
+              <p className="text-sm font-black text-slate-400 uppercase tracking-widest">AI Analyzing {stock.TICKER}...</p>
+            </div>
+          )}
+          {error && (
+            <div className="flex items-center gap-4 bg-rose-50 border-2 border-rose-200 rounded-2xl p-6 text-rose-600">
+              <Icon name="alert-circle" className="w-6 h-6 flex-shrink-0" />
+              <p className="text-base font-bold">{error}</p>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  };
+
+  /* ─── Shared sub‑components ─── */
+  const SecTitle = ({ icon, label, title, Icon }) => (
+    <div className="flex items-center gap-4">
+      <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 flex-shrink-0">
+        <Icon name={icon} className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-1">{label}</p>
+        <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide">{title}</h3>
+      </div>
+    </div>
+  );
+
+  const EngineBlock = ({ title, data, icon, Icon }) => {
+    const map = {
+      'TÍCH CỰC': { wrap: 'eng-pos border-2', badge: 'badge-pos', bar: 'bg-emerald-500', tc: 'text-emerald-700' },
+      'TRUNG LẬP': { wrap: 'eng-neu border-2', badge: 'badge-neu', bar: 'bg-slate-400',   tc: 'text-slate-600'  },
+      'TIÊU CỰC':  { wrap: 'eng-neg border-2', badge: 'badge-neg', bar: 'bg-rose-500',    tc: 'text-rose-700'   },
+    };
+    const t = map[data.bias] || map['TRUNG LẬP'];
+    const pct = Math.min((data.score / 10) * 100, 100);
+    return (
+      <div className={`p-6 rounded-2xl transition-all hover:shadow-md ${t.wrap}`}>
+        <div className="flex justify-between items-start mb-4">
+          <div className="p-2 bg-white rounded-lg shadow-sm">
+            <Icon name={icon} className={`w-5 h-5 ${t.tc}`} />
+          </div>
+          <span className={`eng-badge ${t.badge}`}>{data.bias}</span>
+        </div>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">{title}</p>
+        <div className="flex items-end gap-2 mb-3">
+            <p className={`text-3xl font-black font-mono-custom tracking-tighter leading-none ${t.tc}`}>
+            {data.score}
+            </p>
+            <span className="text-sm text-slate-300 font-bold mb-1">/10</span>
+        </div>
+        <div className="w-full bg-white/80 h-2 rounded-full overflow-hidden">
+          <div className={`h-full rounded-full ${t.bar} transition-all duration-700`} style={{ width: `${pct}%` }}></div>
+        </div>
+      </div>
+    );
+  };
+
+  const LayerCard = ({ title, sub, data, icon, t, Icon }) => {
+    const themes = {
+      blue:    { ico: 'text-blue-600 bg-blue-50',      dot: 'bg-blue-500'    },
+      purple:  { ico: 'text-purple-600 bg-purple-50',  dot: 'bg-purple-500'  },
+      emerald: { ico: 'text-emerald-600 bg-emerald-50',dot: 'bg-emerald-500' },
+      indigo:  { ico: 'text-indigo-600 bg-indigo-50',  dot: 'bg-indigo-500'  },
+    };
+    const th = themes[t] || {};
+    let tag = null, content = 'Đang xử lý...';
+    if (data) {
+      const e = Object.entries(data);
+      if (e.length) { tag = e[0][1]; content = e.slice(1).map(x => x[1]).filter(Boolean).join(' '); }
+    }
+    return (
+      <div className="ly-card">
+        <div className="flex items-start gap-4 mb-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${th.ico}`}>
+            <Icon name={icon} className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{title}</p>
+            <p className="text-base font-black text-slate-800">{sub}</p>
+          </div>
+          {tag && <span className={`flex-shrink-0 text-[10px] font-black px-3 py-1 rounded-full text-white ${th.dot}`}>{tag}</span>}
+        </div>
+        <p className="text-base text-slate-600 leading-relaxed font-medium">{content}</p>
+      </div>
+    );
+  };
+
+  window.AnalysisPage = AnalysisPage;
+</script>

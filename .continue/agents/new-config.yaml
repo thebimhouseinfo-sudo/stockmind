@@ -1,0 +1,16 @@
+name: My Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: MiniMax-M3
+    provider: openai
+    model: minimax-m3
+    apiBase: https://ollama.com/v1
+    apiKey: 23175e389a82495c9f39295ad8731cdc.G1DZIhijWpYODIGbNdFHZONx
+
+    roles:
+      - chat
+      - edit
+      - apply
+      - autocomplete
