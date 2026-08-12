@@ -10,20 +10,8 @@ export const DEFAULT_SETTINGS = {
       gemini: {
         apiKey: null,
         models: [
-          {
-            id: 'gemini-2.5-flash',
-            displayName: 'Gemini 2.5 Flash',
-            builtin: true,
-            pricing: GEMINI_2_5_PRICING,
-            capabilities: { webGrounding: true, structuredOutput: true, reasoning: true }
-          },
-          {
-            id: 'gemini-3-flash',
-            displayName: 'Gemini 3.0 Flash',
-            builtin: true,
-            pricing: GEMINI_3_PRICING,
-            capabilities: { webGrounding: true, structuredOutput: true, reasoning: true }
-          }
+          { id: 'gemini-2.5-flash', displayName: 'Gemini 2.5 Flash', builtin: true, pricing: GEMINI_2_5_PRICING, capabilities: { webGrounding: true, structuredOutput: true, reasoning: true } },
+          { id: 'gemini-3-flash', displayName: 'Gemini 3.0 Flash', builtin: true, pricing: GEMINI_3_PRICING, capabilities: { webGrounding: true, structuredOutput: true, reasoning: true } }
         ]
       },
       openai: { apiKey: null, models: [] },
@@ -52,12 +40,31 @@ export const NODES_ALL = [...NODES_LLM, ...NODES_LOCAL];
 export function loadSettings() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    if (!raw) return clone(DEFAULT_SETTINGS);
     const parsed = JSON.parse(raw);
-    return mergeSettings(DEFAULT_SETTINGS, parsed);
+    const merged = mergeSettings(DEFAULT_SETTINGS, parsed);
+    return normalizeModelPricing(merged);
   } catch {
-    return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    return clone(DEFAULT_SETTINGS);
   }
+}
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalizeModelPricing(settings) {
+  Object.entries(DEFAULT_SETTINGS.crsm.providers).forEach(([providerId, defaultProvider]) => {
+    const provider = settings.crsm.providers[providerId];
+    if (!provider) return;
+    const defaults = new Map((defaultProvider.models || []).map(model => [model.id, model]));
+    provider.models = (provider.models || []).map(model => {
+      const fallback = defaults.get(model.id);
+      if (!fallback || model.pricing) return model;
+      return { ...model, pricing: clone(fallback.pricing) };
+    });
+  });
+  return settings;
 }
 
 export function saveSettings(settings) {
@@ -69,25 +76,17 @@ export function mergeSettings(base, override) {
   if (typeof base !== 'object' || base === null) return override ?? base;
   const out = { ...base };
   for (const key of Object.keys(base)) {
-    if (key in override) {
-      out[key] = mergeDeep(base[key], override[key]);
-    }
+    if (key in (override || {})) out[key] = mergeDeep(base[key], override[key]);
   }
   return out;
 }
 
 function mergeDeep(a, b) {
-  if (Array.isArray(a)) {
-    return b && Array.isArray(b) ? b : a;
-  }
+  if (Array.isArray(a)) return b && Array.isArray(b) ? b : a;
   if (a && typeof a === 'object') {
     const out = { ...a };
-    for (const key of Object.keys(a)) {
-      if (b && key in b) out[key] = mergeDeep(a[key], b[key]);
-    }
-    for (const key of Object.keys(b || {})) {
-      if (!(key in a)) out[key] = b[key];
-    }
+    for (const key of Object.keys(a)) if (b && key in b) out[key] = mergeDeep(a[key], b[key]);
+    for (const key of Object.keys(b || {})) if (!(key in a)) out[key] = b[key];
     return out;
   }
   return b !== undefined && b !== null ? b : a;
@@ -115,8 +114,6 @@ export function removeModel(settings, providerId, modelId) {
   if (kept.length === 0) return;
   NODES_LLM.forEach(nodeId => {
     const a = settings.crsm.nodeAssignment[nodeId];
-    if (a && a.provider === providerId && a.model === modelId) {
-      a.model = kept[0].id;
-    }
+    if (a && a.provider === providerId && a.model === modelId) a.model = kept[0].id;
   });
 }
