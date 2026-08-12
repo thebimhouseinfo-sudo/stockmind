@@ -30,7 +30,8 @@ export async function runLLM({ nodeId, prompt, systemInstruction, responseFormat
     text = result.text;
     usage = result.usage || {};
   } catch (error) {
-    const wrapped = new Error(`[${nodeId}] ${error?.message || error}`, { cause: error });
+    const detail = error?.message || String(error);
+    const wrapped = new Error(`[${nodeId}] ${resolved.provider}/${resolved.model}: ${detail}`, { cause: error });
     throw wrapped;
   }
 
