@@ -28,9 +28,14 @@ export function buildScreeningContext(stock) {
     micro_score: stock.MICRO ?? null,
     momentum_score: stock.MOMENTUM ?? null,
     mispricing_score: stock.MISPRICING ?? null,
+    data_coverage: stock.DATA_COVERAGE ?? null,
+    data_integrity: stock.DATA_INTEGRITY ?? null,
+    data_flags: Array.isArray(stock.DATA_FLAGS) ? stock.DATA_FLAGS : [],
+    data_references: stock.DATA_REFERENCES ?? {},
     metrics: {
       price: stock.PRICE ?? null,
       pe: stock.PE ?? null,
+      peg: stock.PEG ?? null,
       roe: stock.ROE ?? null,
       roic: stock.ROIC ?? null,
       revenue_growth: stock.REVGROWTH ?? null,
@@ -43,7 +48,8 @@ export function buildScreeningContext(stock) {
     },
     industry_benchmarks: {
       pe_median: stock.INDUSTRY_MEDIAN_PE ?? null,
-      roe_median: stock.INDUSTRY_MEDIAN_ROE ?? null
+      roe_median: stock.INDUSTRY_MEDIAN_ROE ?? null,
+      ...((stock.INDUSTRY_REFERENCES && typeof stock.INDUSTRY_REFERENCES === 'object') ? stock.INDUSTRY_REFERENCES : {})
     }
   };
 }
