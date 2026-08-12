@@ -1,5 +1,8 @@
 const STORAGE_KEY = 'stock-mind.crsm.settings.v1';
 
+const GEMINI_2_5_PRICING = { inputPer1M: 0.30, outputPer1M: 2.50, currency: 'USD' };
+const GEMINI_3_PRICING = { inputPer1M: 0.50, outputPer1M: 3.00, currency: 'USD' };
+
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
@@ -11,12 +14,14 @@ export const DEFAULT_SETTINGS = {
             id: 'gemini-2.5-flash',
             displayName: 'Gemini 2.5 Flash',
             builtin: true,
+            pricing: GEMINI_2_5_PRICING,
             capabilities: { webGrounding: true, structuredOutput: true, reasoning: true }
           },
           {
             id: 'gemini-3-flash',
             displayName: 'Gemini 3.0 Flash',
             builtin: true,
+            pricing: GEMINI_3_PRICING,
             capabilities: { webGrounding: true, structuredOutput: true, reasoning: true }
           }
         ]
