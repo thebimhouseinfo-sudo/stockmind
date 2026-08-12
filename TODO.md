@@ -1,46 +1,50 @@
 # Stock Mind — Implementation Checklist
 
-## Completed in this pass
+## Completed
 
 - [x] Keep CRSM as a single engine with SCREENED and DIRECT entry modes.
-- [x] Keep manual DIRECT analysis available for tickers outside the screener.
-- [x] Prepare CRSM settings as a control center instead of one long settings block.
-- [x] Add Models tab for providers, API keys and model list.
-- [x] Add Nodes tab for per-node provider/model assignment.
-- [x] Keep local Node 6A / 6B / 7 visible separately from paid LLM nodes.
-- [x] Add Usage tab with request count and input/output/total token counters.
-- [x] Add Cost tab with current-run total cost and per-node cost.
-- [x] Store input/output pricing on model definitions.
-- [x] Calculate estimated cost from actual token usage returned by the provider.
-- [x] Add model pricing fields when creating a custom model.
-- [x] Load dedicated settings styles without disturbing the main application stylesheet.
+- [x] Keep manual DIRECT analysis available for arbitrary tickers.
+- [x] CRSM settings split into Models / Nodes / Usage / Cost tabs.
+- [x] Per-node provider/model assignment with capability requirements.
+- [x] Model pricing fields and token-based cost calculation.
+- [x] Current-run usage and cost monitor.
+- [x] Persistent usage history in browser storage.
+- [x] Today / 7 days / 30 days / All-time cost views.
+- [x] Average cost per request.
+- [x] Cost by provider/model and node.
+- [x] Monthly budget and warning threshold.
+- [x] Compact source badge for SCREENED vs DIRECT.
+- [x] Compact cost summary on the completed CRSM screen.
+- [x] Clicking a ranked stock now automatically hands off to CRSM SCREENED.
+- [x] Preserve scoring detail as an explicit secondary action.
+- [x] Cache versioning by model assignment/capability/pricing configuration and analysis date.
 
 ## Next CRSM integration
 
-- [ ] Make clicking an already-screened/ranked stock perform an automatic SCREENED handoff.
-- [ ] Preserve the existing manual DIRECT entry for arbitrary tickers.
-- [ ] Show the source of an analysis clearly: SCREENED vs DIRECT.
-- [ ] Pass the complete screening context into CRSM and preserve it in the report.
-- [ ] Add a candidate gate so only selected/high-quality screened stocks are sent to CRSM.
-- [ ] Support batch CRSM for a controlled candidate list.
+- [ ] Add a configurable candidate gate so only selected/high-quality screened stocks are eligible for CRSM handoff.
+- [ ] Add optional batch CRSM for a controlled candidate list.
+- [ ] Add a persistent candidate queue/history.
+- [ ] Preserve the full screening context in exported/report metadata.
 
 ## Cost / observability
 
-- [ ] Persist usage history across CRSM runs instead of only the current run.
-- [ ] Add Today / 7 days / 30 days / All-time cost views.
-- [ ] Add average cost per CRSM report.
-- [ ] Add cost by provider and model.
-- [ ] Add configurable monthly budget and warning threshold.
-- [ ] Account separately for grounding/search charges where the provider bills them outside token cost.
-- [ ] Add a compact cost summary to the completed CRSM report.
+- [x] Persist usage history across CRSM runs.
+- [x] Add Today / 7 days / 30 days / All-time cost views.
+- [x] Add average cost per CRSM report/request.
+- [x] Add cost by provider and model.
+- [x] Add configurable monthly budget and warning threshold.
+- [ ] Account separately for grounding/search charges where provider billing is outside token cost.
+- [ ] Add historical cost chart.
 
 ## Reliability
 
-- [ ] Version cache keys so prompt/model/spec changes cannot return stale CRSM results.
-- [ ] Add cache invalidation by analysis date and configuration version.
+- [x] Version cache keys so prompt/model/spec configuration changes do not reuse the previous cache namespace.
+- [x] Include analysis date in cache keys.
 - [ ] Add automated tests for parser and scoring engine.
 - [ ] Add tests for CRSM JSON validation and deterministic post-processing.
 - [ ] Add CI test/build gate.
+- [ ] Add explicit regression test for SCREENED handoff.
+- [ ] Add explicit regression test for DIRECT mode.
 
 ## Security
 
@@ -52,5 +56,5 @@
 
 - [ ] Rewrite README to describe Stock Mind + Screening + CRSM architecture.
 - [ ] Document node responsibilities and model capability requirements.
-- [ ] Document SCREENED vs DIRECT execution.
-- [ ] Document pricing configuration and cost accounting assumptions.
+- [x] Document SCREENED vs DIRECT execution in the implementation checklist and UI.
+- [x] Document pricing configuration and cost accounting assumptions in the Cost UI.
