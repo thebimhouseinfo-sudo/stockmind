@@ -6,7 +6,7 @@ import { node5 } from './nodes/node5.js';
 import { renderNode6A } from './nodes/node6a.js';
 import { renderNode6B } from './nodes/node6b.js';
 import { node7 } from './nodes/node7.js';
-import { consumePendingUserEvidence } from './user-evidence.js';
+import { consumePendingUserEvidence, getPendingUserEvidence } from './user-evidence.js';
 
 export const NODES = [
   ['userEvidence', prepareUserEvidence],
@@ -46,8 +46,9 @@ export async function runPipeline({
     outputs: { ...existingOutputs }
   };
 
-  const startIndex = NODES.findIndex(([id]) => id === startFrom);
-  if (startIndex < 0) throw new Error(`startFrom không hợp lệ: ${startFrom}`);
+  const effectiveStart = startFrom === 'node1' && getPendingUserEvidence() ? 'userEvidence' : startFrom;
+  const startIndex = NODES.findIndex(([id]) => id === effectiveStart);
+  if (startIndex < 0) throw new Error(`startFrom không hợp lệ: ${effectiveStart}`);
 
   const orderedIds = NODES.slice(startIndex).map(([id]) => id);
   const stages = executionMode === 'parallel'
@@ -107,10 +108,7 @@ async function runNode(nodeId, ctx, { onNodeStart, onNodeDone, onNodeError }) {
     const output = await fn(ctx);
     ctx.outputs[nodeId] = output;
     if (nodeId === 'node1' && ctx.outputs.userEvidence) {
-      ctx.outputs.node1 = {
-        ...output,
-        user_evidence: ctx.outputs.userEvidence
-      };
+      ctx.outputs.node1 = { ...output, user_evidence: ctx.outputs.userEvidence };
       onNodeDone?.(nodeId, ctx.outputs.node1);
     } else {
       onNodeDone?.(nodeId, output);
