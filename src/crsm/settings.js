@@ -18,6 +18,7 @@ const OLLAMA_CLOUD_MODELS = [
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
+    executionMode: 'sequential',
     costControl: { monthlyBudgetUsd: 50, warningThresholdPct: 80 },
     providers: {
       gemini: {
@@ -57,6 +58,7 @@ export function loadSettings() {
     const merged = normalizeModelPricing(mergeSettings(DEFAULT_SETTINGS, parsed));
     ensureBuiltinModels(merged);
     if (!merged.crsm.costControl) merged.crsm.costControl = clone(DEFAULT_SETTINGS.crsm.costControl);
+    if (!merged.crsm.executionMode) merged.crsm.executionMode = 'sequential';
     return merged;
   } catch {
     return clone(DEFAULT_SETTINGS);
