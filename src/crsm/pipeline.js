@@ -24,7 +24,7 @@ const PARALLEL_STAGES = [
   ['node2', 'node3']
 ];
 
-async function prepareUserEvidence(ctx) {
+async function prepareUserEvidence() {
   return getPendingUserEvidence();
 }
 
@@ -106,7 +106,15 @@ async function runNode(nodeId, ctx, { onNodeStart, onNodeDone, onNodeError }) {
   try {
     const output = await fn(ctx);
     ctx.outputs[nodeId] = output;
-    onNodeDone?.(nodeId, output);
+    if (nodeId === 'node1' && ctx.outputs.userEvidence) {
+      ctx.outputs.node1 = {
+        ...output,
+        user_evidence: ctx.outputs.userEvidence
+      };
+      onNodeDone?.(nodeId, ctx.outputs.node1);
+    } else {
+      onNodeDone?.(nodeId, output);
+    }
     return { failedNode: null, error: null };
   } catch (error) {
     onNodeError?.(nodeId, error);
