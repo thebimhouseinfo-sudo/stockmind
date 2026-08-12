@@ -6,6 +6,12 @@ export function getPendingUserEvidence() {
   return pendingEvidence;
 }
 
+export function consumePendingUserEvidence() {
+  const evidence = pendingEvidence;
+  pendingEvidence = null;
+  return evidence;
+}
+
 export function clearPendingUserEvidence() {
   pendingEvidence = null;
 }
