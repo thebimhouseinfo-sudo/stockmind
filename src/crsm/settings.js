@@ -15,6 +15,14 @@ const OLLAMA_CLOUD_MODELS = [
   { id: 'minimax-m3:cloud', displayName: 'MiniMax M3', builtin: true, pricing: {}, capabilities: { webGrounding: false, structuredOutput: true, reasoning: true } }
 ];
 
+const GEMINI_3_FLASH = {
+  id: 'gemini-3-flash-preview',
+  displayName: 'Gemini 3.0 Flash',
+  builtin: true,
+  pricing: GEMINI_3_PRICING,
+  capabilities: { webGrounding: true, structuredOutput: true, reasoning: true }
+};
+
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
@@ -25,7 +33,7 @@ export const DEFAULT_SETTINGS = {
         apiKey: null,
         models: [
           { id: 'gemini-2.5-flash', displayName: 'Gemini 2.5 Flash', builtin: true, pricing: GEMINI_2_5_PRICING, capabilities: { webGrounding: true, structuredOutput: true, reasoning: true } },
-          { id: 'gemini-3-flash', displayName: 'Gemini 3.0 Flash', builtin: true, pricing: GEMINI_3_PRICING, capabilities: { webGrounding: true, structuredOutput: true, reasoning: true } }
+          GEMINI_3_FLASH
         ]
       },
       openai: { apiKey: null, models: OPENAI_REASONING_MODELS },
@@ -57,6 +65,7 @@ export function loadSettings() {
     const parsed = JSON.parse(raw);
     const merged = normalizeModelPricing(mergeSettings(DEFAULT_SETTINGS, parsed));
     ensureBuiltinModels(merged);
+    migrateGemini3ModelId(merged);
     if (!merged.crsm.costControl) merged.crsm.costControl = clone(DEFAULT_SETTINGS.crsm.costControl);
     if (!merged.crsm.executionMode) merged.crsm.executionMode = 'sequential';
     return merged;
@@ -75,6 +84,23 @@ function ensureBuiltinModels(settings) {
     const existing = new Set(current.map(model => model.id));
     const missing = (defaultProvider.models || []).filter(model => model.builtin && !existing.has(model.id));
     if (missing.length) provider.models = [...current, ...clone(missing)];
+  });
+}
+
+function migrateGemini3ModelId(settings) {
+  const provider = settings?.crsm?.providers?.gemini;
+  if (!provider) return;
+  const legacyId = 'gemini-3-flash';
+  const newId = GEMINI_3_FLASH.id;
+  const legacyModel = (provider.models || []).find(model => model.id === legacyId);
+  if (legacyModel) {
+    const alreadyExists = (provider.models || []).some(model => model.id === newId);
+    provider.models = alreadyExists
+      ? provider.models.filter(model => model.id !== legacyId)
+      : provider.models.map(model => model.id === legacyId ? { ...GEMINI_3_FLASH, ...model, id: newId, displayName: GEMINI_3_FLASH.displayName } : model);
+  }
+  Object.values(settings.crsm.nodeAssignment || {}).forEach(assignment => {
+    if (assignment?.provider === 'gemini' && assignment.model === legacyId) assignment.model = newId;
   });
 }
 
