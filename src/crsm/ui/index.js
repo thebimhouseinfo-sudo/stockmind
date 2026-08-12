@@ -4,18 +4,14 @@ import { renderSnapshot } from './snapshot.js';
 import { renderStatusBadge } from './status.js';
 import { renderError } from './error.js';
 import { renderDirectEntry } from './direct.js';
-import { renderSettings, bindSettingsEvents } from './settings.js';
 import { totalUsage } from '../usage.js';
-
-let settingsDelegationBound = false;
 
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
   return `<section class="grid">
-    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div><div class="actions"><button class="btn" id="crsmBack">← Quay lại ranking</button><button class="btn" id="crsmOpenSettings" type="button">⚙ Settings</button></div></div>
+    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div></div>
     ${renderDirectEntry()}
     <div id="crsmDynamic">${renderDynamicContent()}</div>
-    <div id="crsmSettingsRegion"></div>
     <div id="crsmReportRegion">${report ? renderReport(report) : ''}</div>
   </section>`;
 }
@@ -54,25 +50,6 @@ export function updateDynamicRegion() {
 export function bindCRSMUIBindings() {
   bindDynamicEvents();
   bindReportEvents();
-  bindSettingsDelegation();
-}
-
-function bindSettingsDelegation() {
-  if (settingsDelegationBound) return;
-  settingsDelegationBound = true;
-  document.addEventListener('click', event => {
-    const settingsBtn = event.target.closest('#crsmOpenSettings');
-    if (!settingsBtn) return;
-    const region = document.getElementById('crsmSettingsRegion');
-    if (!region) return;
-    const existing = region.querySelector('.settings-panel');
-    if (existing) {
-      existing.remove();
-      return;
-    }
-    region.innerHTML = renderSettings();
-    bindSettingsEvents();
-  });
 }
 
 export function bindDynamicEvents() {
