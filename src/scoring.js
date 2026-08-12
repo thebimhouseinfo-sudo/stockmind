@@ -1,9 +1,14 @@
-const CORE_FIELDS = [
-  'PRICE', 'PE', 'ROE', 'ROIC', 'REVGROWTH', 'EPSGROWTH', 'DEBT',
-  'RET1M', 'RET3M', 'RET6M', 'RET12M'
-];
-const OPTIONAL_FIELDS = ['PEG', 'AVGVOL', 'VOL'];
-const ALL_FIELDS = [...CORE_FIELDS, ...OPTIONAL_FIELDS];
+const BUSINESS_FIELDS = ['ROE', 'ROIC', 'REVGROWTH', 'EPSGROWTH', 'DEBT'];
+const VALUATION_FIELDS = ['PE', 'PEG'];
+const MARKET_FIELDS = ['PRICE', 'RET1M', 'RET3M', 'RET6M', 'RET12M'];
+const OPTIONAL_FIELDS = ['AVGVOL', 'VOL'];
+const ALL_FIELDS = [...MARKET_FIELDS, ...VALUATION_FIELDS, ...BUSINESS_FIELDS, ...OPTIONAL_FIELDS];
+
+const SCORE_WEIGHTS = {
+  business: 0.50,
+  valuation: 0.25,
+  market: 0.25
+};
 
 export function scoreStocks(rawRows) {
   const rows = rawRows.map(row => ({ ...row }));
@@ -12,64 +17,65 @@ export function scoreStocks(rawRows) {
   const industryStats = buildIndustryStats(industryGroups);
 
   rows.forEach(row => {
-    const stats = industryStats.get(row.INDUSTRY || 'Unknown') || {};
+    const industry = row.INDUSTRY || 'Unknown';
+    const stats = industryStats.get(industry) || {};
+    const industryRows = industryGroups.get(industry) || [];
+
     attachDataIntegrity(row, stats);
-    const industryRows = industryGroups.get(row.INDUSTRY || 'Unknown') || [];
 
-    const roePct = relativePercentile(industryRows, marketValues.ROE, row.ROE, 'ROE', 4);
-    const roicPct = relativePercentile(industryRows, marketValues.ROIC, row.ROIC, 'ROIC', 4);
-    const revPct = relativePercentile(industryRows, marketValues.REVGROWTH, row.REVGROWTH, 'REVGROWTH', 4);
-    const epsPct = relativePercentile(industryRows, marketValues.EPSGROWTH, row.EPSGROWTH, 'EPSGROWTH', 4);
-    const pePct = valuationPercentile(industryRows, marketValues.PE, row.PE, 4);
-    const pegPct = pegPercentile(industryRows, marketValues.PEG, row.PEG, 4);
+    const roe = relativePercentile(industryRows, marketValues.ROE, row.ROE, 'ROE');
+    const roic = relativePercentile(industryRows, marketValues.ROIC, row.ROIC, 'ROIC');
+    const revenueGrowth = relativePercentile(industryRows, marketValues.REVGROWTH, row.REVGROWTH, 'REVGROWTH');
+    const epsGrowth = relativePercentile(industryRows, marketValues.EPSGROWTH, row.EPSGROWTH, 'EPSGROWTH');
+    const debt = debtScore(row.DEBT);
 
-    const qualityBase = weightedAvailable([
-      [roePct, 0.40, isFiniteNumber(row.ROE)],
-      [roicPct, 0.40, isFiniteNumber(row.ROIC)],
-      [scoreDebt(row.DEBT), 0.20, isFiniteNumber(row.DEBT)]
-    ], 0.50);
-    row.QUALITY_SCORE = round2(100 * qualityBase);
+    // Business Quality is deliberately simple: this is screening, not CRSM.
+    row.BUSINESS_QUALITY = round2(100 * weightedAvailable([
+      [roe, 0.25, isFiniteNumber(row.ROE)],
+      [roic, 0.25, isFiniteNumber(row.ROIC)],
+      [revenueGrowth, 0.20, isFiniteNumber(row.REVGROWTH)],
+      [epsGrowth, 0.15, isFiniteNumber(row.EPSGROWTH)],
+      [debt, 0.15, isFiniteNumber(row.DEBT)]
+    ]));
 
-    const growthBase = weightedAvailable([
-      [revPct, 0.60, isFiniteNumber(row.REVGROWTH)],
-      [epsPct, 0.40, isFiniteNumber(row.EPSGROWTH)]
-    ], 0.50);
-    row.GROWTH_SCORE = round2(100 * growthBase * scoreGrowthConsistency(row.REVGROWTH, row.EPSGROWTH));
+    // Keep the old component names as compatibility aliases for the UI/CRSM,
+    // but do not use a second Micro/Opportunity layer in the final score.
+    row.QUALITY_SCORE = round2(100 * weightedAvailable([
+      [roe, 0.50, isFiniteNumber(row.ROE)],
+      [roic, 0.50, isFiniteNumber(row.ROIC)]
+    ]));
+    row.GROWTH_SCORE = round2(100 * weightedAvailable([
+      [revenueGrowth, 0.60, isFiniteNumber(row.REVGROWTH)],
+      [epsGrowth, 0.40, isFiniteNumber(row.EPSGROWTH)]
+    ]));
 
-    const valuationBase = weightedAvailable([
-      [pePct, 0.60, isFiniteNumber(row.PE) && row.PE > 0],
-      [pegPct, 0.40, isFiniteNumber(row.PEG) && row.PEG > 0]
-    ], 0.50);
-    row.VALUATION_SCORE = round2(100 * valuationBase);
+    const pe = valuationPercentile(industryRows, marketValues.PE, row.PE);
+    const peg = pegPercentile(industryRows, marketValues.PEG, row.PEG);
+    row.VALUATION_SCORE = round2(100 * weightedAvailable([
+      [pe, 0.70, isFiniteNumber(row.PE) && row.PE > 0],
+      [peg, 0.30, isFiniteNumber(row.PEG) && row.PEG > 0]
+    ]));
 
-    row.MICRO = round2(
-      0.35 * row.QUALITY_SCORE +
-      0.30 * row.GROWTH_SCORE +
-      0.35 * row.VALUATION_SCORE
-    );
-
-    row.MOMENTUM_RAW = weightedMomentum(row);
+    row.MARKET_RAW = weightedMarketExpression(row);
   });
 
-  const momentumValues = rows.map(row => row.MOMENTUM_RAW).filter(isFiniteNumber);
+  const marketValuesForRank = rows.map(row => row.MARKET_RAW).filter(isFiniteNumber);
 
   rows.forEach(row => {
-    const stats = industryStats.get(row.INDUSTRY || 'Unknown') || {};
-    row.MOMENTUM = round2(100 * percentileRank(momentumValues, row.MOMENTUM_RAW, 3));
-    row.MISPRICING = round2(opportunityScore(row, stats));
+    row.MARKET_SCORE = round2(100 * percentileRank(marketValuesForRank, row.MARKET_RAW, 3));
+    row.MOMENTUM = row.MARKET_SCORE;
 
     row.FINALSCORE = round2(
-      0.30 * row.QUALITY_SCORE +
-      0.20 * row.GROWTH_SCORE +
-      0.20 * row.VALUATION_SCORE +
-      0.15 * row.MOMENTUM +
-      0.15 * row.MISPRICING
+      SCORE_WEIGHTS.business * row.BUSINESS_QUALITY +
+      SCORE_WEIGHTS.valuation * row.VALUATION_SCORE +
+      SCORE_WEIGHTS.market * row.MARKET_SCORE
     );
 
     row.GRADE = grade(row.FINALSCORE);
-    row.INDUSTRY_MEDIAN_PE = stats.medians?.PE ?? null;
-    row.INDUSTRY_MEDIAN_ROE = stats.medians?.ROE ?? null;
-    row.INDUSTRY_REFERENCES = stats.medians ?? {};
+    row.SCREENING_GROUP = classifyScreening(row);
+    row.INDUSTRY_MEDIAN_PE = industryStats.get(row.INDUSTRY || 'Unknown')?.medians?.PE ?? null;
+    row.INDUSTRY_MEDIAN_ROE = industryStats.get(row.INDUSTRY || 'Unknown')?.medians?.ROE ?? null;
+    row.INDUSTRY_REFERENCES = industryStats.get(row.INDUSTRY || 'Unknown')?.medians ?? {};
     row.DATA_COVERAGE = dataCoverage(row);
     row.DATA_INTEGRITY = integrityLevel(row);
   });
@@ -77,10 +83,10 @@ export function scoreStocks(rawRows) {
   rows.sort((a, b) => {
     const scoreDiff = (b.FINALSCORE ?? -1) - (a.FINALSCORE ?? -1);
     if (scoreDiff !== 0) return scoreDiff;
-    const momentumDiff = (b.MOMENTUM ?? -1) - (a.MOMENTUM ?? -1);
-    if (momentumDiff !== 0) return momentumDiff;
-    const coverageDiff = (b.DATA_COVERAGE ?? 0) - (a.DATA_COVERAGE ?? 0);
-    if (coverageDiff !== 0) return coverageDiff;
+    const businessDiff = (b.BUSINESS_QUALITY ?? -1) - (a.BUSINESS_QUALITY ?? -1);
+    if (businessDiff !== 0) return businessDiff;
+    const marketDiff = (b.MARKET_SCORE ?? -1) - (a.MARKET_SCORE ?? -1);
+    if (marketDiff !== 0) return marketDiff;
     return String(a.TICKER || '').localeCompare(String(b.TICKER || ''));
   });
 
@@ -95,6 +101,8 @@ export function buildStats(rows) {
     total: rows.length,
     avgScore: round2(average(rows.map(row => row.FINALSCORE), 0)),
     top10: [...rows].sort((a, b) => b.FINALSCORE - a.FINALSCORE).slice(0, 10),
+    cleanTop10: rows.filter(row => !row.DATA_FLAGS?.length).slice(0, 10),
+    flaggedTop20: rows.filter(row => row.DATA_FLAGS?.length && row.RANK <= 20),
     industryCount
   };
 }
@@ -107,9 +115,9 @@ export function buildPrompt(stock) {
 
   return `Bạn là chuyên viên phân tích cổ phiếu Việt Nam cho một quỹ đầu tư kỷ luật.
 
-Hãy phân tích mã ${stock.TICKER} trong ngành ${stock.INDUSTRY} dựa CHỈ trên dữ liệu được cung cấp. Nếu thiếu dữ liệu để kết luận, ghi rõ "chưa đủ dữ liệu", không bịa thông tin ngoài input.
+Hãy phân tích mã ${stock.TICKER} trong ngành ${stock.INDUSTRY} dựa trên dữ liệu screening được cung cấp. Screener chỉ là đánh giá sơ bộ; không coi Screen Score là kết luận đầu tư. Nếu thiếu dữ liệu, ghi rõ và xác minh bằng nguồn phù hợp.
 
-Dữ liệu:
+Dữ liệu Screener:
 - Price: ${line(stock.PRICE)}
 - P/E: ${line(stock.PE)}
 - PEG: ${line(stock.PEG)}
@@ -117,24 +125,34 @@ Dữ liệu:
 - ROIC: ${line(stock.ROIC)}
 - Revenue Growth: ${line(stock.REVGROWTH)}
 - EPS Growth: ${line(stock.EPSGROWTH)}
-- Debt Ratio: ${line(stock.DEBT)}
+- Debt/Equity: ${line(stock.DEBT)}
 - Return 1M/3M/6M/12M: ${line(stock.RET1M)}/${line(stock.RET3M)}/${line(stock.RET6M)}/${line(stock.RET12M)}
-- Quality Score: ${line(stock.QUALITY_SCORE)}
-- Growth Score: ${line(stock.GROWTH_SCORE)}
+- Volume: ${line(stock.VOL)}
+- Average Volume: ${line(stock.AVGVOL)}
+- Business Quality Score: ${line(stock.BUSINESS_QUALITY)}
 - Valuation Score: ${line(stock.VALUATION_SCORE)}
-- Micro Score: ${line(stock.MICRO)}
-- Momentum Score: ${line(stock.MOMENTUM)}
-- Opportunity Score: ${line(stock.MISPRICING)}
-- Final Score: ${line(stock.FINALSCORE)}
+- Market Expression Score: ${line(stock.MARKET_SCORE)}
+- Screening Score: ${line(stock.FINALSCORE)}
 - Rank: ${line(stock.RANK)}
 - Grade: ${line(stock.GRADE)}
+- Screening Group: ${line(stock.SCREENING_GROUP)}
 - Data Coverage: ${line(stock.DATA_COVERAGE)}%
 - Data Integrity: ${line(stock.DATA_INTEGRITY)}
 - Data Flags: ${flags}
 - Industry median P/E: ${line(stock.INDUSTRY_MEDIAN_PE)}
 - Industry median ROE: ${line(stock.INDUSTRY_MEDIAN_ROE)}
 
-Data flags are screening alerts, not conclusions. Verify them with primary/company sources before making an investment judgment.`;
+Data flags are screening alerts, not conclusions. Do not substitute industry medians for missing company data. Verify missing or anomalous fields with external sources when needed.`;
+}
+
+function classifyScreening(row) {
+  const business = row.BUSINESS_QUALITY ?? 0;
+  const valuation = row.VALUATION_SCORE ?? 0;
+  const market = row.MARKET_SCORE ?? 0;
+
+  if (business >= 70 && market >= 60) return 'GOOD_IN_FORM';
+  if (business >= 70 && valuation >= 60 && market < 60) return 'GOOD_UNDERPERFORM';
+  return 'OTHER';
 }
 
 function groupBy(rows, getKey) {
@@ -157,7 +175,7 @@ function buildIndustryStats(groups) {
       medians[key] = median(values);
       coverage[key] = values.length;
     });
-    stats.set(industry, { medians, coverage, medianPE: medians.PE, medianROE: medians.ROE });
+    stats.set(industry, { medians, coverage });
   });
   return stats;
 }
@@ -197,7 +215,7 @@ function pegPercentile(industryRows, marketPEG, value, minIndustrySize = 4) {
   return clamp(1 - percentileRank(base, value, 3), 0, 1);
 }
 
-function scoreDebt(value) {
+function debtScore(value) {
   if (!isFiniteNumber(value)) return 0.5;
   if (value <= 0.5) return 1;
   if (value <= 1.0) return 0.80;
@@ -206,36 +224,17 @@ function scoreDebt(value) {
   return 0;
 }
 
-function scoreGrowthConsistency(revenueGrowth, epsGrowth) {
-  if (!isFiniteNumber(revenueGrowth) || !isFiniteNumber(epsGrowth)) return 1;
-  const gap = epsGrowth - revenueGrowth;
-  if (gap <= 0.20) return 1;
-  const penalty = clamp((gap - 0.20) / 0.80, 0, 1) * 0.25;
-  return 1 - penalty;
-}
+function weightedMarketExpression(row) {
+  const values = [
+    [row.RET1M, 0.10],
+    [row.RET3M, 0.25],
+    [row.RET6M, 0.35],
+    [row.RET12M, 0.30]
+  ].filter(([value]) => isFiniteNumber(value));
 
-function opportunityScore(row, stats) {
-  const valuation = row.VALUATION_SCORE / 100;
-  const quality = row.QUALITY_SCORE / 100;
-  const momentum = row.MOMENTUM / 100;
-  const growth = row.GROWTH_SCORE / 100;
-
-  let score = 100 * (0.50 * valuation + 0.20 * quality + 0.20 * momentum + 0.10 * growth);
-
-  if (isFiniteNumber(row.DEBT) && row.DEBT > 2) score -= 10;
-  if (isFiniteNumber(row.DEBT) && row.DEBT > 3) score -= 10;
-  if (isFiniteNumber(row.REVGROWTH) && isFiniteNumber(row.EPSGROWTH) && row.EPSGROWTH - row.REVGROWTH > 0.80) score -= 10;
-  if (stats?.medianPE != null && isFiniteNumber(row.PE) && row.PE > 0 && row.PE < stats.medianPE) score += 3;
-
-  return clamp(score, 0, 100);
-}
-
-function weightedMomentum(row) {
-  const values = [[row.RET1M, 0.10], [row.RET3M, 0.25], [row.RET6M, 0.35], [row.RET12M, 0.30]];
-  const valid = values.filter(([value]) => isFiniteNumber(value));
-  if (!valid.length) return null;
-  const weight = valid.reduce((sum, [, w]) => sum + w, 0);
-  return valid.reduce((sum, [value, w]) => sum + value * w, 0) / weight;
+  if (!values.length) return null;
+  const weight = values.reduce((sum, [, w]) => sum + w, 0);
+  return values.reduce((sum, [value, w]) => sum + value * w, 0) / weight;
 }
 
 function weightedAvailable(parts, fallback = 0.5) {
@@ -255,7 +254,7 @@ function attachDataIntegrity(row, stats) {
     const valid = isFiniteNumber(value) && (!['PE', 'PEG'].includes(field) || value > 0);
     const industryMedian = stats.medians?.[field] ?? null;
     const industryCoverage = stats.coverage?.[field] ?? 0;
-    const isCore = CORE_FIELDS.includes(field);
+    const isCore = [...BUSINESS_FIELDS, ...VALUATION_FIELDS, ...MARKET_FIELDS].includes(field);
 
     references[field] = {
       status: valid ? 'AVAILABLE' : (industryMedian != null ? 'MISSING_WITH_INDUSTRY_REFERENCE' : 'MISSING_UNVERIFIED'),
@@ -279,9 +278,6 @@ function attachDataIntegrity(row, stats) {
     flags.push('EARNINGS_GROWTH_DIVERGENCE');
   }
   if (isFiniteNumber(row.DEBT) && row.DEBT > 2) flags.push('HIGH_LEVERAGE');
-  if (isFiniteNumber(row.VOL) && isFiniteNumber(row.AVGVOL) && row.AVGVOL > 0 && row.VOL < row.AVGVOL * 0.25) {
-    flags.push('LOW_CURRENT_VOLUME');
-  }
 
   row.DATA_FLAGS = [...new Set(flags)];
   row.DATA_REFERENCES = references;
@@ -337,6 +333,10 @@ function average(values, fallback = null) {
   return valid.reduce((sum, value) => sum + value, 0) / valid.length;
 }
 
-function round2(value) { return isFiniteNumber(value) ? Math.round(value * 100) / 100 : null; }
-function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
+function round2(value) {
+  return isFiniteNumber(value) ? Math.round(value * 100) / 100 : null;
+}
+
+function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+
 function isFiniteNumber(value) { return typeof value === 'number' && Number.isFinite(value); }
