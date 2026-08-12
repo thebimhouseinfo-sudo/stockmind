@@ -6,8 +6,10 @@ import { node5 } from './nodes/node5.js';
 import { renderNode6A } from './nodes/node6a.js';
 import { renderNode6B } from './nodes/node6b.js';
 import { node7 } from './nodes/node7.js';
+import { getPendingUserEvidence } from './user-evidence.js';
 
 export const NODES = [
+  ['userEvidence', prepareUserEvidence],
   ['node1', node1],
   ['node2', node2],
   ['node3', node3],
@@ -21,6 +23,10 @@ export const NODES = [
 const PARALLEL_STAGES = [
   ['node2', 'node3']
 ];
+
+async function prepareUserEvidence(ctx) {
+  return getPendingUserEvidence();
+}
 
 export async function runPipeline({
   ticker,
