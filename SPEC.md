@@ -16,7 +16,7 @@ Stock Mind becomes a standalone web application. The user copies a TradingView s
 1. Copy rows from TradingView Screener.
 2. Paste into Stock Mind.
 3. The app detects columns, normalizes values, validates missing fields, and builds a clean dataset.
-4. The scoring engine calculates industry-relative and market-relative scores.
+4. The scoring engine calculates sector-relative and market-relative scores.
 5. The user reviews dashboard, ranking table, and detail view.
 6. The user copies an optimized AI prompt for a selected ticker.
 7. Data can be saved locally by the browser and exported as JSON.
@@ -50,78 +50,111 @@ The parser accepts common aliases for each canonical field:
 - Commas used as thousands separators are removed.
 - Numeric strings are parsed conservatively.
 
-## Scoring Model V1
+## Scoring Model V2
 
-Scores use a 0-100 scale so the output is readable and comparable.
+The scorer is deterministic and designed for screening rather than deep investment judgment. It uses industry-relative ranks where the industry has enough observations and falls back to market-relative ranks for small groups.
 
-### Industry Relative Scores
+### Percentile rules
 
-For each industry peer group:
-
-```text
-roePct = percentileRank(ROE within industry)
-roicPct = percentileRank(ROIC within industry)
-growthPct = average(
-  percentileRank(REVGROWTH within industry),
-  percentileRank(EPSGROWTH within industry)
-)
-pePct = 1 - percentileRank(PE within industry)
-```
-
-When a peer group is too small or a value is missing, the neutral fallback is `0.5`.
+- Percentile ranks are mid-ranked and normalized so the lowest comparable value is 0 and the highest is 1.
+- For groups with fewer than 4 valid observations, use the market universe for that metric instead of treating the whole industry as neutral.
+- Missing numeric values use a neutral 0.5 score.
+- Non-positive P/E is not interpreted as "cheap" and receives a neutral valuation score of 50.
 
 ### Quality Score
 
 ```text
-debtSafety = DEBT <= 0.5 ? 1
-           : DEBT <= 1.0 ? 0.75
-           : DEBT <= 2.0 ? 0.45
-           : 0.15
+qualityScore = 100 * (
+  0.40 * percentile(ROE)
++ 0.40 * percentile(ROIC)
++ 0.20 * debtSafety
+)
+```
 
-qualityScore = 100 * (0.45 * roePct + 0.45 * roicPct + 0.10 * debtSafety)
+Debt safety:
+
+```text
+debt <= 0.5  -> 1.00
+debt <= 1.0  -> 0.80
+debt <= 2.0  -> 0.50
+debt <= 3.0  -> 0.25
+debt >  3.0  -> 0.00
+missing      -> 0.50
 ```
 
 ### Growth Score
 
 ```text
-growthScore = 100 * growthPct
+rawGrowth = 0.60 * percentile(REVGROWTH)
+          + 0.40 * percentile(EPSGROWTH)
+
+growthScore = 100 * rawGrowth * growthConsistency
 ```
+
+Growth consistency is 1.0 when EPS growth is broadly consistent with revenue growth. A very large EPS-over-revenue gap reduces the score because headline EPS growth can be less reliable when it is not supported by top-line growth.
 
 ### Valuation Score
 
 ```text
-valuationScore = 100 * pePct
+valuationScore = 100 * (1 - percentile(positive P/E))
 ```
+
+The comparison is performed within a sufficiently populated industry, otherwise against the market. Negative/zero P/E receives 50 rather than being ranked as an extreme bargain.
 
 ### Micro Score
 
 ```text
-microScore = 0.40 * qualityScore + 0.30 * growthScore + 0.30 * valuationScore
+microScore = 0.35 * Quality
+           + 0.30 * Growth
+           + 0.35 * Valuation
 ```
+
+Micro is a diagnostic summary for the dashboard. It is not added again into Final Score, which avoids double-counting the underlying factors.
 
 ### Momentum Score
 
 ```text
-momentumRaw = 0.20 * RET1M + 0.30 * RET3M + 0.30 * RET6M + 0.20 * RET12M
-momentumScore = 100 * percentileRank(momentumRaw across all stocks)
+momentumRaw = 0.20 * RET1M
+            + 0.30 * RET3M
+            + 0.30 * RET6M
+            + 0.20 * RET12M
+
+momentumScore = 100 * percentile(momentumRaw across all stocks)
 ```
 
-### Mispricing Score
+### Opportunity / Mispricing Score
+
+This score estimates whether the valuation signal is supported by quality and market behavior rather than rewarding a low P/E by itself.
 
 ```text
-panicSignal = RET1M < -0.20 && qualityScore >= 60 ? 20 : 0
-earningsSignal = EPSGROWTH > 0 ? 15 : -15
-debtSignal = DEBT > 2 ? -15 : 10
-valuationSignal = PE below industry median ? 15 : 0
-
-mispricingScore = clamp(50 + panicSignal + earningsSignal + debtSignal + valuationSignal, 0, 100)
+opportunity = 0.50 * Valuation
+            + 0.20 * Quality
+            + 0.20 * Momentum
+            + 0.10 * Growth
 ```
+
+Adjustments:
+
+```text
+Debt > 2   -> -10
+Debt > 3   -> additional -10
+EPS growth - Revenue growth > 0.80 -> -10
+PE below industry median -> +3 contextual bonus
+```
+
+The final value is clamped to 0–100.
 
 ### Final Score
 
 ```text
-finalScore = 0.45 * microScore + 0.30 * momentumScore + 0.25 * mispricingScore
+finalScore = 0.30 * Quality
+           + 0.20 * Growth
+           + 0.20 * Valuation
+           + 0.15 * Momentum
+           + 0.15 * Opportunity
 ```
+
+This weighting is deliberately transparent and avoids counting `Micro` twice.
 
 ### Grade
 
@@ -164,7 +197,7 @@ Dữ liệu:
 - Valuation Score: {VALUATION_SCORE}
 - Micro Score: {MICRO_SCORE}
 - Momentum Score: {MOMENTUM_SCORE}
-- Mispricing Score: {MISPRICING_SCORE}
+- Mispricing / Opportunity Score: {MISPRICING_SCORE}
 - Final Score: {FINAL_SCORE}
 - Rank: {RANK}
 - Grade: {GRADE}
