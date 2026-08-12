@@ -245,7 +245,104 @@ if validated → System Quant metric
 
 Không đưa một indicator experimental vào Final Score chỉ vì chart nhìn đẹp.
 
-## P2.12 — Web Search boundary
+## P2.12 — User-uploaded data & documents
+
+Stock Mind phải cho phép user bổ sung dữ liệu riêng vào một phiên phân tích, đặc biệt khi dữ liệu SSI hoặc Web Search không đủ chi tiết.
+
+Nguồn upload mục tiêu:
+- Excel `.xlsx` / `.xls` — bảng tổng hợp, dữ liệu tự xây dựng, lịch sử giao dịch, bảng phân tích.
+- CSV/TSV — dataset dạng bảng.
+- PDF — báo cáo tài chính, báo cáo thường niên, báo cáo quản trị, tài liệu nhà đầu tư và các báo cáo liên quan.
+- Các định dạng tài liệu khác chỉ được hỗ trợ khi parser/extractor xác định được schema và chất lượng đọc phù hợp.
+
+Pipeline:
+```text
+User upload
+    ↓
+File validation
+    ↓
+Document/table extraction
+    ↓
+Structure detection
+    ↓
+Normalized evidence
+    ↓
+Data-quality + provenance
+    ↓
+Analysis context
+    ↓
+CRSM / Quant research as appropriate
+```
+
+### Spreadsheet handling
+
+Excel/CSV không chỉ được đưa nguyên văn vào prompt. Hệ thống phải:
+- đọc workbook/sheet/table;
+- nhận diện header và đơn vị;
+- giữ tên sheet, row/column context;
+- nhận diện ngày/kỳ báo cáo;
+- chuẩn hóa số liệu khi có thể;
+- giữ công thức/value distinction nếu cần;
+- phát hiện missing, duplicate, inconsistent units;
+- tạo structured dataset để node có thể truy cập chính xác.
+
+Nếu workbook có nhiều bảng không liên quan, hệ thống phải cho phép chọn sheet/table hoặc tự phân loại rồi yêu cầu xác nhận khi confidence thấp.
+
+### Financial report handling
+
+PDF báo cáo tài chính phải được xử lý như một **evidence source**, không coi toàn bộ văn bản là market data.
+
+Cần trích xuất có cấu trúc khi có thể:
+- kỳ báo cáo;
+- báo cáo KQKD;
+- bảng cân đối kế toán;
+- lưu chuyển tiền tệ;
+- thuyết minh quan trọng;
+- các chỉ tiêu/footnote liên quan;
+- đơn vị tiền tệ và đơn vị trình bày;
+- số trang/bảng/section nguồn.
+
+Phải giữ citation/provenance nội bộ đến file + page/table/section để CRSM có thể giải thích số liệu lấy từ đâu.
+
+### User data không tự động ghi đè SSI
+
+Nếu cùng một metric xuất hiện ở nhiều nguồn:
+```text
+SSI snapshot
+User uploaded data
+Web research
+```
+
+hệ thống phải giữ nguồn riêng và phát hiện discrepancy. Không silently overwrite SSI bằng file upload hoặc ngược lại.
+
+User-uploaded data có thể:
+- bổ sung field SSI không có;
+- cung cấp lịch sử/chi tiết sâu hơn;
+- cung cấp tài liệu để kiểm chứng hoặc phản biện dữ liệu hiện tại;
+- làm evidence cho một nhận định của CRSM.
+
+Nếu dữ liệu upload mâu thuẫn với SSI, CRSM phải thấy được sự khác biệt và provenance thay vì chọn một nguồn mà không thông báo.
+
+### Upload scope
+
+Dữ liệu upload được gắn với analysis session/ticker và timestamp. Không tự động đưa dữ liệu cá nhân vào global market dataset.
+
+Chỉ khi user chủ động xác nhận một dataset đã chuẩn hóa là reusable source mới được xem xét đưa vào shared research/data store.
+
+## P2.13 — User-uploaded data acceptance tests
+
+- XLSX workbook có nhiều sheet được đọc đúng sheet/table đã chọn.
+- Header, unit và reporting period được giữ đúng.
+- CSV/TSV được normalize mà không làm mất precision cần thiết.
+- PDF financial report trích xuất được bảng và page provenance khi parser hỗ trợ.
+- Số liệu có dấu phẩy/chấm, tỷ/nghìn/triệu/tỷ lệ phần trăm không bị đổi sai đơn vị.
+- Missing values không biến thành zero.
+- File upload không ghi đè SSI snapshot.
+- Conflict giữa SSI và user file được đánh dấu rõ ràng.
+- CRSM có thể sử dụng evidence từ upload cùng với SSI/web research.
+- Nếu extraction confidence thấp, hệ thống không tự coi dữ liệu là verified.
+
+## P2.14 — Web Search boundary
 
 Sau SSI integration, Web Search không được dùng để lấy lại dữ liệu định lượng đã có trong canonical snapshot.
 
@@ -260,19 +357,21 @@ Web research tập trung vào thông tin không có trong market dataset, ví d�
 - industry events/news
 - catalysts và risks
 
-CRSM nhận quantitative snapshot từ Data Layer và targeted research từ web.
+CRSM nhận quantitative snapshot từ Data Layer, user-uploaded evidence từ Evidence Layer và targeted research từ web.
 
-## P2.13 — Data quality & provenance
+## P2.15 — Data quality & provenance
 
-Mỗi metric phải có provenance:
+Mỗi metric/evidence phải có provenance:
 ```text
-provider
+provider/source
 field
+file/page/table/section nếu là document
 asOf
-tradingDate
+tradingDate/reportingPeriod
 unit
 availability
 stale status
+extraction confidence
 ```
 
 Nếu SSI thiếu dữ liệu hoặc dữ liệu stale:
@@ -281,21 +380,28 @@ Nếu SSI thiếu dữ liệu hoặc dữ liệu stale:
 - đánh dấu missing/stale
 - chỉ fallback sang web khi đó là thông tin phù hợp để research và nguồn có thể xác minh
 
-## P2.14 — Migration / backward compatibility
+Nếu user upload tài liệu có extraction uncertainty:
+- giữ raw evidence;
+- giữ confidence;
+- không biến giá trị chưa xác minh thành canonical market fact.
+
+## P2.16 — Migration / backward compatibility
 
 Giai đoạn đầu:
 ```text
 TradingView/manual import ─┐
                            ├→ canonical Stock Data → existing pipeline
-SSI Native Screener ───────┘
+SSI Native Screener ───────┤
+                           └→ User Evidence Layer
 ```
 
 Sau khi SSI provider được validate:
 - Native Screener trở thành nguồn chính.
 - Manual import trở thành legacy fallback.
+- User-uploaded evidence trở thành nguồn bổ sung, không phải replacement mặc định cho market data.
 - Không xóa parser/scoring cũ cho tới khi regression + dual-source validation đạt yêu cầu.
 
-## P2.15 — Acceptance tests
+## P2.17 — Acceptance tests
 
 - SSI provider authentication works.
 - Universe coverage matches actual SSI API response.
@@ -310,5 +416,10 @@ Sau khi SSI provider được validate:
 - Historical chart reproduces source OHLC/volume correctly.
 - Custom indicator output is reproducible from the same historical snapshot.
 - Experimental indicators cannot silently enter production scoring.
+- XLSX/CSV table extraction preserves units, dates and missing values.
+- PDF financial-report extraction preserves page/table provenance where supported.
+- User-uploaded data never silently overwrites SSI data.
+- Conflicting sources are surfaced to analysis.
+- CRSM can cite and reason over user-uploaded evidence.
 - Web Search is not called for metrics already present and current in SSI snapshot.
 - Legacy import still works during migration.
