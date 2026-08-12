@@ -7,32 +7,26 @@ export function scoreStocks(rawRows) {
   rows.forEach(row => {
     const industryRows = industryGroups.get(row.INDUSTRY || 'Unknown') || [];
 
-    const roePct = relativePercentile(industryRows, marketValues.ROE, row.ROE, 4);
-    const roicPct = relativePercentile(industryRows, marketValues.ROIC, row.ROIC, 4);
-    const revPct = relativePercentile(industryRows, marketValues.REVGROWTH, row.REVGROWTH, 4);
-    const epsPct = relativePercentile(industryRows, marketValues.EPSGROWTH, row.EPSGROWTH, 4);
+    const roePct = relativePercentile(industryRows, marketValues.ROE, row.ROE, 'ROE', 4);
+    const roicPct = relativePercentile(industryRows, marketValues.ROIC, row.ROIC, 'ROIC', 4);
+    const revPct = relativePercentile(industryRows, marketValues.REVGROWTH, row.REVGROWTH, 'REVGROWTH', 4);
+    const epsPct = relativePercentile(industryRows, marketValues.EPSGROWTH, row.EPSGROWTH, 'EPSGROWTH', 4);
     const pePct = valuationPercentile(industryRows, marketValues.PE, row.PE, 4);
 
     const debtSafety = scoreDebt(row.DEBT);
     const growthConsistency = scoreGrowthConsistency(row.REVGROWTH, row.EPSGROWTH);
 
-    // Quality = profitability + capital efficiency + leverage safety.
     row.QUALITY_SCORE = round2(100 * (
       0.40 * roePct +
       0.40 * roicPct +
       0.20 * debtSafety
     ));
 
-    // Growth rewards revenue first, with EPS as a secondary confirmation.
-    // A very large EPS-vs-revenue disconnect is treated as lower-quality growth,
-    // not automatically as stronger growth.
     const rawGrowth = 0.60 * revPct + 0.40 * epsPct;
     row.GROWTH_SCORE = round2(100 * rawGrowth * growthConsistency);
 
-    // Valuation is sector-relative. Non-positive P/E is not interpreted as "cheap".
     row.VALUATION_SCORE = round2(100 * pePct);
 
-    // Micro is a compact diagnostic view, not an independent extra reward in Final Score.
     row.MICRO = round2(
       0.35 * row.QUALITY_SCORE +
       0.30 * row.GROWTH_SCORE +
@@ -42,9 +36,7 @@ export function scoreStocks(rawRows) {
     row.MOMENTUM_RAW = weightedMomentum(row);
   });
 
-  const momentumValues = rows
-    .map(row => row.MOMENTUM_RAW)
-    .filter(isFiniteNumber);
+  const momentumValues = rows.map(row => row.MOMENTUM_RAW).filter(isFiniteNumber);
 
   rows.forEach(row => {
     const stats = industryStats.get(row.INDUSTRY || 'Unknown') || {};
@@ -53,9 +45,6 @@ export function scoreStocks(rawRows) {
     row.MOMENTUM = round2(100 * momentumPct);
     row.MISPRICING = round2(opportunityScore(row, stats));
 
-    // Final score uses the six displayed concepts without double-counting MICRO.
-    // MICRO remains useful for diagnostics, while Final stays transparent:
-    // Quality 30 + Growth 20 + Valuation 20 + Momentum 15 + Opportunity 15.
     row.FINALSCORE = round2(
       0.30 * row.QUALITY_SCORE +
       0.20 * row.GROWTH_SCORE +
@@ -180,18 +169,13 @@ function valueList(rows, key, predicate = undefined) {
     .filter(value => isFiniteNumber(value) && (!predicate || predicate(value)));
 }
 
-function relativePercentile(industryRows, marketValues, value, minIndustrySize = 4) {
+function relativePercentile(industryRows, marketValues, value, key, minIndustrySize = 4) {
   if (!isFiniteNumber(value)) return 0.5;
-  const industryValues = valueList(industryRows, getKeyByReference(value));
+  const industryValues = valueList(industryRows, key, key === 'PE' ? v => v > 0 : undefined);
   if (industryValues.length >= minIndustrySize) {
     return percentileRank(industryValues, value, 3);
   }
   return percentileRank(marketValues, value, 3);
-}
-
-// Used only to choose the same numeric field from an industry row.
-function getKeyByReference(value) {
-  return Number.isFinite(value) ? '__VALUE__' : '__VALUE__';
 }
 
 function valuationPercentile(industryRows, marketPE, value, minIndustrySize = 4) {
@@ -214,8 +198,6 @@ function scoreDebt(value) {
 function scoreGrowthConsistency(revenueGrowth, epsGrowth) {
   if (!isFiniteNumber(revenueGrowth) || !isFiniteNumber(epsGrowth)) return 1;
 
-  // Positive operating growth with only a modest EPS lead gets full credit.
-  // Very large EPS-vs-revenue gaps are treated as a quality warning.
   const gap = epsGrowth - revenueGrowth;
   if (gap <= 0.20) return 1;
   const penalty = clamp((gap - 0.20) / 0.80, 0, 1) * 0.25;
@@ -235,8 +217,6 @@ function opportunityScore(row, stats) {
     0.10 * growth
   );
 
-  // Explicit risk adjustments: leverage and low-quality growth should not be
-  // rewarded as "mispricing" merely because P/E is low.
   if (isFiniteNumber(row.DEBT) && row.DEBT > 2) score -= 10;
   if (isFiniteNumber(row.DEBT) && row.DEBT > 3) score -= 10;
 
@@ -244,7 +224,6 @@ function opportunityScore(row, stats) {
     if (row.EPSGROWTH - row.REVGROWTH > 0.80) score -= 10;
   }
 
-  // Keep industry median available for explanation/context even when no PE exists.
   if (stats?.medianPE != null && isFiniteNumber(row.PE) && row.PE > 0 && row.PE < stats.medianPE) {
     score += 3;
   }
@@ -274,7 +253,6 @@ function percentileRank(values, value, minSize = 2) {
   const equal = sorted.filter(item => item === value).length;
   const denominator = Math.max(1, sorted.length - 1);
 
-  // Mid-rank percentile: min -> 0, max -> 1, ties share their midpoint.
   return clamp((below + 0.5 * Math.max(0, equal - 1)) / denominator, 0, 1);
 }
 
