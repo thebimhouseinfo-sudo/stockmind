@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Mind · TradingView Test</title>
+  <style>
+    :root{--bg:#f7f8fb;--panel:#fff;--ink:#172033;--muted:#68758a;--line:#dde4ef;--blue:#2563eb}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
+    header{height:58px;flex:0 0 58px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:12px}
+    .brand{font-weight:850;letter-spacing:.06em}.tag{font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.08em}
+    .actions{display:flex;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-weight:800;text-decoration:none;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+    main{min-height:0;flex:1;padding:10px;display:flex;flex-direction:column;gap:8px}
+    .notice{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--muted)}
+    .frame-wrap{position:relative;min-height:0;flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 12px 32px rgba(23,32,51,.07)}
+    iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    .fallback{position:absolute;inset:0;display:none;place-items:center;background:rgba(247,248,251,.96);text-align:center;padding:30px}.fallback.show{display:grid}.fallback-card{max-width:520px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;box-shadow:0 16px 40px rgba(23,32,51,.08)}.fallback h2{margin:0 0 8px}.fallback p{color:var(--muted);line-height:1.55}
+    @media(max-width:700px){header{height:auto;min-height:58px;flex-wrap:wrap;padding:10px 12px}.notice{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}}
+  </style>
+</head>
+<body>
+  <header>
+    <div><div class="brand">STOCK MIND</div><div class="tag">TradingView embed experiment</div></div>
+    <div class="actions">
+      <a class="btn" href="https://www.tradingview.com/screener/" target="_blank" rel="noopener noreferrer">Open TradingView ↗</a>
+      <button class="btn primary" id="reload">Reload</button>
+    </div>
+  </header>
+  <main>
+    <div class="notice"><span>Independent test only. Try login, saved screens, filters and Ctrl+A → Ctrl+C here.</span><span id="status">Loading TradingView…</span></div>
+    <div class="frame-wrap">
+      <iframe id="tv" src="https://www.tradingview.com/screener/" title="TradingView Screener"></iframe>
+      <div class="fallback" id="fallback">
+        <div class="fallback-card">
+          <h2>TradingView không cho nhúng trực tiếp</h2>
+          <p>Nếu trang này xuất hiện, trình duyệt hoặc TradingView đã chặn việc hiển thị Screener trong iframe. Khi đó Stock Mind sẽ dùng nút mở TradingView ngoài như phương án dự phòng.</p>
+          <a class="btn primary" href="https://www.tradingview.com/screener/" target="_blank" rel="noopener noreferrer">Mở TradingView ↗</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    const frame=document.getElementById('tv');
+    const status=document.getElementById('status');
+    const fallback=document.getElementById('fallback');
+    let loaded=false;
+    frame.addEventListener('load',()=>{loaded=true;status.textContent='Frame loaded — test login/filter/copy';});
+    setTimeout(()=>{if(!loaded){status.textContent='Embed may be blocked';fallback.classList.add('show');}},5000);
+    document.getElementById('reload').addEventListener('click',()=>{fallback.classList.remove('show');loaded=false;status.textContent='Reloading…';frame.src='https://www.tradingview.com/screener/?_sm='+Date.now();});
+  </script>
+</body>
+</html>
