@@ -10,7 +10,18 @@ export function renderSettings(activeTab = 'models', period = '7d') {
   return `<div class="panel panel-pad settings-panel">
     <div class="title-row"><div><p class="eyebrow">CRSM Control Center</p><h2>Cấu hình & theo dõi hệ thống</h2></div><button class="btn" id="crsmSettingsClose">✕ Đóng</button></div>
     <div class="settings-tabs" role="tablist">${TAB_DEFS.map(([id, label]) => `<button class="settings-tab ${id === active ? 'active' : ''}" data-setting-tab="${id}" role="tab">${label}</button>`).join('')}</div>
+    ${renderExecutionControl(settings)}
     <div class="settings-tab-content">${active === 'models' ? renderModelsTab(settings) : ''}${active === 'nodes' ? renderNodesTab(settings) : ''}${active === 'usage' ? renderUsageTab() : ''}${active === 'cost' ? renderCostTab(settings, period) : ''}</div>
+  </div>`;
+}
+
+function renderExecutionControl(settings) {
+  const parallel = settings.crsm.executionMode === 'parallel';
+  return `<div class="settings-section execution-section">
+    <div class="settings-row execution-row">
+      <div><strong>Pipeline execution</strong><div class="muted settings-caption">Backend tự quyết định node nào đủ điều kiện chạy song song theo dependency.</div></div>
+      <label class="settings-check execution-toggle"><span>Sequential</span><input type="checkbox" id="crsmExecutionMode" data-execution-mode ${parallel ? 'checked' : ''}><span>Parallel</span></label>
+    </div>
   </div>`;
 }
 
@@ -64,6 +75,11 @@ function metric(label, value) { return `<div class="panel metric"><p class="metr
 export function bindSettingsEvents() {
   document.querySelectorAll('.settings-panel [data-setting-tab]').forEach(btn => btn.addEventListener('click', ev => replaceSettings(ev.currentTarget.dataset.settingTab)));
   document.querySelectorAll('.settings-panel [data-cost-period]').forEach(btn => btn.addEventListener('click', ev => replaceSettings('cost', ev.currentTarget.dataset.costPeriod)));
+  document.querySelectorAll('.settings-panel [data-execution-mode]').forEach(input => input.addEventListener('change', ev => {
+    const settings = loadSettings();
+    settings.crsm.executionMode = ev.target.checked ? 'parallel' : 'sequential';
+    saveSettings(settings);
+  }));
   document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('change', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; const settings = loadSettings(); settings.crsm.providers[provider].apiKey = ev.target.value.trim() || null; saveSettings(settings); }));
   document.querySelectorAll('.settings-panel [data-addmodel]').forEach(btn => btn.addEventListener('click', ev => { const provider = ev.target.dataset.addmodel; const id = prompt(`Model ID cho ${PROVIDER_INFO[provider]?.label || provider}:`); if (!id?.trim()) return; const inputPrice = prompt('Input USD / 1M tokens (để trống nếu chưa biết):',''); const outputPrice = prompt('Output USD / 1M tokens (để trống nếu chưa biết):',''); const hasGrounding = confirm(`${id.trim()} — model hỗ trợ web grounding? OK = Có.`); const settings = loadSettings(); settings.crsm.providers[provider].models = settings.crsm.providers[provider].models || []; settings.crsm.providers[provider].models.push({ id:id.trim(), displayName:id.trim(), builtin:false, pricing:{ inputPer1M:parsePrice(inputPrice), outputPer1M:parsePrice(outputPrice), currency:'USD' }, capabilities:{ webGrounding:hasGrounding, structuredOutput:true, reasoning:false } }); saveSettings(settings); replaceSettings('models'); }));
   document.querySelectorAll('.settings-panel [data-removemodel]').forEach(btn => btn.addEventListener('click', ev => { const modelId = ev.target.dataset.removemodel; const provider = ev.target.closest('[data-provider]')?.dataset.provider; const settings = loadSettings(); settings.crsm.providers[provider].models = (settings.crsm.providers[provider].models || []).filter(m => m.id !== modelId); saveSettings(settings); replaceSettings('models'); }));
