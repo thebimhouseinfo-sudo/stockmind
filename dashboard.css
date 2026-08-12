@@ -1,26 +1,26 @@
-/* Dashboard showcase + ranking cleanup */
+/* Dashboard: focused Top 10 ranking */
 
-/* The dashboard is a showcase for the strongest candidates, not a metrics page. */
 .main > section.grid > .grid.metrics { display: none; }
 .main > section.grid > .grid.two { grid-template-columns: 1fr; }
 .main > section.grid > .grid.two > .panel:nth-child(2) { display: none; }
 
 .main > section.grid > .grid.two > .panel:first-child {
-  padding: 28px;
-  border-radius: 16px;
-  background: radial-gradient(circle at 88% 8%, rgba(37, 99, 235, 0.10), transparent 28%), linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
-  box-shadow: 0 24px 60px rgba(23, 32, 51, 0.10);
+  padding: 26px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 48px rgba(23, 32, 51, 0.07);
   counter-reset: showcase-rank;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .title-row {
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
 }
 
 .main > section.grid > .grid.two > .panel:first-child .title-row h2 {
-  font-size: 26px;
+  font-size: 24px;
   letter-spacing: -0.02em;
 }
 
@@ -29,108 +29,107 @@
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 108px;
-  margin: 0 0 12px;
-  padding: 18px 20px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  min-height: 86px;
+  margin: 0 0 10px;
+  padding: 15px 18px;
+  border: 1px solid #e7ebf2;
+  border-radius: 12px;
+  background: #fff;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
   counter-increment: showcase-rank;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line::before {
   content: counter(showcase-rank, decimal-leading-zero);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: .08em;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line:hover {
-  color: inherit;
-  transform: translateY(-2px);
-  border-color: #bfdbfe;
-  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.12);
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 22px rgba(23, 32, 51, 0.07);
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type strong {
-  font-size: 26px;
-  letter-spacing: .04em;
+  font-size: 21px;
+  letter-spacing: .03em;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type .muted {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 12px;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line > span:last-child {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
+  gap: 9px;
+  font-size: 16px;
   font-weight: 900;
 }
 
-/* Rank #1 gets the visual emphasis. The title row is the first div, so the first stock is div #2. */
+/* All ten entries have identical visual weight: no oversized #1 card. */
 .main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) {
-  min-height: 148px;
-  padding: 24px 26px;
-  border-color: #bfdbfe;
-  background: linear-gradient(110deg, #eff6ff 0%, #ffffff 58%, #f8fbff 100%);
+  min-height: 86px;
+  padding: 15px 18px;
+  border-color: #e7ebf2;
+  background: #fff;
 }
 
 .main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2)::before {
-  color: var(--blue);
-  font-size: 15px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) > span:first-of-type strong { font-size: 42px; }
-.main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) > span:last-child { font-size: 24px; }
+.main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) > span:first-of-type strong,
+.main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) > span:last-child {
+  font-size: inherit;
+}
 
-/* Ranking: the separate detail action is intentionally removed from the UI. */
 .main .crsm-link[data-detail] { display: none; }
 
 @media (min-width: 900px) {
   .main > section.grid > .grid.two > .panel:first-child {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
   }
 
-  .main > section.grid > .grid.two > .panel:first-child .title-row { grid-column: 1 / -1; }
+  .main > section.grid > .grid.two > .panel:first-child .title-row {
+    grid-column: 1 / -1;
+  }
+
   .main > section.grid > .grid.two > .panel:first-child .stock-line { margin: 0; }
-  .main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) { grid-column: 1 / -1; }
 }
 
 @media (max-width: 700px) {
-  .main > section.grid > .grid.two > .panel:first-child { padding: 18px; border-radius: 12px; }
-
-  .main > section.grid > .grid.two > .panel:first-child .stock-line {
-    min-height: 92px;
+  .main > section.grid > .grid.two > .panel:first-child {
     padding: 16px;
-    grid-template-columns: 30px minmax(0, 1fr);
+    border-radius: 14px;
   }
 
-  .main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) {
-    min-height: 112px;
-    padding: 18px;
+  .main > section.grid > .grid.two > .panel:first-child .stock-line {
+    min-height: 78px;
+    padding: 13px 14px;
+    grid-template-columns: 30px minmax(0, 1fr);
   }
 
   .main > section.grid > .grid.two > .panel:first-child .stock-line > span:last-child {
     grid-column: 2;
     justify-content: flex-start;
-    margin-top: 6px;
+    margin-top: 5px;
+    font-size: 15px;
   }
-
-  .main > section.grid > .grid.two > .panel:first-child .stock-line:nth-of-type(2) > span:first-of-type strong { font-size: 34px; }
 }
