@@ -1,5 +1,5 @@
-const MAX_TOTAL_CHARS = 60000;
-const MAX_FILE_CHARS = 24000;
+const MAX_TOTAL_CHARS = 120000;
+const MAX_FILE_CHARS = 40000;
 let pendingEvidence = null;
 
 export function getPendingUserEvidence() {
@@ -27,18 +27,23 @@ export async function ingestUserEvidence(files) {
   for (const file of list) {
     try {
       const extracted = await extractFile(file);
-      const text = clampText(extracted.text || '');
-      if (!text.trim()) throw new Error('Không trích xuất được nội dung.');
       const remaining = Math.max(0, MAX_TOTAL_CHARS - totalChars);
       if (!remaining) break;
-      const finalText = text.slice(0, remaining);
+      const finalText = String(extracted.text || '').slice(0, Math.min(MAX_FILE_CHARS, remaining));
+      if (!finalText.trim()) throw new Error('Không trích xuất được nội dung.');
+
       documents.push({
+        id: `${Date.now()}-${documents.length}`,
         name: file.name,
         type: file.type || guessType(file.name),
         bytes: file.size,
+        source: 'USER_UPLOAD',
+        kind: extracted.kind || classifyDocument(file.name, finalText),
         extractedChars: finalText.length,
         content: finalText,
-        source: 'USER_UPLOAD'
+        structure: extracted.structure || null,
+        provenance: extracted.provenance || { file: file.name },
+        routing: routeEvidence(extracted.kind, file.name, finalText)
       });
       totalChars += finalText.length;
     } catch (error) {
@@ -55,31 +60,48 @@ export async function ingestUserEvidence(files) {
     errors,
     totalChars,
     intendedUse: 'supplementary_evidence',
-    primaryNodes: ['node3', 'node4']
+    routing: summarizeRouting(documents)
   };
   return pendingEvidence;
 }
 
 async function extractFile(file) {
   const name = file.name.toLowerCase();
-  if (/\.(txt|md|csv|tsv|json|xml|html?)$/.test(name) || /text\//.test(file.type)) {
-    return { text: await file.text() };
-  }
   if (/\.(xlsx|xls)$/.test(name) || /spreadsheet|excel/.test(file.type)) return extractSpreadsheet(file);
   if (/\.pdf$/.test(name) || file.type === 'application/pdf') return extractPdf(file);
+  if (/\.(txt|md|csv|tsv|json|xml|html?)$/.test(name) || /text\//.test(file.type)) {
+    const text = normalizeText(await file.text());
+    return { text, kind: classifyDocument(file.name, text), provenance: { file: file.name } };
+  }
   throw new Error('Định dạng chưa hỗ trợ. Dùng PDF, XLSX/XLS, CSV, TSV, TXT, MD hoặc JSON.');
 }
 
 async function extractSpreadsheet(file) {
   const XLSX = await import('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm');
-  const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
+  const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true, cellNF: true });
+  const sheets = [];
   const parts = [];
+
   for (const sheetName of workbook.SheetNames) {
     const sheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, raw: false });
-    parts.push(`## SHEET: ${sheetName}\n${rows.map(row => row.map(value => value == null ? '' : String(value)).join('\t')).join('\n')}`);
+    const ref = sheet['!ref'] || '';
+    const rowCount = rows.length;
+    const colCount = rows.reduce((max, row) => Math.max(max, row.length), 0);
+    const nonEmptyRows = rows.filter(row => row.some(value => value !== null && String(value).trim() !== ''));
+    const preview = nonEmptyRows.slice(0, 8).map(row => row.map(value => value == null ? '' : String(value)).join('\t')).join('\n');
+    const role = classifySheet(sheetName, preview);
+
+    sheets.push({ name: sheetName, ref, rowCount, colCount, role, headerPreview: preview });
+    parts.push(`## SHEET: ${sheetName}\n## ROLE: ${role}\n## RANGE: ${ref}\n${rows.map((row, rowIndex) => row.map((value, colIndex) => value == null ? '' : `${columnName(colIndex)}${rowIndex + 1}=${String(value)}`).join('\t')).join('\n')}`);
   }
-  return { text: parts.join('\n\n') };
+
+  return {
+    text: normalizeText(parts.join('\n\n')),
+    kind: 'spreadsheet',
+    structure: { workbook: file.name, sheets },
+    provenance: { file: file.name, sheets: sheets.map(sheet => ({ sheet: sheet.name, range: sheet.ref, role: sheet.role })) }
+  };
 }
 
 async function extractPdf(file) {
@@ -90,14 +112,62 @@ async function extractPdf(file) {
     const page = await pdf.getPage(pageNumber);
     const content = await page.getTextContent();
     const text = content.items.map(item => item.str || '').join(' ');
-    pages.push(`## PAGE ${pageNumber}\n${text}`);
+    pages.push({ page: pageNumber, text: normalizeText(text) });
   }
-  return { text: pages.join('\n\n') };
+  return {
+    text: pages.map(page => `## PAGE ${page.page}\n${page.text}`).join('\n\n'),
+    kind: 'financial_report',
+    structure: { pageCount: pdf.numPages, pages: pages.map(page => ({ page: page.page, chars: page.text.length })) },
+    provenance: { file: file.name, pages: pages.map(page => page.page) }
+  };
 }
 
-function clampText(text) {
-  const normalized = String(text).replace(/\r\n/g, '\n').replace(/[ \t]+\n/g, '\n').trim();
-  return normalized.length > MAX_FILE_CHARS ? `${normalized.slice(0, MAX_FILE_CHARS)}\n[TRUNCATED BY EVIDENCE LAYER]` : normalized;
+function classifySheet(name, preview) {
+  const value = `${name} ${preview}`.toLowerCase();
+  if (/kqkd|income|doanh thu|lợi nhuận/.test(value)) return 'income_statement';
+  if (/cdkt|balance|tài sản|nguồn vốn/.test(value)) return 'balance_sheet';
+  if (/cstc|financial ratio|roe|roa|eps|p\/e/.test(value)) return 'financial_metrics';
+  if (/cash flow|lưu chuyển tiền/.test(value)) return 'cash_flow';
+  return 'user_analysis_table';
+}
+
+function classifyDocument(name, text) {
+  const value = `${name} ${text.slice(0, 6000)}`.toLowerCase();
+  if (/báo cáo tài chính|financial statements|kết quả kinh doanh|balance sheet/.test(value)) return 'financial_report';
+  if (/giao dịch|khối lượng mua|khối lượng bán|volume/.test(value)) return 'trading_data';
+  return 'user_analysis';
+}
+
+function routeEvidence(kind, name, text) {
+  const value = `${kind || ''} ${name} ${text.slice(0, 8000)}`.toLowerCase();
+  const nodes = new Set();
+  if (/financial_report|income_statement|balance_sheet|financial_metrics|cash_flow|bctc|kqkd|cdkt|cstc/.test(value)) nodes.add('node3');
+  if (/trading_data|volume|giao dịch|khối lượng/.test(value)) nodes.add('node1');
+  if (/industry|ngành|macro|kinh tế|chính sách|policy/.test(value)) nodes.add('node4');
+  if (!nodes.size) {
+    nodes.add('node3');
+    nodes.add('node4');
+  }
+  return [...nodes];
+}
+
+function summarizeRouting(documents) {
+  return [...new Set(documents.flatMap(document => document.routing || []))];
+}
+
+function columnName(index) {
+  let n = index + 1;
+  let result = '';
+  while (n) {
+    const rem = (n - 1) % 26;
+    result = String.fromCharCode(65 + rem) + result;
+    n = Math.floor((n - 1) / 26);
+  }
+  return result;
+}
+
+function normalizeText(text) {
+  return String(text || '').replace(/\r\n/g, '\n').replace(/[ \t]+\n/g, '\n').trim();
 }
 
 function guessType(name) {
