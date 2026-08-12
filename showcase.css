@@ -91,3 +91,82 @@ body.settings-open { overflow: hidden; }
   .settings-overlay { padding: 8px; }
   .settings-modal { border-radius: 12px; }
 }
+
+/* ── Dashboard balanced v2 ── */
+@media (min-width: 1250px) {
+  .showcase-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .showcase-stock.hero {
+    grid-column: 1 / -1;
+    min-height: 184px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) {
+    min-height: 178px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-identity {
+    margin-bottom: 12px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-ticker {
+    font-size: 24px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-score > strong {
+    font-size: 22px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metric {
+    min-height: 43px;
+    padding: 7px 8px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metric span {
+    font-size: 8px;
+    margin-bottom: 2px;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metric strong {
+    font-size: 12px;
+  }
+
+  .showcase-summary {
+    min-width: 250px;
+    justify-content: center;
+  }
+
+  .showcase-summary .showcase-metric {
+    min-width: 92px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1249px) {
+  .showcase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .showcase-stock.hero {
+    grid-column: 1 / -1;
+  }
+
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .showcase-grid .showcase-stock:not(.hero) .showcase-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
