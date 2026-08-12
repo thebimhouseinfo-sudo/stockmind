@@ -12,7 +12,7 @@ export function renderDirectEntry() {
     <p class="eyebrow">${afterScreened ? 'Direct Analysis' : 'Manual Analysis'}</p>
     <h2>${afterScreened ? 'Kiểm tra một mã khác' : 'Phân tích bằng CRSM'}</h2>
     <p class="muted">Nhập mã cổ phiếu Việt Nam (HOSE/HNX/UPCOM) — CRSM chạy full pipeline ${afterScreened ? 'không dùng screening context' : 'mà không cần dữ liệu screening'}.</p>
-    <div class="direct-form"><input class="search" id="crsmTickerInput" placeholder="VD: VCB, HPG, MWG" maxlength="12"><button class="btn primary" id="crsmRunDirect">${afterScreened ? 'Chạy Direct CRSM' : 'Phân tích bằng CRSM'}</button></div>
+    <div class="direct-form"><input class="search" id="crsmTickerInput" placeholder="VD: VCB, HPG, MWG" maxlength="12" autocomplete="off"><button class="btn primary" id="crsmRunDirect" data-crsm-direct type="button">${afterScreened ? 'Chạy Direct CRSM' : 'Phân tích bằng CRSM'}</button></div>
     <div class="crsm-evidence-box">
       <div><strong>User evidence</strong><span class="muted">${evidenceLabel}</span></div>
       <label class="btn" for="crsmEvidenceFiles">Thêm Excel / PDF / CSV</label>
