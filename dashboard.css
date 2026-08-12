@@ -1,0 +1,165 @@
+/* Dashboard showcase + ranking cleanup */
+
+/* The dashboard is a showcase for the strongest candidates, not a metrics page. */
+.main > section.grid > .grid.metrics {
+  display: none;
+}
+
+.main > section.grid > .grid.two {
+  grid-template-columns: 1fr;
+}
+
+.main > section.grid > .grid.two > .panel:nth-child(2) {
+  display: none;
+}
+
+.main > section.grid > .grid.two > .panel:first-child {
+  padding: 28px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(37, 99, 235, 0.10), transparent 28%),
+    linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 24px 60px rgba(23, 32, 51, 0.10);
+}
+
+.main > section.grid > .grid.two > .panel:first-child .title-row {
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.main > section.grid > .grid.two > .panel:first-child .title-row h2 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 108px;
+  margin: 0 0 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  counter-increment: showcase-rank;
+}
+
+.main > section.grid > .grid.two > .panel:first-child {
+  counter-reset: showcase-rank;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line::before {
+  content: counter(showcase-rank, decimal-leading-zero);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line:hover {
+  color: inherit;
+  transform: translateY(-2px);
+  border-color: #bfdbfe;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.12);
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type strong {
+  font-size: 26px;
+  letter-spacing: .04em;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line > span:first-of-type .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* Rank #1 gets the visual emphasis. */
+.main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type {
+  min-height: 148px;
+  padding: 24px 26px;
+  border-color: #bfdbfe;
+  background: linear-gradient(110deg, #eff6ff 0%, #ffffff 58%, #f8fbff 100%);
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type::before {
+  color: var(--blue);
+  font-size: 15px;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type > span:first-of-type strong {
+  font-size: 42px;
+}
+
+.main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type > span:last-child {
+  font-size: 24px;
+}
+
+/* Ranking: the separate detail action is intentionally removed from the UI. */
+.main .crsm-link[data-detail] {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .main > section.grid > .grid.two > .panel:first-child {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .title-row {
+    grid-column: 1 / -1;
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .stock-line {
+    margin: 0;
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .main > section.grid > .grid.two > .panel:first-child {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .stock-line,
+  .main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type {
+    min-height: 92px;
+    padding: 16px;
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .stock-line > span:last-child {
+    grid-column: 2;
+    justify-content: flex-start;
+    margin-top: 6px;
+  }
+
+  .main > section.grid > .grid.two > .panel:first-child .stock-line:first-of-type > span:first-of-type strong {
+    font-size: 34px;
+  }
+}
