@@ -6,7 +6,7 @@ import { node5 } from './nodes/node5.js';
 import { renderNode6A } from './nodes/node6a.js';
 import { renderNode6B } from './nodes/node6b.js';
 import { node7 } from './nodes/node7.js';
-import { getPendingUserEvidence } from './user-evidence.js';
+import { consumePendingUserEvidence } from './user-evidence.js';
 
 export const NODES = [
   ['userEvidence', prepareUserEvidence],
@@ -25,7 +25,7 @@ const PARALLEL_STAGES = [
 ];
 
 async function prepareUserEvidence() {
-  return getPendingUserEvidence();
+  return consumePendingUserEvidence();
 }
 
 export async function runPipeline({
