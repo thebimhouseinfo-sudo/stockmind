@@ -1,10 +1,15 @@
-import { crsmState } from '../state.js';
+import { crsmState, notifyCRSM } from '../state.js';
 import { renderProgress } from './progress.js';
 import { renderSnapshot } from './snapshot.js';
 import { renderStatusBadge } from './status.js';
 import { renderError } from './error.js';
 import { renderDirectEntry } from './direct.js';
 import { totalUsage } from '../usage.js';
+import { buildScreeningContext } from '../context.js';
+import { runCRSM } from '../engine.js';
+
+const DATASET_KEY = 'stock-mind.dataset.v1';
+let screenedClickHandlerInstalled = false;
 
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
@@ -48,8 +53,62 @@ export function updateDynamicRegion() {
 }
 
 export function bindCRSMUIBindings() {
+  installScreenedClickHandler();
   bindDynamicEvents();
   bindReportEvents();
+}
+
+function installScreenedClickHandler() {
+  if (screenedClickHandlerInstalled) return;
+  screenedClickHandlerInstalled = true;
+  document.addEventListener('click', event => {
+    const trigger = event.target?.closest?.('[data-crsm]');
+    if (!trigger) return;
+
+    const ticker = String(trigger.dataset.crsm || '').trim().toUpperCase();
+    if (!ticker) return;
+
+    // Handle this at capture level so the CRSM handoff cannot be lost when the
+    // surrounding view is re-rendered. The normal app handler is intentionally
+    // bypassed for this path; this is the single canonical screened handoff.
+    event.preventDefault();
+    event.stopPropagation();
+
+    const stock = findScreeningStock(ticker);
+    if (!stock) {
+      showLaunchError(`Không tìm thấy dữ liệu screening cho mã ${ticker}.`);
+      return;
+    }
+
+    const crsmTab = document.querySelector('[data-tab="crsm"]');
+    if (!crsmTab) {
+      showLaunchError('Không tìm thấy tab CRSM để mở phiên phân tích.');
+      return;
+    }
+
+    crsmTab.click();
+    const screeningContext = buildScreeningContext(stock);
+    void runCRSM({ mode: 'SCREENED', ticker, screeningContext }).catch(error => {
+      showLaunchError(error?.message || String(error));
+    });
+  }, true);
+}
+
+function findScreeningStock(ticker) {
+  try {
+    const raw = localStorage.getItem(DATASET_KEY);
+    const rows = raw ? JSON.parse(raw) : [];
+    return Array.isArray(rows) ? rows.find(row => String(row?.TICKER || '').toUpperCase() === ticker) : null;
+  } catch {
+    return null;
+  }
+}
+
+function showLaunchError(message) {
+  crsmState.isRunning = false;
+  crsmState.error = { node: null, message: String(message) };
+  crsmState.logRows = [...(crsmState.logRows || []), `✖ launch failed: ${message}`];
+  notifyCRSM();
 }
 
 export function bindDynamicEvents() {
