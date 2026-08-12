@@ -2,6 +2,18 @@ const STORAGE_KEY = 'stock-mind.crsm.settings.v1';
 
 const GEMINI_2_5_PRICING = { inputPer1M: 0.30, outputPer1M: 2.50, currency: 'USD' };
 const GEMINI_3_PRICING = { inputPer1M: 0.50, outputPer1M: 3.00, currency: 'USD' };
+const OPENAI_GPT5_MINI_PRICING = { inputPer1M: 0.25, outputPer1M: 2.00, currency: 'USD' };
+const OPENAI_GPT54_MINI_PRICING = { inputPer1M: 0.75, outputPer1M: 4.50, currency: 'USD' };
+
+const OPENAI_REASONING_MODELS = [
+  { id: 'gpt-5-mini', displayName: 'GPT-5 mini', builtin: true, pricing: OPENAI_GPT5_MINI_PRICING, capabilities: { webGrounding: false, structuredOutput: true, reasoning: true } },
+  { id: 'gpt-5.4-mini', displayName: 'GPT-5.4 mini', builtin: true, pricing: OPENAI_GPT54_MINI_PRICING, capabilities: { webGrounding: false, structuredOutput: true, reasoning: true } }
+];
+
+const OLLAMA_CLOUD_MODELS = [
+  { id: 'gpt-oss:120b-cloud', displayName: 'GPT-OSS 120B', builtin: true, pricing: {}, capabilities: { webGrounding: false, structuredOutput: true, reasoning: true } },
+  { id: 'minimax-m3:cloud', displayName: 'MiniMax M3', builtin: true, pricing: {}, capabilities: { webGrounding: false, structuredOutput: true, reasoning: true } }
+];
 
 export const DEFAULT_SETTINGS = {
   theme: 'light',
@@ -15,8 +27,8 @@ export const DEFAULT_SETTINGS = {
           { id: 'gemini-3-flash', displayName: 'Gemini 3.0 Flash', builtin: true, pricing: GEMINI_3_PRICING, capabilities: { webGrounding: true, structuredOutput: true, reasoning: true } }
         ]
       },
-      openai: { apiKey: null, models: [] },
-      ollamaCloud: { apiKey: null, models: [] }
+      openai: { apiKey: null, models: OPENAI_REASONING_MODELS },
+      ollamaCloud: { apiKey: null, models: OLLAMA_CLOUD_MODELS }
     },
     nodeAssignment: {
       node1: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
@@ -28,7 +40,11 @@ export const DEFAULT_SETTINGS = {
   }
 };
 
-export const PROVIDER_INFO = { gemini: { label: 'Gemini' }, openai: { label: 'OpenAI' }, ollamaCloud: { label: 'Ollama Cloud' } };
+export const PROVIDER_INFO = {
+  gemini: { label: 'Gemini', subtitle: 'Web-grounded research layer' },
+  openai: { label: 'OpenAI', subtitle: 'Reasoning layer' },
+  ollamaCloud: { label: 'Ollama Cloud', subtitle: 'Cloud reasoning alternatives' }
+};
 export const NODES_LLM = ['node1', 'node2', 'node3', 'node4', 'node5'];
 export const NODES_LOCAL = ['node6a', 'node6b', 'node7'];
 export const NODES_ALL = [...NODES_LLM, ...NODES_LOCAL];
@@ -39,6 +55,7 @@ export function loadSettings() {
     if (!raw) return clone(DEFAULT_SETTINGS);
     const parsed = JSON.parse(raw);
     const merged = normalizeModelPricing(mergeSettings(DEFAULT_SETTINGS, parsed));
+    ensureBuiltinModels(merged);
     if (!merged.crsm.costControl) merged.crsm.costControl = clone(DEFAULT_SETTINGS.crsm.costControl);
     return merged;
   } catch {
@@ -47,6 +64,17 @@ export function loadSettings() {
 }
 
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
+
+function ensureBuiltinModels(settings) {
+  Object.entries(DEFAULT_SETTINGS.crsm.providers).forEach(([providerId, defaultProvider]) => {
+    const provider = settings.crsm.providers[providerId];
+    if (!provider) return;
+    const current = provider.models || [];
+    const existing = new Set(current.map(model => model.id));
+    const missing = (defaultProvider.models || []).filter(model => model.builtin && !existing.has(model.id));
+    if (missing.length) provider.models = [...current, ...clone(missing)];
+  });
+}
 
 function normalizeModelPricing(settings) {
   Object.entries(DEFAULT_SETTINGS.crsm.providers).forEach(([providerId, defaultProvider]) => {
