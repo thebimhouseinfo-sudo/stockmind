@@ -29,4 +29,23 @@ assert.equal(stats.total, 2);
 assert.equal(stats.top10.length, 2);
 assert.equal(stats.industryCount.Banks, 1);
 
+// Regression: non-positive P/E must not be treated as cheap.
+const negativePeRows = scoreStocks([
+  { TICKER: 'AAA', INDUSTRY: 'Energy', PRICE: 10, PE: -4, ROE: 0.10, ROIC: 0.08, REVGROWTH: 0.05, EPSGROWTH: -0.02, DEBT: 1, RET1M: 0, RET3M: 0, RET6M: 0, RET12M: 0 },
+  { TICKER: 'BBB', INDUSTRY: 'Energy', PRICE: 10, PE: 8, ROE: 0.12, ROIC: 0.10, REVGROWTH: 0.06, EPSGROWTH: 0.07, DEBT: 0.8, RET1M: 0.01, RET3M: 0.02, RET6M: 0.03, RET12M: 0.05 }
+]);
+const negativePe = negativePeRows.find(row => row.TICKER === 'AAA');
+assert.equal(negativePe.VALUATION_SCORE, 50);
+
+// Regression: a very large EPS/revenue disconnect should not increase Growth Score.
+const growthRows = scoreStocks([
+  { TICKER: 'GOOD', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: 0.18, ROIC: 0.15, REVGROWTH: 0.25, EPSGROWTH: 0.30, DEBT: 0.5, RET1M: 0.02, RET3M: 0.05, RET6M: 0.10, RET12M: 0.15 },
+  { TICKER: 'GAP', INDUSTRY: 'Retail', PRICE: 10, PE: 10, ROE: 0.18, ROIC: 0.15, REVGROWTH: 0.05, EPSGROWTH: 1.00, DEBT: 0.5, RET1M: 0.02, RET3M: 0.05, RET6M: 0.10, RET12M: 0.15 },
+  { TICKER: 'MID', INDUSTRY: 'Retail', PRICE: 10, PE: 12, ROE: 0.15, ROIC: 0.12, REVGROWTH: 0.10, EPSGROWTH: 0.12, DEBT: 1.0, RET1M: 0.00, RET3M: 0.02, RET6M: 0.04, RET12M: 0.08 },
+  { TICKER: 'LOW', INDUSTRY: 'Retail', PRICE: 10, PE: 15, ROE: 0.10, ROIC: 0.08, REVGROWTH: 0.03, EPSGROWTH: 0.04, DEBT: 1.5, RET1M: -0.02, RET3M: -0.01, RET6M: 0.00, RET12M: 0.02 }
+]);
+const good = growthRows.find(row => row.TICKER === 'GOOD');
+const gap = growthRows.find(row => row.TICKER === 'GAP');
+assert.ok(good.GROWTH_SCORE >= gap.GROWTH_SCORE);
+
 console.log('Core tests passed.');
