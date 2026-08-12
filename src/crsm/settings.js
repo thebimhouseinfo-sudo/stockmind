@@ -6,6 +6,7 @@ const GEMINI_3_PRICING = { inputPer1M: 0.50, outputPer1M: 3.00, currency: 'USD' 
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
+    costControl: { monthlyBudgetUsd: 50, warningThresholdPct: 80 },
     providers: {
       gemini: {
         apiKey: null,
@@ -27,12 +28,7 @@ export const DEFAULT_SETTINGS = {
   }
 };
 
-export const PROVIDER_INFO = {
-  gemini: { label: 'Gemini' },
-  openai: { label: 'OpenAI' },
-  ollamaCloud: { label: 'Ollama Cloud' }
-};
-
+export const PROVIDER_INFO = { gemini: { label: 'Gemini' }, openai: { label: 'OpenAI' }, ollamaCloud: { label: 'Ollama Cloud' } };
 export const NODES_LLM = ['node1', 'node2', 'node3', 'node4', 'node5'];
 export const NODES_LOCAL = ['node6a', 'node6b', 'node7'];
 export const NODES_ALL = [...NODES_LLM, ...NODES_LOCAL];
@@ -42,16 +38,15 @@ export function loadSettings() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return clone(DEFAULT_SETTINGS);
     const parsed = JSON.parse(raw);
-    const merged = mergeSettings(DEFAULT_SETTINGS, parsed);
-    return normalizeModelPricing(merged);
+    const merged = normalizeModelPricing(mergeSettings(DEFAULT_SETTINGS, parsed));
+    if (!merged.crsm.costControl) merged.crsm.costControl = clone(DEFAULT_SETTINGS.crsm.costControl);
+    return merged;
   } catch {
     return clone(DEFAULT_SETTINGS);
   }
 }
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
+function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
 function normalizeModelPricing(settings) {
   Object.entries(DEFAULT_SETTINGS.crsm.providers).forEach(([providerId, defaultProvider]) => {
@@ -67,17 +62,13 @@ function normalizeModelPricing(settings) {
   return settings;
 }
 
-export function saveSettings(settings) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-}
+export function saveSettings(settings) { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }
 
 export function mergeSettings(base, override) {
   if (Array.isArray(base)) return override;
   if (typeof base !== 'object' || base === null) return override ?? base;
   const out = { ...base };
-  for (const key of Object.keys(base)) {
-    if (key in (override || {})) out[key] = mergeDeep(base[key], override[key]);
-  }
+  for (const key of Object.keys(base)) if (key in (override || {})) out[key] = mergeDeep(base[key], override[key]);
   return out;
 }
 
@@ -92,13 +83,8 @@ function mergeDeep(a, b) {
   return b !== undefined && b !== null ? b : a;
 }
 
-export function getProviderConfig(settings, providerId) {
-  return settings?.crsm?.providers?.[providerId] || null;
-}
-
-export function getAssignment(settings, nodeId) {
-  return settings?.crsm?.nodeAssignment?.[nodeId] || null;
-}
+export function getProviderConfig(settings, providerId) { return settings?.crsm?.providers?.[providerId] || null; }
+export function getAssignment(settings, nodeId) { return settings?.crsm?.nodeAssignment?.[nodeId] || null; }
 
 export function addModel(settings, providerId, model) {
   const cfg = settings.crsm.providers[providerId];
