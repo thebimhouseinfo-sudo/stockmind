@@ -4,11 +4,12 @@ import { crsmState, subscribeCRSM } from './crsm/state.js';
 import { buildScreeningContext } from './crsm/context.js';
 import { runCRSM } from './crsm/engine.js';
 import { renderCRSMTab, bindCRSMUIBindings, updateDynamicRegion } from './crsm/ui/index.js';
+import { renderSettings, bindSettingsEvents } from './crsm/ui/settings.js';
 import { downloadReportBundle } from './crsm/report-export.js';
 
 const STORAGE_KEY = 'stock-mind.dataset.v1';
 
-let state = { tab: 'import', pasteText: '', rows: loadRows(), errors: [], selectedTicker: null, selectedTickers: [], search: '', batchRunning: false, batchProgress: null, importStatus: null };
+let state = { tab: 'import', pasteText: '', rows: loadRows(), errors: [], selectedTicker: null, selectedTickers: [], search: '', batchRunning: false, batchProgress: null, importStatus: null, settingsOpen: false };
 const app = document.getElementById('app');
 subscribeCRSM(() => { if (state.tab === 'crsm') updateDynamicRegion(); });
 render();
@@ -20,13 +21,15 @@ function render() {
     ${state.tab === 'list' ? renderList() : ''}
     ${state.tab === 'detail' ? renderDetail() : ''}
     ${state.tab === 'crsm' ? renderCRSMTab() : ''}
+    ${state.settingsOpen ? renderSettings() : ''}
   </main></div>`;
   bindEvents();
+  if (state.settingsOpen) bindSettingsEvents();
 }
 
 function renderTopbar() {
   const tabs = [['import', 'Screen'], ['dashboard', 'Dashboard'], ['list', 'Ranking'], ['crsm', 'CRSM']];
-  return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id ? 'active' : ''}" data-tab="${id}">${label}</button>`).join('')}</nav></div></header>`;
+  return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id ? 'active' : ''}" data-tab="${id}">${label}</button>`).join('')}<button class="tab ${state.settingsOpen ? 'active' : ''}" id="openSettings">⚙ Settings</button></nav></div></header>`;
 }
 
 function renderImport() {
@@ -111,7 +114,7 @@ function bindEvents() {
   bind('importClipboard', 'click', importFromClipboard);
   bind('copyPrompt', 'click', copyPrompt);
   bind('crsmRunDirect', 'click', runDirectCRSM);
-  bind('crsmBack', 'click', () => { state.tab = 'list'; render(); });
+  bind('openSettings', 'click', () => { state.settingsOpen = !state.settingsOpen; render(); });
   bind('selectAllCRSM', 'change', event => selectVisible(event.target.checked));
   bind('selectVisibleCRSM', 'click', selectAllVisibleToggle);
   bind('clearSelectedCRSM', 'click', () => { state.selectedTickers = []; render(); });
@@ -177,82 +180,4 @@ function selectAllVisibleToggle() {
   selectVisible(!allSelected);
 }
 
-function launchScreenedCRSM(ticker) {
-  const stock = state.rows.find(row => row.TICKER === ticker);
-  if (!stock) return;
-  state.selectedTicker = ticker;
-  state.tab = 'crsm';
-  render();
-  const context = buildScreeningContext(stock);
-  runCRSM({ mode: 'SCREENED', ticker, screeningContext: context });
-}
-
-async function runSelectedCRSM() {
-  if (state.batchRunning || !state.selectedTickers.length) return;
-  const queue = [...state.selectedTickers];
-  state.batchRunning = true;
-  state.batchProgress = { index: 0, total: queue.length, ticker: queue[0] };
-  state.tab = 'crsm';
-  render();
-
-  for (let index = 0; index < queue.length; index += 1) {
-    const ticker = queue[index];
-    const stock = state.rows.find(row => row.TICKER === ticker);
-    if (!stock) continue;
-    state.batchProgress = { index: index + 1, total: queue.length, ticker };
-    updateBatchProgress();
-    const context = buildScreeningContext(stock);
-    const result = await runCRSM({
-      mode: 'SCREENED',
-      ticker,
-      screeningContext: context,
-      onComplete: async ({ outputs }) => {
-        const report = outputs?.node6a;
-        if (report) await downloadReportBundle(report, ticker);
-      }
-    });
-    if (result?.error && !result?.outputs?.node6a) console.warn(`CRSM batch failed for ${ticker}`, result.error);
-    await new Promise(resolve => setTimeout(resolve, 250));
-  }
-
-  state.batchRunning = false;
-  state.batchProgress = null;
-  state.selectedTickers = [];
-  updateBatchProgress();
-}
-
-function updateBatchProgress() {
-  if (state.tab === 'list') render();
-  else updateDynamicRegion();
-}
-
-async function runDirectCRSM() {
-  const input = document.getElementById('crsmTickerInput');
-  const ticker = (input?.value || '').trim().toUpperCase();
-  if (!ticker) return;
-  setCrsmRunning();
-  await runCRSM({ mode: 'DIRECT', ticker, screeningContext: null });
-}
-
-function setCrsmRunning() { if (state.tab !== 'crsm') render(); else updateDynamicRegion(); }
-
-function retryFailedCRSM() {
-  const mode = crsmState.mode; const ticker = crsmState.ticker; const startFrom = crsmState.failedNode;
-  if (!mode || !ticker) return;
-  runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom, existingOutputs: crsmState.nodeOutputs });
-}
-
-function retryAllCRSM() {
-  const mode = crsmState.mode; const ticker = crsmState.ticker;
-  if (!mode || !ticker) return;
-  runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom: 'node1', existingOutputs: null, bypassCache: true });
-}
-
-function loadRows() { try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
-function emptyState() { return `<section class="panel panel-pad"><p class="eyebrow">No Data</p><h1>Chưa có dữ liệu cổ phiếu</h1><p class="muted">Hãy import bảng TradingView ở tab Screen để bắt đầu.</p><button class="btn primary" data-tab="import">Đi tới Screen</button></section>`; }
-function metric(label, value) { return `<div class="panel metric"><p class="metric-label">${label}</p><p class="metric-value">${value}</p></div>`; }
-function stockLine(row) { return `<div class="stock-line clickable" data-crsm="${row.TICKER}" title="Chạy CRSM cho ${row.TICKER}"><span><strong>${row.TICKER}</strong> <span class="muted">${escapeHtml(row.INDUSTRY)}</span></span><span>${fmt(row.FINALSCORE)} ${gradeBadge(row.GRADE)}</span></div>`; }
-function scoreCard(label, value) { return `<div class="score-card"><span class="muted">${label}</span><strong>${fmt(value)}</strong></div>`; }
-function gradeBadge(grade) { const cls = grade?.startsWith('A') ? 'grade-a' : grade === 'B' ? 'grade-b' : grade === 'C' ? 'grade-c' : 'grade-d'; return `<span class="badge ${cls}">${grade || '-'}</span>`; }
-function fmt(value) { if (value == null || Number.isNaN(value)) return '-'; if (typeof value === 'number') return value.toLocaleString('vi-VN', { maximumFractionDigits: 2 }); return value; }
-function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;'); }
+function launchScreenedCRSM(ticker)... (truncated)
