@@ -1,6 +1,5 @@
 import { parseTradingViewPaste } from './parser.js';
 import { buildPrompt, buildStats, scoreStocks } from './scoring.js';
-import { samplePaste } from './sample.js';
 import { crsmState, subscribeCRSM } from './crsm/state.js';
 import { buildScreeningContext } from './crsm/context.js';
 import { runCRSM } from './crsm/engine.js';
@@ -9,7 +8,7 @@ import { downloadReportBundle } from './crsm/report-export.js';
 
 const STORAGE_KEY = 'stock-mind.dataset.v1';
 
-let state = { tab: 'import', pasteText: '', rows: loadRows(), errors: [], selectedTicker: null, selectedTickers: [], search: '', batchRunning: false, batchProgress: null };
+let state = { tab: 'import', pasteText: '', rows: loadRows(), errors: [], selectedTicker: null, selectedTickers: [], search: '', batchRunning: false, batchProgress: null, importStatus: null };
 const app = document.getElementById('app');
 subscribeCRSM(() => { if (state.tab === 'crsm') updateDynamicRegion(); });
 render();
@@ -26,19 +25,50 @@ function render() {
 }
 
 function renderTopbar() {
-  const tabs = [['import', 'Paste'], ['dashboard', 'Dashboard'], ['list', 'Ranking'], ['crsm', 'CRSM']];
+  const tabs = [['import', 'Screen'], ['dashboard', 'Dashboard'], ['list', 'Ranking'], ['crsm', 'CRSM']];
   return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id ? 'active' : ''}" data-tab="${id}">${label}</button>`).join('')}</nav></div></header>`;
 }
 
 function renderImport() {
-  return `<section class="grid two"><div class="panel panel-pad"><p class="eyebrow">TradingView Input</p><h1>Dán bảng screener vào đây</h1>
-    <p class="muted">Copy cả dòng header từ TradingView để app tự nhận diện cột và tính điểm.</p>
-    <textarea class="paste-box" id="pasteInput" placeholder="Paste dữ liệu TradingView...">${escapeHtml(state.pasteText)}</textarea>
-    <div class="actions"><button class="btn primary" id="processPaste">Xử lý dữ liệu</button><button class="btn" id="loadSample">Dùng dữ liệu mẫu</button><button class="btn" id="exportJson">Export JSON</button><label class="btn" for="importJson">Import JSON</label><input id="importJson" type="file" accept="application/json" hidden><button class="btn danger" id="clearData">Xóa dữ liệu</button></div>
-  </div><div class="panel panel-pad"><p class="eyebrow">Status</p><h2>${state.rows.length ? `${state.rows.length} mã đã sẵn sàng` : 'Chưa có dữ liệu'}</h2>
-    <p class="muted">Dữ liệu được lưu trong trình duyệt của bạn. Không còn phụ thuộc Google Sheet hay Apps Script.</p>
-    ${state.errors.length ? `<div class="errors">${state.errors.map(escapeHtml).join('<br>')}</div>` : '<div class="notice">Công thức đang dùng scoring model V1 trong SPEC.md.</div>'}
-  </div></section>`;
+  const status = state.importStatus || (state.rows.length ? { count: state.rows.length, columns: null, time: null } : null);
+  return `<section class="screen-page">
+    <div class="screen-hero">
+      <div class="screen-copy">
+        <p class="eyebrow">Stock Screening</p>
+        <h1>From TradingView<br>to Stock Mind</h1>
+        <p class="screen-lead">Lọc cổ phiếu trên TradingView, copy toàn bộ bảng kết quả, rồi đưa thẳng vào Stock Mind.</p>
+        <div class="screen-actions">
+          <button class="btn primary screen-action" id="openTradingView">Open TradingView <span>↗</span></button>
+          <button class="btn screen-action" id="importClipboard">Import &amp; Screen</button>
+        </div>
+        <p class="screen-hint">TradingView → Ctrl+A → Ctrl+C → Import &amp; Screen</p>
+        ${status ? `<div class="screen-status"><strong>${status.count.toLocaleString('vi-VN')} mã</strong><span>${status.columns ? `${status.columns} cột` : 'Screening data'}${status.time ? ` · ${escapeHtml(status.time)}` : ''}</span></div>` : ''}
+        ${state.errors.length ? `<div class="errors" style="margin-top:14px">${state.errors.map(escapeHtml).join('<br>')}</div>` : ''}
+      </div>
+      <div class="screen-visual" aria-hidden="true">
+        <div class="screen-orbit orbit-one"></div>
+        <div class="screen-orbit orbit-two"></div>
+        <div class="screen-flow-card flow-tv">
+          <div class="flow-card-top"><span class="flow-dot"></span><span>TRADINGVIEW</span></div>
+          <div class="mini-table"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="mini-bars"><b></b><b></b><b></b><b></b></div>
+        </div>
+        <div class="screen-flow-arrow">→</div>
+        <div class="screen-flow-card flow-rank">
+          <div class="flow-card-top"><span class="flow-dot"></span><span>STOCK MIND</span></div>
+          <div class="rank-row"><strong>#01</strong><span>VCB</span><em>A+</em></div>
+          <div class="rank-row"><strong>#02</strong><span>HPG</span><em>A</em></div>
+          <div class="rank-row"><strong>#03</strong><span>HAH</span><em>A</em></div>
+        </div>
+        <div class="screen-flow-card flow-crsm">
+          <div class="flow-card-top"><span class="flow-dot"></span><span>CRSM</span></div>
+          <div class="crsm-pulse"></div>
+          <small>Deep analysis</small>
+        </div>
+        <div class="screen-caption"><span>01</span> Copy your screen <span>02</span> Rank candidates <span>03</span> Analyze deeply</div>
+      </div>
+    </div>
+  </section>`;
 }
 
 function renderDashboard() {
@@ -77,12 +107,10 @@ function bindEvents() {
   document.querySelectorAll('[data-crsm]').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); launchScreenedCRSM(button.dataset.crsm); }));
   document.querySelectorAll('[data-select-ticker]').forEach(input => input.addEventListener('change', event => toggleSelectedTicker(event.target.dataset.selectTicker, event.target.checked)));
 
-  const pasteInput = document.getElementById('pasteInput');
-  if (pasteInput) pasteInput.addEventListener('input', event => { state.pasteText = event.target.value; });
-  bind('processPaste', 'click', processPaste);
-  bind('loadSample', 'click', () => { state.pasteText = samplePaste; processPaste(); });
-  bind('clearData', 'click', () => { state.rows = []; state.errors = []; state.selectedTicker = null; state.selectedTickers = []; localStorage.removeItem(STORAGE_KEY); render(); });
-  bind('exportJson', 'click', exportJson); bind('importJson', 'change', importJson); bind('copyPrompt', 'click', copyPrompt); bind('crsmRunDirect', 'click', runDirectCRSM);
+  bind('openTradingView', 'click', () => window.open('https://www.tradingview.com/screener/', '_blank', 'noopener,noreferrer'));
+  bind('importClipboard', 'click', importFromClipboard);
+  bind('copyPrompt', 'click', copyPrompt);
+  bind('crsmRunDirect', 'click', runDirectCRSM);
   bind('crsmBack', 'click', () => { state.tab = 'list'; render(); });
   bind('selectAllCRSM', 'change', event => selectVisible(event.target.checked));
   bind('selectVisibleCRSM', 'click', selectAllVisibleToggle);
@@ -98,6 +126,33 @@ function bindEvents() {
 }
 
 function bind(id, event, handler) { const node = document.getElementById(id); if (node) node.addEventListener(event, handler); }
+
+async function importFromClipboard() {
+  state.errors = [];
+  try {
+    if (!navigator.clipboard?.readText) throw new Error('Trình duyệt không hỗ trợ đọc Clipboard. Hãy dùng Chrome/Edge/Safari mới hoặc mở quyền Clipboard.');
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) throw new Error('Clipboard đang trống. Hãy mở TradingView Screener, Ctrl+A → Ctrl+C rồi thử lại.');
+    state.pasteText = text;
+    const result = parseTradingViewPaste(text);
+    state.errors = result.errors;
+    if (result.errors.length || !result.rows.length) {
+      state.importStatus = null;
+      render();
+      return;
+    }
+    state.rows = scoreStocks(result.rows);
+    state.selectedTicker = state.rows[0]?.TICKER || null;
+    state.selectedTickers = [];
+    state.importStatus = { count: state.rows.length, columns: result.rows[0] ? Object.keys(result.rows[0]).length : null, time: new Date().toLocaleString('vi-VN') };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+    state.tab = 'dashboard';
+    render();
+  } catch (error) {
+    state.errors = [error?.message || 'Không thể đọc dữ liệu từ Clipboard.'];
+    render();
+  }
+}
 
 function toggleSelectedTicker(ticker, checked) {
   const next = new Set(state.selectedTickers);
@@ -120,18 +175,6 @@ function selectAllVisibleToggle() {
   const visible = state.rows.filter(row => row.TICKER.toLowerCase().includes(q) || row.INDUSTRY.toLowerCase().includes(q)).map(row => row.TICKER);
   const allSelected = visible.length > 0 && visible.every(ticker => state.selectedTickers.includes(ticker));
   selectVisible(!allSelected);
-}
-
-function processPaste() {
-  const input = document.getElementById('pasteInput');
-  if (input && input.value.trim()) state.pasteText = input.value;
-  const result = parseTradingViewPaste(state.pasteText);
-  state.errors = result.errors;
-  state.rows = result.errors.length ? [] : scoreStocks(result.rows);
-  state.selectedTicker = state.rows[0]?.TICKER || null;
-  state.selectedTickers = [];
-  if (state.rows.length) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows)); state.tab = 'dashboard'; }
-  render();
 }
 
 function launchScreenedCRSM(ticker) {
@@ -168,9 +211,7 @@ async function runSelectedCRSM() {
         if (report) await downloadReportBundle(report, ticker);
       }
     });
-    if (result?.error && !result?.outputs?.node6a) {
-      console.warn(`CRSM batch failed for ${ticker}`, result.error);
-    }
+    if (result?.error && !result?.outputs?.node6a) console.warn(`CRSM batch failed for ${ticker}`, result.error);
     await new Promise(resolve => setTimeout(resolve, 250));
   }
 
@@ -207,15 +248,10 @@ function retryAllCRSM() {
   runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom: 'node1', existingOutputs: null, bypassCache: true });
 }
 
-function exportJson() { const blob = new Blob([JSON.stringify(state.rows, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `stock-mind-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url); }
-
-async function importJson(event) { const file = event.target.files?.[0]; if (!file) return; const rows = JSON.parse(await file.text()); state.rows = scoreStocks(rows); localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows)); state.tab = 'dashboard'; render(); }
-
-async function copyPrompt() { const text = document.getElementById('promptText')?.value; if (!text) return; await navigator.clipboard.writeText(text); }
 function loadRows() { try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
-function emptyState() { return `<section class="panel panel-pad"><p class="eyebrow">No Data</p><h1>Chưa có dữ liệu cổ phiếu</h1><p class="muted">Hãy dán dữ liệu TradingView ở tab Paste để bắt đầu.</p><button class="btn primary" data-tab="import">Đi tới Paste</button></section>`; }
+function emptyState() { return `<section class="panel panel-pad"><p class="eyebrow">No Data</p><h1>Chưa có dữ liệu cổ phiếu</h1><p class="muted">Hãy import bảng TradingView ở tab Screen để bắt đầu.</p><button class="btn primary" data-tab="import">Đi tới Screen</button></section>`; }
 function metric(label, value) { return `<div class="panel metric"><p class="metric-label">${label}</p><p class="metric-value">${value}</p></div>`; }
-function stockLine(row) { return `<div class="stock-line clickable" title="Chạy CRSM cho ${row.TICKER}"><button class="crsm-link ticker-run" data-crsm="${row.TICKER}" title="Chạy CRSM cho ${row.TICKER}" style="margin:0;padding:0;background:transparent;border:0;color:var(--blue);font-weight:900;letter-spacing:.04em">${row.TICKER}</button><span class="muted">${escapeHtml(row.INDUSTRY)}</span><span>${fmt(row.FINALSCORE)} ${gradeBadge(row.GRADE)}</span></div>`; }
+function stockLine(row) { return `<div class="stock-line clickable" data-crsm="${row.TICKER}" title="Chạy CRSM cho ${row.TICKER}"><span><strong>${row.TICKER}</strong> <span class="muted">${escapeHtml(row.INDUSTRY)}</span></span><span>${fmt(row.FINALSCORE)} ${gradeBadge(row.GRADE)}</span></div>`; }
 function scoreCard(label, value) { return `<div class="score-card"><span class="muted">${label}</span><strong>${fmt(value)}</strong></div>`; }
 function gradeBadge(grade) { const cls = grade?.startsWith('A') ? 'grade-a' : grade === 'B' ? 'grade-b' : grade === 'C' ? 'grade-c' : 'grade-d'; return `<span class="badge ${cls}">${grade || '-'}</span>`; }
 function fmt(value) { if (value == null || Number.isNaN(value)) return '-'; if (typeof value === 'number') return value.toLocaleString('vi-VN', { maximumFractionDigits: 2 }); return value; }
