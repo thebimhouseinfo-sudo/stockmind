@@ -9,10 +9,43 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function downloadHtmlReport(reportHtml, ticker) {
+export async function downloadReportImage(reportHtml, ticker) {
   if (!reportHtml) return;
-  const html = normalizeHtmlDocument(reportHtml, ticker);
-  downloadBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), `CRSM_${safeName(ticker)}_${dateStamp()}.html`);
+
+  const text = extractReportText(reportHtml);
+  const lines = wrapLines(text, 92);
+  const width = 1600;
+  const lineHeight = 30;
+  const top = 150;
+  const bottom = 70;
+  const height = Math.max(520, top + lines.length * lineHeight + bottom);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#172033';
+  ctx.font = '700 36px Arial';
+  ctx.fillText(`CRSM — ${ticker}`, 70, 62);
+  ctx.font = '18px Arial';
+  ctx.fillStyle = '#667085';
+  ctx.fillText(`Báo cáo phân tích · ${new Date().toLocaleDateString('vi-VN')}`, 70, 98);
+  ctx.strokeStyle = '#dbe2ec';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(70, 120);
+  ctx.lineTo(width - 70, 120);
+  ctx.stroke();
+
+  ctx.fillStyle = '#172033';
+  ctx.font = '18px Arial';
+  lines.forEach((line, index) => ctx.fillText(line, 70, top + index * lineHeight));
+
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
 }
 
 export function downloadWordReport(reportHtml, ticker) {
@@ -24,9 +57,33 @@ export function downloadWordReport(reportHtml, ticker) {
 
 export async function downloadReportBundle(reportHtml, ticker) {
   if (!reportHtml) return;
-  downloadHtmlReport(reportHtml, ticker);
+  await downloadReportImage(reportHtml, ticker);
   await new Promise(resolve => setTimeout(resolve, 150));
   downloadWordReport(reportHtml, ticker);
+}
+
+function extractReportText(html) {
+  const doc = new DOMParser().parseFromString(normalizeHtmlDocument(html, 'CRSM'), 'text/html');
+  return (doc.body?.innerText || doc.documentElement?.innerText || html)
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function wrapLines(text, maxChars) {
+  const words = String(text || '').split(' ');
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const candidate = `${current} ${word}`.trim();
+    if (candidate.length > maxChars) {
+      if (current) lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
 }
 
 function normalizeHtmlDocument(reportHtml, ticker) {
