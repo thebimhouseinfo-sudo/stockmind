@@ -11,7 +11,84 @@ function downloadBlob(blob, filename) {
 
 export async function downloadReportImage(reportHtml, ticker) {
   if (!reportHtml) return;
+  const html = normalizeHtmlDocument(reportHtml, ticker);
 
+  try {
+    const source = await measureReportDocument(html);
+    const width = Math.min(1600, Math.max(1100, source.width));
+    const height = Math.min(30000, Math.max(600, source.height));
+    const styles = source.styles.replace(/<\/style>/gi, '<\\/style>');
+    const body = source.body.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%"><xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml" style="width:${width}px;min-height:${height}px;background:#fff;overflow:hidden"><xhtml:style>${styles}</xhtml:style><xhtml:div>${body}</xhtml:div></xhtml:div></foreignObject></svg>`;
+
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const image = await blobToImage(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Không tạo được canvas để xuất ảnh.');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!png) throw new Error('Không tạo được PNG.');
+    downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+  } catch (error) {
+    console.warn('[CRSM] High-fidelity image export failed, using text fallback.', error);
+    downloadReportImageFallback(reportHtml, ticker);
+  }
+}
+
+async function measureReportDocument(html) {
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.style.position = 'fixed';
+  iframe.style.left = '-100000px';
+  iframe.style.top = '0';
+  iframe.style.width = '1600px';
+  iframe.style.height = '1200px';
+  iframe.style.border = '0';
+  iframe.style.visibility = 'hidden';
+  document.body.appendChild(iframe);
+
+  try {
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      iframe.srcdoc = html;
+    });
+    const doc = iframe.contentDocument;
+    if (!doc) throw new Error('Không truy cập được report document.');
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const body = doc.body;
+    const width = Math.ceil(Math.max(body.scrollWidth, body.offsetWidth, 1100));
+    const height = Math.ceil(Math.max(body.scrollHeight, body.offsetHeight, 600));
+    const styles = [...doc.querySelectorAll('style')].map(style => style.textContent || '').join('\n');
+    return { width, height, body: body.innerHTML, styles };
+  } finally {
+    iframe.remove();
+  }
+}
+
+function blobToImage(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = error => {
+      URL.revokeObjectURL(url);
+      reject(error);
+    };
+    image.src = url;
+  });
+}
+
+function downloadReportImageFallback(reportHtml, ticker) {
   const text = extractReportText(reportHtml);
   const lines = wrapLines(text, 92);
   const width = 1600;
@@ -24,7 +101,6 @@ export async function downloadReportImage(reportHtml, ticker) {
   canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = '#172033';
@@ -34,18 +110,16 @@ export async function downloadReportImage(reportHtml, ticker) {
   ctx.fillStyle = '#667085';
   ctx.fillText(`Báo cáo phân tích · ${new Date().toLocaleDateString('vi-VN')}`, 70, 98);
   ctx.strokeStyle = '#dbe2ec';
-  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(70, 120);
   ctx.lineTo(width - 70, 120);
   ctx.stroke();
-
   ctx.fillStyle = '#172033';
   ctx.font = '18px Arial';
   lines.forEach((line, index) => ctx.fillText(line, 70, top + index * lineHeight));
-
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+  canvas.toBlob(blob => {
+    if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+  }, 'image/png');
 }
 
 export function downloadWordReport(reportHtml, ticker) {
