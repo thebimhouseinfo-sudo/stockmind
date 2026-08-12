@@ -7,6 +7,7 @@ import { renderDirectEntry } from './direct.js';
 import { totalUsage } from '../usage.js';
 import { buildScreeningContext } from '../context.js';
 import { runCRSM } from '../engine.js';
+import { ingestUserEvidence, getPendingUserEvidence } from '../user-evidence.js';
 
 const DATASET_KEY = 'stock-mind.dataset.v1';
 let screenedClickHandlerInstalled = false;
@@ -56,6 +57,26 @@ export function bindCRSMUIBindings() {
   installScreenedClickHandler();
   bindDynamicEvents();
   bindReportEvents();
+  bindEvidenceUpload();
+}
+
+function bindEvidenceUpload() {
+  const input = document.getElementById('crsmEvidenceFiles');
+  if (!input || input.dataset.bound === '1') return;
+  input.dataset.bound = '1';
+  input.addEventListener('change', async event => {
+    const status = document.getElementById('crsmEvidenceStatus');
+    const files = event.target.files;
+    if (!files?.length) return;
+    if (status) status.textContent = `Đang đọc ${files.length} file…`;
+    try {
+      const evidence = await ingestUserEvidence(files);
+      if (status) status.textContent = `✓ Đã đọc ${evidence.documents.length} file · ${evidence.totalChars.toLocaleString('vi-VN')} ký tự. Sẽ đưa vào Node 3/4 khi chạy CRSM.`;
+    } catch (error) {
+      if (status) status.textContent = `✖ ${error?.message || error}`;
+    }
+    event.target.value = '';
+  });
 }
 
 function installScreenedClickHandler() {
@@ -68,9 +89,6 @@ function installScreenedClickHandler() {
     const ticker = String(trigger.dataset.crsm || '').trim().toUpperCase();
     if (!ticker) return;
 
-    // Handle this at capture level so the CRSM handoff cannot be lost when the
-    // surrounding view is re-rendered. The normal app handler is intentionally
-    // bypassed for this path; this is the single canonical screened handoff.
     event.preventDefault();
     event.stopPropagation();
 
