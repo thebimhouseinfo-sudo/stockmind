@@ -1,252 +1,44 @@
-import { field, setResult, MISSING_SHORT } from './render-common.js';
+import { field, setResult } from './render-common.js';
 
 export function renderNode6A(ctx) {
-  const outputs = ctx.outputs;
-  const { node1, node2, node3, node4, node5 } = outputs;
-  setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker });
-
+  const outputs = ctx.outputs || {};
+  setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker, sectorType: ctx.sectorType });
   const isScreened = ctx.mode === 'SCREENED';
-  const decision = field('node5.decision', 'Chưa có dữ liệu');
-  const aiScore = pct(field('node5.ai_score.value', MISSING_SHORT));
-  const confidence = pct(field('node5.confidence.value', MISSING_SHORT));
-
-  const drivers = (node5?.drivers || []).map(d => `<li>${esc(d)}</li>`).join('') ||
-    `<li class="muted">${MISSING_SHORT}</li>`;
-
-  const factors = [
-    ['Kỹ thuật', field('node5.scores.technical'), 'green'],
-    ['Dòng tiền', field('node5.scores.flow'), 'blue'],
-    ['Cơ bản', field('node5.scores.fundamental'), 'yellow'],
-    ['Ngành/Vĩ mô', field('node5.scores.sector_macro'), 'purple'],
-    ['Định giá', field('node5.scores.valuation'), 'green'],
-    ['Rủi ro', field('node5.scores.risk'), 'red']
-  ].map(([label, value, color]) => `<div class="metric-card"><span class="muted">${label}</span><strong>${value}</strong></div>`).join('');
-
-  const snapshotBlock = isScreened ? `
-    <div class="card border-brand">
-      <h3>Screening Snapshot</h3>
-      <p class="muted">Nguồn: StockScreener (dữ liệu TradingView do người dùng nhập) — bối cảnh sàng lọc ban đầu, KHÔNG phải điểm số CRSM.</p>
-      <div class="score-grid">
-        ${snapshotCard('Score', field('node1.screening_summary.screen_score'))}
-        ${snapshotCard('Rank', field('node1.screening_summary.screen_rank'))}
-        ${snapshotCard('Grade', field('node1.screening_summary.screen_grade'))}
-        ${snapshotCard('Quality', field('node1.screening_summary.quality_score'))}
-        ${snapshotCard('Growth', field('node1.screening_summary.growth_score'))}
-        ${snapshotCard('Valuation', field('node1.screening_summary.valuation_score'))}
-        ${snapshotCard('Momentum', field('node1.screening_summary.momentum_score'))}
-        ${snapshotCard('Mispricing', field('node1.screening_summary.mispricing_score'))}
-      </div>
-      <div class="vs-block">
-        <span class="muted">CRSM Score</span>
-        <strong>${aiScore}/100</strong>
-        <span class="badge ${statusClass(field('node5.screen_vs_crsm.status'))}">SCREEN → CRSM: ${field('node5.screen_vs_crsm.status')}</span>
-        <p class="muted">${field('node5.screen_vs_crsm.interpretation', '')}</p>
-      </div>
-    </div>` : '';
-
-  const sourcesHtml = (node1?.sources || []).map(s => esc(s.name || s.url_or_ref || '')).filter(Boolean).join(', ') || 'Chưa có dữ liệu';
-
-  return `<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Báo cáo phân tích ${esc(ctx.ticker)}</title>
-<style>
-  body { font-family: Inter, system-ui, sans-serif; background: #f5f7fb; color: #1a1a1a; margin: 0; padding: 24px; }
-  .report { max-width: 1100px; margin: 0 auto; }
-  .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
-  .hero { background: linear-gradient(135deg, #1e3a8a, #1e40af); color: #fff; }
-  .hero h1 { margin: 0 0 4px; font-size: 28px; }
-  .hero .lede { color: #bfdbfe; margin-bottom: 12px; }
-  .hero-row { display: flex; gap: 32px; flex-wrap: wrap; }
-  .hero-row strong { font-size: 34px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-  .metric-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center;}
-  .metric-card strong { display: block; font-size: 20px; margin-top: 4px; }
-  .muted { color: #64748b; }
-  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; }
-  .badge-ok { background: #dcfce7; color: #166534; }
-  .badge-warn { background: #fef3c7; color: #92400e; }
-  .badge-err { background: #fee2e2; color: #991b1b; }
-  .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-  @media (max-width: 760px) { .score-grid { grid-template-columns: repeat(2, 1fr);} }
-  .score-grid > div { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; text-align: center;}
-  .score-grid strong { display: block; margin-top: 2px; }
-  .vs-block { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: #fff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #edf1f7; font-size: 14px; }
-  th { color: #64748b; font-size: 12px; text-transform: uppercase; }
-  ul { margin: 0; padding-left: 18px; }
-</style>
-</head>
-<body>
-<div class="report">
-  <div class="card hero">
-    <p class="lede">HOSE: ${esc(ctx.ticker)} · Cập nhật: ${field('date')} · Kỳ dữ liệu: ${field('node1.data_period')}</p>
-    <h1>BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1>
-    <div class="hero-row">
-      <div><p class="muted">Quyết định</p><strong>${decision}</strong></div>
-      <div><p class="muted">AI Score</p><strong>${aiScore}<span style="font-size:16px">/100</span></strong></div>
-      <div><p class="muted">Tin tưởng</p><strong>${confidence}</strong></div>
-      <div><p class="muted">Điều kiện vô hiệu</p><p>${field('node5.thesis_invalidation')}</p></div>
-    </div>
-    <ul>${drivers}</ul>
-  </div>
-
-  ${snapshotBlock}
-
-  <div class="card">
-    <div class="grid-2">
-      <div>
-        <h3>Hệ thống chấm điểm AI</h3>
-        <div class="score-grid">${factors}</div>
-        <p class="muted">Buổi đánh giá: ${field('node5.ai_score.formula_shown', '')}</p>
-      </div>
-      <div>
-        <h3>Tín hiệu tổng hợp</h3>
-        ${conflictSignals(node5)}
-        <p class="muted">Catalyst gần nhất: ${field('node5.catalyst_horizon.nearest_catalyst')} (${field('node5.catalyst_horizon.bucket')})</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <h3>Vĩ mô</h3>
-      <p class="muted">Chế độ rủi ro: <strong>${field('node4.risk_regime')}</strong></p>
-      <p>FED: ${field('node4.macro_indicators.fed_rate.value')} · USD/VND: ${field('node4.macro_indicators.usd_vnd.value')} · Dầu Brent: ${field('node4.macro_indicators.oil_brent.value')} · Lạm phát: ${field('node4.macro_indicators.us_inflation.value')}</p>
-      <p>${field('node4.macro_view')}</p>
-    </div>
-    <div class="card">
-      <h3>Nhóm ngành</h3>
-      <p class="muted">Sức mạnh ngành: <strong>${field('node2.sector_vs_market.sector_strength_label')}</strong></p>
-      <p>Ngành (${field('node2.sector_vs_market.period')}): ${field('node2.sector_vs_market.sector_perf_pct')} · VN-Index: ${field('node2.sector_vs_market.vnindex_perf_pct')}</p>
-      <p>${field('node2.conclusion')}</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Doanh nghiệp & Chất lượng lợi nhuận</h3>
-    <table>
-      <tr><th>Doanh thu (${field('node1.financial_core_raw.revenue.period')})</th><td>${field('node1.financial_core_raw.revenue.value')} (${field('node1.financial_core_raw.revenue.yoy')})</td></tr>
-      <tr><th>Lợi nhuận sau thuế</th><td>${field('node1.financial_core_raw.npat.value')} (${field('node1.financial_core_raw.npat.yoy')})</td></tr>
-      <tr><th>CFO/NPAT</th><td>${field('node3.earnings_quality.cfo_over_npat')}</td></tr>
-      <tr><th>FCF/NPAT</th><td>${field('node3.earnings_quality.fcf_over_npat')}</td></tr>
-      <tr><th>Accrual Ratio</th><td>${field('node3.earnings_quality.accrual_ratio')}</td></tr>
-      <tr><th>Phân loại tăng trưởng</th><td>${field('node3.earnings_sustainability.classification')} — ${field('node3.earnings_sustainability.reasoning')}</td></tr>
-      <tr><th>F-Score / M-Score</th><td>${field('node3.f_score')} / ${field('node3.m_score')} (${field('node3.m_score_note')})</td></tr>
-      <tr><th>WACC / ROIC / Kinh tế biên</th><td>${field('node3.capital_efficiency.wacc.value')} / ${field('node3.capital_efficiency.roic.value')} / ${field('node3.capital_efficiency.economic_spread')}</td></tr>
-      <tr><th>Moat</th><td>${field('node3.moat')}</td></tr>
-    </table>
-  </div>
-
-  <div class="card">
-    <h3>Định giá & So sánh</h3>
-    <p class="muted">P/E (TTM): <strong>${field('node1.valuation_multiples.pe_ttm')}</strong> · P/B: <strong>${field('node1.valuation_multiples.pb_current')}</strong> · DCF Fair Value: <strong>${field('node3.valuation.dcf_fair_value')}</strong></p>
-    <p>Reverse DCF: ${field('node3.valuation.reverse_dcf_commentary')}</p>
-    ${peersTable(node3)}
-  </div>
-
-  <div class="card">
-    <h3>Kỹ thuật</h3>
-    <p>Xu hướng: ${field('node2.trend_status')} · ${field('node2.sma_200_rel')}</p>
-    <p>Volume Ratio: ${field('node2.volume_analysis.ratio')} — ${field('node2.volume_analysis.classification')} — ${field('node2.volume_analysis.vsa_signal_candidate')}</p>
-    <p>Giai đoạn: ${field('node2.smart_money_phase')} (${field('node2.zones.demand')})</p>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <h3>Quản trị Rủi ro</h3>
-      <p>Doanh nghiệp: ${field('node5.liquidity_note')}</p>
-      <p>Vĩ mô: ${field('node4.risk_regime')}</p>
-      <p>Thanh khoản: ${field('node1.market_data.liquidity_flag')}</p>
-    </div>
-    <div class="card">
-      <h3>Phân tích Nhân quả</h3>
-      <p>Gốc: ${field('node4.causal_chains.0.facts')}</p>
-      <p>Quả: ${field('node4.causal_chains.0.chain_summary')}</p>
-      <p>Kỹ thuật: ${field('node4.causal_chains.0.inferences')}</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Kịch bản</h3>
-    ${scenariosTable(node4)}
-  </div>
-
-  <div class="card">
-    <h3>Chiến lược giao dịch</h3>
-    <table>
-      <tr><th>Vùng mua</th><td>${field('node5.strategy.entry_zone')} — ${field('node5.strategy.allocation_plan')}</td></tr>
-      <tr><th>Cắt lỗ kỹ thuật</th><td>${field('node5.trading_stop.price')} (${field('node5.trading_stop.basis')})</td></tr>
-      <tr><th>Mục tiêu 1 / 2</th><td>${field('node5.strategy.tp1')} / ${field('node5.strategy.tp2')}</td></tr>
-      <tr><th>Quản trị vị thế</th><td>Rủi ro/lệnh ${field('node5.strategy.risk_per_trade_pct_nav')} NAV · Tỷ trọng tối đa ${field('node5.strategy.max_portfolio_weight_pct')} · Loại ${field('node5.strategy.position_type')}</td></tr>
-    </table>
-  </div>
-
-  <p class="muted" style="font-size:12px;">Nguồn: ${sourcesHtml}</p>
-  <p class="muted" style="font-size:12px;">Báo cáo tự động bởi CRSM · ${field('date')} · Không phải khuyến nghị đầu tư chính thức.</p>
-</div>
-</body>
-</html>`;
+  const f = (path, fallback = 'Data not available') => escapeHtml(field(path, fallback));
+  const raw = (path, fallback = null) => field(path, fallback);
+  const scoreWidth = path => { const n = Number(raw(path)); return Number.isFinite(n) ? `${Math.max(0, Math.min(100, n / 20 * 100))}%` : '0%'; };
+  const n1 = outputs.node1 || {}, n2 = outputs.node2 || {}, n3 = outputs.node3 || {}, n4 = outputs.node4 || {}, n5 = outputs.node5 || {};
+  const drivers = (n5.drivers || []).slice(0,3).map(x => `<li><span class="dot">●</span><span>${escapeHtml(x)}</span></li>`).join('') || '<li><span class="dot">●</span><span>Data not available</span></li>';
+  const peers = (n3.peer_list || []).slice(0,5).map(p => `<tr><td>${escapeHtml(p.ticker ?? 'Data not available')}</td><td>${escapeHtml(p.pe ?? 'Data not available')}</td><td>${escapeHtml(p.pb ?? 'Data not available')}</td><td>${escapeHtml(p.roe ?? 'Data not available')}</td><td>${escapeHtml(p.selection_reason ?? 'Data not available')}</td></tr>`).join('') || '<tr><td colspan="5">Data not available</td></tr>';
+  const sources = (n1.sources || []).map(s => s?.name || s?.url_or_ref).filter(Boolean).slice(0,8).map(escapeHtml).join(', ') || 'Data not available';
+  const scenarios = n4.risk_scenarios || {};
+  const bull = scenarios.bull || scenarios.BULL || {}, base = scenarios.base || scenarios.BASE || {}, bear = scenarios.bear || scenarios.BEAR || {};
+  const screening = isScreened ? `<section class="card screening-card"><p class="eyebrow">SCREENING SNAPSHOT</p><h2>Stock Mind pre-filter</h2><p class="subtle">Nguồn: StockScreener · dữ liệu TradingView do người dùng nhập. Đây là bối cảnh sàng lọc ban đầu, không phải điểm số CRSM.</p><div class="metric-grid eight">${metricBox('Score',f('node1.screening_summary.screen_score'))}${metricBox('Rank',f('node1.screening_summary.screen_rank'))}${metricBox('Grade',f('node1.screening_summary.screen_grade'))}${metricBox('Quality',f('node1.screening_summary.quality_score'))}${metricBox('Growth',f('node1.screening_summary.growth_score'))}${metricBox('Valuation',f('node1.screening_summary.valuation_score'))}${metricBox('Momentum',f('node1.screening_summary.momentum_score'))}${metricBox('Mispricing',f('node1.screening_summary.mispricing_score'))}</div><div class="comparison"><div><span>CRSM Score</span><strong>${f('node5.ai_score.value')}</strong></div><div><b>${statusLabel(raw('node5.screen_vs_crsm.status'))}</b><p>${f('node5.screen_vs_crsm.interpretation')}</p></div></div></section>` : '';
+  return `<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Báo Cáo Phân Tích ${escapeHtml(ctx.ticker)}</title><style>${CSS}</style></head><body><div id="report" class="page">
+<header class="header"><div><span class="ticker">HOSE: ${escapeHtml(ctx.ticker)}</span><span class="date">Cập nhật: ${f('date')}</span><h1>BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><p class="company">${f('node1.company_name',`Hồ sơ ${escapeHtml(ctx.ticker)}`)}</p></div><div class="analyst"><p>CHUYÊN GIA PHÂN TÍCH</p><strong>Senior Equity Analyst &amp; Geopolitical Strategist</strong></div></header>
+<section class="card hero"><div class="hero-top"><div><span class="eyebrow light">QUYẾT ĐỊNH ĐẦU TƯ</span><div class="decision">${f('node5.decision')}</div></div><div class="hero-score"><div><span>AI SCORE</span><strong>${f('node5.ai_score.value')}</strong></div><div><span>TIN TƯỞNG</span><strong>${f('node5.confidence.value')}</strong></div></div></div><div class="hero-grid"><div><h3>ĐỘNG LỰC TĂNG TRƯỞNG CHÍNH</h3><ul>${drivers}</ul></div><div class="invalidation"><h3>ĐIỀU KIỆN VÔ HIỆU (INVALIDATION)</h3><p>${f('node5.thesis_invalidation')}</p></div></div></section>
+${screening}
+<section class="card"><div class="eyebrow">INSTITUTIONAL SIGNALS</div><h2>Tín hiệu Tổng hợp</h2><div class="signal-grid">${signalBox('Cơ bản',n5.conflict_detector?.fundamental)}${signalBox('Kỹ thuật',n5.conflict_detector?.technical)}${signalBox('Vĩ mô',n5.conflict_detector?.macro)}${signalBox('Thanh khoản',n5.conflict_detector?.liquidity)}</div><div class="center-badge">Đồng thuận tín hiệu: ${escapeHtml(n5.conflict_detector?.alignment ?? 'Data not available')}</div><div class="three-grid"><div class="subcard"><span class="label">Catalyst gần nhất</span><strong>${f('node5.catalyst_horizon.nearest_catalyst')}</strong><small>${f('node5.catalyst_horizon.bucket')}</small></div><div class="subcard"><span class="label">Chất lượng lợi nhuận</span><p>${(n3.earnings_quality?.red_flags || []).length ? escapeHtml(n3.earnings_quality.red_flags.join('; ')) : 'Không phát hiện bất thường'}</p></div><div class="subcard"><span class="label">Reverse DCF</span><p>CAGR ngầm định: ${f('node3.valuation.reverse_dcf_implied_fcf_cagr')} — ${f('node3.valuation.reverse_dcf_commentary')}</p></div></div></section>
+<div class="two-col"><section class="card"><div class="eyebrow">MACRO</div><h2>Vĩ mô &amp; Địa chính trị</h2><div class="risk-row"><span>Chế độ rủi ro</span><strong>${f('node4.risk_regime')}</strong></div><div class="metric-grid two">${metricBox('Lãi suất FED',f('node4.macro_indicators.fed_rate.value'))}${metricBox('USD/VND',f('node4.macro_indicators.usd_vnd.value'))}${metricBox('Dầu Brent',f('node4.macro_indicators.oil_brent.value'))}${metricBox('Lạm phát Mỹ',f('node4.macro_indicators.us_inflation.value'))}</div><p class="text">${f('node4.macro_view')}</p></section><section class="card"><div class="eyebrow">SECTOR</div><h2>Phân tích Nhóm Ngành</h2><div class="risk-row"><span>Sức mạnh ngành</span><strong>${f('node2.sector_vs_market.sector_strength_label')}</strong></div><div class="subcard"><div class="between"><span>Ngành</span><strong>${f('node2.sector_vs_market.sector_perf_pct')}</strong></div><div class="between"><span>VN-Index</span><strong>${f('node2.sector_vs_market.vnindex_perf_pct')}</strong></div><div class="bar"><i style="width:${sectorBar(n2.sector_vs_market)}"></i></div></div><p class="text">${f('node2.conclusion')}</p></section></div>
+<div class="two-col"><section class="card"><div class="eyebrow">INDUSTRY</div><h2>Chu kỳ &amp; Chính sách</h2><div class="subcard"><span class="label">GIAI ĐOẠN</span><strong>${f('node4.industry_impact')}</strong></div><div class="two-grid"><div class="subcard"><span class="label">BIÊN NGÀNH</span><strong>${industryMargin(n3.peer_list)}</strong><small>${industryMarginDesc(n3.peer_list)}</small></div><div class="subcard"><span class="label">CAPEX / ĐẦU TƯ CÔNG</span><strong>${f('node4.domestic_drivers.0.value')}</strong></div></div></section><section class="card"><div class="eyebrow">COMPANY</div><h2>Phân tích Doanh nghiệp</h2><table class="table"><tr><th>Doanh thu (${f('node1.financial_core_raw.revenue.period')})</th><td>${f('node1.financial_core_raw.revenue.value')} · ${f('node1.financial_core_raw.revenue.yoy')}</td></tr><tr><th>Lợi nhuận sau thuế</th><td>${f('node1.financial_core_raw.npat.value')} · ${f('node1.financial_core_raw.npat.yoy')}</td></tr><tr><th>Moat</th><td>${f('node3.moat')}</td></tr></table></section></div>
+<section class="card"><div class="two-col"><div><div class="eyebrow">SMART MONEY</div><h2>Dòng tiền thông minh</h2><div class="highlight"><strong>Key Insight:</strong> ${f('node2.smart_money_phase')} tại vùng ${f('node2.zones.demand')}. ${f('node2.volume_analysis.vsa_signal_candidate')}</div><div class="metric-grid two">${metricBox('Volume Ratio',f('node2.volume_analysis.ratio'))}${metricBox('Tín hiệu',f('node2.volume_analysis.classification'))}</div></div><div><div class="eyebrow">VALUATION</div><h2>Định giá</h2><div class="metric-grid two">${metricBox('P/E (TTM)',f('node1.valuation_multiples.pe_ttm'))}${metricBox('P/B',f('node1.valuation_multiples.pb_current'))}</div><p class="text">TB Peer P/E: ${f('node3.valuation.peer_avg_pe')}</p><p class="text">DCF Fair Value: ${f('node3.valuation.dcf_fair_value')}</p><div class="highlight"><strong>Reverse DCF:</strong> ${f('node3.valuation.reverse_dcf_commentary')}</div></div></div></section>
+<section class="card"><div class="eyebrow">TECHNICAL</div><h2>Cấu trúc Kỹ thuật</h2><table class="table"><tr><th>Xu hướng</th><td>${f('node2.trend_status')}</td></tr><tr><th>So với SMA 200</th><td>${f('node2.sma_200_rel')}</td></tr><tr><th>Volume behavior</th><td>${f('node2.volume_analysis.classification')}</td></tr><tr><th>Smart Money phase</th><td>${f('node2.smart_money_phase')}</td></tr></table></section>
+<section class="card"><div class="eyebrow">AI SCORE GRID</div><h2>Hệ thống chấm điểm AI</h2><div class="score-grid">${scoreBox('Kỹ thuật','node5.scores.technical')}${scoreBox('Dòng tiền','node5.scores.flow')}${scoreBox('Cơ bản','node5.scores.fundamental')}${scoreBox('Ngành/Vĩ mô','node5.scores.sector_macro')}${scoreBox('Định giá','node5.scores.valuation')}${scoreBox('Rủi ro','node5.scores.risk')}</div><p class="text">${f('node5.ai_score.formula_shown')}</p></section>
+<div class="two-col"><section class="card"><div class="eyebrow">RISK</div><h2>Quản trị Rủi ro</h2><table class="table"><tr><th>Doanh nghiệp</th><td>${f('node5.liquidity_note')}</td></tr><tr><th>Vĩ mô</th><td>${f('node4.risk_regime')}</td></tr><tr><th>Thanh khoản</th><td>${f('node1.market_data.liquidity_flag')}</td></tr></table></section><section class="card"><div class="eyebrow">CAUSAL ANALYSIS</div><h2>Phân tích Nhân quả</h2><ul class="causal"><li><b>Gốc:</b> ${f('node4.causal_chains.0.facts')}</li><li><b>Quả:</b> ${f('node4.causal_chains.0.chain_summary')}</li><li><b>Suy luận:</b> ${f('node4.causal_chains.0.inferences')}</li></ul></section></div>
+<section class="card"><div class="eyebrow">SCENARIOS</div><h2>Kịch bản Phân tích</h2><div class="three-grid"><div class="subcard bull"><h3>BULL CASE <span>${escapeHtml(bull.probability ?? bull.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(bull.condition ?? bull.description ?? 'Data not available')}</p><strong>${escapeHtml(bull.target ?? 'Data not available')}</strong></div><div class="subcard base"><h3>BASE CASE <span>${escapeHtml(base.probability ?? base.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(base.condition ?? base.description ?? 'Data not available')}</p><strong>${escapeHtml(base.target ?? 'Data not available')}</strong></div><div class="subcard bear"><h3>BEAR CASE <span>${escapeHtml(bear.probability ?? bear.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(bear.condition ?? bear.description ?? 'Data not available')}</p><strong>${escapeHtml(bear.target ?? bear.price ?? 'Data not available')}</strong></div></div></section>
+<section class="card trade"><div style="text-align:center"><div class="eyebrow">TRADE SETUP</div><h2>Chiến lược Giao dịch</h2></div><div class="trade-grid">${tradeBox('Vùng Mua',f('node5.strategy.entry_zone'))}${tradeBox('Cắt Lỗ',f('node5.trading_stop.price'))}${tradeBox('Mục tiêu 1',f('node5.strategy.tp1'))}${tradeBox('Mục tiêu 2',f('node5.strategy.tp2'))}</div><div class="allocation"><b>Lộ trình giải ngân</b><p>${f('node5.strategy.allocation_plan')}</p></div><div class="allocation"><b>Quản trị vị thế</b><div class="three-grid"><div>Rủi ro/lệnh: ${f('node5.strategy.risk_per_trade_pct_nav')}</div><div>Tỷ trọng tối đa: ${f('node5.strategy.max_portfolio_weight_pct')}</div><div>Loại vị thế: ${f('node5.strategy.position_type')}</div></div></div></section>
+<footer class="footer">Nguồn: ${sources}<br>Báo cáo được tạo tự động bởi AI Equity Research Engine · ${f('date')} · Chỉ dành cho mục đích tham khảo, không phải khuyến nghị đầu tư chính thức.</footer>
+</div></body></html>`;
 }
 
-function snapshotCard(label, value) {
-  return `<div><span class="muted">${label}</span><strong>${value}</strong></div>`;
-}
+function metricBox(label,value){return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>`}
+function signalBox(label,value){return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value ?? 'Data not available')}</strong></div>`}
+function scoreBox(label,path){const value=field(path,'Data not available');return `<div class="score"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong><div class="track"><i style="width:${scoreWidth(path)}"></i></div></div>`}
+function tradeBox(label,value){return `<div class="tradebox"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>`}
+function statusLabel(v){if(v==='CONFIRMED')return 'XÁC NHẬN';if(v==='PARTIAL')return 'MỘT PHẦN';if(v==='DIVERGENT')return 'PHÂN KỲ';return 'Data not available'}
+function sectorBar(d){const a=Number(d?.sector_perf_pct),b=Number(d?.vnindex_perf_pct);if(!Number.isFinite(a)||!Number.isFinite(b)||b===0)return '50%';return `${Math.max(10,Math.min(100,Math.abs(a)/Math.max(1,Math.abs(b))*50))}%`}
+function industryMargin(peers){const vals=(peers||[]).map(p=>Number(p.net_margin??p.gross_margin??NaN)).filter(Number.isFinite);if(!vals.length)return 'Data not available';return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}%`}
+function industryMarginDesc(peers){return(peers||[]).some(p=>p.net_margin!=null||p.gross_margin!=null)?'Bình quân từ peer_list':'Data not available'}
+function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;')}
 
-function conflictSignals(node5) {
-  if (!node5?.conflict_detector) return `<p class="muted">${MISSING_SHORT}</p>`;
-  const d = node5.conflict_detector;
-  return `
-    <table>
-      <tr><th>Cơ bản</th><td>${d.fundamental ?? MISSING_SHORT}</td></tr>
-      <tr><th>Kỹ thuật</th><td>${d.technical ?? MISSING_SHORT}</td></tr>
-      <tr><th>Vĩ mô</th><td>${d.macro ?? MISSING_SHORT}</td></tr>
-      <tr><th>Thanh khoản</th><td>${d.liquidity ?? MISSING_SHORT}</td></tr>
-      <tr><th>Đồng thuận tín hiệu</th><td>${d.signal_alignment ?? MISSING_SHORT}</td></tr>
-    </table>`;
-}
-
-function peersTable(node3) {
-  const peers = node3?.valuation?.peer_list || [];
-  if (!peers.length) return `<p>${MISSING_SHORT}</p>`;
-  return `<table>
-    <tr><th>Mã</th><th>P/E</th><th>P/B</th><th>ROE</th><th>Lý do chọn</th></tr>
-    ${peers.map(p => `<tr><td>${esc(p.ticker)}</td><td>${p.pe ?? ''}</td><td>${p.pb ?? ''}</td><td>${p.roe ?? ''}</td><td>${esc(p.peer_selection_reason || '')}</td></tr>`).join('')}
-  </table>`;
-}
-
-function scenariosTable(node4) {
-  const scenarios = node4?.risk_scenarios || [];
-  if (!scenarios.length) return `<p>${MISSING_SHORT}</p>`;
-  return `<table>
-    <tr><th>Kịch bản</th><th>Xác suất</th><th>Điều kiện</th></tr>
-    ${scenarios.map(s => `<tr><td>${esc(s.case)}</td><td>${s.probability_pct ?? ''}%</td><td>${esc(s.condition || '')}</td></tr>`).join('')}
-  </table>`;
-}
-
-function statusClass(status) {
-  if (status === 'CONFIRMED') return 'badge-ok';
-  if (status === 'PARTIAL') return 'badge-warn';
-  if (status === 'DIVERGENT') return 'badge-err';
-  return '';
-}
-
-function pct(value) {
-  if (value == null || value === MISSING_SHORT) return value ?? MISSING_SHORT;
-  if (String(value).includes('%')) return value;
-  if (!Number.isFinite(Number(value))) return value;
-  return `${Math.round(Number(value) * 100) / 100}%`;
-}
-
-function esc(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+const CSS=`:root{--deep:#1e3a8a;--accent:#3b82f6;--bg:#f5f7fb;--text:#1a1a1a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--red:#dc2626}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.6}.page{max-width:1100px;margin:auto;padding:32px 18px 48px}.header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:28px}.ticker{background:var(--deep);color:#fff;padding:5px 10px;border-radius:5px;font-size:12px;font-weight:800;letter-spacing:.12em}.date{margin-left:10px;color:#64748b;font-size:12px;font-weight:600}.header h1{font-size:34px;line-height:1.15;color:var(--deep);margin:8px 0 3px;font-weight:900}.company{font-weight:600;color:#475569;margin:0}.analyst{text-align:right}.analyst p{font-size:10px;letter-spacing:.12em;color:#94a3b8;font-weight:800;margin:0 0 4px}.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:24px;border:1px solid rgba(226,232,240,.9);box-shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -2px rgba(0,0,0,.05)}.hero{background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;border:0}.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:center;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:20px;margin-bottom:20px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:#94a3b8;margin:0 0 6px}.eyebrow.light{color:#bfdbfe}.decision{font-size:54px;font-weight:900}.hero-score{display:flex;gap:38px;text-align:center}.hero-score span{font-size:10px;color:#bfdbfe;letter-spacing:.12em;font-weight:800}.hero-score strong{font-size:32px;display:block}.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:24px}.hero h3{font-size:11px;letter-spacing:.1em;color:#dbeafe}.hero ul{list-style:none;margin:0;padding:0}.hero li{display:flex;gap:8px;margin:7px 0;font-size:14px}.dot{color:#86efac}.invalidation{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:16px}.invalidation h3{color:#fecaca}.section-title h2,h2{font-size:22px;color:var(--deep);margin:3px 0 14px}.subtle,.text{color:#64748b;font-size:13px}.metric-grid{display:grid;gap:12px}.metric-grid.eight{grid-template-columns:repeat(4,1fr)}.metric-grid.two{grid-template-columns:repeat(2,1fr)}.metric{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}.metric span{display:block;color:#94a3b8;text-transform:uppercase;font-size:10px;font-weight:800}.metric strong{display:block;font-size:20px;margin-top:2px}.comparison{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center;margin-top:16px;padding:16px;border:1px solid #dbeafe;border-radius:12px;background:#fff}.comparison>div:first-child{text-align:center}.comparison>div:first-child span{display:block;color:#94a3b8;text-transform:uppercase;font-size:10px;font-weight:800}.comparison>div:first-child strong{font-size:28px;color:var(--deep)}.comparison b{display:inline-block;padding:4px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:11px}.comparison p{color:#64748b;font-size:12px;margin:6px 0 0}.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.center-badge{text-align:center;margin:14px 0;font-size:12px;font-weight:800;color:#1d4ed8}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}.two-grid,.three-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.two-grid{grid-template-columns:repeat(2,1fr)}.subcard{background:#fff;border:1px solid #edf2f7;padding:15px;border-radius:10px}.subcard .label{display:block;color:#94a3b8;font-size:10px;text-transform:uppercase;font-weight:800;margin-bottom:5px}.subcard strong{display:block;font-size:17px}.subcard small{display:block;color:#64748b;margin-top:4px}.risk-row{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:12px;border:1px solid #edf2f7;border-radius:10px;margin-bottom:12px}.between{display:flex;justify-content:space-between;margin-bottom:8px}.bar{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--accent)}.highlight{background:#eff6ff;border-left:4px solid var(--accent);padding:16px;margin:14px 0;border-radius:0 8px 8px 0}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px 12px;border-bottom:1px solid #edf1f7;vertical-align:top;font-size:13px}.table th{color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.score-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.score{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.score small{display:block;color:#94a3b8;text-transform:uppercase;font-size:9px;font-weight:800}.score strong{display:block;font-size:20px}.track{height:4px;background:#e5e7eb;border-radius:999px;margin-top:8px}.track i{display:block;height:100%;background:var(--accent);border-radius:999px}.causal{padding-left:18px}.causal li{margin:8px 0;font-size:13px}.scenario h3{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin:0 0 8px}.scenario h3 span{font-size:10px;padding:4px 8px;border-radius:999px;background:#f1f5f9}.scenario p{font-size:12px;color:#64748b;min-height:58px}.scenario strong{font-size:20px}.bull{border-top:4px solid #22c55e}.base{border-top:4px solid #3b82f6}.bear{border-top:4px solid #ef4444}.trade{border:2px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff)}.trade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.tradebox{text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.tradebox span{display:block;color:#94a3b8;font-size:10px;text-transform:uppercase;font-weight:800;margin-bottom:5px}.tradebox strong{font-size:20px}.allocation{background:#fff;border:1px solid #dbeafe;border-radius:12px;padding:14px;margin-top:14px}.footer{border-top:1px solid var(--line);padding-top:18px;margin-top:34px;color:#94a3b8;text-align:center;font-size:11px}@media(max-width:900px){.hero-grid,.two-col{grid-template-columns:1fr}.metric-grid.eight,.signal-grid{grid-template-columns:repeat(2,1fr)}.score-grid{grid-template-columns:repeat(3,1fr)}.trade-grid{grid-template-columns:repeat(2,1fr)}.three-grid{grid-template-columns:1fr}}@media(max-width:600px){.page{padding:20px 12px 36px}.header{align-items:flex-start;flex-direction:column}.analyst{text-align:left}.decision{font-size:42px}.hero-score{gap:20px}.metric-grid.eight,.signal-grid,.score-grid{grid-template-columns:repeat(2,1fr)}.trade-grid,.two-grid{grid-template-columns:1fr}.card{padding:20px}}`;
