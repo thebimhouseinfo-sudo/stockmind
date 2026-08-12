@@ -16,7 +16,7 @@ const OLLAMA_CLOUD_MODELS = [
 ];
 
 const GEMINI_3_FLASH = {
-  id: 'gemini-3-flash-preview',
+  id: 'gemini-3.0-flash',
   displayName: 'Gemini 3.0 Flash',
   builtin: true,
   pricing: GEMINI_3_PRICING,
@@ -90,17 +90,24 @@ function ensureBuiltinModels(settings) {
 function migrateGemini3ModelId(settings) {
   const provider = settings?.crsm?.providers?.gemini;
   if (!provider) return;
-  const legacyId = 'gemini-3-flash';
-  const newId = GEMINI_3_FLASH.id;
-  const legacyModel = (provider.models || []).find(model => model.id === legacyId);
-  if (legacyModel) {
-    const alreadyExists = (provider.models || []).some(model => model.id === newId);
-    provider.models = alreadyExists
-      ? provider.models.filter(model => model.id !== legacyId)
-      : provider.models.map(model => model.id === legacyId ? { ...GEMINI_3_FLASH, ...model, id: newId, displayName: GEMINI_3_FLASH.displayName } : model);
-  }
+  const stableId = GEMINI_3_FLASH.id;
+  const legacyIds = ['gemini-3-flash', 'gemini-3-flash-preview'];
+  const models = provider.models || [];
+  const existingStable = models.some(model => model.id === stableId);
+
+  provider.models = models.reduce((out, model) => {
+    if (!legacyIds.includes(model.id)) {
+      out.push(model);
+      return out;
+    }
+    if (!existingStable && !out.some(item => item.id === stableId)) {
+      out.push({ ...GEMINI_3_FLASH, ...model, id: stableId, displayName: GEMINI_3_FLASH.displayName, builtin: true });
+    }
+    return out;
+  }, []);
+
   Object.values(settings.crsm.nodeAssignment || {}).forEach(assignment => {
-    if (assignment?.provider === 'gemini' && assignment.model === legacyId) assignment.model = newId;
+    if (assignment?.provider === 'gemini' && legacyIds.includes(assignment.model)) assignment.model = stableId;
   });
 }
 
