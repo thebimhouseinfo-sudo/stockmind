@@ -1,14 +1,15 @@
 import { todayISODate } from './context.js';
 import { loadSettings } from './settings.js';
 
-const STORAGE_KEY = 'stock-mind.crsm.cache.v2';
-const CACHE_VERSION = 'crsm-v2';
+const STORAGE_KEY = 'stock-mind.crsm.cache.v3';
+const CACHE_VERSION = 'crsm-v3';
 const DEFAULT_OVERRIDES = null;
 
 function configFingerprint() {
   const settings = loadSettings();
   const assignments = settings?.crsm?.nodeAssignment || {};
   const providers = settings?.crsm?.providers || {};
+  const executionMode = settings?.crsm?.executionMode || 'sequential';
   const relevant = Object.keys(assignments).sort().map(nodeId => {
     const a = assignments[nodeId] || {};
     const model = providers?.[a.provider]?.models?.find(m => m.id === a.model);
@@ -18,7 +19,8 @@ function configFingerprint() {
       model: a.model,
       enabled: a.enabled !== false,
       capabilities: model?.capabilities || {},
-      pricing: model?.pricing || {}
+      pricing: model?.pricing || {},
+      executionMode
     };
   });
   return simpleHash(JSON.stringify(relevant));
@@ -54,6 +56,7 @@ export function cacheSet({ mode, ticker }, outputs) {
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+    localStorage.removeItem('stock-mind.crsm.cache.v2');
   } catch {
     // Quota exceeded — bỏ qua, không làm hỏng run hiện tại
   }
@@ -62,6 +65,7 @@ export function cacheSet({ mode, ticker }, outputs) {
 export function cacheClear() {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('stock-mind.crsm.cache.v2');
     localStorage.removeItem('stock-mind.crsm.cache.v1');
   } catch {
     // ignore
