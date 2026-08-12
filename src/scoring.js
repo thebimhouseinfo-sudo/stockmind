@@ -1,39 +1,82 @@
 export function scoreStocks(rawRows) {
   const rows = rawRows.map(row => ({ ...row }));
+  const marketValues = buildMarketValues(rows);
   const industryGroups = groupBy(rows, row => row.INDUSTRY || 'Unknown');
   const industryStats = buildIndustryStats(industryGroups);
 
   rows.forEach(row => {
-    const peers = industryGroups.get(row.INDUSTRY || 'Unknown') || rows;
-    const roePct = percentileRank(valueList(peers, 'ROE'), row.ROE);
-    const roicPct = percentileRank(valueList(peers, 'ROIC'), row.ROIC);
-    const revPct = percentileRank(valueList(peers, 'REVGROWTH'), row.REVGROWTH);
-    const epsPct = percentileRank(valueList(peers, 'EPSGROWTH'), row.EPSGROWTH);
-    const pePct = 1 - percentileRank(valueList(peers, 'PE'), row.PE);
-    const growthPct = average([revPct, epsPct], 0.5);
-    const debtSafety = scoreDebt(row.DEBT);
+    const industryRows = industryGroups.get(row.INDUSTRY || 'Unknown') || [];
 
-    row.QUALITY_SCORE = round2(100 * (0.45 * roePct + 0.45 * roicPct + 0.10 * debtSafety));
-    row.GROWTH_SCORE = round2(100 * growthPct);
+    const roePct = relativePercentile(industryRows, marketValues.ROE, row.ROE, 4);
+    const roicPct = relativePercentile(industryRows, marketValues.ROIC, row.ROIC, 4);
+    const revPct = relativePercentile(industryRows, marketValues.REVGROWTH, row.REVGROWTH, 4);
+    const epsPct = relativePercentile(industryRows, marketValues.EPSGROWTH, row.EPSGROWTH, 4);
+    const pePct = valuationPercentile(industryRows, marketValues.PE, row.PE, 4);
+
+    const debtSafety = scoreDebt(row.DEBT);
+    const growthConsistency = scoreGrowthConsistency(row.REVGROWTH, row.EPSGROWTH);
+
+    // Quality = profitability + capital efficiency + leverage safety.
+    row.QUALITY_SCORE = round2(100 * (
+      0.40 * roePct +
+      0.40 * roicPct +
+      0.20 * debtSafety
+    ));
+
+    // Growth rewards revenue first, with EPS as a secondary confirmation.
+    // A very large EPS-vs-revenue disconnect is treated as lower-quality growth,
+    // not automatically as stronger growth.
+    const rawGrowth = 0.60 * revPct + 0.40 * epsPct;
+    row.GROWTH_SCORE = round2(100 * rawGrowth * growthConsistency);
+
+    // Valuation is sector-relative. Non-positive P/E is not interpreted as "cheap".
     row.VALUATION_SCORE = round2(100 * pePct);
-    row.MICRO = round2(0.40 * row.QUALITY_SCORE + 0.30 * row.GROWTH_SCORE + 0.30 * row.VALUATION_SCORE);
+
+    // Micro is a compact diagnostic view, not an independent extra reward in Final Score.
+    row.MICRO = round2(
+      0.35 * row.QUALITY_SCORE +
+      0.30 * row.GROWTH_SCORE +
+      0.35 * row.VALUATION_SCORE
+    );
+
     row.MOMENTUM_RAW = weightedMomentum(row);
   });
 
-  const momentumValues = rows.map(row => row.MOMENTUM_RAW).filter(isFiniteNumber);
+  const momentumValues = rows
+    .map(row => row.MOMENTUM_RAW)
+    .filter(isFiniteNumber);
 
   rows.forEach(row => {
     const stats = industryStats.get(row.INDUSTRY || 'Unknown') || {};
-    row.MOMENTUM = round2(100 * percentileRank(momentumValues, row.MOMENTUM_RAW));
-    row.MISPRICING = round2(mispricingScore(row, stats));
-    row.FINALSCORE = round2(0.45 * row.MICRO + 0.30 * row.MOMENTUM + 0.25 * row.MISPRICING);
+    const momentumPct = percentileRank(momentumValues, row.MOMENTUM_RAW, 3);
+
+    row.MOMENTUM = round2(100 * momentumPct);
+    row.MISPRICING = round2(opportunityScore(row, stats));
+
+    // Final score uses the six displayed concepts without double-counting MICRO.
+    // MICRO remains useful for diagnostics, while Final stays transparent:
+    // Quality 30 + Growth 20 + Valuation 20 + Momentum 15 + Opportunity 15.
+    row.FINALSCORE = round2(
+      0.30 * row.QUALITY_SCORE +
+      0.20 * row.GROWTH_SCORE +
+      0.20 * row.VALUATION_SCORE +
+      0.15 * row.MOMENTUM +
+      0.15 * row.MISPRICING
+    );
+
     row.GRADE = grade(row.FINALSCORE);
     row.INDUSTRY_MEDIAN_PE = stats.medianPE ?? null;
     row.INDUSTRY_MEDIAN_ROE = stats.medianROE ?? null;
   });
 
   rows
-    .sort((a, b) => (b.FINALSCORE ?? -1) - (a.FINALSCORE ?? -1))
+    .sort((a, b) => {
+      const scoreDiff = (b.FINALSCORE ?? -1) - (a.FINALSCORE ?? -1);
+      if (scoreDiff !== 0) return scoreDiff;
+      const momentumDiff = (b.MOMENTUM ?? -1) - (a.MOMENTUM ?? -1);
+      if (momentumDiff !== 0) return momentumDiff;
+      return String(a.TICKER || '').localeCompare(String(b.TICKER || ''));
+    })
     .forEach((row, index) => {
       row.RANK = index + 1;
     });
@@ -76,7 +119,7 @@ Dữ liệu:
 - Valuation Score: ${line(stock.VALUATION_SCORE)}
 - Micro Score: ${line(stock.MICRO)}
 - Momentum Score: ${line(stock.MOMENTUM)}
-- Mispricing Score: ${line(stock.MISPRICING)}
+- Mispricing / Opportunity Score: ${line(stock.MISPRICING)}
 - Final Score: ${line(stock.FINALSCORE)}
 - Rank: ${line(stock.RANK)}
 - Grade: ${line(stock.GRADE)}
@@ -117,46 +160,104 @@ function buildIndustryStats(groups) {
   const stats = new Map();
   groups.forEach((rows, industry) => {
     stats.set(industry, {
-      medianPE: round2(median(valueList(rows, 'PE'))),
-      medianROE: round2(median(valueList(rows, 'ROE')))
+      medianPE: median(valueList(rows, 'PE', value => value > 0)),
+      medianROE: median(valueList(rows, 'ROE'))
     });
   });
   return stats;
 }
 
-function valueList(rows, key) {
-  return rows.map(row => row[key]).filter(isFiniteNumber);
+function buildMarketValues(rows) {
+  const fields = ['ROE', 'ROIC', 'REVGROWTH', 'EPSGROWTH', 'PE'];
+  return Object.fromEntries(
+    fields.map(field => [field, valueList(rows, field, field === 'PE' ? value => value > 0 : undefined)])
+  );
 }
 
-function percentileRank(values, value) {
-  if (!isFiniteNumber(value) || values.length < 2) return 0.5;
-  const sorted = [...values].filter(isFiniteNumber).sort((a, b) => a - b);
-  if (sorted.length < 2) return 0.5;
+function valueList(rows, key, predicate = undefined) {
+  return rows
+    .map(row => row[key])
+    .filter(value => isFiniteNumber(value) && (!predicate || predicate(value)));
+}
 
-  let below = 0;
-  let equal = 0;
-  sorted.forEach(item => {
-    if (item < value) below += 1;
-    if (item === value) equal += 1;
-  });
+function relativePercentile(industryRows, marketValues, value, minIndustrySize = 4) {
+  if (!isFiniteNumber(value)) return 0.5;
+  const industryValues = valueList(industryRows, getKeyByReference(value));
+  if (industryValues.length >= minIndustrySize) {
+    return percentileRank(industryValues, value, 3);
+  }
+  return percentileRank(marketValues, value, 3);
+}
 
-  return clamp((below + 0.5 * equal) / sorted.length, 0, 1);
+// Used only to choose the same numeric field from an industry row.
+function getKeyByReference(value) {
+  return Number.isFinite(value) ? '__VALUE__' : '__VALUE__';
+}
+
+function valuationPercentile(industryRows, marketPE, value, minIndustrySize = 4) {
+  if (!isFiniteNumber(value) || value <= 0) return 0.5;
+  const industryValues = valueList(industryRows, 'PE', v => v > 0);
+  const base = industryValues.length >= minIndustrySize ? industryValues : marketPE;
+  if (base.length < 2) return 0.5;
+  return clamp(1 - percentileRank(base, value, 3), 0, 1);
 }
 
 function scoreDebt(value) {
   if (!isFiniteNumber(value)) return 0.5;
   if (value <= 0.5) return 1;
-  if (value <= 1) return 0.75;
-  if (value <= 2) return 0.45;
-  return 0.15;
+  if (value <= 1.0) return 0.80;
+  if (value <= 2.0) return 0.50;
+  if (value <= 3.0) return 0.25;
+  return 0;
+}
+
+function scoreGrowthConsistency(revenueGrowth, epsGrowth) {
+  if (!isFiniteNumber(revenueGrowth) || !isFiniteNumber(epsGrowth)) return 1;
+
+  // Positive operating growth with only a modest EPS lead gets full credit.
+  // Very large EPS-vs-revenue gaps are treated as a quality warning.
+  const gap = epsGrowth - revenueGrowth;
+  if (gap <= 0.20) return 1;
+  const penalty = clamp((gap - 0.20) / 0.80, 0, 1) * 0.25;
+  return 1 - penalty;
+}
+
+function opportunityScore(row, stats) {
+  const valuation = row.VALUATION_SCORE / 100;
+  const quality = row.QUALITY_SCORE / 100;
+  const momentum = row.MOMENTUM / 100;
+  const growth = row.GROWTH_SCORE / 100;
+
+  let score = 100 * (
+    0.50 * valuation +
+    0.20 * quality +
+    0.20 * momentum +
+    0.10 * growth
+  );
+
+  // Explicit risk adjustments: leverage and low-quality growth should not be
+  // rewarded as "mispricing" merely because P/E is low.
+  if (isFiniteNumber(row.DEBT) && row.DEBT > 2) score -= 10;
+  if (isFiniteNumber(row.DEBT) && row.DEBT > 3) score -= 10;
+
+  if (isFiniteNumber(row.REVGROWTH) && isFiniteNumber(row.EPSGROWTH)) {
+    if (row.EPSGROWTH - row.REVGROWTH > 0.80) score -= 10;
+  }
+
+  // Keep industry median available for explanation/context even when no PE exists.
+  if (stats?.medianPE != null && isFiniteNumber(row.PE) && row.PE > 0 && row.PE < stats.medianPE) {
+    score += 3;
+  }
+
+  return clamp(score, 0, 100);
 }
 
 function weightedMomentum(row) {
   const values = [
-    [row.RET1M, 0.2],
-    [row.RET3M, 0.3],
-    [row.RET6M, 0.3],
-    [row.RET12M, 0.2]
+    [row.RET1M, 0.20],
+    [row.RET3M, 0.30],
+    [row.RET6M, 0.30],
+    [row.RET12M, 0.20]
   ];
 
   const valid = values.filter(([value]) => isFiniteNumber(value));
@@ -165,12 +266,16 @@ function weightedMomentum(row) {
   return valid.reduce((sum, [value, w]) => sum + value * w, 0) / weight;
 }
 
-function mispricingScore(row, stats) {
-  const panicSignal = row.RET1M < -0.2 && row.QUALITY_SCORE >= 60 ? 20 : 0;
-  const earningsSignal = row.EPSGROWTH > 0 ? 15 : -15;
-  const debtSignal = row.DEBT > 2 ? -15 : 10;
-  const valuationSignal = isFiniteNumber(row.PE) && isFiniteNumber(stats.medianPE) && row.PE < stats.medianPE ? 15 : 0;
-  return clamp(50 + panicSignal + earningsSignal + debtSignal + valuationSignal, 0, 100);
+function percentileRank(values, value, minSize = 2) {
+  const sorted = values.filter(isFiniteNumber).sort((a, b) => a - b);
+  if (!isFiniteNumber(value) || sorted.length < minSize) return 0.5;
+
+  const below = sorted.filter(item => item < value).length;
+  const equal = sorted.filter(item => item === value).length;
+  const denominator = Math.max(1, sorted.length - 1);
+
+  // Mid-rank percentile: min -> 0, max -> 1, ties share their midpoint.
+  return clamp((below + 0.5 * Math.max(0, equal - 1)) / denominator, 0, 1);
 }
 
 function grade(score) {
