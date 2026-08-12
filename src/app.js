@@ -29,7 +29,7 @@ function render() {
 
 function renderTopbar() {
   const tabs = [['import', 'Screen'], ['dashboard', 'Dashboard'], ['list', 'Ranking'], ['crsm', 'CRSM']];
-  return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id ? 'active' : ''}" data-tab="${id}">${label}</button>`).join('')}<button class="tab ${state.settingsOpen ? 'active' : ''}" id="openSettings">⚙ Settings</button></nav></div></header>`;
+  return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id ? 'active' : ''}" data-tab="${id}">${label}</button>`).join('')}<button class="tab ${state.settingsOpen ? 'active' : ''}" id="openSettings" type="button">⚙ Settings</button></nav></div></header>`;
 }
 
 function renderImport() {
@@ -99,7 +99,7 @@ function renderDetail() {
   const stock = state.rows.find(row => row.TICKER === state.selectedTicker) || state.rows[0];
   if (!stock) return emptyState();
   const prompt = buildPrompt(stock);
-  return `<section class="grid"><button class="btn" data-tab="list">← Quay lại ranking</button><div class="detail-head"><div class="panel panel-pad"><p class="eyebrow">${escapeHtml(stock.INDUSTRY)}</p><h1>${stock.TICKER}</h1><div class="score-big">${fmt(stock.FINALSCORE)}</div><p>Rank #${stock.RANK} · ${gradeBadge(stock.GRADE)}</p><button class="btn primary" data-crsm="${stock.TICKER}">Phân tích bằng CRSM →</button></div>
+  return `<section class="grid"><div class="detail-head"><div class="panel panel-pad"><p class="eyebrow">${escapeHtml(stock.INDUSTRY)}</p><h1>${stock.TICKER}</h1><div class="score-big">${fmt(stock.FINALSCORE)}</div><p>Rank #${stock.RANK} · ${gradeBadge(stock.GRADE)}</p><button class="btn primary" data-crsm="${stock.TICKER}">Phân tích bằng CRSM →</button></div>
     <div class="panel panel-pad"><p class="eyebrow">Score Breakdown</p><div class="score-grid">${scoreCard('Quality', stock.QUALITY_SCORE)}${scoreCard('Growth', stock.GROWTH_SCORE)}${scoreCard('Valuation', stock.VALUATION_SCORE)}${scoreCard('Micro', stock.MICRO)}${scoreCard('Momentum', stock.MOMENTUM)}${scoreCard('Mispricing', stock.MISPRICING)}</div></div></div>
     <div class="panel panel-pad"><div class="title-row"><div><p class="eyebrow">AI Prompt</p><h2>Prompt phân tích tối ưu</h2></div><button class="btn primary" id="copyPrompt">Copy prompt</button></div><textarea class="prompt" id="promptText" readonly>${escapeHtml(prompt)}</textarea></div></section>`;
 }
@@ -109,7 +109,6 @@ function bindEvents() {
   document.querySelectorAll('[data-detail]').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); state.selectedTicker = button.dataset.detail; state.tab = 'detail'; render(); }));
   document.querySelectorAll('[data-crsm]').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); launchScreenedCRSM(button.dataset.crsm); }));
   document.querySelectorAll('[data-select-ticker]').forEach(input => input.addEventListener('change', event => toggleSelectedTicker(event.target.dataset.selectTicker, event.target.checked)));
-
   bind('openTradingView', 'click', () => window.open('https://www.tradingview.com/screener/', '_blank', 'noopener,noreferrer'));
   bind('importClipboard', 'click', importFromClipboard);
   bind('copyPrompt', 'click', copyPrompt);
@@ -139,11 +138,7 @@ async function importFromClipboard() {
     state.pasteText = text;
     const result = parseTradingViewPaste(text);
     state.errors = result.errors;
-    if (result.errors.length || !result.rows.length) {
-      state.importStatus = null;
-      render();
-      return;
-    }
+    if (result.errors.length || !result.rows.length) { state.importStatus = null; render(); return; }
     state.rows = scoreStocks(result.rows);
     state.selectedTicker = state.rows[0]?.TICKER || null;
     state.selectedTickers = [];
@@ -151,33 +146,39 @@ async function importFromClipboard() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
     state.tab = 'dashboard';
     render();
-  } catch (error) {
-    state.errors = [error?.message || 'Không thể đọc dữ liệu từ Clipboard.'];
-    render();
+  } catch (error) { state.errors = [error?.message || 'Không thể đọc dữ liệu từ Clipboard.']; render(); }
+}
+
+function toggleSelectedTicker(ticker, checked) { const next = new Set(state.selectedTickers); if (checked) next.add(ticker); else next.delete(ticker); state.selectedTickers = [...next]; render(); }
+function selectVisible(checked) { const q = state.search.toLowerCase(); const visible = state.rows.filter(row => row.TICKER.toLowerCase().includes(q) || row.INDUSTRY.toLowerCase().includes(q)).map(row => row.TICKER); const next = new Set(state.selectedTickers); visible.forEach(ticker => checked ? next.add(ticker) : next.delete(ticker)); state.selectedTickers = [...next]; render(); }
+function selectAllVisibleToggle() { const q = state.search.toLowerCase(); const visible = state.rows.filter(row => row.TICKER.toLowerCase().includes(q) || row.INDUSTRY.toLowerCase().includes(q)).map(row => row.TICKER); const allSelected = visible.length > 0 && visible.every(ticker => state.selectedTickers.includes(ticker)); selectVisible(!allSelected); }
+
+function launchScreenedCRSM(ticker) { const stock = state.rows.find(row => row.TICKER === ticker); if (!stock) return; state.selectedTicker = ticker; state.tab = 'crsm'; render(); const context = buildScreeningContext(stock); runCRSM({ mode: 'SCREENED', ticker, screeningContext: context }); }
+
+async function runSelectedCRSM() {
+  if (state.batchRunning || !state.selectedTickers.length) return;
+  const queue = [...state.selectedTickers]; state.batchRunning = true; state.batchProgress = { index: 0, total: queue.length, ticker: queue[0] }; state.tab = 'crsm'; render();
+  for (let index = 0; index < queue.length; index += 1) {
+    const ticker = queue[index]; const stock = state.rows.find(row => row.TICKER === ticker); if (!stock) continue;
+    state.batchProgress = { index: index + 1, total: queue.length, ticker }; updateBatchProgress();
+    const context = buildScreeningContext(stock);
+    const result = await runCRSM({ mode: 'SCREENED', ticker, screeningContext: context, onComplete: async ({ outputs }) => { const report = outputs?.node6a; if (report) await downloadReportBundle(report, ticker); } });
+    if (result?.error && !result?.outputs?.node6a) console.warn(`CRSM batch failed for ${ticker}`, result.error);
+    await new Promise(resolve => setTimeout(resolve, 250));
   }
+  state.batchRunning = false; state.batchProgress = null; state.selectedTickers = []; updateBatchProgress();
 }
 
-function toggleSelectedTicker(ticker, checked) {
-  const next = new Set(state.selectedTickers);
-  if (checked) next.add(ticker); else next.delete(ticker);
-  state.selectedTickers = [...next];
-  render();
-}
-
-function selectVisible(checked) {
-  const q = state.search.toLowerCase();
-  const visible = state.rows.filter(row => row.TICKER.toLowerCase().includes(q) || row.INDUSTRY.toLowerCase().includes(q)).map(row => row.TICKER);
-  const next = new Set(state.selectedTickers);
-  visible.forEach(ticker => checked ? next.add(ticker) : next.delete(ticker));
-  state.selectedTickers = [...next];
-  render();
-}
-
-function selectAllVisibleToggle() {
-  const q = state.search.toLowerCase();
-  const visible = state.rows.filter(row => row.TICKER.toLowerCase().includes(q) || row.INDUSTRY.toLowerCase().includes(q)).map(row => row.TICKER);
-  const allSelected = visible.length > 0 && visible.every(ticker => state.selectedTickers.includes(ticker));
-  selectVisible(!allSelected);
-}
-
-function launchScreenedCRSM(ticker)... (truncated)
+function updateBatchProgress() { if (state.tab === 'list') render(); else updateDynamicRegion(); }
+async function runDirectCRSM() { const input = document.getElementById('crsmTickerInput'); const ticker = (input?.value || '').trim().toUpperCase(); if (!ticker) return; setCrsmRunning(); await runCRSM({ mode: 'DIRECT', ticker, screeningContext: null }); }
+function setCrsmRunning() { if (state.tab !== 'crsm') render(); else updateDynamicRegion(); }
+function retryFailedCRSM() { const mode = crsmState.mode; const ticker = crsmState.ticker; const startFrom = crsmState.failedNode; if (!mode || !ticker) return; runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom, existingOutputs: crsmState.nodeOutputs }); }
+function retryAllCRSM() { const mode = crsmState.mode; const ticker = crsmState.ticker; if (!mode || !ticker) return; runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom: 'node1', existingOutputs: null, bypassCache: true }); }
+function loadRows() { try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
+function emptyState() { return `<section class="panel panel-pad"><p class="eyebrow">No Data</p><h1>Chưa có dữ liệu cổ phiếu</h1><p class="muted">Hãy import bảng TradingView ở tab Screen để bắt đầu.</p><button class="btn primary" data-tab="import">Đi tới Screen</button></section>`; }
+function metric(label, value) { return `<div class="panel metric"><p class="metric-label">${label}</p><p class="metric-value">${value}</p></div>`; }
+function stockLine(row) { return `<div class="stock-line clickable" data-crsm="${row.TICKER}" title="Chạy CRSM cho ${row.TICKER}"><span><strong>${row.TICKER}</strong> <span class="muted">${escapeHtml(row.INDUSTRY)}</span></span><span>${fmt(row.FINALSCORE)} ${gradeBadge(row.GRADE)}</span></div>`; }
+function scoreCard(label, value) { return `<div class="score-card"><span class="muted">${label}</span><strong>${fmt(value)}</strong></div>`; }
+function gradeBadge(grade) { const cls = grade?.startsWith('A') ? 'grade-a' : grade === 'B' ? 'grade-b' : grade === 'C' ? 'grade-c' : 'grade-d'; return `<span class="badge ${cls}">${grade || '-'}</span>`; }
+function fmt(value) { if (value == null || Number.isNaN(value)) return '-'; if (typeof value === 'number') return value.toLocaleString('vi-VN', { maximumFractionDigits: 2 }); return value; }
+function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;'); }
