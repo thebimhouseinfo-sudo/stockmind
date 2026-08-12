@@ -1,6 +1,6 @@
 import { renderSettings, bindSettingsEvents } from './crsm/ui/settings.js';
 import { crsmState, subscribeCRSM } from './crsm/state.js';
-import { downloadHtmlReport, downloadWordReport } from './crsm/report-export.js';
+import { downloadReportImage, downloadWordReport } from './crsm/report-export.js';
 
 const DATA_KEY = 'stock-mind.dataset.v1';
 let observerScheduled = false;
@@ -102,9 +102,7 @@ function ensureReportTab() {
   button.type = 'button';
   button.dataset.reportTab = '1';
   button.innerHTML = 'Reports';
-  if (crsmState.nodeOutputs?.node6a || crsmState.nodeOutputs?.node6b) {
-    button.innerHTML = 'Reports <span class="report-ready-dot">•</span>';
-  }
+  if (crsmState.nodeOutputs?.node6a || crsmState.nodeOutputs?.node6b) button.innerHTML = 'Reports <span class="report-ready-dot">•</span>';
   tabs.insertBefore(button, settingsButton || null);
 }
 
@@ -141,14 +139,14 @@ function renderReportWorkspace(overlay) {
     <div class="report-toolbar">
       <div class="report-title"><div><strong>CRSM Reports</strong><span>${escapeHtml(ticker)}${available ? ' · báo cáo hoàn tất' : ' · chưa có báo cáo'}</span></div></div>
       <div class="report-actions">
-        ${html ? '<button class="btn" data-report-download="html" type="button">Tải HTML</button>' : ''}
+        ${html ? '<button class="btn" data-report-download="image" type="button">Tải ảnh</button>' : ''}
         ${html ? '<button class="btn" data-report-download="word" type="button">Tải Word</button>' : ''}
         <button class="btn report-close" data-report-close type="button">✕</button>
       </div>
     </div>
     <div class="report-tabs" role="tablist">
-      <button class="report-tab ${reportTab === 'html' ? 'active' : ''}" data-report-view="html" type="button">HTML Report</button>
-      <button class="report-tab ${reportTab === 'word' ? 'active' : ''}" data-report-view="word" type="button">Word Report</button>
+      <button class="report-tab ${reportTab === 'html' ? 'active' : ''}" data-report-view="html" type="button">HTML Preview</button>
+      <button class="report-tab ${reportTab === 'word' ? 'active' : ''}" data-report-view="word" type="button">Word Preview</button>
     </div>
     <div class="report-content">${!available ? renderReportEmpty() : reportTab === 'word' ? renderWordPreview(markdown) : renderHtmlPreview(html)}</div>
   </div>`;
@@ -215,9 +213,7 @@ function parseMdRow(line) {
 }
 
 function inlineMd(value) {
-  return escapeHtml(value)
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+  return escapeHtml(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
 // Header interactions are handled at capture level so they survive app re-renders.
@@ -261,7 +257,7 @@ document.addEventListener('click', event => {
     event.preventDefault();
     const html = crsmState.nodeOutputs?.node6a || crsmState.finalReport;
     const md = crsmState.nodeOutputs?.node6b || '';
-    if (reportDownload.dataset.reportDownload === 'html' && html) downloadHtmlReport(html, crsmState.ticker || 'CRSM');
+    if (reportDownload.dataset.reportDownload === 'image' && html) downloadReportImage(html, crsmState.ticker || 'CRSM');
     if (reportDownload.dataset.reportDownload === 'word' && html) {
       const wordHtml = md ? markdownToHtmlDocument(md, crsmState.ticker || 'CRSM') : html;
       downloadWordReport(wordHtml, crsmState.ticker || 'CRSM');
