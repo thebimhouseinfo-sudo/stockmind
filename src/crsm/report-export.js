@@ -19,7 +19,7 @@ export async function downloadReportImage(reportHtml, ticker) {
     const height = Math.min(30000, Math.max(600, source.height));
     const styles = source.styles;
     const body = source.body;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%"><xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml" style="width:${width}px;min-height:${height}px;background:#fff;overflow:hidden"><xhtml:style><![CDATA[${styles}]]></xhtml:style><xhtml:div>${body}</xhtml:div></xhtml:div></foreignObject></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%"><xhtml:body xmlns:xhtml="http://www.w3.org/1999/xhtml" style="width:${width}px;min-height:${height}px;margin:0;background:#fff;overflow:hidden"><xhtml:style><![CDATA[${styles}]]></xhtml:style>${body}</xhtml:body></foreignObject></svg>`;
 
     const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
     const image = await blobToImage(blob);
