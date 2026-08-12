@@ -7,10 +7,12 @@ import { renderDirectEntry } from './direct.js';
 import { renderSettings, bindSettingsEvents } from './settings.js';
 import { totalUsage } from '../usage.js';
 
+let settingsDelegationBound = false;
+
 export function renderCRSMTab() {
   const report = crsmState.nodeOutputs.node6a || crsmState.finalReport;
   return `<section class="grid">
-    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div><div class="actions"><button class="btn" id="crsmBack">← Quay lại ranking</button><button class="btn" id="crsmOpenSettings">⚙ Settings</button></div></div>
+    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research & Strategy Machine</h1>${renderSourceBadge()}</div><div class="actions"><button class="btn" id="crsmBack">← Quay lại ranking</button><button class="btn" id="crsmOpenSettings" type="button">⚙ Settings</button></div></div>
     ${renderDirectEntry()}
     <div id="crsmDynamic">${renderDynamicContent()}</div>
     <div id="crsmSettingsRegion"></div>
@@ -50,13 +52,26 @@ export function updateDynamicRegion() {
 }
 
 export function bindCRSMUIBindings() {
-  bindDynamicEvents(); bindReportEvents();
-  const settingsBtn = document.getElementById('crsmOpenSettings');
-  if (settingsBtn) settingsBtn.addEventListener('click', () => {
+  bindDynamicEvents();
+  bindReportEvents();
+  bindSettingsDelegation();
+}
+
+function bindSettingsDelegation() {
+  if (settingsDelegationBound) return;
+  settingsDelegationBound = true;
+  document.addEventListener('click', event => {
+    const settingsBtn = event.target.closest('#crsmOpenSettings');
+    if (!settingsBtn) return;
     const region = document.getElementById('crsmSettingsRegion');
     if (!region) return;
-    if (region.querySelector('.settings-panel')) region.innerHTML = '';
-    else { region.innerHTML = renderSettings(); bindSettingsEvents(); }
+    const existing = region.querySelector('.settings-panel');
+    if (existing) {
+      existing.remove();
+      return;
+    }
+    region.innerHTML = renderSettings();
+    bindSettingsEvents();
   });
 }
 
