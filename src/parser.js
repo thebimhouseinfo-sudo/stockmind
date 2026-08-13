@@ -7,8 +7,19 @@ const TRADINGVIEW_COLUMNS = [
   'ev_ebitda','ev_revenue','dividend_yield_ttm'
 ];
 
-const UNIT_NUMBER_FIELDS = new Set([
-  'price','volume','avg_volume_10d','avg_volume_30d','avg_volume_60d'
+// TradingView's compact K/M/B/T notation is display formatting only.
+// These fields are quantity fields, so Stock Mind decodes them to the full numeric quantity.
+const QUANTITY_FIELDS = new Set([
+  'market_cap',
+  'price',
+  'volume',
+  'avg_volume_10d',
+  'avg_volume_30d',
+  'avg_volume_60d',
+  'revenue_fq',
+  'revenue_fy',
+  'revenue_ttm',
+  'fcf_ttm'
 ]);
 
 const LEGACY_ALIASES = {
@@ -56,7 +67,7 @@ function parseTradingViewFourLine(lines){
     const row={sourceRow:i+1,ticker,company_name:cleanText(companyLine),ui_marker:markerLine==='D'?'D':markerLine||null};
     for(let index=0;index<TRADINGVIEW_COLUMNS.length;index+=1){
       const field=TRADINGVIEW_COLUMNS[index]; const value=cells[index]??null;
-      row[field]=field==='sector'||field==='industry'?cleanText(value):(UNIT_NUMBER_FIELDS.has(field)?cleanUnitNumber(value):cleanText(value));
+      row[field]=field==='sector'||field==='industry'?cleanText(value):(QUANTITY_FIELDS.has(field)?cleanQuantity(value):cleanText(value));
     }
     if(!row.industry)row.industry='Unknown'; applyLegacyAliases(row); rows.push(row); i+=3;
   }
@@ -66,7 +77,7 @@ function parseTradingViewFourLine(lines){
 
 function buildScreenerColumns(){const columns={mode:'tradingview-four-line-tab',ticker:-1,company_name:-1};TRADINGVIEW_COLUMNS.forEach((field,index)=>{columns[field]=index;});return columns;}
 function extractPlainTicker(line){const value=stripMarkdown(line).replace(/\s+D\s*$/i,'').trim();if(/^[A-Z0-9]{2,8}$/.test(value)&&!['VN','HOSE','HNX','UPCOM'].includes(value))return value;return null;}
-function normalizeHeaderRow(cells,columns,sourceRow){const row={sourceRow};for(const field of Object.keys(HEADER_ALIASES)){const index=columns[field];const raw=index==null?null:cells[index];if(field==='ticker')row.ticker=extractPlainTicker(raw)||cleanText(raw);else if(field==='company_name'||field==='sector'||field==='industry')row[field]=cleanText(raw);else row[field]=UNIT_NUMBER_FIELDS.has(field)?cleanUnitNumber(raw):cleanText(raw);}if(!row.industry)row.industry='Unknown';applyLegacyAliases(row);return row;}
+function normalizeHeaderRow(cells,columns,sourceRow){const row={sourceRow};for(const field of Object.keys(HEADER_ALIASES)){const index=columns[field];const raw=index==null?null:cells[index];if(field==='ticker')row.ticker=extractPlainTicker(raw)||cleanText(raw);else if(field==='company_name'||field==='sector'||field==='industry')row[field]=cleanText(raw);else row[field]=QUANTITY_FIELDS.has(field)?cleanQuantity(raw):cleanText(raw);}if(!row.industry)row.industry='Unknown';applyLegacyAliases(row);return row;}
 function applyLegacyAliases(row){for(const [legacy,source] of Object.entries(LEGACY_ALIASES))row[legacy]=source?row[source]??null:null;return row;}
 function mapColumns(headers){const normalized=headers.map(normalizeHeader);const result={};for(const [field,aliases] of Object.entries(HEADER_ALIASES)){const index=normalized.findIndex(header=>aliases.includes(header));if(index>=0)result[field]=index;}if(result.ticker==null&&result.company_name!=null)result.ticker=result.company_name;return result;}
 function findHeaderIndex(table){let bestIndex=0,bestScore=-1;table.slice(0,12).forEach((cells,index)=>{const score=Object.keys(mapColumns(cells)).length;if(score>bestScore){bestScore=score;bestIndex=index;}});return bestIndex;}
@@ -77,14 +88,21 @@ function isSeparatorRow(cells){return cells.length>0&&cells.every(cell=>/^\s*:?-
 function stripMarkdown(value){return String(value||'').replace(/\[\*\*([^\]]+)\*\*\]\([^)]+\)/g,'$1').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\*\*/g,'');}
 function cleanText(value){const text=stripMarkdown(value).trim();return isMissing(text)?null:text||null;}
 
-export function cleanUnitNumber(value){
+export function cleanQuantity(value){
   if(typeof value==='number'&&Number.isFinite(value))return value;
-  let text=stripMarkdown(value).trim(); if(!text||isMissing(text))return null;
+  let text=stripMarkdown(value).trim();
+  if(!text||isMissing(text))return null;
   const multiplier=suffixMultiplier(text);
-  const normalized=text.replace(/\u2212/g,'-').replace(/−/g,'-').replace(/\u202f/g,'').replace(/\u00a0/g,'').replace(/\s/g,'').replace(/^\+/,'').replace(/[KMBT]$/i,'').replace(/,/g,'');
-  const number=Number.parseFloat(normalized); if(!Number.isFinite(number))return null;
+  const hasSuffix=/[KMBT]\s*$/i.test(text);
+  text=text.replace(/\u2212/g,'-').replace(/−/g,'-').replace(/\u202f/g,'').replace(/\u00a0/g,'').replace(/\s/g,'').replace(/^\+/,'').replace(/[KMBT]$/i,'');
+  if(!hasSuffix && /^[-+]?\d{1,3}([.,]\d{3})+$/.test(text)) text=text.replace(/[.,]/g,'');
+  else if(hasSuffix && text.includes(',') && !text.includes('.')) text=text.replace(',', '.');
+  else if(hasSuffix && text.includes(',') && text.includes('.')) text=text.replace(/,/g,'');
+  else if(!hasSuffix && text.includes(',') && text.includes('.')) text=text.replace(/,/g,'');
+  const number=Number.parseFloat(text);
+  if(!Number.isFinite(number))return null;
   return number*multiplier;
 }
 
-function suffixMultiplier(value){const text=String(value||'').trim().toUpperCase();if(/[0-9]\s*K$/.test(text))return 1_000;if(/[0-9]\s*M$/.test(text))return 1_000_000;if(/[0-9]\s*B$/.test(text))return 1_000_000_000;if(/[0-9]\s*T$/.test(text))return 1_000_000_000_000;return 1;}
+function suffixMultiplier(value){const text=String(value||'').trim().toUpperCase();if(/[0-9][\d.,]*\s*K$/.test(text))return 1_000;if(/[0-9][\d.,]*\s*M$/.test(text))return 1_000_000;if(/[0-9][\d.,]*\s*B$/.test(text))return 1_000_000_000;if(/[0-9][\d.,]*\s*T$/.test(text))return 1_000_000_000_000;return 1;}
 function isMissing(value){return['-','—','–','na','n/a','null','undefined','�','no rating'].includes(String(value||'').trim().toLowerCase());}
