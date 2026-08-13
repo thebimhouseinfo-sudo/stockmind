@@ -12,6 +12,17 @@ const TRADINGVIEW_COLUMNS = [
   'pe', 'peg', 'pb', 'ps', 'ev_ebitda', 'ev_revenue', 'dividend_yield_ttm'
 ];
 
+const PERCENT_FIELDS = new Set([
+  'change_pct', 'perf_1w', 'perf_1m', 'perf_3m', 'perf_6m', 'perf_1y', 'perf_ytd',
+  'roe_ttm', 'roa_ttm', 'revenue_growth_quarterly_yoy', 'revenue_growth_annual_yoy',
+  'eps_dil_growth_ttm_yoy', 'gross_margin_ttm', 'operating_margin_ttm', 'net_margin_ttm',
+  'fcf_growth_ttm_yoy', 'dividend_yield_ttm'
+]);
+
+const VOLUME_FIELDS = new Set([
+  'volume', 'avg_volume_10d', 'avg_volume_30d', 'avg_volume_60d'
+]);
+
 const LEGACY_ALIASES = {
   TICKER: 'ticker', COMPANY_NAME: 'company_name', SECTOR: 'sector', INDUSTRY: 'industry',
   PRICE: 'price', VOL: 'volume', AVGVOL: 'avg_volume_30d', ROE: 'roe_ttm', ROIC: null,
@@ -56,12 +67,9 @@ export function parseTradingViewPaste(text) {
   const rawLines = String(text || '').split(/\r?\n/).map(line => line.replace(/\r$/, '')).filter(line => line.trim());
   if (!rawLines.length) return { rows: [], errors: ['Chua co du lieu de xu ly.'], columns: {} };
 
-  // TradingView's current clipboard format is record-based, not a Markdown table:
-  // SYMBOL -> COMPANY -> D/UI marker -> one TAB-separated data row.
   const screener = parseTradingViewFourLine(rawLines);
   if (screener.rows.length) return screener;
 
-  // Keep compatibility with real table exports that contain readable headers.
   const table = rawLines.map(line => splitLine(line, detectDelimiter(line)));
   const headerIndex = findHeaderIndex(table);
   const columns = mapColumns(table[headerIndex] || []);
@@ -91,8 +99,6 @@ function parseTradingViewFourLine(lines) {
     const markerLine = (lines[i + 2] || '').trim();
     const dataLine = lines[i + 3] || '';
 
-    // The actual format has exactly three lines after the ticker. We deliberately
-    // require a TAB-heavy data line so ordinary text/watchlist rows are not consumed.
     if (!dataLine.includes('\t')) continue;
     const cells = dataLine.split('\t').map(cell => cell.trim());
     if (cells.length < TRADINGVIEW_COLUMNS.length) {
@@ -111,15 +117,12 @@ function parseTradingViewFourLine(lines) {
     for (let index = 0; index < TRADINGVIEW_COLUMNS.length; index += 1) {
       const field = TRADINGVIEW_COLUMNS[index];
       const value = cells[index] ?? null;
-      row[field] = field === 'sector' || field === 'industry' ? cleanText(value) : cleanNumber(value);
+      row[field] = field === 'sector' || field === 'industry' ? cleanText(value) : normalizeFieldValue(field, value);
     }
 
     if (!row.industry) row.industry = 'Unknown';
     applyLegacyAliases(row);
     rows.push(row);
-
-    // Consume the record. This prevents the company/marker lines from being
-    // reconsidered as independent ticker candidates.
     i += 3;
   }
 
@@ -154,11 +157,70 @@ function normalizeHeaderRow(cells, columns, sourceRow) {
     const raw = index == null ? null : cells[index];
     if (field === 'ticker') row.ticker = extractPlainTicker(raw) || cleanText(raw);
     else if (field === 'company_name' || field === 'sector' || field === 'industry') row[field] = cleanText(raw);
-    else row[field] = cleanNumber(raw);
+    else row[field] = normalizeFieldValue(field, raw);
   }
   if (!row.industry) row.industry = 'Unknown';
   applyLegacyAliases(row);
   return row;
+}
+
+function normalizeFieldValue(field, value) {
+  if (PERCENT_FIELDS.has(field)) return cleanPercent(value);
+  if (VOLUME_FIELDS.has(field)) return cleanScaledNumber(value);
+  return cleanNumber(value);
+}
+
+function cleanPercent(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  let text = stripMarkdown(value).trim();
+  if (!text || isMissing(text)) return null;
+
+  const hasPercentSign = text.includes('%');
+  const parsed = parseNumericText(text);
+  if (!Number.isFinite(parsed)) return null;
+
+  // TradingView clipboard uses ratio form for many percentage fields
+  // (e.g. 7.1792 means 717.92%). Only convert when the source explicitly
+  // contains a percent sign; otherwise preserve the ratio exactly.
+  return hasPercentSign ? parsed / 100 : parsed;
+}
+
+function cleanScaledNumber(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  let text = stripMarkdown(value).trim();
+  if (!text || isMissing(text)) return null;
+  const multiplier = suffixMultiplier(text);
+  const parsed = parseNumericText(text.replace(/[KMBT]$/i, ''));
+  if (!Number.isFinite(parsed)) return null;
+  return parsed * multiplier;
+}
+
+export function cleanNumber(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  let text = stripMarkdown(value).trim();
+  if (!text || isMissing(text)) return null;
+  return parseNumericText(text) * suffixMultiplier(text);
+}
+
+function parseNumericText(value) {
+  const text = String(value || '').trim()
+    .replace(/\u2212/g, '-').replace(/−/g, '-')
+    .replace(/\u202f/g, '').replace(/\u00a0/g, '')
+    .replace(/\s/g, '')
+    .replace(/^\+/, '')
+    .replace(/[KMBT]$/i, '')
+    .replace(/%$/, '');
+  const number = Number.parseFloat(text.replace(/,/g, ''));
+  return Number.isFinite(number) ? number : null;
+}
+
+function suffixMultiplier(value) {
+  const text = String(value || '').trim().toUpperCase();
+  if (/[0-9]\s*K$/.test(text)) return 1_000;
+  if (/[0-9]\s*M$/.test(text)) return 1_000_000;
+  if (/[0-9]\s*B$/.test(text)) return 1_000_000_000;
+  if (/[0-9]\s*T$/.test(text)) return 1_000_000_000_000;
+  return 1;
 }
 
 function applyLegacyAliases(row) {
@@ -218,32 +280,6 @@ function stripMarkdown(value) {
 function cleanText(value) {
   const text = stripMarkdown(value).trim();
   return isMissing(text) ? null : text || null;
-}
-
-export function cleanNumber(value) {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  let text = stripMarkdown(value).trim();
-  if (!text || isMissing(text)) return null;
-
-  const multiplier = suffixMultiplier(text);
-  const isPercent = text.includes('%');
-  text = text.replace(/\u2212/g, '-').replace(/−/g, '-')
-    .replace(/\u202f/g, '').replace(/\u00a0/g, '').replace(/\s/g, '')
-    .replace(/^\+/, '').replace(/[KMBT]$/i, '').replace(/,/g, '').replace('%', '');
-
-  const number = Number.parseFloat(text);
-  if (!Number.isFinite(number)) return null;
-  const scaled = number * multiplier;
-  return isPercent ? scaled / 100 : scaled;
-}
-
-function suffixMultiplier(value) {
-  const text = String(value || '').trim().toUpperCase();
-  if (/[0-9]\s*K$/.test(text)) return 1_000;
-  if (/[0-9]\s*M$/.test(text)) return 1_000_000;
-  if (/[0-9]\s*B$/.test(text)) return 1_000_000_000;
-  if (/[0-9]\s*T$/.test(text)) return 1_000_000_000_000;
-  return 1;
 }
 
 function isMissing(value) {
