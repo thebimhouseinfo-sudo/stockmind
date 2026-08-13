@@ -38,7 +38,37 @@
 .report-word-page code{background:#f1f5f9;padding:2px 5px;border-radius:5px}
 .report-empty{height:100%;display:grid;place-items:center;color:#64748b;text-align:center}
 
+/* CRSM mobile */
 @media(max-width:900px){
+  .crsm-analysis-page{grid-template-columns:minmax(0,1fr)!important;min-width:0}
+  .crsm-head{gap:10px}
+  .crsm-head h1{font-size:26px}
+  .crsm-direct-entry{padding:18px}
+  .crsm-progress,.crsm-status-card,.crsm-error,.screening-snapshot{min-width:0}
+  .crsm-nodes{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .crsm-node{min-width:0;padding:9px 10px;font-size:11px}
+  .crsm-log{max-height:180px;overflow-x:hidden;overflow-y:auto}
+  .snapshot-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .vs-block{gap:12px}
+  .crsm-cost-strip{align-items:flex-start}
   .report-workspace{padding:8px}.report-shell{border-radius:14px}.report-toolbar{padding:12px}.report-content{padding:8px}.report-word-page{padding:28px 22px}
 }
-@media(max-width:640px){.crsm-direct-entry .direct-form{gap:8px}.crsm-direct-entry .direct-form .search{width:100%}.crsm-direct-entry .direct-form .btn,.crsm-direct-entry .crsm-evidence-box .btn{width:100%}.crsm-direct-entry .crsm-evidence-box{display:block}.report-actions .btn:not(.report-close){display:none}.report-tabs{overflow:auto}.report-tab{white-space:nowrap}}
+@media(max-width:640px){
+  .crsm-direct-entry{padding:16px}
+  .crsm-direct-entry .direct-form{gap:8px;align-items:stretch}
+  .crsm-direct-entry .direct-form .search{width:100%;max-width:none}
+  .crsm-direct-entry .direct-form .btn,.crsm-direct-entry .crsm-evidence-box .btn{width:100%}
+  .crsm-direct-entry .crsm-evidence-box{display:block}
+  .crsm-nodes{grid-template-columns:1fr}
+  .crsm-node{min-height:42px}
+  .crsm-progress .panel-pad,.crsm-status-card,.crsm-error{padding:14px}
+  .snapshot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .vs-block{display:grid;grid-template-columns:1fr;gap:8px}
+  .vs-arrow{display:none}
+  .crsm-cost-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+  .crsm-cost-strip strong{font-size:15px}
+  .report-actions .btn:not(.report-close){display:none}
+  .report-tabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .report-tabs::-webkit-scrollbar{display:none}
+  .report-tab{white-space:nowrap;flex:0 0 auto}
+}
