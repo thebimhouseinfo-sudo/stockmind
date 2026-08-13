@@ -4,9 +4,13 @@ export const crsmState = {
   ticker: null,
   screeningContext: null,
   currentNode: null,
+  currentStage: null,
   failedNode: null,
   nodeStatus: {},
   nodeOutputs: {},
+  stageStatus: {},
+  executionStages: [],
+  executionMode: 'sequential',
   usage: [],
   finalReport: null,
   logRows: [],
@@ -42,8 +46,14 @@ export function resetState(overrides = {}) {
   Object.assign(crsmState, overrides);
   crsmState.isRunning = true;
   crsmState.startedAt = new Date().toISOString();
+  crsmState.currentNode = null;
+  crsmState.currentStage = null;
+  crsmState.failedNode = null;
   crsmState.nodeStatus = {};
   crsmState.nodeOutputs = {};
+  crsmState.stageStatus = {};
+  crsmState.executionStages = [];
+  crsmState.executionMode = 'sequential';
   crsmState.usage = [];
   crsmState.logRows = [];
   crsmState.error = null;
