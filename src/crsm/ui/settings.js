@@ -2,11 +2,26 @@ import { loadSettings, saveSettings, PROVIDER_INFO, NODES_LLM } from '../setting
 import { crsmState } from '../state.js';
 import { totalUsage, usageByNode, usageByModel, filterUsageHistory, usageSummary, clearUsageHistory } from '../usage.js';
 
-// Settings is compact: CRSM Engine controls execution and node assignments;
+// Settings is compact: CRSM Engine controls execution policy and model assignments;
 // Providers manages API connections/model registry; Usage and Cost are monitoring views.
 const TAB_DEFS = [['engine', 'CRSM Engine'], ['providers', 'Providers'], ['usage', 'Usage'], ['cost', 'Cost']];
 let draftSettings = null;
 let savedSnapshot = '';
+
+const EXECUTION_GROUPS = [
+  {
+    key: 'research',
+    title: 'Phân tích chuyên sâu',
+    description: 'Kỹ thuật & Smart Money và Cơ bản & Định giá có thể chạy song song vì cùng phụ thuộc vào dữ liệu đầu vào đã hoàn tất.',
+    members: ['Kỹ thuật & Smart Money', 'Cơ bản & Định giá']
+  },
+  {
+    key: 'reports',
+    title: 'Đầu ra báo cáo',
+    description: 'Báo cáo HTML, Báo cáo Word và Nhật ký quyết định độc lập sau Tổng hợp & Quyết định.',
+    members: ['Báo cáo HTML', 'Báo cáo Word', 'Nhật ký quyết định']
+  }
+];
 
 function getDraftSettings() {
   if (!draftSettings) {
@@ -41,11 +56,22 @@ export function renderSettings(activeTab = 'engine', period = '7d') {
 }
 
 function renderEngineTab(settings) {
-  const parallel = settings.crsm.executionMode === 'parallel';
   const rows = NODES_LLM.map(nodeId => {
     const a = settings.crsm.nodeAssignment[nodeId] || {};
-    const label = { node1: 'Node 1', node2: 'Node 2', node3: 'Node 3', node4: 'Node 4', node5: 'Node 5' }[nodeId] || nodeId;
-    const requirement = { node1: 'Web grounding + JSON', node2: 'Web grounding + JSON', node3: 'JSON / reasoning', node4: 'Web grounding + JSON', node5: 'JSON / reasoning' }[nodeId] || 'AI node';
+    const label = {
+      node1: 'Dữ liệu & Tài chính',
+      node2: 'Kỹ thuật & Smart Money',
+      node3: 'Cơ bản & Định giá',
+      node4: 'Vĩ mô & Nhân quả',
+      node5: 'Tổng hợp & Quyết định'
+    }[nodeId] || nodeId;
+    const requirement = {
+      node1: 'Web grounding + JSON',
+      node2: 'Web grounding + JSON',
+      node3: 'JSON / reasoning',
+      node4: 'Web grounding + JSON',
+      node5: 'JSON / reasoning'
+    }[nodeId] || 'AI';
     const providerDrop = Object.keys(PROVIDER_INFO).map(id => `<option value="${id}" ${id === a.provider ? 'selected' : ''}>${PROVIDER_INFO[id].label}</option>`).join('');
     const cfg = settings.crsm.providers[a.provider] || { models: [] };
     const modelOptions = (cfg.models || []).map(m => `<option value="${escapeAttr(m.id)}" ${m.id === a.model ? 'selected' : ''}>${escapeHtml(m.displayName || m.id)}</option>`).join('');
@@ -57,13 +83,32 @@ function renderEngineTab(settings) {
     </div>`;
   }).join('');
 
+  const executionPolicy = settings.crsm.executionPolicy || {};
+  const stageCards = EXECUTION_GROUPS.map(group => {
+    const mode = executionPolicy.parallelStages?.[group.key] || 'auto';
+    const modeLabel = mode === 'parallel' ? 'Song song' : mode === 'sequential' ? 'Tuần tự' : 'Tự động';
+    const autoNote = group.key === 'reports'
+      ? 'Hiện tại các đầu ra là local nên Tự động = song song. Nếu sau này có AI, engine sẽ chuyển về tuần tự trừ khi bạn cho phép song song.'
+      : 'Khi có nhiều tác vụ AI trong cùng stage, Tự động ưu tiên tuần tự để kiểm soát API; local vẫn có thể chạy song song.';
+    return `<div class="execution-policy-card" data-execution-stage="${group.key}">
+      <div class="execution-policy-head">
+        <div><strong>${group.title}</strong><span class="muted">${group.description}</span></div>
+        <span class="execution-policy-badge">${modeLabel}</span>
+      </div>
+      <div class="execution-policy-members">${group.members.map(member => `<span>${member}</span>`).join('')}</div>
+      <div class="execution-policy-controls">
+        ${['auto','parallel','sequential'].map(value => `<label class="policy-option"><input type="radio" name="execution-${group.key}" value="${value}" data-execution-stage="${group.key}" data-execution-policy ${mode === value ? 'checked' : ''}><span>${value === 'auto' ? 'Tự động' : value === 'parallel' ? 'Cho phép song song' : 'Buộc tuần tự'}</span></label>`).join('')}
+      </div>
+      <p class="muted execution-policy-note">${autoNote}</p>
+    </div>`;
+  }).join('');
+
   return `<div class="settings-section">
-    <div class="settings-section-head"><div><h3>CRSM ENGINE</h3><p class="muted">Điều khiển cách pipeline chạy và model được dùng cho từng node.</p></div></div>
-    <div class="settings-row execution-row">
-      <div><strong>Execution mode</strong><div class="muted settings-caption">Parallel chỉ chạy khi dependency cho phép; backend vẫn kiểm soát thứ tự thực thi.</div></div>
-      <label class="settings-check execution-toggle"><span>Sequential</span><input type="checkbox" id="crsmExecutionMode" data-execution-mode ${parallel ? 'checked' : ''}><span>Parallel</span></label>
+    <div class="settings-section-head"><div><h3>CRSM ENGINE</h3><p class="muted">Execution policy chỉ điều khiển cách các tác vụ độc lập chạy trong phạm vi dependency cho phép. Không có một công tắc song song cho toàn pipeline.</p></div></div>
+    <div class="execution-policy-list">
+      ${stageCards}
     </div>
-    <div class="settings-section-head settings-subsection-head"><div><h3>NODE MODEL ASSIGNMENT</h3><p class="muted">Chỉ Node 1–5 sử dụng AI. Node 6A, 6B và Node 7 là local.</p></div></div>
+    <div class="settings-section-head settings-subsection-head"><div><h3>MODEL THEO CHỨC NĂNG</h3><p class="muted">Các chức năng AI bên dưới vẫn có thể chọn provider/model riêng. Đây là cấu hình model, không phải dependency của pipeline.</p></div></div>
     ${rows}
   </div>`;
 }
@@ -75,7 +120,7 @@ function renderProvidersTab(settings) {
     </div>
     <div class="settings-models">${(cfg.models || []).map(model => renderModelRow(model)).join('')}<button class="btn" data-addmodel="${id}">+ Add model</button></div>
   </div>`).join('');
-  return `<div class="settings-section"><div class="settings-section-head"><div><h3>PROVIDERS & MODELS</h3><p class="muted">API connection và model registry. Assignment cho từng node nằm trong CRSM Engine.</p></div></div><div class="notice settings-notice">Capability và pricing được lưu cùng model để router và cost monitor sử dụng.</div>${providers}</div>`;
+  return `<div class="settings-section"><div class="settings-section-head"><div><h3>PROVIDERS & MODELS</h3><p class="muted">API connection và model registry. Assignment theo chức năng nằm trong CRSM Engine.</p></div></div><div class="notice settings-notice">Capability và pricing được lưu cùng model để router và cost monitor sử dụng.</div>${providers}</div>`;
 }
 
 function renderModelRow(model) {
@@ -108,7 +153,15 @@ function metric(label, value) { return `<div class="panel metric"><p class="metr
 export function bindSettingsEvents() {
   document.querySelectorAll('.settings-panel [data-setting-tab]').forEach(btn => btn.addEventListener('click', ev => replaceSettings(ev.currentTarget.dataset.settingTab)));
   document.querySelectorAll('.settings-panel [data-cost-period]').forEach(btn => btn.addEventListener('click', ev => replaceSettings('cost', ev.currentTarget.dataset.costPeriod)));
-  document.querySelectorAll('.settings-panel [data-execution-mode]').forEach(input => input.addEventListener('change', ev => { const settings = getDraftSettings(); settings.crsm.executionMode = ev.target.checked ? 'parallel' : 'sequential'; replaceSettings('engine'); }));
+  document.querySelectorAll('.settings-panel [data-execution-policy]').forEach(input => input.addEventListener('change', ev => {
+    const settings = getDraftSettings();
+    const stage = ev.target.dataset.executionStage;
+    if (!stage) return;
+    settings.crsm.executionPolicy = settings.crsm.executionPolicy || { default: 'auto', parallelStages: {} };
+    settings.crsm.executionPolicy.parallelStages = settings.crsm.executionPolicy.parallelStages || {};
+    settings.crsm.executionPolicy.parallelStages[stage] = ev.target.value;
+    replaceSettings('engine');
+  }));
   document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('input', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; getDraftSettings().crsm.providers[provider].apiKey = ev.target.value.trim() || null; updateSaveState(); }));
   document.querySelectorAll('.settings-panel [data-addmodel]').forEach(btn => btn.addEventListener('click', ev => {
     const provider = ev.target.dataset.addmodel;
