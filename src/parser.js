@@ -49,6 +49,60 @@ const FIELD_ALIASES = {
   dividend_yield_ttm: ['div yield % ttm', 'dividend yield % ttm', 'dividend yield ttm']
 };
 
+// TradingView's Markdown export used by StockMind does not include the
+// visible column names. The data rows are positional and contain an extra
+// UI marker column (`D`) after the combined Symbol/Company cell.
+const TRADINGVIEW_MARKDOWN_COLUMNS = [
+  'symbol',
+  'ui_marker',
+  'sector',
+  'industry',
+  'market_cap',
+  'price',
+  'change_pct',
+  'perf_1w',
+  'perf_1m',
+  'perf_3m',
+  'perf_6m',
+  'perf_1y',
+  'perf_ytd',
+  'high_52w',
+  'low_52w',
+  'volume',
+  'relative_volume',
+  'avg_volume_10d',
+  'avg_volume_30d',
+  'avg_volume_60d',
+  'roe_ttm',
+  'roa_ttm',
+  'revenue_fq',
+  'revenue_fy',
+  'revenue_ttm',
+  'revenue_growth_quarterly_yoy',
+  'revenue_growth_annual_yoy',
+  'eps_dil_ttm',
+  'eps_dil_growth_ttm_yoy',
+  'peg_ttm',
+  'gross_margin_ttm',
+  'operating_margin_ttm',
+  'net_margin_ttm',
+  'fcf_ttm',
+  'fcf_growth_ttm_yoy',
+  'debt_equity_fq',
+  'debt_equity_fy',
+  'current_ratio_fq',
+  'current_ratio_fy',
+  'quick_ratio_fq',
+  'quick_ratio_fy',
+  'pe',
+  'peg',
+  'pb',
+  'ps',
+  'ev_ebitda',
+  'ev_revenue',
+  'dividend_yield_ttm'
+];
+
 const LEGACY_ALIASES = {
   TICKER: 'ticker',
   COMPANY_NAME: 'company_name',
@@ -71,7 +125,7 @@ const LEGACY_ALIASES = {
 };
 
 export function parseTradingViewPaste(text) {
-  const lines = text
+  const lines = String(text || '')
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean);
@@ -80,9 +134,27 @@ export function parseTradingViewPaste(text) {
     return { rows: [], errors: ['Chua co du lieu de xu ly.'], columns: {} };
   }
 
-  // Prefer the full TradingView table whenever its header is present.
-  // The legacy watchlist format has a very different row layout and must
-  // never be allowed to reinterpret a full screener export.
+  // 1. The current TradingView Screener export is a headerless Markdown
+  // table. Detect and parse it before any legacy parser can reinterpret it.
+  const markdownRows = lines
+    .filter(isMarkdownTableRow)
+    .map(splitMarkdownTableRow);
+
+  const markdownDataRows = findTradingViewMarkdownDataRows(markdownRows);
+  if (markdownDataRows.length) {
+    const rows = markdownDataRows
+      .map((cells, index) => normalizeTradingViewMarkdownRow(cells, index + 1))
+      .filter(row => row.ticker);
+
+    return {
+      rows,
+      errors: rows.length ? [] : ['Khong doc duoc dong du lieu TradingView.'],
+      columns: buildPositionalColumns(),
+      mode: 'tradingview-markdown-headerless'
+    };
+  }
+
+  // 2. Fallback for an actual table export that contains readable headers.
   const delimiter = detectDelimiter(lines[0]);
   const table = lines.map(line => splitLine(line, delimiter));
   const headerIndex = findHeaderIndex(table);
@@ -103,12 +175,87 @@ export function parseTradingViewPaste(text) {
     return { rows, errors, columns: { ...columns, mode: 'tradingview-table' } };
   }
 
+  // 3. Legacy watchlist fallback only when neither TradingView table format
+  // was detected. This prevents Screener Markdown rows from being misread.
   const watchlistRows = parseTradingViewWatchlist(lines);
   if (watchlistRows.length) {
     return { rows: watchlistRows, errors: [], columns: { mode: 'tradingview-watchlist' } };
   }
 
   return { rows: [], errors: ['Khong nhan dien duoc bang TradingView.'], columns };
+}
+
+function isMarkdownTableRow(line) {
+  return /^\s*\|/.test(line) && line.includes('|');
+}
+
+function splitMarkdownTableRow(line) {
+  const trimmed = line.trim();
+  const withoutLeading = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
+  const withoutOuter = withoutLeading.endsWith('|') ? withoutLeading.slice(0, -1) : withoutLeading;
+  return withoutOuter.split('|').map(cell => cell.trim());
+}
+
+function findTradingViewMarkdownDataRows(rows) {
+  if (!rows.length) return [];
+
+  // A TradingView Markdown export has two special rows before the data:
+  // an empty/header placeholder row and a separator row. Once the separator
+  // is found, every sufficiently wide following row is a data row.
+  for (let index = 0; index < rows.length - 1; index += 1) {
+    if (!isSeparatorRow(rows[index])) continue;
+
+    const candidates = rows.slice(index + 1).filter(cells => {
+      if (isSeparatorRow(cells)) return false;
+      if (cells.length < TRADINGVIEW_MARKDOWN_COLUMNS.length - 2) return false;
+      return Boolean(extractTickerFromSymbolCell(cells[0]));
+    });
+
+    if (candidates.length) return candidates;
+  }
+
+  // Defensive fallback: identify rows by the characteristic wide row shape
+  // and the presence of a TradingView symbol link in the first cell.
+  return rows.filter(cells =>
+    cells.length >= TRADINGVIEW_MARKDOWN_COLUMNS.length - 2 &&
+    Boolean(extractTickerFromSymbolCell(cells[0]))
+  );
+}
+
+function normalizeTradingViewMarkdownRow(cells, sourceRow) {
+  const row = { sourceRow };
+
+  for (let index = 0; index < TRADINGVIEW_MARKDOWN_COLUMNS.length; index += 1) {
+    const field = TRADINGVIEW_MARKDOWN_COLUMNS[index];
+    const raw = cells[index] ?? null;
+
+    if (field === 'symbol') {
+      row.ticker = extractTickerFromSymbolCell(raw);
+      row.company_name = extractCompanyNameFromSymbolCell(raw);
+    } else if (field === 'ui_marker') {
+      // Intentionally ignored. TradingView's `D` is a UI marker, not data.
+      continue;
+    } else if (field === 'sector' || field === 'industry') {
+      row[field] = cleanText(raw);
+    } else {
+      row[field] = cleanNumber(raw);
+    }
+  }
+
+  if (!row.industry) row.industry = 'Unknown';
+  if (!row.company_name) row.company_name = null;
+
+  return withLegacyAliases(row);
+}
+
+function buildPositionalColumns() {
+  const columns = { mode: 'tradingview-markdown-headerless' };
+  TRADINGVIEW_MARKDOWN_COLUMNS.forEach((field, index) => {
+    if (field !== 'ui_marker') columns[field] = index;
+  });
+  columns.ticker = 0;
+  columns.company_name = 0;
+  return columns;
 }
 
 function parseTradingViewWatchlist(lines) {
