@@ -11,8 +11,8 @@ export function renderDirectEntry() {
     <h2>${afterScreened ? 'Kiểm tra một mã khác' : 'Phân tích bằng CRSM'}</h2>
     <div class="direct-form">
       <input class="search" id="crsmTickerInput" placeholder="VD: VCB, HPG, MWG" maxlength="12" autocomplete="off" aria-label="Mã cổ phiếu">
-      <button class="btn primary" id="crsmRunDirect" data-crsm-direct type="button">${afterScreened ? 'Chạy Direct CRSM' : 'Phân tích bằng CRSM'}</button>
       <label class="btn" for="crsmEvidenceFiles">${evidence ? '✓ ' : '＋ '}${evidenceLabel}</label>
+      <button class="btn primary" id="crsmRunDirect" data-crsm-direct type="button">${afterScreened ? 'Chạy Direct CRSM' : 'Phân tích bằng CRSM'}</button>
     </div>
     <input id="crsmEvidenceFiles" type="file" multiple accept=".xlsx,.xls,.pdf,.csv,.tsv,.txt,.md,.json,application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
     <div id="crsmEvidenceStatus" class="muted crsm-evidence-status" aria-live="polite">${evidence ? `Đã đọc ${evidence.documents.length} file` : ''}</div>
