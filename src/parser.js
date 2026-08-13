@@ -1,62 +1,12 @@
-const FIELD_ALIASES = {
-  ticker: ['symbol', 'ticker', 'ma', 'ma ck'],
-  company_name: ['symbol', 'company', 'company name', 'name', 'ten cong ty'],
-  sector: ['sector'],
-  industry: ['industry', 'nganh'],
-  market_cap: ['mkt cap', 'market cap'],
-  price: ['price', 'last', 'close', 'gia'],
-  change_pct: ['chg', 'chg %', 'change', 'change %'],
-  perf_1w: ['perf 1w', 'performance 1w'],
-  perf_1m: ['perf 1m', 'performance 1m'],
-  perf_3m: ['perf 3m', 'performance 3m'],
-  perf_6m: ['perf 6m', 'performance 6m'],
-  perf_1y: ['perf 1y', 'performance 1y'],
-  perf_ytd: ['perf ytd', 'performance ytd'],
-  high_52w: ['high 52w', '52w high'],
-  low_52w: ['low 52w', '52w low'],
-  volume: ['vol', 'volume', 'last volume'],
-  relative_volume: ['rel vol', 'relative volume'],
-  avg_volume_10d: ['avg vol 10d', 'average volume 10d'],
-  avg_volume_30d: ['avg vol 30d', 'average volume 30d'],
-  avg_volume_60d: ['avg vol 60d', 'average volume 60d'],
-  roe_ttm: ['roe ttm', 'roe'],
-  roa_ttm: ['roa ttm', 'roa'],
-  revenue_fq: ['revenue fq'],
-  revenue_fy: ['revenue fy'],
-  revenue_ttm: ['revenue ttm'],
-  revenue_growth_quarterly_yoy: ['revenue growth quarterly yoy'],
-  revenue_growth_annual_yoy: ['revenue growth annual yoy', 'revenue growth yoy'],
-  eps_dil_ttm: ['eps dil ttm', 'eps ttm'],
-  eps_dil_growth_ttm_yoy: ['eps dil growth ttm yoy', 'eps growth ttm yoy'],
-  peg_ttm: ['peg ttm'],
-  gross_margin_ttm: ['gross margin % ttm', 'gross margin ttm'],
-  operating_margin_ttm: ['op margin % ttm', 'operating margin % ttm', 'operating margin ttm'],
-  net_margin_ttm: ['net margin % ttm', 'net margin ttm'],
-  fcf_ttm: ['fcf ttm', 'free cash flow ttm'],
-  fcf_growth_ttm_yoy: ['fcf growth ttm yoy'],
-  debt_equity_fq: ['debt/equity fq', 'debt equity fq'],
-  debt_equity_fy: ['debt/equity fy', 'debt equity fy'],
-  current_ratio_fq: ['current ratio fq'],
-  current_ratio_fy: ['current ratio fy'],
-  quick_ratio_fq: ['quick ratio fq'],
-  quick_ratio_fy: ['quick ratio fy'],
-  pe: ['p/e', 'pe', 'price to earnings'],
-  peg: ['peg'],
-  pb: ['p/b', 'pb'],
-  ps: ['p/s', 'ps'],
-  ev_ebitda: ['ev/ebitda', 'ev ebitda'],
-  ev_revenue: ['ev/revenue', 'ev revenue'],
-  dividend_yield_ttm: ['div yield % ttm', 'dividend yield % ttm', 'dividend yield ttm']
-};
-
-const TRADINGVIEW_MARKDOWN_COLUMNS = [
-  'symbol', 'ui_marker', 'sector', 'industry', 'market_cap', 'price',
-  'change_pct', 'perf_1w', 'perf_1m', 'perf_3m', 'perf_6m', 'perf_1y',
-  'perf_ytd', 'high_52w', 'low_52w', 'volume', 'relative_volume',
-  'avg_volume_10d', 'avg_volume_30d', 'avg_volume_60d', 'roe_ttm', 'roa_ttm',
-  'revenue_fq', 'revenue_fy', 'revenue_ttm', 'revenue_growth_quarterly_yoy',
-  'revenue_growth_annual_yoy', 'eps_dil_ttm', 'eps_dil_growth_ttm_yoy',
-  'peg_ttm', 'gross_margin_ttm', 'operating_margin_ttm', 'net_margin_ttm',
+const TRADINGVIEW_COLUMNS = [
+  'sector', 'industry', 'market_cap', 'price', 'change_pct',
+  'perf_1w', 'perf_1m', 'perf_3m', 'perf_6m', 'perf_1y', 'perf_ytd',
+  'high_52w', 'low_52w', 'volume', 'relative_volume',
+  'avg_volume_10d', 'avg_volume_30d', 'avg_volume_60d',
+  'roe_ttm', 'roa_ttm', 'revenue_fq', 'revenue_fy', 'revenue_ttm',
+  'revenue_growth_quarterly_yoy', 'revenue_growth_annual_yoy',
+  'eps_dil_ttm', 'eps_dil_growth_ttm_yoy', 'peg_ttm',
+  'gross_margin_ttm', 'operating_margin_ttm', 'net_margin_ttm',
   'fcf_ttm', 'fcf_growth_ttm_yoy', 'debt_equity_fq', 'debt_equity_fy',
   'current_ratio_fq', 'current_ratio_fy', 'quick_ratio_fq', 'quick_ratio_fy',
   'pe', 'peg', 'pb', 'ps', 'ev_ebitda', 'ev_revenue', 'dividend_yield_ttm'
@@ -70,193 +20,176 @@ const LEGACY_ALIASES = {
   RET6M: 'perf_6m', RET12M: 'perf_1y'
 };
 
+const HEADER_ALIASES = {
+  ticker: ['symbol', 'ticker', 'ma', 'ma ck'],
+  company_name: ['company', 'company name', 'name', 'ten cong ty'],
+  sector: ['sector'], industry: ['industry', 'nganh'],
+  market_cap: ['mkt cap', 'market cap'], price: ['price', 'last', 'close', 'gia'],
+  change_pct: ['chg', 'chg %', 'change', 'change %'],
+  perf_1w: ['perf 1w', 'performance 1w'], perf_1m: ['perf 1m', 'performance 1m'],
+  perf_3m: ['perf 3m', 'performance 3m'], perf_6m: ['perf 6m', 'performance 6m'],
+  perf_1y: ['perf 1y', 'performance 1y'], perf_ytd: ['perf ytd', 'performance ytd'],
+  high_52w: ['high 52w', '52w high'], low_52w: ['low 52w', '52w low'],
+  volume: ['vol', 'volume', 'last volume'], relative_volume: ['rel vol', 'relative volume'],
+  avg_volume_10d: ['avg vol 10d', 'average volume 10d'],
+  avg_volume_30d: ['avg vol 30d', 'average volume 30d'],
+  avg_volume_60d: ['avg vol 60d', 'average volume 60d'],
+  roe_ttm: ['roe ttm', 'roe'], roa_ttm: ['roa ttm', 'roa'],
+  revenue_fq: ['revenue fq'], revenue_fy: ['revenue fy'], revenue_ttm: ['revenue ttm'],
+  revenue_growth_quarterly_yoy: ['revenue growth quarterly yoy'],
+  revenue_growth_annual_yoy: ['revenue growth annual yoy', 'revenue growth yoy'],
+  eps_dil_ttm: ['eps dil ttm', 'eps ttm'],
+  eps_dil_growth_ttm_yoy: ['eps dil growth ttm yoy', 'eps growth ttm yoy'],
+  peg_ttm: ['peg ttm'], gross_margin_ttm: ['gross margin % ttm', 'gross margin ttm'],
+  operating_margin_ttm: ['op margin % ttm', 'operating margin % ttm', 'operating margin ttm'],
+  net_margin_ttm: ['net margin % ttm', 'net margin ttm'], fcf_ttm: ['fcf ttm', 'free cash flow ttm'],
+  fcf_growth_ttm_yoy: ['fcf growth ttm yoy'],
+  debt_equity_fq: ['debt/equity fq', 'debt equity fq'], debt_equity_fy: ['debt/equity fy', 'debt equity fy'],
+  current_ratio_fq: ['current ratio fq'], current_ratio_fy: ['current ratio fy'],
+  quick_ratio_fq: ['quick ratio fq'], quick_ratio_fy: ['quick ratio fy'],
+  pe: ['p/e', 'pe', 'price to earnings'], peg: ['peg'], pb: ['p/b', 'pb'], ps: ['p/s', 'ps'],
+  ev_ebitda: ['ev/ebitda', 'ev ebitda'], ev_revenue: ['ev/revenue', 'ev revenue'],
+  dividend_yield_ttm: ['div yield % ttm', 'dividend yield % ttm', 'dividend yield ttm']
+};
+
 export function parseTradingViewPaste(text) {
-  const lines = String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-  if (!lines.length) return { rows: [], errors: ['Chua co du lieu de xu ly.'], columns: {} };
+  const rawLines = String(text || '').split(/\r?\n/).map(line => line.replace(/\r$/, '')).filter(line => line.trim());
+  if (!rawLines.length) return { rows: [], errors: ['Chua co du lieu de xu ly.'], columns: {} };
 
-  // Current TradingView Screener Markdown is headerless: it contains a
-  // placeholder row, a separator row, then 48 data columns. Detect this
-  // format before any legacy parser can reinterpret the row positions.
-  const markdownRows = lines.filter(isMarkdownTableRow).map(splitMarkdownTableRow);
-  const markdownDataRows = findTradingViewMarkdownDataRows(markdownRows);
+  // TradingView's current clipboard format is record-based, not a Markdown table:
+  // SYMBOL -> COMPANY -> D/UI marker -> one TAB-separated data row.
+  const screener = parseTradingViewFourLine(rawLines);
+  if (screener.rows.length) return screener;
 
-  if (markdownDataRows.length) {
-    const rows = markdownDataRows
-      .map((cells, index) => normalizeTradingViewMarkdownRow(cells, index + 1))
+  // Keep compatibility with real table exports that contain readable headers.
+  const table = rawLines.map(line => splitLine(line, detectDelimiter(line)));
+  const headerIndex = findHeaderIndex(table);
+  const columns = mapColumns(table[headerIndex] || []);
+  const headerFieldCount = Object.keys(columns).length;
+
+  if (headerFieldCount >= 10 && columns.ticker != null) {
+    const rows = table.slice(headerIndex + 1)
+      .filter(cells => !isSeparatorRow(cells))
+      .map((cells, i) => normalizeHeaderRow(cells, columns, i + headerIndex + 2))
       .filter(row => row.ticker);
+    return { rows, errors: [], columns: { ...columns, mode: 'tradingview-table' }, mode: 'tradingview-table' };
+  }
 
+  return { rows: [], errors: ['Khong nhan dien duoc bang TradingView.'], columns, mode: 'unknown' };
+}
+
+function parseTradingViewFourLine(lines) {
+  const rows = [];
+  let recordsSeen = 0;
+  let malformed = 0;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const ticker = extractPlainTicker(lines[i]);
+    if (!ticker) continue;
+
+    const companyLine = lines[i + 1] || '';
+    const markerLine = (lines[i + 2] || '').trim();
+    const dataLine = lines[i + 3] || '';
+
+    // The actual format has exactly three lines after the ticker. We deliberately
+    // require a TAB-heavy data line so ordinary text/watchlist rows are not consumed.
+    if (!dataLine.includes('\t')) continue;
+    const cells = dataLine.split('\t').map(cell => cell.trim());
+    if (cells.length < TRADINGVIEW_COLUMNS.length) {
+      malformed += 1;
+      continue;
+    }
+
+    recordsSeen += 1;
+    const row = {
+      sourceRow: i + 1,
+      ticker,
+      company_name: cleanText(companyLine),
+      ui_marker: markerLine === 'D' ? 'D' : markerLine || null
+    };
+
+    for (let index = 0; index < TRADINGVIEW_COLUMNS.length; index += 1) {
+      const field = TRADINGVIEW_COLUMNS[index];
+      const value = cells[index] ?? null;
+      row[field] = field === 'sector' || field === 'industry' ? cleanText(value) : cleanNumber(value);
+    }
+
+    if (!row.industry) row.industry = 'Unknown';
+    applyLegacyAliases(row);
+    rows.push(row);
+
+    // Consume the record. This prevents the company/marker lines from being
+    // reconsidered as independent ticker candidates.
+    i += 3;
+  }
+
+  if (recordsSeen) {
     return {
       rows,
-      errors: rows.length ? [] : ['Khong doc duoc dong du lieu TradingView.'],
-      columns: buildPositionalColumns(),
-      mode: 'tradingview-markdown-headerless'
+      errors: malformed ? [`Bo qua ${malformed} dong TradingView khong du 46 cot.`] : [],
+      columns: buildScreenerColumns(),
+      mode: 'tradingview-four-line-tab'
     };
   }
 
-  // Fallback for TradingView/table exports that actually contain readable headers.
-  const delimiter = detectDelimiter(lines[0]);
-  const table = lines.map(line => splitLine(line, delimiter));
-  const headerIndex = findHeaderIndex(table);
-  const headers = table[headerIndex] || [];
-  const columns = mapColumns(headers);
-  const headerFieldCount = Object.keys(columns).length;
-  const hasFullTableHeader = headerFieldCount >= 10 && columns.ticker != null && columns.industry != null;
-
-  if (hasFullTableHeader) {
-    const missing = ['ticker', 'sector', 'industry', 'price'].filter(field => columns[field] == null);
-    const errors = missing.length ? [`Thieu cot bat buoc: ${missing.join(', ')}`] : [];
-    const rows = table.slice(headerIndex + 1)
-      .filter(cells => !isSeparatorRow(cells))
-      .map((cells, rowIndex) => normalizeRow(cells, columns, rowIndex + headerIndex + 2))
-      .filter(row => row.ticker);
-    return { rows, errors, columns: { ...columns, mode: 'tradingview-table' } };
-  }
-
-  // Legacy watchlist fallback only when neither screener table format was detected.
-  const watchlistRows = parseTradingViewWatchlist(lines);
-  if (watchlistRows.length) return { rows: watchlistRows, errors: [], columns: { mode: 'tradingview-watchlist' } };
-  return { rows: [], errors: ['Khong nhan dien duoc bang TradingView.'], columns };
+  return { rows: [], errors: [], columns: {}, mode: null };
 }
 
-function isMarkdownTableRow(line) {
-  return /^\s*\|/.test(line) && line.includes('|');
-}
-
-function splitMarkdownTableRow(line) {
-  const trimmed = line.trim();
-  const withoutLeading = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
-  const withoutOuter = withoutLeading.endsWith('|') ? withoutLeading.slice(0, -1) : withoutLeading;
-  return withoutOuter.split('|').map(cell => cell.trim());
-}
-
-function findTradingViewMarkdownDataRows(rows) {
-  if (!rows.length) return [];
-
-  for (let index = 0; index < rows.length - 1; index += 1) {
-    if (!isSeparatorRow(rows[index])) continue;
-    const candidates = rows.slice(index + 1).filter(cells => {
-      if (isSeparatorRow(cells)) return false;
-      if (cells.length !== TRADINGVIEW_MARKDOWN_COLUMNS.length + 1) return false;
-      return Boolean(extractTickerFromSymbolCell(cells[0]));
-    });
-    if (candidates.length) return candidates;
-  }
-
-  return rows.filter(cells =>
-    cells.length === TRADINGVIEW_MARKDOWN_COLUMNS.length + 1 &&
-    Boolean(extractTickerFromSymbolCell(cells[0]))
-  );
-}
-
-function normalizeTradingViewMarkdownRow(cells, sourceRow) {
-  const row = { sourceRow };
-
-  for (let index = 0; index < TRADINGVIEW_MARKDOWN_COLUMNS.length; index += 1) {
-    const field = TRADINGVIEW_MARKDOWN_COLUMNS[index];
-    const raw = cells[index] ?? null;
-
-    if (field === 'symbol') {
-      row.ticker = extractTickerFromSymbolCell(raw);
-      row.company_name = extractCompanyNameFromSymbolCell(raw);
-    } else if (field === 'ui_marker') {
-      continue; // TradingView's D marker is UI, not a data field.
-    } else if (field === 'sector' || field === 'industry') {
-      row[field] = cleanText(raw);
-    } else {
-      row[field] = cleanNumber(raw);
-    }
-  }
-
-  if (!row.industry) row.industry = 'Unknown';
-  if (!row.company_name) row.company_name = null;
-  return withLegacyAliases(row);
-}
-
-function buildPositionalColumns() {
-  const columns = { mode: 'tradingview-markdown-headerless' };
-  TRADINGVIEW_MARKDOWN_COLUMNS.forEach((field, index) => {
-    if (field !== 'ui_marker') columns[field] = index;
-  });
-  columns.ticker = 0;
-  columns.company_name = 0;
+function buildScreenerColumns() {
+  const columns = { mode: 'tradingview-four-line-tab', ticker: -1, company_name: -1 };
+  TRADINGVIEW_COLUMNS.forEach((field, index) => { columns[field] = index; });
   return columns;
 }
 
-function parseTradingViewWatchlist(lines) {
-  const rows = [];
-  for (let index = 0; index < lines.length; index += 1) {
-    const ticker = extractTicker(lines[index]);
-    if (!ticker) continue;
-    const dataLine = findWatchlistDataLine(lines, index + 1);
-    if (!dataLine) continue;
-    const cells = splitWatchlistDataLine(dataLine);
-    if (cells.length < 15) continue;
-
-    rows.push({
-      sourceRow: index + 1, ticker, company_name: extractCompanyName(lines[index]), sector: null,
-      industry: cleanIndustry(cells[3]), avg_volume_10d: null, avg_volume_30d: cleanNumber(cells[0]),
-      avg_volume_60d: null, price: cleanNumber(cells[1]), volume: cleanNumber(cells[2]), relative_volume: null,
-      roe_ttm: cleanNumber(cells[4]), roa_ttm: null, revenue_fq: null, revenue_fy: null, revenue_ttm: null,
-      revenue_growth_quarterly_yoy: null, revenue_growth_annual_yoy: cleanNumber(cells[6]), eps_dil_ttm: null,
-      eps_dil_growth_ttm_yoy: cleanNumber(cells[7]), peg_ttm: null, gross_margin_ttm: null,
-      operating_margin_ttm: null, net_margin_ttm: null, fcf_ttm: null, fcf_growth_ttm_yoy: null,
-      debt_equity_fq: cleanNumber(cells[8]), debt_equity_fy: null, current_ratio_fq: null,
-      current_ratio_fy: null, quick_ratio_fq: null, quick_ratio_fy: null, pe: cleanNumber(cells[9]),
-      peg: cleanNumber(cells[10]), pb: null, ps: null, ev_ebitda: null, ev_revenue: null,
-      dividend_yield_ttm: null, change_pct: null, perf_1w: null, perf_1m: cleanNumber(cells[11]),
-      perf_3m: cleanNumber(cells[12]), perf_6m: cleanNumber(cells[13]), perf_1y: cleanNumber(cells[14]),
-      perf_ytd: null, high_52w: null, low_52w: null
-    });
-  }
-  return rows.map(withLegacyAliases);
-}
-
-function extractTicker(line) {
-  const markdownMatch = line.match(/\[\*\*([A-Z0-9]{2,8})\*\*\]\(/);
-  if (markdownMatch) return markdownMatch[1];
-  const clean = stripMarkdown(line).replace(/\*/g, '').trim();
-  const ticker = clean.split(/\s+/)[0];
-  if (/^[A-Z0-9]{2,8}$/.test(ticker) && !['VN', 'HOSE', 'HNX', 'UPCOM'].includes(ticker)) return ticker;
+function extractPlainTicker(line) {
+  const value = stripMarkdown(line).replace(/\s+D\s*$/i, '').trim();
+  if (/^[A-Z0-9]{2,8}$/.test(value) && !['VN', 'HOSE', 'HNX', 'UPCOM'].includes(value)) return value;
   return null;
 }
 
-function extractCompanyName(line) {
-  const links = extractMarkdownLinkTexts(line);
-  if (links.length >= 2) return cleanText(links[1]);
-  const clean = stripMarkdown(line).replace(/\s+D\s*$/i, '').trim();
-  const ticker = extractTicker(line);
-  return ticker ? clean.replace(new RegExp(`^${ticker}\\s*`, 'i'), '').trim() || null : null;
-}
-
-function extractMarkdownLinkTexts(value) {
-  const matches = [];
-  const regex = /\[([^\]]+)\]\([^)]+\)/g;
-  let match;
-  while ((match = regex.exec(String(value || ''))) !== null) matches.push(match[1]);
-  return matches.map(text => text.replace(/\*\*/g, '').trim()).filter(Boolean);
-}
-
-function findWatchlistDataLine(lines, startIndex) {
-  for (let index = startIndex; index < Math.min(lines.length, startIndex + 8); index += 1) {
-    const line = lines[index];
-    const normalized = stripMarkdown(line);
-    const numericHits = (normalized.match(/[+\-−]?\d[\d,.]*\s*[KMBT]?|[+\-−]?\d[\d,.]*%/gi) || []).length;
-    if (numericHits >= 10 && normalized.includes('%')) return line;
+function normalizeHeaderRow(cells, columns, sourceRow) {
+  const row = { sourceRow };
+  for (const field of Object.keys(HEADER_ALIASES)) {
+    const index = columns[field];
+    const raw = index == null ? null : cells[index];
+    if (field === 'ticker') row.ticker = extractPlainTicker(raw) || cleanText(raw);
+    else if (field === 'company_name' || field === 'sector' || field === 'industry') row[field] = cleanText(raw);
+    else row[field] = cleanNumber(raw);
   }
-  return null;
+  if (!row.industry) row.industry = 'Unknown';
+  applyLegacyAliases(row);
+  return row;
 }
 
-function splitWatchlistDataLine(line) {
-  const stripped = stripMarkdown(line).replace(/\u202f/g, ' ').replace(/\u00a0/g, ' ');
-  if (stripped.includes('\t')) return stripped.split('\t').map(cell => cell.trim());
-  return stripped.split(/\s{2,}/).map(cell => cell.trim()).filter(Boolean);
+function applyLegacyAliases(row) {
+  for (const [legacy, source] of Object.entries(LEGACY_ALIASES)) row[legacy] = source ? row[source] ?? null : null;
+  return row;
 }
 
-function stripMarkdown(value) {
-  return String(value || '')
-    .replace(/\[\*\*([^\]]+)\*\*\]\([^)]+\)/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/\*\*/g, '');
+function mapColumns(headers) {
+  const normalized = headers.map(normalizeHeader);
+  const result = {};
+  for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+    const index = normalized.findIndex(header => aliases.includes(header));
+    if (index >= 0) result[field] = index;
+  }
+  if (result.ticker == null && result.company_name != null) result.ticker = result.company_name;
+  return result;
+}
+
+function findHeaderIndex(table) {
+  let bestIndex = 0;
+  let bestScore = -1;
+  table.slice(0, 12).forEach((cells, index) => {
+    const score = Object.keys(mapColumns(cells)).length;
+    if (score > bestScore) { bestScore = score; bestIndex = index; }
+  });
+  return bestIndex;
+}
+
+function normalizeHeader(value) {
+  return String(value || '').toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[|%()]/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function detectDelimiter(line) {
@@ -268,92 +201,23 @@ function detectDelimiter(line) {
 }
 
 function splitLine(line, delimiter) {
-  if (delimiter instanceof RegExp) return line.split(delimiter).map(cell => cell.trim());
-  return line.split(delimiter).map(cell => cell.trim());
-}
-
-function findHeaderIndex(table) {
-  let bestIndex = 0;
-  let bestScore = -1;
-  table.slice(0, 12).forEach((cells, index) => {
-    const columns = mapColumns(cells);
-    const score = Object.keys(columns).length;
-    if (score > bestScore) { bestScore = score; bestIndex = index; }
-  });
-  return bestIndex;
-}
-
-function mapColumns(headers) {
-  const normalized = headers.map(normalizeHeader);
-  const result = {};
-  for (const [field, aliases] of Object.entries(FIELD_ALIASES)) {
-    const index = normalized.findIndex(header => aliases.includes(header));
-    if (index >= 0) result[field] = index;
-  }
-  if (result.ticker == null) result.ticker = result.company_name;
-  if (result.company_name == null) result.company_name = result.ticker;
-  return result;
-}
-
-function normalizeHeader(value) {
-  return String(value || '').toLowerCase().normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '').replace(/[|%()]/g, '').replace(/\s+/g, ' ').trim();
-}
-
-function normalizeRow(cells, columns, sourceRow) {
-  const row = { sourceRow };
-  for (const field of Object.keys(FIELD_ALIASES)) {
-    const raw = columns[field] == null ? null : cells[columns[field]];
-    if (field === 'ticker') row.ticker = extractTickerFromSymbolCell(raw);
-    else if (field === 'company_name') row.company_name = extractCompanyNameFromSymbolCell(raw);
-    else if (field === 'sector' || field === 'industry') row[field] = cleanText(raw);
-    else row[field] = cleanNumber(raw);
-  }
-  if (!row.ticker) row.ticker = null;
-  if (!row.company_name) row.company_name = null;
-  if (!row.industry) row.industry = 'Unknown';
-  return withLegacyAliases(row);
-}
-
-function extractTickerFromSymbolCell(value) {
-  const links = extractMarkdownLinkTexts(value);
-  const first = links[0] || '';
-  const tickerMatch = first.match(/^([A-Z0-9]{2,8})$/);
-  if (tickerMatch) return tickerMatch[1].toUpperCase();
-
-  const text = stripMarkdown(value).replace(/\s+D\s*$/i, '').trim();
-  const match = text.match(/^([A-Z0-9]{2,8})(?:\s+|$)/);
-  return match ? match[1].toUpperCase() : null;
-}
-
-function extractCompanyNameFromSymbolCell(value) {
-  const links = extractMarkdownLinkTexts(value);
-  if (links.length >= 2) return cleanText(links[1]);
-
-  const text = stripMarkdown(value).replace(/\s+D\s*$/i, '').trim();
-  const ticker = extractTickerFromSymbolCell(text);
-  return ticker ? text.slice(ticker.length).trim() || null : null;
-}
-
-function withLegacyAliases(row) {
-  for (const [legacyField, sourceField] of Object.entries(LEGACY_ALIASES)) {
-    row[legacyField] = sourceField ? row[sourceField] ?? null : null;
-  }
-  return row;
+  return delimiter instanceof RegExp ? line.split(delimiter).map(v => v.trim()) : line.split(delimiter).map(v => v.trim());
 }
 
 function isSeparatorRow(cells) {
   return cells.length > 0 && cells.every(cell => /^\s*:?-{1,}:?\s*$/.test(cell) || cell === '');
 }
 
-function cleanText(value) {
-  const text = stripMarkdown(value).trim();
-  if (!text || isMissing(text)) return null;
-  return text;
+function stripMarkdown(value) {
+  return String(value || '')
+    .replace(/\[\*\*([^\]]+)\*\*\]\([^)]+\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\*\*/g, '');
 }
 
-function cleanIndustry(value) {
-  return cleanText(value) || 'Unknown';
+function cleanText(value) {
+  const text = stripMarkdown(value).trim();
+  return isMissing(text) ? null : text || null;
 }
 
 export function cleanNumber(value) {
@@ -362,15 +226,13 @@ export function cleanNumber(value) {
   if (!text || isMissing(text)) return null;
 
   const multiplier = suffixMultiplier(text);
-  text = text.replace(/\u2212/g, '-').replace(/−/g, '-').replace(/\u202f/g, '')
-    .replace(/\u00a0/g, '').replace(/\s/g, '').replace(/^\+/, '')
-    .replace(/[KMBT]$/i, '').replace(/,/g, '');
-
   const isPercent = text.includes('%');
-  text = text.replace('%', '');
+  text = text.replace(/\u2212/g, '-').replace(/−/g, '-')
+    .replace(/\u202f/g, '').replace(/\u00a0/g, '').replace(/\s/g, '')
+    .replace(/^\+/, '').replace(/[KMBT]$/i, '').replace(/,/g, '').replace('%', '');
+
   const number = Number.parseFloat(text);
   if (!Number.isFinite(number)) return null;
-
   const scaled = number * multiplier;
   return isPercent ? scaled / 100 : scaled;
 }
@@ -385,5 +247,5 @@ function suffixMultiplier(value) {
 }
 
 function isMissing(value) {
-  return ['-', '—', '–', 'na', 'n/a', 'null', 'undefined', '�', 'no rating'].includes(String(value).trim().toLowerCase());
+  return ['-', '—', '–', 'na', 'n/a', 'null', 'undefined', '�', 'no rating'].includes(String(value || '').trim().toLowerCase());
 }
