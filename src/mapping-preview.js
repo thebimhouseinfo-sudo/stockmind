@@ -3,45 +3,54 @@ const TAB_ID = 'mapping-preview';
 const TAB_LABEL = 'Mapping';
 
 const COLUMNS = [
-  ['ticker', 'TICKER', 'Ticker'],
-  ['company_name', 'COMPANY', 'Company'],
-  ['sector', 'SECTOR', 'Sector'],
-  ['industry', 'INDUSTRY', 'Industry'],
-  ['market_cap', 'MKT CAP', 'Market Cap'],
-  ['price', 'PRICE', 'Price'],
-  ['change_pct', 'CHG %', 'Change %'],
-  ['perf_1w', 'PERF 1W', '1W'],
-  ['perf_1m', 'PERF 1M', '1M'],
-  ['perf_3m', 'PERF 3M', '3M'],
-  ['perf_6m', 'PERF 6M', '6M'],
-  ['perf_1y', 'PERF 1Y', '1Y'],
-  ['perf_ytd', 'PERF YTD', 'YTD'],
-  ['high_52w', 'HIGH 52W', '52W High'],
-  ['low_52w', 'LOW 52W', '52W Low'],
-  ['volume', 'VOL', 'Volume'],
-  ['relative_volume', 'REL VOL', 'Relative Vol'],
-  ['avg_volume_10d', 'AVG VOL 10D', 'Avg Vol 10D'],
-  ['avg_volume_30d', 'AVG VOL 30D', 'Avg Vol 30D'],
-  ['avg_volume_60d', 'AVG VOL 60D', 'Avg Vol 60D'],
+  ['ticker', 'Symbol', 'Ticker'],
+  ['company_name', 'Company', 'Company'],
+  ['sector', 'Sector', 'Sector'],
+  ['industry', 'Industry', 'Industry'],
+  ['market_cap', 'Market Cap', 'Market Cap'],
+  ['price', 'Price', 'Price'],
+  ['change_pct', 'Chg %', 'Change %'],
+  ['perf_1w', 'Perf 1W', '1W'],
+  ['perf_1m', 'Perf 1M', '1M'],
+  ['perf_3m', 'Perf 3M', '3M'],
+  ['perf_6m', 'Perf 6M', '6M'],
+  ['perf_1y', 'Perf 1Y', '1Y'],
+  ['perf_ytd', 'Perf YTD', 'YTD'],
+  ['high_52w', 'High 52W', '52W High'],
+  ['low_52w', 'Low 52W', '52W Low'],
+  ['volume', 'Vol', 'Volume'],
+  ['relative_volume', 'Rel Vol', 'Relative Vol'],
+  ['avg_volume_10d', 'Avg Vol 10D', 'Avg Vol 10D'],
+  ['avg_volume_30d', 'Avg Vol 30D', 'Avg Vol 30D'],
+  ['avg_volume_60d', 'Avg Vol 60D', 'Avg Vol 60D'],
   ['roe_ttm', 'ROE TTM', 'ROE TTM'],
   ['roa_ttm', 'ROA TTM', 'ROA TTM'],
-  ['revenue_fq', 'REVENUE FQ', 'Revenue FQ'],
-  ['revenue_fy', 'REVENUE FY', 'Revenue FY'],
-  ['revenue_ttm', 'REVENUE TTM', 'Revenue TTM'],
-  ['revenue_growth_quarterly_yoy', 'REV GROWTH Q YOY', 'Revenue Growth Q YoY'],
-  ['revenue_growth_annual_yoy', 'REV GROWTH FY YOY', 'Revenue Growth FY YoY'],
-  ['eps_dil_ttm', 'EPS DIL TTM', 'EPS TTM'],
-  ['eps_dil_growth_ttm_yoy', 'EPS DIL GROWTH TTM YOY', 'EPS Growth TTM YoY'],
+  ['revenue_fq', 'Revenue FQ', 'Revenue FQ'],
+  ['revenue_fy', 'Revenue FY', 'Revenue FY'],
+  ['revenue_ttm', 'Revenue TTM', 'Revenue TTM'],
+  ['revenue_growth_quarterly_yoy', 'Revenue Growth Quarterly YoY', 'Revenue Growth Q YoY'],
+  ['revenue_growth_annual_yoy', 'Revenue Growth Annual YoY', 'Revenue Growth FY YoY'],
+  ['eps_dil_ttm', 'EPS Dil TTM', 'EPS TTM'],
+  ['eps_dil_growth_ttm_yoy', 'EPS Dil Growth TTM YoY', 'EPS Growth TTM YoY'],
   ['peg_ttm', 'PEG TTM', 'PEG TTM'],
-  ['gross_margin_ttm', 'GROSS MARGIN TTM', 'Gross Margin TTM'],
-  ['operating_margin_ttm', 'OPERATING MARGIN TTM', 'Operating Margin TTM'],
-  ['net_margin_ttm', 'NET MARGIN TTM', 'Net Margin TTM'],
+  ['gross_margin_ttm', 'Gross Margin % TTM', 'Gross Margin TTM'],
+  ['operating_margin_ttm', 'Op Margin % TTM', 'Operating Margin TTM'],
+  ['net_margin_ttm', 'Net Margin % TTM', 'Net Margin TTM'],
   ['fcf_ttm', 'FCF TTM', 'FCF TTM'],
-  ['fcf_growth_ttm_yoy', 'FCF GROWTH TTM YOY', 'FCF Growth TTM YoY'],
-  ['debt_equity_fq', 'DEBT/EQUITY FQ', 'D/E FQ'],
-  ['debt_equity_fy', 'DEBT/EQUITY FY', 'D/E FY'],
-  ['current_ratio_fq', 'CURRENT RATIO FQ', 'Current Ratio FQ'],
-  ['current_ratio_fy', 'CURRENT RATIO FY', 'Current Ratio FY']
+  ['fcf_growth_ttm_yoy', 'FCF Growth TTM YoY', 'FCF Growth TTM YoY'],
+  ['debt_equity_fq', 'Debt/Equity FQ', 'D/E FQ'],
+  ['debt_equity_fy', 'Debt/Equity FY', 'D/E FY'],
+  ['current_ratio_fq', 'Current Ratio FQ', 'Current Ratio FQ'],
+  ['current_ratio_fy', 'Current Ratio FY', 'Current Ratio FY'],
+  ['quick_ratio_fq', 'Quick Ratio FQ', 'Quick Ratio FQ'],
+  ['quick_ratio_fy', 'Quick Ratio FY', 'Quick Ratio FY'],
+  ['pe', 'P/E', 'P/E'],
+  ['peg', 'PEG', 'PEG'],
+  ['pb', 'P/B', 'P/B'],
+  ['ps', 'P/S', 'P/S'],
+  ['ev_ebitda', 'EV/EBITDA', 'EV/EBITDA'],
+  ['ev_revenue', 'EV/Revenue', 'EV/Revenue'],
+  ['dividend_yield_ttm', 'Div Yield % TTM', 'Dividend Yield TTM']
 ];
 
 let previewOpen = false;
@@ -97,12 +106,12 @@ function renderPreview() {
     </div>
     <div class="mapping-preview-note">
       <span class="mapping-dot"></span>
-      <span>Header hiển thị <strong>Internal field</strong> và tên TradingView tương ứng. Giá trị bên dưới là dữ liệu parser đã lưu.</span>
+      <span>Header hiển thị <strong>tên TradingView</strong> và <strong>Internal field</strong>. Dấu <strong>—</strong> nghĩa là parser hiện chưa nhận giá trị cho field đó.</span>
     </div>
     ${rows.length ? `<div class="mapping-table-wrap"><table class="mapping-table">
       <thead><tr>
         <th class="sticky-col">#</th>
-        ${COLUMNS.map(([key, tv, label]) => `<th title="${escapeHtml(tv)}"><span>${escapeHtml(label)}</span><small>${escapeHtml(key)}</small></th>`).join('')}
+        ${COLUMNS.map(([key, tv, label]) => `<th title="TradingView: ${escapeHtml(tv)}"><span>${escapeHtml(tv)}</span><small>${escapeHtml(key)}</small></th>`).join('')}
       </tr></thead>
       <tbody>
         ${rows.map((row, index) => `<tr>
