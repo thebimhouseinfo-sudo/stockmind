@@ -59,13 +59,21 @@ export function renderProgress() {
     </div>`;
 }
 
+function findRuntimeStage(descriptor) {
+  return (crsmState.executionStages || []).find(stage =>
+    stage.nodes.length === descriptor.nodes.length && stage.nodes.every(nodeId => descriptor.nodes.includes(nodeId))
+  ) || null;
+}
+
 function renderStage(descriptor, statuses, title, eligible) {
+  const runtime = findRuntimeStage(descriptor);
   const cards = descriptor.nodes.map(nodeId => renderNodeCard(nodeId, statuses)).join('');
-  const mode = descriptor.mode;
+  const mode = runtime?.mode || descriptor.mode;
+  const stageStatus = runtime ? (crsmState.stageStatus?.[runtime.index] || 'pending') : 'pending';
   const modeText = mode === 'parallel' ? 'Song song' : 'Tuần tự';
-  const parallelClass = eligible && mode === 'parallel' ? ' active' : '';
   const runningCount = descriptor.nodes.filter(id => statuses[id] === 'running').length;
-  const parallelNow = runningCount > 1;
+  const parallelNow = stageStatus === 'running' && runningCount > 1;
+  const activeClass = parallelNow ? ' active' : '';
 
   return `
     <section class="crsm-stage ${parallelNow ? 'parallel-running' : ''}" data-stage="${descriptor.stage}">
@@ -76,7 +84,7 @@ function renderStage(descriptor, statuses, title, eligible) {
         </div>
         ${eligible ? `<div class="crsm-stage-execution" aria-label="Execution policy">
           <span class="crsm-stage-mode-label">${parallelNow ? 'Đang chạy song song' : modeText}</span>
-          <span class="crsm-parallel-toggle${parallelClass}" title="Cấu hình execution policy trong Settings">
+          <span class="crsm-parallel-toggle${activeClass}" title="Cấu hình execution policy trong Settings">
             <span class="crsm-toggle-dot"></span>
             <span>Song song</span>
           </span>
