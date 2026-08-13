@@ -3,42 +3,239 @@ import { field, setResult } from './render-common.js';
 export function renderNode6A(ctx) {
   const outputs = ctx.outputs || {};
   setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker, sectorType: ctx.sectorType });
+
   const isScreened = ctx.mode === 'SCREENED';
-  const f = (path, fallback = 'Data not available') => escapeHtml(field(path, fallback));
+  const f = (path, fallback = 'Data not available') => escapeHtml(formatValue(field(path, fallback)));
   const raw = (path, fallback = null) => field(path, fallback);
-  const scoreWidth = path => { const n = Number(raw(path)); return Number.isFinite(n) ? `${Math.max(0, Math.min(100, n / 20 * 100))}%` : '0%'; };
-  const n1 = outputs.node1 || {}, n2 = outputs.node2 || {}, n3 = outputs.node3 || {}, n4 = outputs.node4 || {}, n5 = outputs.node5 || {};
-  const drivers = (n5.drivers || []).slice(0,3).map(x => `<li><span class="dot">●</span><span>${escapeHtml(x)}</span></li>`).join('') || '<li><span class="dot">●</span><span>Data not available</span></li>';
-  const peers = (n3.peer_list || []).slice(0,5).map(p => `<tr><td>${escapeHtml(p.ticker ?? 'Data not available')}</td><td>${escapeHtml(p.pe ?? 'Data not available')}</td><td>${escapeHtml(p.pb ?? 'Data not available')}</td><td>${escapeHtml(p.roe ?? 'Data not available')}</td><td>${escapeHtml(p.selection_reason ?? 'Data not available')}</td></tr>`).join('') || '<tr><td colspan="5">Data not available</td></tr>';
-  const sources = (n1.sources || []).map(s => s?.name || s?.url_or_ref).filter(Boolean).slice(0,8).map(escapeHtml).join(', ') || 'Data not available';
+  const n1 = outputs.node1 || {};
+  const n2 = outputs.node2 || {};
+  const n3 = outputs.node3 || {};
+  const n4 = outputs.node4 || {};
+  const n5 = outputs.node5 || {};
+
+  const drivers = Array.isArray(n5.drivers) ? n5.drivers.slice(0, 3) : [];
+  while (drivers.length < 3) drivers.push('Data not available');
+
   const scenarios = n4.risk_scenarios || {};
-  const bull = scenarios.bull || scenarios.BULL || {}, base = scenarios.base || scenarios.BASE || {}, bear = scenarios.bear || scenarios.BEAR || {};
-  const screening = isScreened ? `<section class="card screening-card"><p class="eyebrow">SCREENING SNAPSHOT</p><h2>Stock Mind pre-filter</h2><p class="subtle">Nguồn: StockScreener · dữ liệu TradingView do người dùng nhập. Đây là bối cảnh sàng lọc ban đầu, không phải điểm số CRSM.</p><div class="metric-grid eight">${metricBox('Score',f('node1.screening_summary.screen_score'))}${metricBox('Rank',f('node1.screening_summary.screen_rank'))}${metricBox('Grade',f('node1.screening_summary.screen_grade'))}${metricBox('Quality',f('node1.screening_summary.quality_score'))}${metricBox('Growth',f('node1.screening_summary.growth_score'))}${metricBox('Valuation',f('node1.screening_summary.valuation_score'))}${metricBox('Momentum',f('node1.screening_summary.momentum_score'))}${metricBox('Mispricing',f('node1.screening_summary.mispricing_score'))}</div><div class="comparison"><div><span>CRSM Score</span><strong>${f('node5.ai_score.value')}</strong></div><div><b>${statusLabel(raw('node5.screen_vs_crsm.status'))}</b><p>${f('node5.screen_vs_crsm.interpretation')}</p></div></div></section>` : '';
-  return `<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Báo Cáo Phân Tích ${escapeHtml(ctx.ticker)}</title><style>${CSS}</style></head><body><div id="report" class="page">
-<header class="header"><div><span class="ticker">HOSE: ${escapeHtml(ctx.ticker)}</span><span class="date">Cập nhật: ${f('date')}</span><h1>BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><p class="company">${f('node1.company_name',`Hồ sơ ${escapeHtml(ctx.ticker)}`)}</p></div><div class="analyst"><p>CHUYÊN GIA PHÂN TÍCH</p><strong>Senior Equity Analyst &amp; Geopolitical Strategist</strong></div></header>
-<section class="card hero"><div class="hero-top"><div><span class="eyebrow light">QUYẾT ĐỊNH ĐẦU TƯ</span><div class="decision">${f('node5.decision')}</div></div><div class="hero-score"><div><span>AI SCORE</span><strong>${f('node5.ai_score.value')}</strong></div><div><span>TIN TƯỞNG</span><strong>${f('node5.confidence.value')}</strong></div></div></div><div class="hero-grid"><div><h3>ĐỘNG LỰC TĂNG TRƯỞNG CHÍNH</h3><ul>${drivers}</ul></div><div class="invalidation"><h3>ĐIỀU KIỆN VÔ HIỆU (INVALIDATION)</h3><p>${f('node5.thesis_invalidation')}</p></div></div></section>
+  const bull = scenarios.bull || scenarios.BULL || {};
+  const base = scenarios.base || scenarios.BASE || {};
+  const bear = scenarios.bear || scenarios.BEAR || {};
+
+  const screening = isScreened ? renderScreeningSnapshot(n1, n5) : '';
+  const sources = sourceBar(n1.sources);
+  const allocation = allocationSteps(n5.strategy?.allocation_plan);
+
+  return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo Cáo Phân Tích ${escapeHtml(ctx.ticker)} | Senior Equity Analyst</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif'],display:['Outfit','sans-serif']},colors:{brand:{deep:'#1e3a8a',accent:'#3b82f6',bg:'#f5f7fb'},status:{buy:'#16a34a',sell:'#dc2626',hold:'#f59e0b'}},boxShadow:{premium:'0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)'}}}}</script>
+<style>body{background-color:#f5f7fb;color:#1a1a1a;line-height:1.6}.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 4px 6px -1px rgb(0 0 0/0.05),0 2px 4px -2px rgb(0 0 0/0.05);transition:transform .2s ease,box-shadow .2s ease}.card:hover{box-shadow:0 20px 25px -5px rgb(0 0 0/0.05)}.hero-card{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);color:#fff}.metric-card{background:#f8fafc;border:1px solid #e2e8f0;padding:16px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:16px;margin:16px 0;border-radius:0 8px 8px 0;font-style:italic}.sub-card{background:#fff;border:1px solid #f1f5f9;padding:16px;border-radius:10px;margin-bottom:12px}.badge{padding:4px 12px;border-radius:9999px;font-size:.75rem;font-weight:600;text-transform:uppercase}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:768px){.grid-3{grid-template-columns:1fr}.card{padding:20px}}</style>
+</head>
+<body class="font-sans antialiased">
+<div id="report" class="container mx-auto px-4 py-8 max-w-[1100px]">
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4"><div><div class="flex items-center gap-3 mb-2"><span class="bg-brand-deep text-white px-3 py-1 rounded text-sm font-bold tracking-widest">HOSE: ${escapeHtml(ctx.ticker)}</span><span class="text-gray-500 font-medium text-sm">Cập nhật: ${f('date')}</span></div><h1 class="text-3xl md:text-4xl font-display font-extrabold text-brand-deep">BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><p class="text-gray-600 mt-1 font-medium">${f('node1.company_name')}</p></div><div class="text-right"><p class="text-xs uppercase tracking-wider text-gray-400 font-bold">Chuyên gia phân tích</p><p class="text-sm font-semibold text-gray-800">Senior Equity Analyst & Geopolitical Strategist</p></div></header>
+<main>
+<div class="card hero-card shadow-2xl relative overflow-hidden mb-6"><div class="relative z-10"><div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-white/20 pb-6"><div><h2 class="text-sm uppercase tracking-widest text-blue-200 font-bold mb-1">Quyết định đầu tư</h2><div class="text-5xl font-display font-black text-white tracking-tight">${f('node5.decision')}</div></div><div class="mt-4 md:mt-0 flex gap-8"><div class="text-center"><p class="text-blue-200 text-xs font-bold uppercase mb-1">AI Score</p><p class="text-3xl font-black">${f('node5.ai_score.value')}<span class="text-sm">/100</span></p></div><div class="text-center"><p class="text-blue-200 text-xs font-bold uppercase mb-1">Tin tưởng</p><p class="text-3xl font-black">${f('node5.confidence.value')}</p></div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h3 class="text-blue-100 font-bold text-sm uppercase mb-3">Động lực tăng trưởng chính</h3><ul class="space-y-2">${drivers.map(x => `<li class="flex items-start gap-2 text-sm"><span class="text-green-400 mt-0.5">●</span><span>${escapeHtml(formatValue(x))}</span></li>`).join('')}</ul></div><div class="bg-white/10 p-4 rounded-lg border border-white/10"><h3 class="text-red-300 font-bold text-sm uppercase mb-2">Điều kiện vô hiệu (Invalidation)</h3><p class="text-sm leading-relaxed">${f('node5.thesis_invalidation')}</p></div></div></div></div>
 ${screening}
-<section class="card"><div class="eyebrow">INSTITUTIONAL SIGNALS</div><h2>Tín hiệu Tổng hợp</h2><div class="signal-grid">${signalBox('Cơ bản',n5.conflict_detector?.fundamental)}${signalBox('Kỹ thuật',n5.conflict_detector?.technical)}${signalBox('Vĩ mô',n5.conflict_detector?.macro)}${signalBox('Thanh khoản',n5.conflict_detector?.liquidity)}</div><div class="center-badge">Đồng thuận tín hiệu: ${escapeHtml(n5.conflict_detector?.alignment ?? 'Data not available')}</div><div class="three-grid"><div class="subcard"><span class="label">Catalyst gần nhất</span><strong>${f('node5.catalyst_horizon.nearest_catalyst')}</strong><small>${f('node5.catalyst_horizon.bucket')}</small></div><div class="subcard"><span class="label">Chất lượng lợi nhuận</span><p>${(n3.earnings_quality?.red_flags || []).length ? escapeHtml(n3.earnings_quality.red_flags.join('; ')) : 'Không phát hiện bất thường'}</p></div><div class="subcard"><span class="label">Reverse DCF</span><p>CAGR ngầm định: ${f('node3.valuation.reverse_dcf_implied_fcf_cagr')} — ${f('node3.valuation.reverse_dcf_commentary')}</p></div></div></section>
-<div class="two-col"><section class="card"><div class="eyebrow">MACRO</div><h2>Vĩ mô &amp; Địa chính trị</h2><div class="risk-row"><span>Chế độ rủi ro</span><strong>${f('node4.risk_regime')}</strong></div><div class="metric-grid two">${metricBox('Lãi suất FED',f('node4.macro_indicators.fed_rate.value'))}${metricBox('USD/VND',f('node4.macro_indicators.usd_vnd.value'))}${metricBox('Dầu Brent',f('node4.macro_indicators.oil_brent.value'))}${metricBox('Lạm phát Mỹ',f('node4.macro_indicators.us_inflation.value'))}</div><p class="text">${f('node4.macro_view')}</p></section><section class="card"><div class="eyebrow">SECTOR</div><h2>Phân tích Nhóm Ngành</h2><div class="risk-row"><span>Sức mạnh ngành</span><strong>${f('node2.sector_vs_market.sector_strength_label')}</strong></div><div class="subcard"><div class="between"><span>Ngành</span><strong>${f('node2.sector_vs_market.sector_perf_pct')}</strong></div><div class="between"><span>VN-Index</span><strong>${f('node2.sector_vs_market.vnindex_perf_pct')}</strong></div><div class="bar"><i style="width:${sectorBar(n2.sector_vs_market)}"></i></div></div><p class="text">${f('node2.conclusion')}</p></section></div>
-<div class="two-col"><section class="card"><div class="eyebrow">INDUSTRY</div><h2>Chu kỳ &amp; Chính sách</h2><div class="subcard"><span class="label">GIAI ĐOẠN</span><strong>${f('node4.industry_impact')}</strong></div><div class="two-grid"><div class="subcard"><span class="label">BIÊN NGÀNH</span><strong>${industryMargin(n3.peer_list)}</strong><small>${industryMarginDesc(n3.peer_list)}</small></div><div class="subcard"><span class="label">CAPEX / ĐẦU TƯ CÔNG</span><strong>${f('node4.domestic_drivers.0.value')}</strong></div></div></section><section class="card"><div class="eyebrow">COMPANY</div><h2>Phân tích Doanh nghiệp</h2><table class="table"><tr><th>Doanh thu (${f('node1.financial_core_raw.revenue.period')})</th><td>${f('node1.financial_core_raw.revenue.value')} · ${f('node1.financial_core_raw.revenue.yoy')}</td></tr><tr><th>Lợi nhuận sau thuế</th><td>${f('node1.financial_core_raw.npat.value')} · ${f('node1.financial_core_raw.npat.yoy')}</td></tr><tr><th>Moat</th><td>${f('node3.moat')}</td></tr></table></section></div>
-<section class="card"><div class="two-col"><div><div class="eyebrow">SMART MONEY</div><h2>Dòng tiền thông minh</h2><div class="highlight"><strong>Key Insight:</strong> ${f('node2.smart_money_phase')} tại vùng ${f('node2.zones.demand')}. ${f('node2.volume_analysis.vsa_signal_candidate')}</div><div class="metric-grid two">${metricBox('Volume Ratio',f('node2.volume_analysis.ratio'))}${metricBox('Tín hiệu',f('node2.volume_analysis.classification'))}</div></div><div><div class="eyebrow">VALUATION</div><h2>Định giá</h2><div class="metric-grid two">${metricBox('P/E (TTM)',f('node1.valuation_multiples.pe_ttm'))}${metricBox('P/B',f('node1.valuation_multiples.pb_current'))}</div><p class="text">TB Peer P/E: ${f('node3.valuation.peer_avg_pe')}</p><p class="text">DCF Fair Value: ${f('node3.valuation.dcf_fair_value')}</p><div class="highlight"><strong>Reverse DCF:</strong> ${f('node3.valuation.reverse_dcf_commentary')}</div></div></div></section>
-<section class="card"><div class="eyebrow">TECHNICAL</div><h2>Cấu trúc Kỹ thuật</h2><table class="table"><tr><th>Xu hướng</th><td>${f('node2.trend_status')}</td></tr><tr><th>So với SMA 200</th><td>${f('node2.sma_200_rel')}</td></tr><tr><th>Volume behavior</th><td>${f('node2.volume_analysis.classification')}</td></tr><tr><th>Smart Money phase</th><td>${f('node2.smart_money_phase')}</td></tr></table></section>
-<section class="card"><div class="eyebrow">AI SCORE GRID</div><h2>Hệ thống chấm điểm AI</h2><div class="score-grid">${scoreBox('Kỹ thuật','node5.scores.technical')}${scoreBox('Dòng tiền','node5.scores.flow')}${scoreBox('Cơ bản','node5.scores.fundamental')}${scoreBox('Ngành/Vĩ mô','node5.scores.sector_macro')}${scoreBox('Định giá','node5.scores.valuation')}${scoreBox('Rủi ro','node5.scores.risk')}</div><p class="text">${f('node5.ai_score.formula_shown')}</p></section>
-<div class="two-col"><section class="card"><div class="eyebrow">RISK</div><h2>Quản trị Rủi ro</h2><table class="table"><tr><th>Doanh nghiệp</th><td>${f('node5.liquidity_note')}</td></tr><tr><th>Vĩ mô</th><td>${f('node4.risk_regime')}</td></tr><tr><th>Thanh khoản</th><td>${f('node1.market_data.liquidity_flag')}</td></tr></table></section><section class="card"><div class="eyebrow">CAUSAL ANALYSIS</div><h2>Phân tích Nhân quả</h2><ul class="causal"><li><b>Gốc:</b> ${f('node4.causal_chains.0.facts')}</li><li><b>Quả:</b> ${f('node4.causal_chains.0.chain_summary')}</li><li><b>Suy luận:</b> ${f('node4.causal_chains.0.inferences')}</li></ul></section></div>
-<section class="card"><div class="eyebrow">SCENARIOS</div><h2>Kịch bản Phân tích</h2><div class="three-grid"><div class="subcard bull"><h3>BULL CASE <span>${escapeHtml(bull.probability ?? bull.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(bull.condition ?? bull.description ?? 'Data not available')}</p><strong>${escapeHtml(bull.target ?? 'Data not available')}</strong></div><div class="subcard base"><h3>BASE CASE <span>${escapeHtml(base.probability ?? base.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(base.condition ?? base.description ?? 'Data not available')}</p><strong>${escapeHtml(base.target ?? 'Data not available')}</strong></div><div class="subcard bear"><h3>BEAR CASE <span>${escapeHtml(bear.probability ?? bear.prob ?? 'Data not available')}</span></h3><p>${escapeHtml(bear.condition ?? bear.description ?? 'Data not available')}</p><strong>${escapeHtml(bear.target ?? bear.price ?? 'Data not available')}</strong></div></div></section>
-<section class="card trade"><div style="text-align:center"><div class="eyebrow">TRADE SETUP</div><h2>Chiến lược Giao dịch</h2></div><div class="trade-grid">${tradeBox('Vùng Mua',f('node5.strategy.entry_zone'))}${tradeBox('Cắt Lỗ',f('node5.trading_stop.price'))}${tradeBox('Mục tiêu 1',f('node5.strategy.tp1'))}${tradeBox('Mục tiêu 2',f('node5.strategy.tp2'))}</div><div class="allocation"><b>Lộ trình giải ngân</b><p>${f('node5.strategy.allocation_plan')}</p></div><div class="allocation"><b>Quản trị vị thế</b><div class="three-grid"><div>Rủi ro/lệnh: ${f('node5.strategy.risk_per_trade_pct_nav')}</div><div>Tỷ trọng tối đa: ${f('node5.strategy.max_portfolio_weight_pct')}</div><div>Loại vị thế: ${f('node5.strategy.position_type')}</div></div></div></section>
-<footer class="footer">Nguồn: ${sources}<br>Báo cáo được tạo tự động bởi AI Equity Research Engine · ${f('date')} · Chỉ dành cho mục đích tham khảo, không phải khuyến nghị đầu tư chính thức.</footer>
-</div></body></html>`;
+<div class="card border-2 border-brand-accent/20 mb-6"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Tín hiệu Tổng hợp</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"><div class="sub-card m-0 text-center"><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Cơ bản</span><span class="text-2xl">${signal('fundamental')}</span></div><div class="sub-card m-0 text-center"><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Kỹ thuật</span><span class="text-2xl">${signal('technical')}</span></div><div class="sub-card m-0 text-center"><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Vĩ mô</span><span class="text-2xl">${signal('macro')}</span></div><div class="sub-card m-0 text-center"><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Thanh khoản</span><span class="text-2xl">${signal('liquidity')}</span></div></div><div class="text-center mb-4"><span class="badge bg-blue-100 text-blue-700">Đồng thuận tín hiệu: ${escapeHtml(n5.conflict_detector?.alignment ?? 'Data not available')}</span></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><div class="sub-card m-0"><span class="text-xs font-bold text-gray-400 uppercase block mb-1">Catalyst gần nhất</span><p class="text-sm font-medium">${f('node5.catalyst_horizon.nearest_catalyst')} (${f('node5.catalyst_horizon.bucket')})</p></div><div class="sub-card m-0"><span class="text-xs font-bold text-gray-400 uppercase block mb-1">Chất lượng lợi nhuận</span><p class="text-sm font-medium">${earningsQuality(n3.earnings_quality?.red_flags)}</p></div><div class="sub-card m-0"><span class="text-xs font-bold text-gray-400 uppercase block mb-1">Reverse DCF</span><p class="text-sm font-medium">CAGR ngầm định: ${f('node3.valuation.reverse_dcf_implied_fcf_cagr')} — ${f('node3.valuation.reverse_dcf_commentary')}</p></div></div></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="card"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Vĩ mô & Địa chính trị</h2><div class="space-y-4"><div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100"><span class="text-sm font-semibold text-gray-600 uppercase">Chế độ rủi ro</span><span class="badge bg-yellow-100 text-yellow-700">${f('node4.risk_regime')}</span></div><div class="grid grid-cols-2 gap-3"><div class="sub-card m-0"><h3 class="text-xs font-bold text-gray-400 uppercase mb-1">Lãi suất FED</h3><p class="text-lg font-bold">${f('node4.macro_indicators.fed_rate.value')}</p></div><div class="sub-card m-0"><h3 class="text-xs font-bold text-gray-400 uppercase mb-1">Tỷ giá USD/VND</h3><p class="text-lg font-bold">${f('node4.macro_indicators.usd_vnd.value')}</p></div><div class="sub-card m-0"><h3 class="text-xs font-bold text-gray-400 uppercase mb-1">Dầu Brent</h3><p class="text-lg font-bold">${f('node4.macro_indicators.oil_brent.value')}</p></div><div class="sub-card m-0"><h3 class="text-xs font-bold text-gray-400 uppercase mb-1">Lạm phát Mỹ</h3><p class="text-lg font-bold">${f('node4.macro_indicators.us_inflation.value')}</p></div></div><p class="text-sm text-gray-600">${f('node4.macro_view')}</p></div></div><div class="card"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Phân tích Nhóm Ngành</h2><div class="space-y-4"><div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100"><span class="text-sm font-semibold text-gray-600 uppercase">Sức mạnh ngành</span><span class="badge bg-gray-200 text-gray-700">${f('node2.sector_vs_market.sector_strength_label')}</span></div><div class="bg-blue-50 border border-blue-100 p-4 rounded-xl"><div class="flex justify-between mb-2"><span class="text-sm font-medium">Ngành (cùng kỳ)</span><span class="text-sm font-bold">${sectorPerf(n2)}</span></div><div class="flex justify-between"><span class="text-sm font-medium">VN-Index</span><span class="text-sm font-bold">${f('node2.sector_vs_market.vnindex_perf_pct')}</span></div><div class="w-full bg-gray-200 h-2 rounded-full mt-3 overflow-hidden"><div class="bg-brand-accent h-full" style="width:${sectorBar(n2.sector_vs_market)}"></div></div></div><p class="text-sm text-gray-600 italic">${sectorInsight(n2)}</p></div></div></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="card"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Chu kỳ & Chính sách</h2><div class="sub-card"><p class="text-xs font-bold text-blue-500 uppercase mb-1">Giai đoạn</p><p class="font-bold text-gray-800">${industryStage(n4)}</p></div><div class="space-y-3"><div class="flex items-center gap-3"><div class="w-14 h-10 bg-red-50 text-red-600 rounded flex items-center justify-center font-bold text-sm">${industryMargin(n3.peer_list)}</div><p class="text-xs text-gray-500 uppercase font-semibold leading-tight">${industryMarginDesc(n3.peer_list)}</p></div><div class="flex items-center gap-3"><div class="w-14 h-10 bg-green-50 text-green-600 rounded flex items-center justify-center font-bold text-sm">${f('node4.domestic_drivers.0.value')}</div><p class="text-xs text-gray-500 uppercase font-semibold leading-tight">Ngân sách đầu tư công (Tỷ USD)</p></div></div></div><div class="card"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Phân tích Doanh nghiệp</h2><div class="space-y-3"><div class="flex justify-between items-end border-b border-gray-100 pb-2"><div><p class="text-xs text-gray-400 font-bold uppercase">Doanh thu (${f('node1.financial_core_raw.revenue.period')})</p><p class="text-lg font-bold">${f('node1.financial_core_raw.revenue.value')}</p></div><span class="text-green-600 font-bold text-sm">${f('node1.financial_core_raw.revenue.yoy')}</span></div><div class="flex justify-between items-end border-b border-gray-100 pb-2"><div><p class="text-xs text-gray-400 font-bold uppercase">Lợi nhuận sau thuế</p><p class="text-lg font-bold">${f('node1.financial_core_raw.npat.value')}</p></div><span class="text-green-600 font-bold text-sm">${f('node1.financial_core_raw.npat.yoy')}</span></div><div class="highlight text-xs m-0 mt-2 py-2"><strong>Lợi thế (Moat):</strong> ${f('node3.moat')}</div></div></div></div>
+<div class="card mb-6"><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"><div><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Dòng tiền thông minh & Định giá</h2><div class="highlight"><strong>Key Insight:</strong> Đang trong giai đoạn <strong>${f('node2.smart_money_phase')}</strong> tại vùng ${smartMoneyZone(n2)}. ${f('node2.volume_analysis.vsa_signal_candidate')}</div><div class="grid grid-cols-2 gap-4 mt-4"><div class="metric-card"><span class="text-xs font-bold text-gray-400 uppercase">Volume Ratio</span><strong class="text-2xl text-brand-deep">${f('node2.volume_analysis.ratio')}</strong><span class="text-[10px] text-gray-400">vs avg 20 phiên</span></div><div class="metric-card"><span class="text-xs font-bold text-gray-400 uppercase">Tín hiệu</span><strong class="text-sm text-center text-brand-accent mt-1">${f('node2.volume_analysis.classification')}</strong></div></div></div><div><h3 class="text-sm font-bold uppercase text-gray-500 mb-4">Định giá (Valuation)</h3><div class="grid grid-cols-2 gap-4 mb-6"><div class="metric-card"><span class="text-xs font-bold text-gray-400 uppercase">P/E (TTM)</span><strong class="text-2xl ${peColor(n1, n3)}">${f('node1.valuation_multiples.pe_ttm')}</strong><span class="text-[10px] text-gray-400">TB Peer: ${f('node3.valuation.peer_avg_pe')}</span></div><div class="metric-card"><span class="text-xs font-bold text-gray-400 uppercase">P/B Ratio</span><strong class="text-2xl ${pbColor(n1)}">${f('node1.valuation_multiples.pb_current')}</strong><span class="text-[10px] text-gray-400">${pbDesc(n1)}</span></div></div><div class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300"><h3 class="text-sm font-bold uppercase text-gray-500 mb-4">Cấu trúc Kỹ thuật</h3><ul class="space-y-4"><li class="flex justify-between items-center"><span class="text-sm font-medium">Xu hướng</span><span class="badge bg-green-100 ${trendColor(n2)}">${f('node2.trend_status')}</span></li><li class="flex justify-between items-center"><span class="text-sm font-medium">So với SMA 200</span><span class="text-sm font-bold">${f('node2.sma_200_rel')}</span></li><li class="flex justify-between items-center"><span class="text-sm font-medium">Thanh khoản (Volume)</span><span class="text-sm font-bold">${f('node2.volume_analysis.classification')}</span></li></ul></div></div></div></div>
+<div class="mb-6"><h2 class="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1">Hệ thống chấm điểm AI</h2><div class="grid grid-cols-2 md:grid-cols-6 gap-3">${scoreCard('Kỹ thuật','node5.scores.technical','green-500')}${scoreCard('Dòng tiền','node5.scores.flow','blue-500')}${scoreCard('Cơ bản','node5.scores.fundamental','yellow-500')}${scoreCard('Ngành/Vĩ mô','node5.scores.sector_macro','purple-500')}${scoreCard('Định giá','node5.scores.valuation','green-400')}${scoreCard('Rủi ro','node5.scores.risk','red-500')}</div></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="card"><h2 class="text-xl font-display font-bold text-red-700 mb-4">Quản trị Rủi ro</h2><div class="space-y-3"><div class="sub-card m-0 border-red-100"><span class="text-red-600 font-bold text-xs uppercase block mb-1">Doanh nghiệp</span><p class="text-sm font-medium">${riskCompany(n3)}</p></div><div class="sub-card m-0 border-red-100"><span class="text-red-600 font-bold text-xs uppercase block mb-1">Vĩ mô</span><p class="text-sm font-medium">${riskMacro(n4)}</p></div><div class="sub-card m-0 border-red-100"><span class="text-red-600 font-bold text-xs uppercase block mb-1">Thanh khoản</span><p class="text-sm font-medium">${liquidityNote(n5)}</p></div></div></div><div class="card"><h2 class="text-xl font-display font-bold text-brand-deep mb-4">Phân tích Nhân quả</h2><ul class="space-y-2"><li class="text-sm flex gap-2"><span class="font-bold text-brand-deep shrink-0">Gốc:</span><span>${causalFacts(n4)}</span></li><li class="text-sm flex gap-2"><span class="font-bold text-brand-deep shrink-0">Quả:</span><span>${f('node4.causal_chains.0.chain_summary')}</span></li><li class="text-sm flex gap-2"><span class="font-bold text-brand-deep shrink-0">Kỹ thuật:</span><span>${causalInference(n4)}</span></li></ul></div></div>
+<div class="mb-6"><h2 class="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1">Kịch bản Phân tích</h2><div class="grid-3"><div class="card m-0 border-t-4 border-green-500"><div class="flex justify-between items-center mb-2"><h3 class="font-bold text-green-700">BULL CASE</h3><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded">${scenarioValue(bull,'probability','prob')}</span></div><p class="text-xs text-gray-600 mb-4">${scenarioValue(bull,'condition','description')}</p><p class="text-2xl font-black text-green-700">${scenarioValue(bull,'target')}</p><p class="text-[10px] font-bold text-gray-400 uppercase">Target Price</p></div><div class="card m-0 border-t-4 border-blue-500"><div class="flex justify-between items-center mb-2"><h3 class="font-bold text-brand-deep">BASE CASE</h3><span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded">${scenarioValue(base,'probability','prob')}</span></div><p class="text-xs text-gray-600 mb-4">${scenarioValue(base,'condition','description')}</p><p class="text-2xl font-black text-brand-deep">${scenarioValue(base,'target')}</p><p class="text-[10px] font-bold text-gray-400 uppercase">Target Price</p></div><div class="card m-0 border-t-4 border-red-500"><div class="flex justify-between items-center mb-2"><h3 class="font-bold text-red-700">BEAR CASE</h3><span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded">${scenarioValue(bear,'probability','prob')}</span></div><p class="text-xs text-gray-600 mb-4">${scenarioValue(bear,'condition','description')}</p><p class="text-2xl font-black text-red-700">${scenarioValue(bear,'target','price')}</p><p class="text-[10px] font-bold text-gray-400 uppercase">Stop Loss</p></div></div></div>
+<div class="card border-2 border-brand-accent/20 bg-blue-50/30"><h2 class="text-2xl font-display font-bold text-brand-deep mb-6 text-center">Chiến lược Giao dịch (Trade Setup)</h2><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div class="sub-card m-0 text-center"><p class="text-xs font-bold text-gray-400 uppercase mb-2">Vùng Mua</p><p class="text-xl font-bold text-brand-deep">${f('node5.strategy.entry_zone')}</p><p class="text-[10px] text-gray-500 mt-1">${allocation.note}</p></div><div class="sub-card m-0 text-center border-red-100"><p class="text-xs font-bold text-red-400 uppercase mb-2">Cắt Lỗ (SL)</p><p class="text-xl font-bold text-red-600">${f('node5.trading_stop.price')}</p><p class="text-[10px] text-gray-500 mt-1">${f('node5.trading_stop.basis')}</p></div><div class="sub-card m-0 text-center border-green-100"><p class="text-xs font-bold text-green-400 uppercase mb-2">Mục tiêu 1</p><p class="text-xl font-bold text-green-700">${strategyValue(n5.strategy?.tp1)}</p><p class="text-[10px] text-gray-500 mt-1">${strategyRationale(n5.strategy?.tp1)}</p></div><div class="sub-card m-0 text-center border-green-100"><p class="text-xs font-bold text-green-400 uppercase mb-2">Mục tiêu 2</p><p class="text-xl font-bold text-green-700">${strategyValue(n5.strategy?.tp2)}</p><p class="text-[10px] text-gray-500 mt-1">${strategyRationale(n5.strategy?.tp2)}</p></div></div><div class="mt-6 bg-white p-4 rounded-xl border border-brand-accent/10"><h3 class="text-sm font-bold uppercase text-brand-deep mb-3">Lộ trình giải ngân</h3><div class="flex flex-col md:flex-row justify-between gap-4 text-sm"><div class="flex-1"><span class="font-bold text-brand-accent">Bước 1:</span> ${escapeHtml(allocation.steps[0])}</div><div class="flex-1"><span class="font-bold text-brand-accent">Bước 2:</span> ${escapeHtml(allocation.steps[1])}</div><div class="flex-1"><span class="font-bold text-brand-accent">Bước 3:</span> ${escapeHtml(allocation.steps[2])}</div></div></div><div class="mt-4 bg-white p-4 rounded-xl border border-brand-accent/10"><h3 class="text-sm font-bold uppercase text-brand-deep mb-3">Quản trị vị thế (Position Sizing)</h3><div class="flex flex-col md:flex-row justify-between gap-4 text-sm"><div class="flex-1"><span class="font-bold text-brand-accent">Rủi ro/lệnh:</span> ${f('node5.strategy.risk_per_trade_pct_nav')}</div><div class="flex-1"><span class="font-bold text-brand-accent">Tỷ trọng tối đa:</span> ${f('node5.strategy.max_portfolio_weight_pct')}</div><div class="flex-1"><span class="font-bold text-brand-accent">Loại vị thế:</span> ${f('node5.strategy.position_type')}</div></div></div></div>
+</main><footer class="mt-10 pt-6 border-t border-gray-200 text-center text-xs text-gray-400"><p class="mb-1">${sources}</p><p>Báo cáo được tạo tự động bởi AI Equity Research Engine · ${f('date')} · Chỉ dành cho mục đích tham khảo, không phải khuyến nghị đầu tư chính thức.</p></footer></div>
+</body></html>`;
+
+  function signal(key) {
+    return escapeHtml(n5.conflict_detector?.[key] ?? 'Data not available');
+  }
 }
 
-function metricBox(label,value){return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>`}
-function signalBox(label,value){return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value ?? 'Data not available')}</strong></div>`}
-function scoreBox(label,path){const value=field(path,'Data not available');return `<div class="score"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong><div class="track"><i style="width:${scoreWidth(path)}"></i></div></div>`}
-function tradeBox(label,value){return `<div class="tradebox"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>`}
-function statusLabel(v){if(v==='CONFIRMED')return 'XÁC NHẬN';if(v==='PARTIAL')return 'MỘT PHẦN';if(v==='DIVERGENT')return 'PHÂN KỲ';return 'Data not available'}
-function sectorBar(d){const a=Number(d?.sector_perf_pct),b=Number(d?.vnindex_perf_pct);if(!Number.isFinite(a)||!Number.isFinite(b)||b===0)return '50%';return `${Math.max(10,Math.min(100,Math.abs(a)/Math.max(1,Math.abs(b))*50))}%`}
-function industryMargin(peers){const vals=(peers||[]).map(p=>Number(p.net_margin??p.gross_margin??NaN)).filter(Number.isFinite);if(!vals.length)return 'Data not available';return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}%`}
-function industryMarginDesc(peers){return(peers||[]).some(p=>p.net_margin!=null||p.gross_margin!=null)?'Bình quân từ peer_list':'Data not available'}
-function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;')}
+function renderScreeningSnapshot(n1, n5) {
+  const s = n1.screening_summary || {};
+  const metric = (label, value) => `<div class="sub-card m-0 text-center"><span class="text-[10px] text-gray-400 uppercase block">${label}</span><strong class="text-lg">${escapeHtml(formatValue(value))}</strong></div>`;
+  return `<div class="card border-2 border-purple-200 mb-6"><h2 class="text-xl font-display font-bold text-brand-deep mb-1">Screening Snapshot</h2><p class="text-xs text-gray-400 mb-4">Nguồn: StockScreener — đây là bối cảnh sàng lọc ban đầu, KHÔNG phải điểm số của CRSM</p><div class="grid grid-cols-3 md:grid-cols-4 gap-3 mb-4">${metric('Score',s.screen_score)}${metric('Rank',s.screen_rank)}${metric('Grade',s.screen_grade)}${metric('Quality',s.quality_score)}${metric('Growth',s.growth_score)}${metric('Valuation',s.valuation_score)}${metric('Momentum',s.momentum_score)}${metric('Mispricing',s.mispricing_score ?? s.opportunity_score)}</div><div class="flex flex-col md:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-brand-accent/10"><div class="text-center md:text-left"><span class="text-xs text-gray-400 uppercase block">CRSM Score</span><strong class="text-2xl text-brand-deep">${escapeHtml(formatValue(n5.ai_score?.value))}/100</strong></div><div class="text-center"><span class="badge bg-purple-100 text-purple-700">SCREEN → CRSM: ${escapeHtml(statusLabel(n5.screen_vs_crsm?.status))}</span><p class="text-[10px] text-gray-500 mt-1">${escapeHtml(formatValue(n5.screen_vs_crsm?.interpretation))}</p></div></div></div>`;
+}
 
-const CSS=`:root{--deep:#1e3a8a;--accent:#3b82f6;--bg:#f5f7fb;--text:#1a1a1a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--red:#dc2626}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.6}.page{max-width:1100px;margin:auto;padding:32px 18px 48px}.header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:28px}.ticker{background:var(--deep);color:#fff;padding:5px 10px;border-radius:5px;font-size:12px;font-weight:800;letter-spacing:.12em}.date{margin-left:10px;color:#64748b;font-size:12px;font-weight:600}.header h1{font-size:34px;line-height:1.15;color:var(--deep);margin:8px 0 3px;font-weight:900}.company{font-weight:600;color:#475569;margin:0}.analyst{text-align:right}.analyst p{font-size:10px;letter-spacing:.12em;color:#94a3b8;font-weight:800;margin:0 0 4px}.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:24px;border:1px solid rgba(226,232,240,.9);box-shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -2px rgba(0,0,0,.05)}.hero{background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;border:0}.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:center;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:20px;margin-bottom:20px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:#94a3b8;margin:0 0 6px}.eyebrow.light{color:#bfdbfe}.decision{font-size:54px;font-weight:900}.hero-score{display:flex;gap:38px;text-align:center}.hero-score span{font-size:10px;color:#bfdbfe;letter-spacing:.12em;font-weight:800}.hero-score strong{font-size:32px;display:block}.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:24px}.hero h3{font-size:11px;letter-spacing:.1em;color:#dbeafe}.hero ul{list-style:none;margin:0;padding:0}.hero li{display:flex;gap:8px;margin:7px 0;font-size:14px}.dot{color:#86efac}.invalidation{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:16px}.invalidation h3{color:#fecaca}.section-title h2,h2{font-size:22px;color:var(--deep);margin:3px 0 14px}.subtle,.text{color:#64748b;font-size:13px}.metric-grid{display:grid;gap:12px}.metric-grid.eight{grid-template-columns:repeat(4,1fr)}.metric-grid.two{grid-template-columns:repeat(2,1fr)}.metric{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}.metric span{display:block;color:#94a3b8;text-transform:uppercase;font-size:10px;font-weight:800}.metric strong{display:block;font-size:20px;margin-top:2px}.comparison{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center;margin-top:16px;padding:16px;border:1px solid #dbeafe;border-radius:12px;background:#fff}.comparison>div:first-child{text-align:center}.comparison>div:first-child span{display:block;color:#94a3b8;text-transform:uppercase;font-size:10px;font-weight:800}.comparison>div:first-child strong{font-size:28px;color:var(--deep)}.comparison b{display:inline-block;padding:4px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:11px}.comparison p{color:#64748b;font-size:12px;margin:6px 0 0}.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.center-badge{text-align:center;margin:14px 0;font-size:12px;font-weight:800;color:#1d4ed8}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}.two-grid,.three-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.two-grid{grid-template-columns:repeat(2,1fr)}.subcard{background:#fff;border:1px solid #edf2f7;padding:15px;border-radius:10px}.subcard .label{display:block;color:#94a3b8;font-size:10px;text-transform:uppercase;font-weight:800;margin-bottom:5px}.subcard strong{display:block;font-size:17px}.subcard small{display:block;color:#64748b;margin-top:4px}.risk-row{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:12px;border:1px solid #edf2f7;border-radius:10px;margin-bottom:12px}.between{display:flex;justify-content:space-between;margin-bottom:8px}.bar{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--accent)}.highlight{background:#eff6ff;border-left:4px solid var(--accent);padding:16px;margin:14px 0;border-radius:0 8px 8px 0}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px 12px;border-bottom:1px solid #edf1f7;vertical-align:top;font-size:13px}.table th{color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.score-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.score{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.score small{display:block;color:#94a3b8;text-transform:uppercase;font-size:9px;font-weight:800}.score strong{display:block;font-size:20px}.track{height:4px;background:#e5e7eb;border-radius:999px;margin-top:8px}.track i{display:block;height:100%;background:var(--accent);border-radius:999px}.causal{padding-left:18px}.causal li{margin:8px 0;font-size:13px}.scenario h3{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin:0 0 8px}.scenario h3 span{font-size:10px;padding:4px 8px;border-radius:999px;background:#f1f5f9}.scenario p{font-size:12px;color:#64748b;min-height:58px}.scenario strong{font-size:20px}.bull{border-top:4px solid #22c55e}.base{border-top:4px solid #3b82f6}.bear{border-top:4px solid #ef4444}.trade{border:2px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff)}.trade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.tradebox{text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.tradebox span{display:block;color:#94a3b8;font-size:10px;text-transform:uppercase;font-weight:800;margin-bottom:5px}.tradebox strong{font-size:20px}.allocation{background:#fff;border:1px solid #dbeafe;border-radius:12px;padding:14px;margin-top:14px}.footer{border-top:1px solid var(--line);padding-top:18px;margin-top:34px;color:#94a3b8;text-align:center;font-size:11px}@media(max-width:900px){.hero-grid,.two-col{grid-template-columns:1fr}.metric-grid.eight,.signal-grid{grid-template-columns:repeat(2,1fr)}.score-grid{grid-template-columns:repeat(3,1fr)}.trade-grid{grid-template-columns:repeat(2,1fr)}.three-grid{grid-template-columns:1fr}}@media(max-width:600px){.page{padding:20px 12px 36px}.header{align-items:flex-start;flex-direction:column}.analyst{text-align:left}.decision{font-size:42px}.hero-score{gap:20px}.metric-grid.eight,.signal-grid,.score-grid{grid-template-columns:repeat(2,1fr)}.trade-grid,.two-grid{grid-template-columns:1fr}.card{padding:20px}}`;
+function scoreCard(label, path, color) {
+  const value = field(path, 'Data not available');
+  const n = Number(value);
+  const width = Number.isFinite(n) ? `${Math.max(0, Math.min(100, n / 20 * 100))}%` : '0%';
+  return `<div class="metric-card"><span class="text-[10px] font-bold text-gray-400 uppercase">${escapeHtml(label)}</span><strong class="text-xl">${escapeHtml(formatValue(value))}</strong><div class="w-full bg-gray-200 h-1 mt-2 rounded"><div class="bg-${color} h-full rounded" style="width:${width}"></div></div></div>`;
+}
+
+function sectorPerf(n2) {
+  const value = n2.sector_vs_market?.sector_perf_pct;
+  if (value == null || value === '') return 'Data not available';
+  const method = n2.sector_benchmark?.method;
+  return method === 'peer_basket' ? `${formatValue(value)} (rổ peer, không có chỉ số ngành chính thức)` : formatValue(value);
+}
+
+function sectorBar(sector) {
+  const a = Number(sector?.sector_perf_pct);
+  const b = Number(sector?.vnindex_perf_pct);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return '0%';
+  return `${Math.max(0, Math.min(100, (a / Math.max(Math.abs(a), Math.abs(b), 1)) * 100))}%`;
+}
+
+function sectorInsight(n2) {
+  const a = Number(n2.sector_vs_market?.sector_perf_pct);
+  const b = Number(n2.sector_vs_market?.vnindex_perf_pct);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return 'Data not available';
+  const diff = Math.round((a - b) * 100) / 100;
+  return `Nhóm ngành ${diff >= 0 ? 'vượt' : 'kém'} VN-Index ${Math.abs(diff)} điểm % trong cùng kỳ.`;
+}
+
+function industryStage(n4) {
+  const impact = n4.industry_impact;
+  const sensitivity = n4.sensitivity_table;
+  if (!impact && !sensitivity) return 'Data not available';
+  return formatValue(impact || 'Data not available');
+}
+
+function industryMargin(peers) {
+  if (!Array.isArray(peers) || !peers.length) return 'Data not available';
+  const values = peers.map(p => p.gross_margin ?? p.net_margin).map(Number).filter(Number.isFinite);
+  if (!values.length) return 'Data not available';
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  return `${Math.round(avg * 10) / 10}%`;
+}
+
+function industryMarginDesc(peers) {
+  if (!Array.isArray(peers) || !peers.length) return 'Biên lợi nhuận peer: Data not available';
+  const has = peers.some(p => Number.isFinite(Number(p.gross_margin ?? p.net_margin)));
+  return has ? 'Biên lợi nhuận bình quân từ peer list' : 'Biên lợi nhuận peer: Data not available';
+}
+
+function smartMoneyZone(n2) {
+  return formatValue(n2.zones?.demand ?? n2.zones?.supply);
+}
+
+function peColor(n1, n3) {
+  const pe = Number(n1.valuation_multiples?.pe_ttm);
+  const peer = Number(n3.valuation?.peer_avg_pe);
+  if (!Number.isFinite(pe) || !Number.isFinite(peer)) return 'text-gray-500';
+  return pe > peer ? 'text-red-500' : 'text-green-600';
+}
+
+function pbColor(n1) {
+  const pb = Number(n1.valuation_multiples?.pb_current);
+  if (!Number.isFinite(pb)) return 'text-gray-500';
+  if (pb < 1) return 'text-green-600';
+  if (pb > 2) return 'text-red-500';
+  return 'text-gray-800';
+}
+
+function pbDesc(n1) {
+  const pb = Number(n1.valuation_multiples?.pb_current);
+  if (!Number.isFinite(pb)) return 'Data not available';
+  return pb < 1 ? 'Dưới giá trị sổ sách' : 'Trên giá trị sổ sách';
+}
+
+function trendColor(n2) {
+  const trend = String(n2.trend_status || '').toLowerCase();
+  if (/(up|bull|tăng|positive|strong)/.test(trend)) return 'text-green-700';
+  if (/(down|bear|giảm|negative|weak)/.test(trend)) return 'text-red-700';
+  return 'text-gray-700';
+}
+
+function riskCompany(n3) {
+  const flags = n3.earnings_quality?.red_flags;
+  const debt = n3.debt_to_equity ?? n3.earnings_quality?.debt_to_equity;
+  const parts = [];
+  if (Array.isArray(flags) && flags.length) parts.push(flags.join('; '));
+  if (debt != null) parts.push(`Debt/Equity: ${formatValue(debt)}`);
+  return escapeHtml(parts.length ? parts.join(' · ') : 'Không phát hiện cảnh báo trọng yếu');
+}
+
+function riskMacro(n4) {
+  const regime = n4.risk_regime;
+  const sensitivity = n4.sensitivity_table;
+  if (regime == null && sensitivity == null) return 'Data not available';
+  return escapeHtml(formatValue(regime || sensitivity));
+}
+
+function liquidityNote(n5) {
+  return escapeHtml(n5.liquidity_note || 'Thanh khoản bình thường');
+}
+
+function causalFacts(n4) {
+  const facts = n4.causal_chains?.[0]?.facts;
+  if (Array.isArray(facts)) return escapeHtml(facts.join('; '));
+  return escapeHtml(formatValue(facts));
+}
+
+function causalInference(n4) {
+  const chain = n4.causal_chains?.[0] || {};
+  const inference = chain.inferences;
+  const confidence = chain.inference_confidence;
+  if (inference == null) return 'Data not available';
+  const suffix = confidence != null ? ` (${formatValue(confidence)})` : '';
+  return escapeHtml(`Suy luận: ${formatValue(inference)}${suffix}`);
+}
+
+function earningsQuality(flags) {
+  if (!Array.isArray(flags) || !flags.length) return 'Không phát hiện bất thường';
+  return escapeHtml(flags.join('; '));
+}
+
+function scenarioValue(obj, key, altKey) {
+  const value = obj?.[key] ?? (altKey ? obj?.[altKey] : null);
+  return escapeHtml(formatValue(value));
+}
+
+function strategyValue(value) {
+  if (value == null) return 'Data not available';
+  if (typeof value === 'object') return escapeHtml(formatValue(value.price ?? value.value ?? value.target));
+  return escapeHtml(formatValue(value));
+}
+
+function strategyRationale(value) {
+  if (value == null) return 'Data not available';
+  if (typeof value === 'object') return escapeHtml(formatValue(value.rationale ?? value.basis ?? value.description));
+  return 'Data not available';
+}
+
+function allocationSteps(value) {
+  const fallback = ['Data not available', 'Data not available', 'Data not available'];
+  if (value == null) return { note: 'Data not available', steps: fallback };
+  if (typeof value === 'object') {
+    const steps = [value.step1, value.step2, value.step3, ...(Array.isArray(value.steps) ? value.steps : [])].filter(v => v != null).slice(0, 3).map(formatValue);
+    while (steps.length < 3) steps.push('Data not available');
+    return { note: formatValue(value.note ?? value.summary ?? value.description), steps };
+  }
+  return { note: formatValue(value), steps: fallback };
+}
+
+function sourceBar(sources) {
+  if (!Array.isArray(sources)) return 'Data not available';
+  const names = sources.map(s => s?.name || s?.url_or_ref).filter(Boolean).slice(0, 8);
+  return names.length ? names.map(escapeHtml).join(', ') : 'Data not available';
+}
+
+function statusLabel(status) {
+  if (status === 'CONFIRMED') return 'XÁC NHẬN';
+  if (status === 'PARTIAL') return 'MỘT PHẦN';
+  if (status === 'DIVERGENT') return 'KHÁC BIỆT';
+  return 'Data not available';
+}
+
+function formatValue(value) {
+  if (value == null || value === '') return 'Data not available';
+  if (typeof value === 'object') {
+    try { return JSON.stringify(value); } catch { return 'Data not available'; }
+  }
+  return String(value);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
