@@ -26,7 +26,16 @@ const GEMINI_3_FLASH = {
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
+    // Legacy field kept for migration/backward compatibility. The engine now
+    // resolves execution from dependency stages + executionPolicy below.
     executionMode: 'sequential',
+    executionPolicy: {
+      default: 'auto',
+      parallelStages: {
+        research: 'auto',
+        reports: 'auto'
+      }
+    },
     costControl: { monthlyBudgetUsd: 50, warningThresholdPct: 80 },
     providers: {
       gemini: {
@@ -68,6 +77,11 @@ export function loadSettings() {
     migrateGemini3ModelId(merged);
     if (!merged.crsm.costControl) merged.crsm.costControl = clone(DEFAULT_SETTINGS.crsm.costControl);
     if (!merged.crsm.executionMode) merged.crsm.executionMode = 'sequential';
+    if (!merged.crsm.executionPolicy) merged.crsm.executionPolicy = clone(DEFAULT_SETTINGS.crsm.executionPolicy);
+    if (!merged.crsm.executionPolicy.default) merged.crsm.executionPolicy.default = 'auto';
+    if (!merged.crsm.executionPolicy.parallelStages) {
+      merged.crsm.executionPolicy.parallelStages = clone(DEFAULT_SETTINGS.crsm.executionPolicy.parallelStages);
+    }
     return merged;
   } catch {
     return clone(DEFAULT_SETTINGS);
