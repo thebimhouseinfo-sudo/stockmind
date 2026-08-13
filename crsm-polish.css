@@ -1,16 +1,16 @@
 /* CRSM / Reports polish */
 .crsm-page-shell{gap:16px}
 .crsm-page-shell>.grid{gap:16px}
-.crsm-direct-entry{padding:24px 28px}
+.crsm-direct-entry{padding:18px 24px;min-height:0}
 .crsm-direct-entry .eyebrow{margin-bottom:6px}
 .crsm-direct-entry h2{margin-bottom:0}
-.crsm-direct-entry .direct-form{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.crsm-direct-entry .direct-form{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}
 .crsm-direct-entry .direct-form .search{width:min(360px,72vw);text-align:center;height:42px}
 .crsm-direct-entry .crsm-evidence-box{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}
 .crsm-direct-entry .crsm-evidence-box>div{display:none}
 .crsm-direct-entry .crsm-evidence-box small{display:none}
 .crsm-direct-entry .crsm-evidence-box .btn{min-height:42px}
-.crsm-direct-entry .crsm-evidence-status{min-height:16px;margin-top:8px;text-align:center;font-size:11px}
+.crsm-direct-entry .crsm-evidence-status{min-height:0;margin-top:6px;text-align:center;font-size:11px}
 .crsm-progress{margin-top:0}
 .crsm-progress,.crsm-report,.crsm-status-card,.crsm-error{box-shadow:0 8px 28px rgba(23,32,51,.06)}
 .crsm-node{min-height:40px}
@@ -57,29 +57,24 @@
   .crsm-analysis-page{grid-template-columns:minmax(0,1fr)!important;min-width:0}
   .crsm-head{gap:10px}
   .crsm-head h1{font-size:26px}
-  .crsm-direct-entry{padding:18px}
-  .crsm-progress,.crsm-status-card,.crsm-error,.screening-snapshot{min-width:0}
+  .crsm-direct-entry{padding:16px 18px}
+  .crsm-progress,.crsm-status-card,.crsm-error{min-width:0}
   .crsm-nodes{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
   .crsm-node{min-width:0;padding:9px 10px;font-size:11px}
   .crsm-log{max-height:180px;overflow-x:hidden;overflow-y:auto}
-  .snapshot-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .vs-block{gap:12px}
   .crsm-cost-strip{align-items:flex-start}
   .report-workspace{padding:8px}.report-shell{border-radius:14px}.report-toolbar{padding:12px}.report-content{padding:8px}.report-word-page{padding:28px 22px}
   .decision-log-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.decision-log-field:nth-child(4n){border-right:1px solid #edf1f6}.decision-log-field:nth-child(2n){border-right:0}
 }
 @media(max-width:640px){
-  .crsm-direct-entry{padding:16px}
+  .crsm-direct-entry{padding:14px 16px}
   .crsm-direct-entry .direct-form{gap:8px;align-items:stretch}
   .crsm-direct-entry .direct-form .search{width:100%;max-width:none}
-  .crsm-direct-entry .direct-form .btn,.crsm-direct-entry .crsm-evidence-box .btn{width:100%}
-  .crsm-direct-entry .crsm-evidence-box{display:block}
+  .crsm-direct-entry .direct-form .btn{width:100%}
+  .crsm-direct-entry .crsm-evidence-status{margin-top:5px}
   .crsm-nodes{grid-template-columns:1fr}
   .crsm-node{min-height:42px}
   .crsm-progress .panel-pad,.crsm-status-card,.crsm-error{padding:14px}
-  .snapshot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .vs-block{display:grid;grid-template-columns:1fr;gap:8px}
-  .vs-arrow{display:none}
   .crsm-cost-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
   .crsm-cost-strip strong{font-size:15px}
   .report-actions .btn:not(.report-close){display:none}
