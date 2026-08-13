@@ -2,11 +2,11 @@
 
 ## 0. Purpose
 
-Screener V2 is a redesign of Stock Mind's stock filtering and candidate-selection layer around the **current TradingView Screener dataset**.
+Screener V2 redesigns Stock Mind's stock evaluation layer around the **current TradingView Screener dataset**.
 
-The old Screener was designed around an older dataset and older evaluation assumptions. Those formulas are now treated as **legacy/reference**, not as the target implementation.
+The old Screener formulas and thresholds are **legacy/reference material only**. They are not the target design.
 
-The objective is not to patch the old formulas field-by-field. The objective is to establish a clean pipeline:
+The objective is to build a clean pipeline that:
 
 ```text
 TradingView clipboard
@@ -19,20 +19,36 @@ Screener Evaluation V2
         ↓
 Ranking / Classification
         ↓
-Candidate Gate
+Dashboard + Ranking
         ↓
-CRSM / Node 1
+User selects a stock
+        ↓
+User manually starts CRSM analysis
+        ↓
+Node 1
 ```
 
-The Screener is a **candidate-selection layer**, not the final investment-analysis engine. CRSM / Node 1 remains responsible for deeper verification and analysis.
+### Critical system boundary
 
-> **Planning rule:** do not implement new scoring formulas until the data contract and evaluation design have been reviewed and approved.
+**Screener does not automatically hand off stocks to CRSM.**
+
+After Screener evaluation is complete:
+
+- Dashboard presents the four classification tables.
+- Ranking tab continues to present the full ranking/universe view.
+- The user decides which stock deserves deeper analysis.
+- CRSM is started only by an explicit user action.
+- The Screener may provide context to Node 1 when the user starts CRSM for a selected stock.
+
+The Screener is a **quantitative candidate discovery and organization layer**. CRSM remains the deeper research and analysis layer.
+
+> Planning rule: do not implement final scoring formulas until the data contract and evaluation model have been explicitly reviewed and approved.
 
 ---
 
-# 1. Current Checkpoint
+# 1. Current Checkpoint — Data Ingestion
 
-## 1.1 TradingView source format — understood
+## 1.1 TradingView source format
 
 The actual TradingView clipboard format has been identified.
 
@@ -41,33 +57,32 @@ Each stock is represented by four lines:
 1. Ticker / Symbol
 2. Company name
 3. UI marker (`D`)
-4. One TAB-separated line containing the 46 analytical fields
+4. One TAB-separated line containing 46 analytical fields
 
-The `D` marker is not an analytical field and is ignored.
+The `D` marker is UI metadata, not an analytical field.
 
-The Symbol line is split into:
+The Symbol and Company lines are therefore mapped into:
 
 - `ticker`
-- `company_name` from the following line
+- `company_name`
 
-## 1.2 Mapping — validated
+## 1.2 Mapping
 
-The 46 TradingView fields have been mapped to the internal schema in the exact positional order of the current export.
+The 46 current TradingView analytical fields have been mapped into the internal schema in the exact positional order of the current export.
 
-The Mapping UI and raw clipboard debug view were intentionally added so the mapping could be visually validated before changing the Screener.
+The Mapping UI and raw clipboard inspector were deliberately added because ticker correctness alone is not enough to prove parser correctness.
+
+Mapping was validated by reconstructing the table and comparing it against raw TradingView data.
 
 **Status: PASS.**
 
-## 1.3 Current field set
+## 1.3 Current field inventory
 
-The current Screener input contains:
+The current input set contains:
 
 - Symbol / Company
-- Sector
-- Industry
-- Market Cap
-- Price
-- Chg %
+- Sector / Industry
+- Market Cap / Price / Chg %
 - Perf % 1W / 1M / 3M / 6M / 1Y / YTD
 - High 52W / Low 52W
 - Vol / Rel Vol
@@ -88,31 +103,25 @@ The current Screener input contains:
 
 ---
 
-# 2. Data Contract: Raw Means Raw
+# 2. Data Contract — Preserve Raw Meaning
 
-The ingestion layer must **not invent financial meaning**.
+The ingestion layer is a data-ingestion layer, not an investment-judgment layer.
 
-TradingView's compact display is a presentation choice. Stock Mind does not need to preserve that compactness.
+TradingView uses K/M/B/T and percentage formatting to make the table compact. Stock Mind does not need to preserve the visual compactness.
 
-### 2.1 General rule
+## 2.1 General rule
 
-For ordinary fields:
+> Read the source value, preserve its meaning, and do not apply strategy-specific transformations during ingestion.
 
-> **Read the source value and keep its meaning. Do not arbitrarily multiply, divide, or reinterpret it during ingestion.**
-
-Examples:
+For percentage fields, the internal representation is **percentage points**:
 
 ```text
--0.58%  → -0.58   (percentage-point representation)
-8%      → 8
-3.62%   → 3.62
-0.65    → 0.65
-29.82   → 29.82
+-0.58% → -0.58
+8%     → 8
+3.62%  → 3.62
 ```
 
-A percentage field is therefore stored as **percentage points**, not as a decimal fraction.
-
-`-15` means `-15%`; it must not silently become `-0.15`.
+This means `-15` represents `-15%`, not `-0.15%`.
 
 Ratios remain ratios:
 
@@ -124,13 +133,11 @@ Relative Volume  0.46
 P/E              29.82
 ```
 
-These must not be multiplied by 100 merely because they are numeric.
+These must not be multiplied by 100.
 
-### 2.2 K/M/B/T decoding
+## 2.2 K/M/B/T decoding
 
-TradingView uses suffixes to make large numbers compact.
-
-Where the internal representation requires a numeric quantity, decode the suffix without changing the underlying value:
+Where TradingView uses compact suffixes, the parser may decode them back to the full quantity:
 
 ```text
 857.4K → 857,400
@@ -139,24 +146,34 @@ Where the internal representation requires a numeric quantity, decode the suffix
 14.31T → 14,310,000,000,000
 ```
 
-This applies especially to:
+This is display-format decoding only.
 
-- Price when TradingView formats it with a suffix
-- Volume
-- Average Volume 10D / 30D / 60D
+It may apply to quantity fields such as:
+
 - Market Cap
+- Price when expressed with a suffix
+- Volume
+- Avg Volume 10D / 30D / 60D
 - Revenue
 - FCF
 
-The purpose is only to recover the full quantity. It is **not a scoring transformation**.
+It is not a scoring transformation.
 
-### 2.3 Evaluation-time conversion
+## 2.3 Evaluation-time derived values
 
-If the Screener needs a numeric value for a calculation, that conversion belongs to the **evaluation layer** or a clearly defined evaluation helper.
+When the Screener needs a metric in another mathematical form, the derived value is created in the **evaluation layer**, not by mutating the source representation.
 
-The ingestion layer must not perform strategy-specific transformations.
+Example:
 
-### 2.4 Missing values
+```text
+Raw Revenue Growth = 717.92%
+Scoring representation = bounded/ranked derived value
+Anomaly signal = EXTREME_GROWTH
+```
+
+The raw value remains available.
+
+## 2.4 Missing-value semantics
 
 The data contract must distinguish:
 
@@ -165,90 +182,113 @@ missing
 zero
 negative
 not applicable
-invalid/unparseable
+invalid / unparseable
 ```
 
 Missing must never silently become zero.
 
 ---
 
-# 3. Architecture Boundaries
+# 3. Target Architecture
 
-The V2 implementation must preserve four responsibilities.
+Screener V2 is divided into explicit responsibilities.
 
-## Layer 1 — Ingestion
+```text
+                    TradingView Raw
+                          │
+                          ▼
+                  Ingestion / Parser
+                          │
+                          ▼
+                 Internal Dataset
+                          │
+             ┌────────────┴────────────┐
+             ▼                         ▼
+      Evaluation Layer          Signal / Anomaly
+             │                         │
+             ├── ranking              ├── extreme growth
+             ├── factor scores        ├── value-trap warning
+             ├── composites           ├── earnings-quality concern
+             └── classification       ├── deep drawdown
+                                       └── data-gap alerts
+             └────────────┬────────────┘
+                          ▼
+                  Screener Result Set
+                          │
+                ┌─────────┴─────────┐
+                ▼                   ▼
+           Dashboard             Ranking
+        four classification      full ranking
+             tables                view
+                │                   │
+                └─────────┬─────────┘
+                          ▼
+                  User selects stock
+                          │
+                          ▼
+                 Explicit CRSM action
+                          │
+                          ▼
+                        Node 1
+```
 
-Responsible for:
+## 3.1 Screener does not auto-handoff
 
-- reading TradingView clipboard
-- detecting the actual TradingView format
-- parsing records
-- separating ticker/company
-- mapping the 46 fields
-- decoding display suffixes when required to recover the actual quantity
-- preserving source meaning
+There is **no automatic candidate gate that starts CRSM**.
 
-Not responsible for scoring.
+The evaluation engine can determine classifications and rankings, but it must stop at presentation.
 
-## Layer 2 — Internal Dataset
+The user remains the decision point between Screener and CRSM.
 
-Provides a stable schema between ingestion and evaluation.
+## 3.2 Node 1 boundary
 
-The Screener evaluation must be replaceable without rewriting the parser.
+When a user explicitly starts analysis for a selected stock, the system may construct a Screener context for Node 1 containing:
 
-## Layer 3 — Evaluation
+- the selected stock identity
+- its classification
+- ranking
+- component scores
+- signals/anomalies
+- relevant current metrics
+- data-quality warnings
+- suggested verification priorities
 
-Responsible for:
+Node 1 then performs deeper research and verification.
 
-- interpreting metrics
-- applying hard filters
-- calculating component scores
-- generating signals
-- calculating the overall result
-- ranking candidates
-- explaining why a candidate passed or failed
-
-## Layer 4 — Candidate Gate / Node 1
-
-Responsible for:
-
-- selecting candidates for deep analysis
-- constructing the Screener context
-- handing the selected candidates to CRSM / Node 1
-
-Node 1 JSON must be designed from the V2 evaluation result, not from the old parser structure.
+The Screener must not invent catalysts, legal events, project stories, macro explanations, or other information that is unavailable from the TradingView dataset.
 
 ---
 
-# 4. Phase 1 — Freeze and Validate Data Ingestion
+# 4. Phase 1 — Freeze and Validate the Data Layer
 
-Before changing the evaluation method, freeze the current data contract.
+Before changing evaluation logic, freeze the current data contract.
 
 ### Tasks
 
 - [ ] Keep the four-line TradingView parser as the primary parser.
-- [ ] Keep the Mapping visual verification tool during development.
-- [ ] Keep the raw clipboard inspector during validation.
+- [ ] Keep Mapping visual verification during development.
+- [ ] Keep Raw Clipboard Inspector / Parser Debug during validation.
 - [ ] Verify all 46 fields against raw TradingView data.
 - [ ] Verify ticker/company separation.
+- [ ] Verify percentage semantics.
+- [ ] Verify ratio semantics.
 - [ ] Verify K/M/B/T decoding.
-- [ ] Verify percentage fields remain percentage points.
-- [ ] Verify ratios remain ratios.
-- [ ] Verify missing values are not converted to zero.
+- [ ] Verify missing values are not zero.
+- [ ] Preserve FQ/FY/TTM as separate source fields.
 
 ### Acceptance
 
-The reconstructed Mapping table must match the raw TradingView sheet by ticker and field position.
+The reconstructed table must match the raw TradingView table by ticker and field position.
 
-Only after this is confirmed should Screener V2 evaluation work begin.
+This phase is already validated sufficiently to proceed to evaluation design.
 
 ---
 
 # 5. Phase 2 — Audit the Legacy Screener
 
-The legacy Screener is reference material only.
+Legacy code is reference material only.
 
-Read the existing implementation and create an explicit inventory of:
+Create an inventory of:
 
 - filters
 - formulas
@@ -258,57 +298,353 @@ Read the existing implementation and create an explicit inventory of:
 - classification rules
 - ranking rules
 - missing-data behavior
-- hard exclusions
+- exclusions
 - legacy aliases
-- fields sent to Node 1
+- Node 1 context fields
 
-For every legacy rule, classify it:
+For every legacy rule classify it as:
 
 | Decision | Meaning |
 |---|---|
-| Keep | Still valid with current data and strategy |
-| Adapt | Concept useful, implementation must change |
-| Replace | Old method no longer appropriate |
+| Keep | Valid with the new dataset and strategy |
+| Adapt | Concept useful but implementation changes |
+| Replace | Old approach no longer appropriate |
 | Remove | No longer useful |
-| Review | Needs evidence before deciding |
+| Review | Requires evidence before deciding |
 
-Do **not** preserve a formula simply because it already exists.
-
-### Deliverable
-
-A rule audit:
-
-```text
-Legacy rule
-    ↓
-Current field(s)
-    ↓
-Keep / Adapt / Replace / Remove / Review
-    ↓
-Reason
-```
+A legacy formula must never be retained merely because it already exists.
 
 ---
 
-# 6. Phase 3 — Audit the Current Dataset
+# 6. Phase 3 — Universe Definition
 
-Before defining formulas, determine what each current field can and cannot tell us.
+Universe definition must be decided before relative ranking.
 
-## 6.1 Analytical groups
+The initial universe is the set of successfully imported TradingView Screener rows.
 
-### Market / Momentum
+The evaluation design must determine whether the working universe is:
 
-- Chg %
-- Perf 1W / 1M / 3M / 6M / 1Y / YTD
-- High 52W / Low 52W
+```text
+All valid imported rows
+```
 
-### Liquidity
+or:
 
-- Vol
-- Rel Vol
-- Avg Vol 10D / 30D / 60D
+```text
+Imported rows
+    ↓
+minimum data validity
+    ↓
+optional conservative liquidity gate
+    ↓
+evaluation universe
+```
 
-### Business / Profitability
+## 6.1 Liquidity rule
+
+Liquidity thresholds must be treated carefully.
+
+A fixed threshold such as `Volume > 30K` must not automatically remain a hard filter if it unnecessarily destroys the candidate universe.
+
+The design must explicitly decide whether liquidity is:
+
+- hard filter
+- scoring input
+- risk signal
+- context only
+
+## 6.2 Universe must not be overfit
+
+The current 76-stock dataset is a real validation universe, not a list whose expected winners should be hard-coded into the model.
+
+Any examples such as GMD, MWG, HHS, etc. are validation cases only.
+
+---
+
+# 7. Phase 4 — Metric Role Mapping
+
+Every current field receives an explicit role before scoring formulas are designed.
+
+Allowed roles:
+
+- **Raw Evidence** — preserved and available for inspection/Node 1.
+- **Scoring Input** — used by one or more factor scores.
+- **Derived Input** — used only after a deterministic derived metric is calculated.
+- **Anomaly Trigger** — used to generate a warning/signal.
+- **Context** — shown to the user but not scored.
+- **Unused** — deliberately excluded with a documented reason.
+
+## 7.1 Important rule
+
+A field does not need to be scored merely because TradingView provides it.
+
+## 7.2 Period handling
+
+FQ / FY / TTM must not be silently merged.
+
+For each period-specific metric, decide whether it is:
+
+- independently scored
+- used together as a consistency check
+- used to calculate a trend
+- used as anomaly/context evidence
+- unused
+
+---
+
+# 8. Phase 5 — Raw vs Derived vs Signal Contract
+
+This phase formalizes the three representations of data.
+
+## 8.1 Raw
+
+Raw means the mapped value with source meaning preserved.
+
+Example:
+
+```text
+Revenue Growth Annual YoY = 717.92%
+```
+
+## 8.2 Derived
+
+Derived values are created only for evaluation.
+
+Possible examples:
+
+```text
+FCF Yield
+Volume Trend
+Price Drawdown
+Upside to 52W High
+Momentum Reversal
+Range Volatility
+```
+
+A derived value may use math, scaling, log transformation, or percentile ranking, but it must not overwrite the raw value.
+
+## 8.3 Signal / anomaly
+
+Signals identify patterns that require attention.
+
+Possible examples:
+
+```text
+EXTREME_GROWTH
+VALUE_TRAP_WARNING
+EARNINGS_QUALITY_CONCERN
+DEEP_DRAWDOWN
+HIGH_LEVERAGE
+LOW_LIQUIDITY
+DATA_GAP
+```
+
+An anomaly is not automatically a score penalty.
+
+For example:
+
+```text
+EPS Growth = +640%
+```
+
+may become:
+
+```text
+raw = +640%
+scoring representation = bounded/ranked
+signal = EXTREME_GROWTH
+```
+
+This preserves both information and robustness.
+
+---
+
+# 9. Phase 6 — Relative Ranking Design
+
+The system should favor relative ranking over arbitrary hard thresholds where appropriate.
+
+## 9.1 Ranking direction
+
+Each scoring metric must explicitly define direction:
+
+```text
+HIGHER_IS_BETTER
+LOWER_IS_BETTER
+TWO_SIDED / OPTIMAL_RANGE
+CONTEXT_ONLY
+```
+
+Do not implement valuation as `1/x` merely to reverse direction.
+
+Prefer a ranking operation such as:
+
+```text
+rank(metric, direction=LOWER_IS_BETTER)
+```
+
+This avoids divide-by-zero, negative-value inversion and extreme-value explosions.
+
+## 9.2 Ranking granularity
+
+Each metric must be assigned a ranking universe:
+
+```text
+GLOBAL / FULL UNIVERSE
+SECTOR
+INDUSTRY
+```
+
+This is particularly important for metrics whose meaning varies structurally by business type.
+
+Possible examples to evaluate:
+
+- Momentum → likely universe-level
+- Volume Trend → likely universe-level
+- P/B → potentially industry/sector-relative
+- Net Margin → potentially industry-relative
+- Debt/Equity → potentially industry/sector-relative
+
+These are design candidates, not final assignments.
+
+## 9.3 Small-universe caution
+
+The current universe is only around 76 rows.
+
+Avoid pretending that percentile behavior is statistically equivalent to a large cross-section.
+
+The model should remain stable when the universe changes moderately.
+
+## 9.4 No automatic winsorization policy
+
+Do not automatically winsorize everything at 1–99%.
+
+Extreme values may contain important information.
+
+Instead consider:
+
+- bounded scoring representation
+- monotonic transformations
+- robust ranking
+- explicit anomaly signals
+
+The raw value must remain unchanged.
+
+---
+
+# 10. Phase 7 — Missing Data and Coverage
+
+Missing data must be handled by field role and context, not by one universal rule.
+
+For each factor decide whether missing data should:
+
+- reduce factor coverage
+- remain neutral
+- exclude the metric from that factor's calculation
+- create a `DATA_GAP` signal
+- block a candidate only when the missing field is critical
+
+Do not use `missing = 0`.
+
+## 10.1 Factor coverage
+
+A factor should expose how much of its intended evidence is actually available.
+
+Conceptual example:
+
+```text
+Valuation Score       78
+Valuation Coverage    4/6
+Signal                DATA_GAP
+```
+
+This is preferable to hiding missing inputs behind a fabricated score.
+
+## 10.2 Data quality is not business quality
+
+A company with missing FCF data is not automatically a bad company.
+
+It is a company with lower evidence quality for the FCF-dependent evaluation.
+
+---
+
+# 11. Phase 8 — Anomaly / Signal Engine
+
+The anomaly engine runs in parallel with scoring.
+
+It should identify patterns such as:
+
+### Earnings quality
+
+- Operating margin negative while net margin is strongly positive.
+- Net margin materially exceeds operating margin.
+- EPS growth is extreme relative to other periods.
+- FCF is negative while accounting profitability is strong.
+
+### Growth
+
+- Extreme Revenue Growth.
+- Extreme EPS Growth.
+- Quarterly growth diverges sharply from annual growth.
+
+### Financial safety
+
+- High Debt/Equity.
+- Weak Current/Quick Ratio.
+- Negative FCF.
+
+### Market behavior
+
+- Deep drawdown from 52W high.
+- Momentum reversal.
+- Strong price movement with unusual volume behavior.
+
+### Data quality
+
+- Missing critical metrics.
+- Inconsistent or unparseable values.
+
+Signals should be explicit and machine-readable.
+
+Example:
+
+```json
+{
+  "code": "EARNINGS_QUALITY_CONCERN",
+  "severity": "high",
+  "evidence": [
+    "operating_margin_ttm",
+    "net_margin_ttm",
+    "fcf_ttm"
+  ]
+}
+```
+
+The signal describes **what needs attention**. It does not automatically decide the investment outcome.
+
+---
+
+# 12. Phase 9 — Factor Evaluation Model
+
+The factor architecture is deliberately defined before weights.
+
+Potential factors:
+
+```text
+Quality
+Growth
+Financial Strength / Safety
+Cash Flow
+Valuation
+Momentum
+High Reward
+Risk
+```
+
+The final factor set must be based on Phase 7 and Phase 8 analysis.
+
+## 12.1 Quality
+
+Potential evidence:
 
 - ROE
 - ROA
@@ -316,499 +652,580 @@ Before defining formulas, determine what each current field can and cannot tell 
 - Operating Margin
 - Net Margin
 
-### Growth
+Possible derived evidence:
+
+- FCF Yield
+- margin consistency
+
+## 12.2 Growth
+
+Potential evidence:
 
 - Revenue Growth Quarterly YoY
 - Revenue Growth Annual YoY
 - EPS Growth TTM YoY
 - FCF Growth TTM YoY
 
-### Scale
+Possible derived evidence:
 
-- Market Cap
-- Revenue FQ / FY / TTM
-- FCF TTM
+- growth acceleration
+- quarterly vs annual divergence
 
-### Financial Strength
+## 12.3 Financial Strength / Safety
+
+Potential evidence:
 
 - Debt/Equity FQ / FY
 - Current Ratio FQ / FY
 - Quick Ratio FQ / FY
+- FCF TTM
 
-### Valuation
+Possible derived evidence:
+
+- leverage change
+- liquidity deterioration
+
+## 12.4 Valuation
+
+Potential evidence:
 
 - P/E
-- PEG TTM
-- PEG
 - P/B
 - P/S
 - EV/EBITDA
 - EV/Revenue
+- PEG / PEG TTM
+- Dividend Yield
 
-### Shareholder Return
+The model must explicitly define how invalid/negative P/E and PEG values are treated.
 
-- Dividend Yield TTM
+## 12.5 Momentum
 
-## 6.2 Field-role decision
+Potential evidence:
 
-For every field decide whether it is:
+- Perf 1W / 1M / 3M / 6M / 1Y / YTD
+- Rel Vol
+- Avg Vol Trend
 
-- hard-filter input
-- score input
-- signal/anomaly input
-- contextual evidence
-- unused
-
-The existence of a field does not require its inclusion in scoring.
-
-## 6.3 Period handling
-
-FQ, FY and TTM fields are intentionally retained separately.
-
-Do not merge them prematurely.
-
-The evaluation design must explicitly decide whether each period is:
-
-- independently useful
-- used together as a consistency check
-- used to derive a trend
-- contextual only
-- unused
-
----
-
-# 7. Phase 4 — Define the V2 Screener Philosophy
-
-The Screener's job is to reduce a broad universe to a smaller set of **high-quality candidates for deeper analysis**.
-
-It is not intended to:
-
-- perform full company research
-- make the final investment decision
-- replace CRSM
-- explain every market event
-
-The evaluation should seek a balanced picture across several dimensions.
-
-Potential dimensions to evaluate:
+Potential derived metrics:
 
 ```text
-Business Quality
-Growth
-Financial Strength
-Cash Flow
-Valuation
-Market / Momentum
-Liquidity
+Volume Trend = Avg Vol 10D / Avg Vol 60D
+Reversal = Perf 1M - Perf 6M
+Drawdown = Price / High 52W - 1
 ```
 
-The final set of dimensions is not fixed until Phase 3 is complete.
+## 12.6 High Reward
 
-### Core principle
+High Reward is a separate dimension from Core Quality.
 
-A stock should not rank highly merely because it has one extreme metric.
+Potential ingredients:
 
-Likewise, a stock should not be rejected merely because one metric is temporarily weak when the broader evidence is strong.
+- Growth acceleration
+- Price dislocation / drawdown
+- Valuation optionality
+- Turnaround momentum
+- minimum quality floor
+
+High Reward does not mean “good company”. It identifies a potentially asymmetric opportunity worth investigating.
+
+## 12.7 Risk
+
+Risk remains a separate overlay.
+
+Potential ingredients:
+
+- Leverage
+- Liquidity
+- Cash-flow weakness
+- Volatility proxies
+- Size/liquidity
+- Earnings quality concerns
+
+Risk should not simply be subtracted from every other factor.
 
 ---
 
-# 8. Phase 5 — Design Hard Filters
+# 13. Phase 10 — Weighting and Composite Scores
 
-Hard filters should eliminate candidates that are clearly unsuitable for the intended analysis universe.
+Weights are intentionally **not defined yet**.
 
-They should be conservative.
+Before selecting weights:
 
-Possible areas to evaluate:
+1. inspect metric correlation
+2. inspect double counting
+3. inspect score distributions
+4. test candidate sensitivity
+5. inspect sector/industry effects
+6. inspect extreme values
+7. inspect missing-data effects
 
-- insufficient liquidity
-- unusable financial data
-- structurally weak balance sheet
-- extreme data anomalies
-- other clearly disqualifying conditions discovered during the audit
+Only then define:
 
-Exact thresholds are intentionally **not defined in this document**.
+- factor weights
+- submetric weights
+- score ranges
+- confidence/coverage treatment
 
-Do not automatically reuse legacy thresholds such as a fixed minimum volume simply because they existed before.
+## 13.1 Candidate composites
 
----
-
-# 9. Phase 6 — Design the New Scoring Model
-
-This is the main V2 redesign.
-
-## 9.1 No formula is pre-approved
-
-The old formulas are not the starting point.
-
-The final formulas must be derived from:
-
-- the current fields
-- their financial meaning
-- their distribution in the actual dataset
-- intended candidate behavior
-
-## 9.2 Component scoring
-
-Each selected evaluation dimension should have its own score before contributing to the total.
-
-Conceptually:
+The eventual model may have separate composites such as:
 
 ```text
-Quality Score
-Growth Score
-Financial Strength Score
-Cash Flow Score
-Valuation Score
-Market Score
-Liquidity Score
+Core Score
+Quality Underperformer Score
+High Reward Score
+Risk Score
+```
+
+The exact equations are to be designed after the factor specifications are approved.
+
+## 13.2 No example-based overfitting
+
+Stocks such as GMD, MWG, HHS, GEE, VCG, DIG, KSF, ASP, etc. may be used as validation cases.
+
+They must never be hard-coded into the model or used to force expected classifications.
+
+---
+
+# 14. Phase 11 — Classification Model and Four Dashboard Tables
+
+After scoring, every valid stock is classified for presentation.
+
+The Dashboard will contain exactly four major tables for Screener V2.
+
+## 14.1 Table 1 — Core Performers
+
+Purpose:
+
+> Identify companies with strong overall quality/economic characteristics and reasonably supportive market behavior.
+
+Typical evidence may include:
+
+- strong Core Score
+- acceptable Safety/Risk
+- sufficient data coverage
+- no severe earnings-quality warning
+- supportive Momentum where adopted
+
+The exact threshold is not yet fixed.
+
+## 14.2 Table 2 — Quality Underperformers
+
+Purpose:
+
+> Identify relatively strong businesses that are currently underperforming in price and may deserve deeper investigation.
+
+The table should combine:
+
+- strong underlying quality
+- acceptable safety
+- attractive/acceptable valuation
+- weak or lagging Momentum
+- evidence of stabilization where that concept is retained
+
+This group must not automatically imply “buy”.
+
+## 14.3 Table 3 — High Reward / High Risk
+
+Purpose:
+
+> Identify potentially asymmetric opportunities where upside characteristics are strong but risk is also elevated.
+
+The classification should require both:
+
+```text
+High Reward Score = high
+Risk Score = high
+```
+
+The table must show risk signals prominently so the user cannot mistake it for the Core list.
+
+Typical visible signals may include:
+
+- deep drawdown
+- extreme growth
+- leverage
+- negative FCF
+- earnings quality concern
+- low liquidity
+
+## 14.4 Table 4 — Avoid / Value Trap
+
+Purpose:
+
+> Identify candidates whose apparent value or headline performance is contradicted by weak quality, financial risk or serious anomaly signals.
+
+This group is not merely “low score”.
+
+It should be based on explicit evidence such as:
+
+- weak business quality
+- poor growth
+- weak financial safety
+- expensive/invalid valuation despite poor quality
+- strong value-trap signals
+- severe data-risk combinations
+
+The exact classification logic must be approved after evaluation testing.
+
+## 14.5 Stocks not suitable for any four-table category
+
+The model must define what happens to valid but ambiguous stocks.
+
+Possible behavior:
+
+- show in Ranking only
+- show as an unclassified/neutral result inside the Dashboard
+- retain in the full universe without forcing an investment-style category
+
+The implementation must not force every stock into a story merely for presentation.
+
+---
+
+# 15. Phase 12 — Ranking Tab
+
+The existing **Ranking tab remains**.
+
+It is not replaced by the four Dashboard tables.
+
+## 15.1 Purpose
+
+Ranking is the complete-universe quantitative view.
+
+It should allow the user to:
+
+- inspect the full ranked universe
+- sort/inspect overall score
+- see factor/component scores as appropriate
+- inspect classification
+- identify any stock regardless of Dashboard category
+- manually choose a stock for CRSM analysis
+
+## 15.2 Dashboard vs Ranking
+
+They are two views of the same Screener result set:
+
+```text
+Screener Result Set
+       │
+       ├── Dashboard
+       │    ├── Core Performers
+       │    ├── Quality Underperformers
+       │    ├── High Reward / High Risk
+       │    └── Avoid / Value Trap
+       │
+       └── Ranking tab
+            └── Full ranked universe
+```
+
+There must be a single source of truth for scoring/ranking. The Dashboard must not calculate a separate score.
+
+---
+
+# 16. Phase 13 — Explicit User-Initiated CRSM Workflow
+
+This replaces the previous concept of an automatic candidate gate.
+
+## 16.1 No automatic handoff
+
+When Screener finishes:
+
+```text
+Screener evaluation complete
         ↓
-Overall Screener Score
+Dashboard + Ranking updated
+        ↓
+STOP
 ```
 
-The final groups and weights are to be decided during implementation.
+No CRSM request is created automatically.
 
-## 9.3 Comparable scoring ranges
+No Node 1 request is created automatically.
 
-Metrics with different units must be transformed into comparable scoring ranges where appropriate.
+No hidden queue of candidates is generated.
 
-The implementation must prevent a metric with a large raw numeric range from dominating the score merely because of its scale.
+## 16.2 User selection
 
-## 9.4 Directionality
+The user may select a stock from:
 
-The model must explicitly define whether higher or lower values are favorable.
+- any of the four Dashboard tables
+- the Ranking tab
+- the existing manual analysis interface
 
-Examples:
+The selected stock becomes the explicit input to the CRSM workflow.
 
-Higher generally favorable:
+## 16.3 User action
 
-- ROE
-- ROA
-- margins
-- revenue growth
-- EPS growth
-- FCF growth
-
-Lower generally favorable:
-
-- Debt/Equity
-- P/E
-- P/B
-- P/S
-- EV/EBITDA
-- EV/Revenue
-
-Context-dependent:
-
-- PEG
-- dividend yield
-- relative volume
-- momentum
-- FCF
-
-These are examples of analytical direction, not final scoring formulas.
-
-## 9.5 Avoid double counting
-
-The model must inspect correlated metrics before assigning weights.
-
-Examples:
-
-- ROE and ROA
-- Revenue FQ / FY / TTM
-- Current Ratio and Quick Ratio
-- PEG TTM and PEG
-- multiple overlapping momentum periods
-
-Related fields may still be useful, but their contribution must be intentional.
-
-## 9.6 Missing data
-
-Missing data must not automatically become zero or a severe penalty.
-
-The model must distinguish:
+Only after explicit user action:
 
 ```text
-missing
-zero
-negative
-not applicable
+User selects stock
+      ↓
+User starts CRSM analysis
+      ↓
+Screener context is attached
+      ↓
+Node 1 receives context
 ```
 
-The final approach may include data-coverage/confidence information, but data quality must remain conceptually separate from business quality.
+## 16.4 What the Screener context should provide
 
----
-
-# 10. Phase 7 — Signals and Explainability
-
-The Screener should generate explicit signals alongside scores.
-
-Examples of possible signals:
-
-- strong profitability
-- strong growth
-- improving/weak cash flow
-- attractive valuation
-- expensive valuation
-- strong momentum
-- market underperformance
-- high leverage
-- liquidity concern
-- growth/value divergence
-- missing critical data
-
-Signals are **explanatory evidence**, not automatically score penalties.
-
-A high-quality but underperforming stock should remain discoverable if that pattern is strategically useful for deeper CRSM analysis.
-
-The output should answer:
-
-> Why did this stock rank highly?
-
-and:
-
-> What needs to be verified by Node 1?
-
----
-
-# 11. Phase 8 — Ranking and Classification
-
-After hard filtering and scoring:
-
-1. Calculate component scores.
-2. Calculate overall score.
-3. Rank eligible candidates.
-4. Generate signals and warnings.
-5. Classify candidates.
-6. Apply the candidate gate for deeper analysis.
-
-The final classification scheme must be derived from the new evaluation model rather than copied from legacy logic.
-
-Possible concepts such as:
-
-- high-quality candidate
-- undervalued / underperforming candidate
-- watch / secondary candidate
-- not selected
-
-may be retained or redesigned after evaluation.
-
----
-
-# 12. Phase 9 — Screener Result Contract
-
-The Screener result must contain enough information for both the UI and Node 1.
-
-Conceptual structure:
+For the selected stock, the context may include:
 
 ```text
-Stock identity
-├── ticker
-├── company
-├── sector
-└── industry
-
-Evaluation
-├── component scores
-├── overall score
-├── rank
-└── classification
-
-Signals
-├── positive
-├── negative
-└── anomalies
-
-Data quality
-├── missing fields
-├── warnings
-└── coverage/confidence if adopted
-
-Evidence
-└── relevant current metrics
-
-Conclusion
-└── why this candidate passed
-
-Node 1 priorities
-└── what CRSM should verify
+identity
+classification
+rank
+factor scores
+signals/anomalies
+data coverage
+key current metrics
+relevant derived metrics
+screening conclusion
+verification priorities
 ```
 
-The Screener should not pass a meaningless score without context.
+The context should be concise enough for Node 1 to consume efficiently and detailed enough to prevent redundant quantitative searching.
+
+## 16.5 What Node 1 should verify
+
+Node 1 may investigate:
+
+- why a strong company is underperforming
+- whether valuation is justified
+- whether abnormal growth is sustainable
+- whether an earnings-quality concern is material
+- missing/current information not available in TradingView
+- catalyst/event explanations
+- industry/company context
+
+These are **verification tasks**, not data invented by the Screener.
+
+## 16.6 DIRECT mode
+
+Direct/manual analysis remains functional.
+
+A user can analyze a ticker without first using the Screener.
 
 ---
 
-# 13. Phase 10 — Node 1 JSON Redesign
+# 17. Phase 14 — Screener Result Contract
 
-Node 1 JSON must be redesigned **after** the V2 evaluation model is finalized.
+The Screener result is the shared source for both Dashboard and Ranking and the optional context for user-initiated CRSM.
 
-The new contract should carry the result of the Screener, not merely repeat the raw TradingView row.
+Conceptual result shape:
 
-Conceptually:
+```text
+Stock
+├── identity
+│   ├── ticker
+│   ├── company
+│   ├── sector
+│   └── industry
+│
+├── source_data
+│   └── relevant current TradingView values
+│
+├── derived_metrics
+│   └── evaluation-only calculations
+│
+├── evaluation
+│   ├── factor scores
+│   ├── composite scores
+│   ├── overall score
+│   └── rank
+│
+├── classification
+│   └── one dashboard classification when applicable
+│
+├── signals
+│   ├── positive
+│   ├── risk
+│   └── anomaly/data-gap
+│
+├── coverage
+│   ├── factor coverage
+│   └── missing critical fields
+│
+└── analysis_context
+    └── verification priorities for user-started CRSM
+```
+
+This result must be generated once and consumed by both Dashboard and Ranking.
+
+---
+
+# 18. Phase 15 — Node 1 JSON Contract
+
+The Node 1 JSON is an output contract of the Screener result, but is only constructed when the user explicitly starts CRSM.
+
+Conceptual shape:
 
 ```json
 {
   "schema_version": "screener_v2",
-  "symbol": "KDC",
-  "company": "KIDO Group Corporation",
-  "sector": "...",
-  "industry": "...",
+  "source": {
+    "dataset": "tradingview",
+    "as_of": "..."
+  },
+  "stock": {
+    "ticker": "KDC",
+    "company": "KIDO Group Corporation",
+    "sector": "...",
+    "industry": "..."
+  },
   "screen": {
-    "total_score": 0,
     "classification": "...",
-    "component_scores": {},
+    "rank": 0,
+    "overall_score": 0,
+    "factor_scores": {},
     "signals": [],
-    "warnings": []
+    "warnings": [],
+    "coverage": {}
   },
   "metrics": {},
-  "node1_priorities": []
+  "verification_priorities": []
 }
 ```
 
-This is a shape example only. Final fields must be determined from the actual V2 output.
+This is a contract shape example only. Exact fields are decided after the evaluation result schema is finalized.
 
-## Node 1 responsibilities in SCREENED mode
-
-Node 1 should:
-
-- verify important Screener conclusions
-- investigate anomalies
-- verify missing/uncertain information
-- retrieve information unavailable from the TradingView dataset
-- investigate the reasons behind unusual price/valuation behavior
-- provide deeper analysis
-
-Node 1 should **not unnecessarily repeat quantitative research already available and current in the Screener context**.
-
-## DIRECT mode
-
-Manual ticker analysis remains supported.
-
-Without Screener context, Node 1 may collect the required information itself.
+Node 1 must use the Screener context as a starting point and should not unnecessarily repeat searches for current quantitative fields already supplied and valid.
 
 ---
 
-# 14. Phase 11 — Candidate Gate / CRSM Handoff
+# 19. Phase 16 — Validation on the Real Dataset
 
-The automatic handoff must be based on the V2 ranking/classification.
+The current 76-row dataset should be the primary validation universe during development.
 
-The gate should control how many candidates enter the expensive deep-analysis pipeline.
+## 19.1 Distribution validation
 
-Goals:
+Inspect:
 
-- reduce unnecessary CRSM calls
-- prioritize the strongest candidates
-- retain enough context for Node 1
-- preserve manual analysis as a fallback
-
-The candidate count and threshold are to be determined after ranking validation.
-
----
-
-# 15. Phase 12 — Validation
-
-Validation must happen before production integration.
-
-## 15.1 Data validation
-
-Compare raw TradingView data with reconstructed Stock Mind data.
-
-Requirement:
-
-```text
-field position = correct
-value meaning = preserved
-```
-
-## 15.2 Formula validation
-
-Use representative examples:
-
-- strong quality / strong growth
-- strong quality / weak momentum
-- high growth / expensive valuation
-- cheap / weak business
-- high leverage
-- negative FCF
-- missing financial data
-- extreme growth values
-- unusual market performance
-
-## 15.3 Ranking validation
-
-Run the complete dataset and inspect:
-
-- top-ranked stocks
-- bottom-ranked stocks
+- overall score distribution
+- factor-score distribution
+- number of stocks in each dashboard table
+- number of unclassified stocks
 - sector concentration
 - industry concentration
-- score distribution
-- sensitivity to individual metrics
-- effect of missing data
 
-## 15.4 Regression validation
+## 19.2 Sensitivity validation
 
-Compare V2 with legacy only as a diagnostic.
+Test whether one metric can dominate the result.
 
-The purpose is **not** to reproduce legacy rankings.
+Examples:
 
-If rankings differ substantially, investigate whether the difference is logically explained by the new model.
+- extreme EPS Growth
+- extreme Revenue Growth
+- very high ROE
+- very low P/E
+- deep drawdown
+- high Dividend Yield
 
-## 15.5 End-to-end validation
+## 19.3 Missing-data validation
 
-Test:
+Test representative stocks with:
+
+- missing PEG
+- missing FCF
+- missing growth
+- partial period data
+
+Verify that missingness is visible and does not silently become zero or falsely positive evidence.
+
+## 19.4 Anomaly validation
+
+Use real examples to verify that unusual values are handled as intended.
+
+Examples are validation cases, not hard-coded expected winners.
+
+## 19.5 Dashboard validation
+
+Verify that each stock appears in the correct table and that a stock is not simultaneously presented as contradictory classifications unless the design explicitly permits this.
+
+## 19.6 Ranking validation
+
+Ensure Ranking and Dashboard use the same underlying result object and score.
+
+A stock must not have one score in Ranking and another score in Dashboard.
+
+## 19.7 CRSM workflow validation
+
+Verify:
 
 ```text
-TradingView
- → Import
- → Internal dataset
- → Screener V2
- → Ranking
- → Candidate Gate
- → Node 1 JSON
- → SCREENED analysis
+Open Screener
+    ↓
+Screener runs
+    ↓
+Dashboard + Ranking update
+    ↓
+No CRSM request occurs
+    ↓
+User selects stock
+    ↓
+User explicitly starts CRSM
+    ↓
+Correct Screener context reaches Node 1
 ```
 
-DIRECT mode must continue to work independently.
+## 19.8 Legacy comparison
+
+Compare V2 and legacy only as a diagnostic.
+
+The purpose is not to reproduce legacy rankings.
+
+Substantial differences must be investigated, not automatically corrected.
 
 ---
 
-# 16. Phase 13 — UI / Developer Tools
+# 20. UI / Developer Validation Tools
 
-During implementation, retain:
+During development, retain:
 
 - Mapping tab
 - Raw Clipboard Inspector
 - Parser Debug
-- reconstructed table
+- reconstructed Mapping table
+- Excel-copy-friendly table output if useful
 
-These are validation tools, not part of the analytical model.
+These tools are validation/debug infrastructure, not part of the investment model.
 
-After the data and Screener are stable, they may be moved to a developer/debug area or hidden behind a debug setting.
+They should remain available until the V2 data layer and evaluation have passed real-data validation.
 
-The visual Mapping table is particularly valuable because parser correctness cannot be established from ticker correctness alone.
+The Mapping table proved essential because a parser can return correct tickers while all downstream fields are shifted.
 
 ---
 
-# 17. Expected Implementation Areas
+# 21. Expected Implementation Areas
 
-Exact files must be confirmed from the current repository before coding.
+Exact files must be confirmed from the repository before coding.
 
-Expected areas include:
+Likely areas include:
 
 ```text
 Parser / ingestion
         ↓
 Internal data contract
         ↓
+Derived metric helpers
+        ↓
 Screener filters
         ↓
-Evaluation / scoring
+Factor evaluation
         ↓
-Signals / ranking / classification
+Signals / anomaly engine
         ↓
-Dashboard
+Ranking / classification
         ↓
-Screener context builder
+Screener result object
+        ↓
+Dashboard (4 tables)
+        ↓
+Ranking tab
+        ↓
+User-initiated Screener context builder
         ↓
 Node 1
 ```
@@ -817,99 +1234,133 @@ Do not modify unrelated CRSM components unless a direct dependency is identified
 
 ---
 
-# 18. Implementation Order
+# 22. Implementation Order
 
-The implementation order is fixed:
+The implementation order is intentionally strict.
 
 ```text
-1. Validate ingestion
+1. Freeze / validate ingestion
         ↓
 2. Audit legacy Screener
         ↓
-3. Audit current dataset
+3. Define universe
         ↓
-4. Define evaluation philosophy
+4. Map metric roles
         ↓
-5. Define hard filters
+5. Define raw / derived / signal layers
         ↓
-6. Design component scoring
+6. Define ranking granularity
         ↓
-7. Design signals / classification
+7. Define missing-data policy
         ↓
-8. Validate ranking
+8. Define anomaly engine
         ↓
-9. Implement final evaluation engine
+9. Design factor specifications
         ↓
-10. Redesign Screener result contract
+10. Design composite / weights
         ↓
-11. Redesign Node 1 JSON
+11. Design classification
         ↓
-12. Integrate candidate gate
+12. Design single Screener result contract
         ↓
-13. End-to-end validation
+13. Implement evaluation engine
         ↓
-14. UI cleanup
+14. Implement Dashboard 4-table presentation
+        ↓
+15. Preserve / integrate Ranking tab
+        ↓
+16. Implement user-initiated Screener → CRSM context
+        ↓
+17. Update Node 1 JSON / prompt contract
+        ↓
+18. Real-dataset validation
+        ↓
+19. UI cleanup
 ```
 
 Do not jump directly from the new dataset to formulas.
 
+Do not add an automatic CRSM candidate gate.
+
 ---
 
-# 19. Explicit Non-Goals
+# 23. Explicit Non-Goals
 
 This phase does not include:
 
+- automatic CRSM handoff
+- automatic Node 1 analysis after Screener completion
+- automatic candidate queues for CRSM
 - SSI / future native market-data integration
-- replacing TradingView as the current source
+- replacing TradingView as the current data source
 - rewriting CRSM architecture
 - changing CRSM provider/model routing
 - redesigning unrelated CRSM nodes
 - reproducing legacy scoring for compatibility
-- adding arbitrary metrics solely because they exist in old code
+- adding arbitrary metrics merely because they exist in legacy code
+- inventing catalysts or qualitative investment stories inside Screener
 
-`legacy/` remains **reference material**, not an implementation specification.
+`legacy/` remains reference material only.
 
 ---
 
-# 20. Definition of Done
+# 24. Definition of Done
 
 ## Data layer
 
-- [ ] TradingView four-line format remains correctly parsed.
-- [ ] Ticker/company separation is correct.
-- [ ] All 46 fields are mapped correctly.
-- [ ] Percentage semantics are preserved as percentage points.
-- [ ] Ratios are not converted into percentages.
-- [ ] K/M/B/T display suffixes are decoded where numeric quantity is required.
-- [ ] Missing values are explicit.
-- [ ] Mapping has been validated against raw TradingView data.
+- [ ] TradingView four-line format parsed correctly.
+- [ ] Ticker/company separation correct.
+- [ ] All 46 fields mapped correctly.
+- [ ] Percentage semantics preserved as percentage points.
+- [ ] Ratios remain ratios.
+- [ ] K/M/B/T display suffixes decoded only to recover quantities.
+- [ ] FQ/FY/TTM remain explicit.
+- [ ] Missing values remain explicit.
+- [ ] Mapping validated against raw TradingView data.
 
 ## Evaluation layer
 
 - [ ] Legacy rules audited.
+- [ ] Universe defined.
 - [ ] Every current field has an explicit role or is intentionally unused.
-- [ ] Hard filters defined.
-- [ ] Component scores defined.
-- [ ] Weighting defined and justified.
-- [ ] Double counting reviewed.
-- [ ] Missing-data behavior defined.
-- [ ] Signals defined.
-- [ ] Classification defined.
+- [ ] Raw/derived/signal boundaries defined.
+- [ ] Ranking granularity defined.
+- [ ] Missing-data policy defined.
+- [ ] Anomaly engine defined.
+- [ ] Factor specifications defined.
+- [ ] Correlation/double-counting reviewed.
+- [ ] Weights defined and justified.
+- [ ] Composite scores defined.
+- [ ] Classification rules defined.
 - [ ] Ranking validated on real data.
 
-## Node 1 / CRSM
+## Dashboard / Ranking
 
-- [ ] Screener result contract defined.
-- [ ] Node 1 JSON schema versioned.
+- [ ] Four Dashboard tables implemented.
+- [ ] Core Performers table works.
+- [ ] Quality Underperformers table works.
+- [ ] High Reward / High Risk table works.
+- [ ] Avoid / Value Trap table works.
+- [ ] Ambiguous/unclassified behavior defined.
+- [ ] Ranking tab remains functional.
+- [ ] Dashboard and Ranking use one shared Screener result source.
+
+## CRSM / Node 1
+
+- [ ] No automatic CRSM handoff exists.
+- [ ] User can manually select a stock from Dashboard.
+- [ ] User can manually select a stock from Ranking.
+- [ ] User can explicitly start CRSM.
+- [ ] Screener context is attached only after explicit user action.
+- [ ] Node 1 JSON schema is versioned.
 - [ ] Node 1 receives relevant Screener context.
-- [ ] Node 1 verification priorities are explicit.
-- [ ] SCREENED mode does not unnecessarily duplicate Screener research.
+- [ ] Verification priorities are explicit.
+- [ ] Node 1 does not unnecessarily duplicate Screener quantitative research.
 - [ ] DIRECT mode remains functional.
-- [ ] Candidate gate tested end-to-end.
 
 ---
 
-# 21. Current Status
+# 25. Current Status
 
 | Area | Status |
 |---|---|
@@ -920,33 +1371,45 @@ This phase does not include:
 | Mapping debug tools | ✅ Available |
 | Raw-data convention | ✅ Established |
 | K/M/B/T decoding | ✅ Implemented |
+| Automatic CRSM handoff | ❌ Explicitly not part of V2 |
 | Legacy Screener audit | ⏳ Next |
-| Current dataset audit | ⏳ Next |
-| V2 evaluation philosophy | ⏳ To define |
-| Hard filters | ⏳ Not decided |
+| Universe definition | ⏳ To define |
+| Metric role mapping | ⏳ To define |
+| Raw/Derived/Signal contract | ⏳ To define |
+| Ranking granularity | ⏳ To define |
+| Missing-data policy | ⏳ To define |
+| Anomaly engine | ⏳ To define |
+| Factor specifications | ⏳ To define |
 | Scoring formulas | ⏳ Not decided |
-| Signals | ⏳ Not decided |
-| Ranking/classification | ⏳ Not decided |
-| Node 1 JSON | ⏳ After evaluation design |
-| Candidate gate | ⏳ After ranking design |
+| Weights | ⏳ Not decided |
+| Classification rules | ⏳ Not decided |
+| Dashboard four tables | ⏳ Evaluation dependent |
+| Ranking tab | ✅ Existing function retained |
+| User-initiated CRSM context | ⏳ After evaluation contract |
+| Node 1 JSON | ⏳ After Screener result contract |
 | SSI | ⏸ Future |
 
 ---
 
-# 22. Golden Rules
+# 26. Golden Rules
 
 1. **Map first, evaluate second, code third.**
-2. **The raw ingestion layer does not contain investment judgment.**
-3. **Do not silently change the meaning of TradingView data.**
+2. **Raw ingestion contains no investment judgment.**
+3. **Do not silently change TradingView data meaning.**
 4. **Percentages are percentage points; ratios remain ratios.**
 5. **K/M/B/T decoding restores quantity; it is not a scoring transformation.**
-6. **Do not merge FQ/FY/TTM fields before deciding why they should be combined.**
-7. **Do not reuse legacy formulas merely because they already exist.**
-8. **Do not let one extreme metric determine the whole candidate ranking.**
-9. **Missing data is not zero.**
-10. **Data quality is separate from business quality.**
-11. **Signals explain the score; they do not automatically penalize it.**
-12. **The Screener selects candidates; CRSM performs deep analysis.**
-13. **Node 1 JSON is designed from the V2 Screener result, not the other way around.**
-14. **Do not modify Node 1 until the Screener evaluation model is stable.**
-15. **Keep the Mapping/debug layer until the new Screener has passed real-data validation.**
+6. **FQ/FY/TTM remain separate until an explicit evaluation reason exists to combine them.**
+7. **Legacy formulas are reference material, not the V2 specification.**
+8. **Do not use 1/x merely to reverse ranking direction.**
+9. **Do not automatically winsorize extreme values and destroy useful signals.**
+10. **Raw values, derived scoring values and anomaly signals are separate representations.**
+11. **Missing is not zero.**
+12. **Data quality is separate from business quality.**
+13. **Signals explain what needs attention; they do not automatically determine the score.**
+14. **Do not invent catalysts or qualitative investment explanations in Screener.**
+15. **Dashboard and Ranking consume one shared Screener result set.**
+16. **Screener never automatically starts CRSM.**
+17. **CRSM starts only after explicit user action.**
+18. **Node 1 JSON is derived from the V2 Screener result, not the other way around.**
+19. **DIRECT analysis remains functional.**
+20. **Keep Mapping/debug tools until real-data validation is complete.**
