@@ -10,6 +10,7 @@ import { consumePendingUserEvidence, getPendingUserEvidence } from './user-evide
 import { buildExecutionStages } from './execution-policy.js';
 import { loadSettings } from './settings.js';
 import { crsmState, notifyCRSM } from './state.js';
+import { prepareNode6AOutputs, localizeReportText } from './report-data-normalizer.js';
 
 export const NODES = [
   ['userEvidence', prepareUserEvidence],
@@ -153,7 +154,13 @@ async function runNode(nodeId, ctx, { onNodeStart, onNodeDone, onNodeError }) {
   notifyCRSM();
 
   try {
-    const output = await fn(ctx);
+    const nodeCtx = nodeId === 'node6a'
+      ? { ...ctx, outputs: prepareNode6AOutputs(ctx.outputs) }
+      : ctx;
+    const rawOutput = await fn(nodeCtx);
+    const output = nodeId === 'node6a' && typeof rawOutput === 'string'
+      ? localizeReportText(rawOutput)
+      : rawOutput;
     ctx.outputs[nodeId] = output;
     if (nodeId === 'node1' && ctx.outputs.userEvidence) {
       ctx.outputs.node1 = { ...output, user_evidence: ctx.outputs.userEvidence };
