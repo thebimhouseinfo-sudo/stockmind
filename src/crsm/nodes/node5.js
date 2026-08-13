@@ -3,6 +3,38 @@ import { node5Prompt } from '../prompts/node5.js';
 import { currentDateDDMMYYYY, detectSectorType } from './common.js';
 import { extractJson, validateJsonObject, num } from './json.js';
 
+const NODE5_LOCALIZATION_INSTRUCTION = `
+
+# DOWNSTREAM REPORT LANGUAGE NORMALIZATION — REQUIRED
+Node 5 is the final semantic normalization layer before the report/log nodes.
+Keep all existing scoring, decision, formulas, machine enums, numeric values,
+source names, tickers, dates and field structure unchanged.
+
+In addition to the normal Node 5 JSON fields, add a top-level object named
+\`localized_upstream\`. It is a translation map for human-facing content from
+Node 1–4 that downstream Node 6A, Node 6B and Node 7 may display.
+
+Rules for \`localized_upstream\`:
+1. Keys are exact source paths such as \`node4.macro_view\` or
+   \`node3.moat\`.
+2. Translate human-readable English text into natural, concise Vietnamese.
+3. Preserve the original meaning, numbers, units, dates, caveats and uncertainty.
+4. Do NOT translate ticker symbols, source names, URLs, formulas, numeric values,
+   field identifiers, or machine-control enums such as BUY/HOLD/SELL,
+   CONFIRMED/PARTIAL/DIVERGENT.
+5. If a source value is already Vietnamese, keep it unchanged.
+6. For arrays of prose, return an array with each item translated.
+7. Do not invent missing data. Omit a key when the source field is null/missing.
+8. Cover all human-facing prose fields from Node 1–4 that are likely to appear
+   in the report, especially macro_view, sector/trend/volume descriptions,
+   smart-money commentary, earnings-quality flags/reasoning, moat, valuation
+   commentary, causal-chain text, scenario conditions/descriptions, and other
+   narrative fields used by Node 6A/6B.
+
+The localization map is presentation data only. It MUST NOT affect the six-factor
+score, confidence calculation, conflict detector, decision, or any numeric output.
+`;
+
 export async function node5(ctx) {
   const outputs = ctx.outputs;
   const sectorType = detectSectorType(ctx.screeningContext?.industry || ctx.industry);
@@ -34,7 +66,7 @@ explanations, no markdown fences.
   const result = await runLLM({
     nodeId: 'node5',
     prompt: userPrompt,
-    systemInstruction: node5Prompt,
+    systemInstruction: `${node5Prompt}${NODE5_LOCALIZATION_INSTRUCTION}`,
     responseFormat: 'json'
   });
 
