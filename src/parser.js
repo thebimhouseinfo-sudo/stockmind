@@ -1,23 +1,77 @@
 const FIELD_ALIASES = {
-  TICKER: ['ticker', 'symbol', 'ma', 'ma ck'],
-  INDUSTRY: ['industry', 'sector', 'nganh'],
-  AVGVOL: ['avg vol', 'average volume', 'vol avg', 'avg volume', 'avg vol 10d'],
-  PRICE: ['price', 'last', 'close', 'gia'],
-  VOL: ['vol', 'volume', 'last volume'],
-  ROE: ['roe', 'return on equity'],
-  ROIC: ['roic', 'return on invested capital'],
-  REVGROWTH: ['revenue growth', 'revenue_growth', 'sales growth', 'rev growth'],
-  EPSGROWTH: ['eps growth', 'eps_growth'],
-  DEBT: ['debt ratio', 'debt/equity', 'd/e', 'debt', 'debt to equity'],
-  PE: ['p/e', 'pe', 'price to earnings'],
-  PEG: ['peg'],
-  RET1M: ['return 1m', '1m perf', 'performance 1m', 'ret1m'],
-  RET3M: ['return 3m', '3m perf', 'performance 3m', 'ret3m'],
-  RET6M: ['return 6m', '6m perf', 'performance 6m', 'ret6m'],
-  RET12M: ['return 12m', 'return 1y', '1y perf', 'performance 1y', 'ret12m']
+  ticker: ['symbol', 'ticker', 'ma', 'ma ck'],
+  company_name: ['symbol', 'company', 'company name', 'name', 'ten cong ty'],
+  sector: ['sector'],
+  industry: ['industry', 'nganh'],
+  market_cap: ['mkt cap', 'market cap'],
+  price: ['price', 'last', 'close', 'gia'],
+  change_pct: ['chg', 'chg %', 'change', 'change %'],
+  perf_1w: ['perf 1w', 'performance 1w'],
+  perf_1m: ['perf 1m', 'performance 1m'],
+  perf_3m: ['perf 3m', 'performance 3m'],
+  perf_6m: ['perf 6m', 'performance 6m'],
+  perf_1y: ['perf 1y', 'performance 1y'],
+  perf_ytd: ['perf ytd', 'performance ytd'],
+  high_52w: ['high 52w', '52w high'],
+  low_52w: ['low 52w', '52w low'],
+  volume: ['vol', 'volume', 'last volume'],
+  relative_volume: ['rel vol', 'relative volume'],
+  avg_volume_10d: ['avg vol 10d', 'average volume 10d'],
+  avg_volume_30d: ['avg vol 30d', 'average volume 30d'],
+  avg_volume_60d: ['avg vol 60d', 'average volume 60d'],
+  roe_ttm: ['roe ttm', 'roe'],
+  roa_ttm: ['roa ttm', 'roa'],
+  revenue_fq: ['revenue fq'],
+  revenue_fy: ['revenue fy'],
+  revenue_ttm: ['revenue ttm'],
+  revenue_growth_quarterly_yoy: ['revenue growth quarterly yoy'],
+  revenue_growth_annual_yoy: ['revenue growth annual yoy', 'revenue growth yoy'],
+  eps_dil_ttm: ['eps dil ttm', 'eps ttm'],
+  eps_dil_growth_ttm_yoy: ['eps dil growth ttm yoy', 'eps growth ttm yoy'],
+  peg_ttm: ['peg ttm'],
+  gross_margin_ttm: ['gross margin % ttm', 'gross margin ttm'],
+  operating_margin_ttm: ['op margin % ttm', 'operating margin % ttm', 'operating margin ttm'],
+  net_margin_ttm: ['net margin % ttm', 'net margin ttm'],
+  fcf_ttm: ['fcf ttm', 'free cash flow ttm'],
+  fcf_growth_ttm_yoy: ['fcf growth ttm yoy'],
+  debt_equity_fq: ['debt/equity fq', 'debt equity fq'],
+  debt_equity_fy: ['debt/equity fy', 'debt equity fy'],
+  current_ratio_fq: ['current ratio fq'],
+  current_ratio_fy: ['current ratio fy'],
+  quick_ratio_fq: ['quick ratio fq'],
+  quick_ratio_fy: ['quick ratio fy'],
+  pe: ['p/e', 'pe', 'price to earnings'],
+  peg: ['peg'],
+  pb: ['p/b', 'pb'],
+  ps: ['p/s', 'ps'],
+  ev_ebitda: ['ev/ebitda', 'ev ebitda'],
+  ev_revenue: ['ev/revenue', 'ev revenue'],
+  dividend_yield_ttm: ['div yield % ttm', 'dividend yield % ttm', 'dividend yield ttm']
 };
 
-const REQUIRED = ['TICKER', 'INDUSTRY', 'PRICE', 'PE', 'ROE', 'ROIC', 'REVGROWTH', 'EPSGROWTH', 'DEBT', 'RET1M', 'RET3M', 'RET6M', 'RET12M'];
+// Temporary compatibility aliases keep the existing UI/scoring runtime working
+// while the new evaluation model is redesigned. They are derived from the new
+// normalized fields and must not be treated as the new data contract.
+const LEGACY_ALIASES = {
+  TICKER: 'ticker',
+  COMPANY_NAME: 'company_name',
+  SECTOR: 'sector',
+  INDUSTRY: 'industry',
+  PRICE: 'price',
+  VOL: 'volume',
+  AVGVOL: 'avg_volume_30d',
+  ROE: 'roe_ttm',
+  ROIC: null,
+  REVGROWTH: 'revenue_growth_annual_yoy',
+  EPSGROWTH: 'eps_dil_growth_ttm_yoy',
+  DEBT: 'debt_equity_fq',
+  PE: 'pe',
+  PEG: 'peg',
+  RET1M: 'perf_1m',
+  RET3M: 'perf_3m',
+  RET6M: 'perf_6m',
+  RET12M: 'perf_1y'
+};
 
 export function parseTradingViewPaste(text) {
   const lines = text
@@ -39,13 +93,14 @@ export function parseTradingViewPaste(text) {
   const headerIndex = findHeaderIndex(table);
   const headers = table[headerIndex] || [];
   const columns = mapColumns(headers);
-  const missing = REQUIRED.filter(field => columns[field] == null);
+  const missing = ['ticker', 'sector', 'industry', 'price'].filter(field => columns[field] == null);
   const errors = missing.length ? [`Thieu cot bat buoc: ${missing.join(', ')}`] : [];
 
   const rows = table
     .slice(headerIndex + 1)
+    .filter(cells => !isSeparatorRow(cells))
     .map((cells, rowIndex) => normalizeRow(cells, columns, rowIndex + headerIndex + 2))
-    .filter(row => row.TICKER);
+    .filter(row => row.ticker);
 
   return { rows, errors, columns };
 }
@@ -65,26 +120,57 @@ function parseTradingViewWatchlist(lines) {
 
     rows.push({
       sourceRow: index + 1,
-      TICKER: ticker,
-      AVGVOL: cleanNumber(cells[0]),
-      PRICE: cleanNumber(cells[1]),
-      VOL: cleanNumber(cells[2]),
-      INDUSTRY: cleanIndustry(cells[3]),
-      ROE: cleanNumber(cells[4]),
-      ROIC: cleanNumber(cells[5]),
-      REVGROWTH: cleanNumber(cells[6]),
-      EPSGROWTH: cleanNumber(cells[7]),
-      DEBT: cleanNumber(cells[8]),
-      PE: cleanNumber(cells[9]),
-      PEG: cleanNumber(cells[10]),
-      RET1M: cleanNumber(cells[11]),
-      RET3M: cleanNumber(cells[12]),
-      RET6M: cleanNumber(cells[13]),
-      RET12M: cleanNumber(cells[14])
+      ticker,
+      company_name: extractCompanyName(lines[index]),
+      sector: null,
+      industry: cleanIndustry(cells[3]),
+      avg_volume_10d: null,
+      avg_volume_30d: cleanNumber(cells[0]),
+      avg_volume_60d: null,
+      price: cleanNumber(cells[1]),
+      volume: cleanNumber(cells[2]),
+      relative_volume: null,
+      roe_ttm: cleanNumber(cells[4]),
+      roa_ttm: null,
+      revenue_fq: null,
+      revenue_fy: null,
+      revenue_ttm: null,
+      revenue_growth_quarterly_yoy: null,
+      revenue_growth_annual_yoy: cleanNumber(cells[6]),
+      eps_dil_ttm: null,
+      eps_dil_growth_ttm_yoy: cleanNumber(cells[7]),
+      peg_ttm: null,
+      gross_margin_ttm: null,
+      operating_margin_ttm: null,
+      net_margin_ttm: null,
+      fcf_ttm: null,
+      fcf_growth_ttm_yoy: null,
+      debt_equity_fq: cleanNumber(cells[8]),
+      debt_equity_fy: null,
+      current_ratio_fq: null,
+      current_ratio_fy: null,
+      quick_ratio_fq: null,
+      quick_ratio_fy: null,
+      pe: cleanNumber(cells[9]),
+      peg: cleanNumber(cells[10]),
+      pb: null,
+      ps: null,
+      ev_ebitda: null,
+      ev_revenue: null,
+      dividend_yield_ttm: null,
+      change_pct: null,
+      perf_1w: null,
+      perf_1m: cleanNumber(cells[11]),
+      perf_3m: cleanNumber(cells[12]),
+      perf_6m: cleanNumber(cells[13]),
+      perf_1y: cleanNumber(cells[14]),
+      perf_ytd: null,
+      high_52w: null,
+      low_52w: null
     });
   }
 
-  return rows;
+  return rows.map(withLegacyAliases);
 }
 
 function extractTicker(line) {
@@ -92,8 +178,17 @@ function extractTicker(line) {
   if (markdownMatch) return markdownMatch[1];
 
   const clean = stripMarkdown(line).replace(/\*/g, '').trim();
-  if (/^[A-Z0-9]{2,8}$/.test(clean) && !['VN', 'HOSE', 'HNX', 'UPCOM'].includes(clean)) return clean;
+  const ticker = clean.split(/\s+/)[0];
+  if (/^[A-Z0-9]{2,8}$/.test(ticker) && !['VN', 'HOSE', 'HNX', 'UPCOM'].includes(ticker)) return ticker;
   return null;
+}
+
+function extractCompanyName(line) {
+  const markdown = String(line || '').match(/\]\((?:[^)]*)\)\s*([^\[]+?)(?:\s*D)?$/);
+  if (markdown) return cleanText(markdown[1]);
+  const clean = stripMarkdown(line).replace(/\s+D\s*$/i, '').trim();
+  const ticker = extractTicker(line);
+  return ticker ? clean.replace(new RegExp(`^${ticker}\\s*`, 'i'), '').trim() || null : null;
 }
 
 function findWatchlistDataLine(lines, startIndex) {
@@ -123,6 +218,7 @@ function detectDelimiter(line) {
   if (line.includes('\t')) return '\t';
   if (line.includes(';')) return ';';
   if (line.split(',').length > 4) return ',';
+  if (line.includes('|')) return '|';
   return /\s{2,}/;
 }
 
@@ -156,6 +252,10 @@ function mapColumns(headers) {
     if (index >= 0) result[field] = index;
   }
 
+  // Symbol is intentionally one source column but yields two internal fields.
+  if (result.ticker == null) result.ticker = result.company_name;
+  if (result.company_name == null) result.company_name = result.ticker;
+
   return result;
 }
 
@@ -164,7 +264,7 @@ function normalizeHeader(value) {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[%()]/g, '')
+    .replace(/[|%()]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -174,13 +274,45 @@ function normalizeRow(cells, columns, sourceRow) {
 
   for (const field of Object.keys(FIELD_ALIASES)) {
     const raw = columns[field] == null ? null : cells[columns[field]];
-    row[field] = field === 'TICKER' || field === 'INDUSTRY' ? cleanText(raw) : cleanNumber(raw);
+    if (field === 'ticker') {
+      row.ticker = extractTickerFromSymbolCell(raw);
+    } else if (field === 'company_name') {
+      row.company_name = extractCompanyNameFromSymbolCell(raw);
+    } else if (field === 'sector' || field === 'industry') {
+      row[field] = cleanText(raw);
+    } else {
+      row[field] = cleanNumber(raw);
+    }
   }
 
-  if (row.TICKER) row.TICKER = row.TICKER.toUpperCase();
-  if (!row.INDUSTRY) row.INDUSTRY = 'Unknown';
+  if (!row.ticker) row.ticker = null;
+  if (!row.company_name) row.company_name = null;
+  if (!row.industry) row.industry = 'Unknown';
 
+  return withLegacyAliases(row);
+}
+
+function extractTickerFromSymbolCell(value) {
+  const text = stripMarkdown(value).replace(/\s+D\s*$/i, '').trim();
+  const match = text.match(/^([A-Z0-9]{2,8})(?:\s+|$)/);
+  return match ? match[1].toUpperCase() : null;
+}
+
+function extractCompanyNameFromSymbolCell(value) {
+  const text = stripMarkdown(value).replace(/\s+D\s*$/i, '').trim();
+  const ticker = extractTickerFromSymbolCell(text);
+  return ticker ? text.slice(ticker.length).trim() || null : null;
+}
+
+function withLegacyAliases(row) {
+  for (const [legacyField, sourceField] of Object.entries(LEGACY_ALIASES)) {
+    row[legacyField] = sourceField ? row[sourceField] ?? null : null;
+  }
   return row;
+}
+
+function isSeparatorRow(cells) {
+  return cells.length > 0 && cells.every(cell => /^\s*:?-{1,}:?\s*$/.test(cell) || cell === '');
 }
 
 function cleanText(value) {
@@ -207,7 +339,7 @@ export function cleanNumber(value) {
     .replace(/\u00a0/g, '')
     .replace(/\s/g, '')
     .replace(/^\+/, '')
-    .replace(/[KMB]$/i, '')
+    .replace(/[KMBT]$/i, '')
     .replace(/,/g, '');
 
   const isPercent = text.includes('%');
@@ -225,6 +357,7 @@ function suffixMultiplier(value) {
   if (/[0-9]\s*K$/.test(text)) return 1_000;
   if (/[0-9]\s*M$/.test(text)) return 1_000_000;
   if (/[0-9]\s*B$/.test(text)) return 1_000_000_000;
+  if (/[0-9]\s*T$/.test(text)) return 1_000_000_000_000;
   return 1;
 }
 
