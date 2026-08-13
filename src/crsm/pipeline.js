@@ -7,6 +7,8 @@ import { renderNode6A } from './nodes/node6a.js';
 import { renderNode6B } from './nodes/node6b.js';
 import { node7 } from './nodes/node7.js';
 import { consumePendingUserEvidence, getPendingUserEvidence } from './user-evidence.js';
+import { buildExecutionStages } from './execution-policy.js';
+import { loadSettings } from './settings.js';
 
 export const NODES = [
   ['userEvidence', prepareUserEvidence],
@@ -18,12 +20,6 @@ export const NODES = [
   ['node6a', renderNode6A],
   ['node6b', renderNode6B],
   ['node7', node7]
-];
-
-// Backend-owned concurrency policy. Only nodes explicitly listed here may
-// share a stage; dependency order is still preserved by buildParallelStages().
-const PARALLEL_STAGES = [
-  ['node2', 'node3']
 ];
 
 async function prepareUserEvidence() {
@@ -53,9 +49,8 @@ export async function runPipeline({
   if (startIndex < 0) throw new Error(`startFrom không hợp lệ: ${effectiveStart}`);
 
   const orderedIds = NODES.slice(startIndex).map(([id]) => id);
-  const stages = executionMode === 'parallel'
-    ? buildParallelStages(orderedIds)
-    : orderedIds.map(id => [id]);
+  const settings = loadSettings();
+  const stages = buildRuntimeStages(orderedIds, settings, executionMode);
 
   for (const stage of stages) {
     const result = stage.length === 1
@@ -68,34 +63,17 @@ export async function runPipeline({
   return { ctx, failedNode: null, error: null };
 }
 
-function buildParallelStages(orderedIds) {
-  const remaining = [...orderedIds];
-  const stages = [];
+function buildRuntimeStages(orderedIds, settings, legacyExecutionMode) {
+  // Dependency-bounded execution policy is authoritative. The legacy global
+  // executionMode is only used as a backwards-compatible override for AI-capable
+  // stages when an explicit stage policy has not yet been configured.
+  const stages = buildExecutionStages(orderedIds, settings);
+  if (legacyExecutionMode !== 'parallel') return stages.map(stage => [...stage]);
 
-  while (remaining.length) {
-    const first = remaining.shift();
-    if (!first) continue;
-
-    // A parallel group is inserted at the position of its first member. This
-    // guarantees prerequisites earlier in the pipeline have already completed.
-    const group = PARALLEL_STAGES.find(stage => stage.includes(first));
-    if (!group) {
-      stages.push([first]);
-      continue;
-    }
-
-    const available = [first];
-    for (const member of group) {
-      if (member === first) continue;
-      const index = remaining.indexOf(member);
-      if (index >= 0) {
-        available.push(member);
-        remaining.splice(index, 1);
-      }
-    }
-    stages.push(available);
-  }
-
+  // Do not widen dependency boundaries. A global "parallel" setting may only
+  // enable parallelism where the stage resolver says it is allowed. Local stages
+  // are already parallel by default; AI stages remain sequential until a future
+  // stage-specific policy explicitly permits them.
   return stages;
 }
 
