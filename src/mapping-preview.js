@@ -1,3 +1,5 @@
+import { parseTradingViewPaste } from './parser.js';
+
 const STORAGE_KEY = 'stock-mind.dataset.v1';
 const TAB_ID = 'mapping-preview';
 const TAB_LABEL = 'Mapping';
@@ -53,8 +55,19 @@ const COLUMNS = [
   ['dividend_yield_ttm', 'Div Yield % TTM', 'Dividend Yield TTM']
 ];
 
+const DEBUG_COLUMNS = [
+  'symbol', 'ui_marker', 'sector', 'industry', 'market_cap', 'price', 'change_pct', 'perf_1w', 'perf_1m',
+  'perf_3m', 'perf_6m', 'perf_1y', 'perf_ytd', 'high_52w', 'low_52w', 'volume', 'relative_volume',
+  'avg_volume_10d', 'avg_volume_30d', 'avg_volume_60d', 'roe_ttm', 'roa_ttm', 'revenue_fq', 'revenue_fy',
+  'revenue_ttm', 'revenue_growth_quarterly_yoy', 'revenue_growth_annual_yoy', 'eps_dil_ttm',
+  'eps_dil_growth_ttm_yoy', 'peg_ttm', 'gross_margin_ttm', 'operating_margin_ttm', 'net_margin_ttm',
+  'fcf_ttm', 'fcf_growth_ttm_yoy', 'debt_equity_fq', 'debt_equity_fy', 'current_ratio_fq', 'current_ratio_fy',
+  'quick_ratio_fq', 'quick_ratio_fy', 'pe', 'peg', 'pb', 'ps', 'ev_ebitda', 'ev_revenue', 'dividend_yield_ttm'
+];
+
 let previewOpen = false;
 let observerStarted = false;
+let debugState = { status: 'Chưa lấy clipboard debug.', rawRow: [], parsedRow: null, result: null, error: null };
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -85,6 +98,88 @@ function displayValue(row, key) {
     return Number.isFinite(value) ? value.toLocaleString('vi-VN', { maximumFractionDigits: 4 }) : '—';
   }
   return String(value);
+}
+
+function splitDebugMarkdownRow(line) {
+  const trimmed = String(line || '').trim();
+  if (!trimmed.startsWith('|')) return [];
+  const body = trimmed.slice(1).endsWith('|') ? trimmed.slice(1, -1) : trimmed.slice(1);
+  return body.split('|').map(cell => cell.trim());
+}
+
+function findFirstDebugDataRow(text) {
+  const rows = String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const tableRows = rows.filter(line => /^\s*\|/.test(line) && line.includes('|')).map(splitDebugMarkdownRow);
+  for (let index = 0; index < tableRows.length - 1; index += 1) {
+    const row = tableRows[index];
+    const separator = row.length > 0 && row.every(cell => /^\s*:?-{1,}:?\s*$/.test(cell) || cell === '');
+    if (!separator) continue;
+    for (let next = index + 1; next < tableRows.length; next += 1) {
+      const candidate = tableRows[next];
+      if (candidate.every(cell => /^\s*:?-{1,}:?\s*$/.test(cell) || cell === '')) continue;
+      if (candidate.length && candidate[0]) return candidate;
+    }
+  }
+  return [];
+}
+
+async function captureDebug() {
+  debugState = { status: 'Đang đọc clipboard…', rawRow: [], parsedRow: null, result: null, error: null };
+  renderPreview();
+  try {
+    if (!navigator.clipboard?.readText) throw new Error('Trình duyệt không hỗ trợ đọc Clipboard.');
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) throw new Error('Clipboard đang trống.');
+    const rawRow = findFirstDebugDataRow(text);
+    const result = parseTradingViewPaste(text);
+    debugState = {
+      status: rawRow.length ? `Đã đọc clipboard · ${rawRow.length} cells ở dòng mẫu đầu tiên` : 'Không tìm thấy dòng Markdown data.',
+      rawRow,
+      parsedRow: result.rows?.[0] || null,
+      result,
+      error: null
+    };
+  } catch (error) {
+    debugState = { status: 'Debug lỗi', rawRow: [], parsedRow: null, result: null, error: error?.message || String(error) };
+  }
+  renderPreview();
+}
+
+function renderDebugPanel() {
+  const result = debugState.result;
+  const parsed = debugState.parsedRow;
+  const cells = debugState.rawRow || [];
+  const mode = result?.mode || result?.columns?.mode || '—';
+  const rowCount = result?.rows?.length ?? '—';
+  const expected = DEBUG_COLUMNS.length;
+  const countClass = cells.length === expected ? 'debug-ok' : 'debug-warn';
+
+  const rows = DEBUG_COLUMNS.map((field, index) => {
+    const raw = cells[index] ?? '∅';
+    const parsedKey = field === 'symbol' ? 'ticker + company_name' : field === 'ui_marker' ? 'ignored' : field;
+    let parsedValue = '—';
+    if (parsed) {
+      if (field === 'symbol') parsedValue = `ticker=${parsed.ticker ?? '—'} · company=${parsed.company_name ?? '—'}`;
+      else if (field === 'ui_marker') parsedValue = 'ignored';
+      else parsedValue = displayValue(parsed, field);
+    }
+    return `<tr><td>${index}</td><td>${escapeHtml(field)}</td><td>${escapeHtml(raw)}</td><td>${escapeHtml(parsedKey)}</td><td>${escapeHtml(parsedValue)}</td></tr>`;
+  }).join('');
+
+  return `<section class="mapping-debug-panel">
+    <div class="mapping-debug-head">
+      <div><p class="eyebrow">PARSER DEBUG</p><h2>Raw Clipboard → Parser → Internal</h2><p class="muted">Debug chỉ đọc mẫu dòng đầu tiên để xác định chính xác parser đang nhận bao nhiêu cell và map từng vị trí như thế nào.</p></div>
+      <button class="btn" id="mappingDebugRefresh">Đọc lại Clipboard</button>
+    </div>
+    <div class="mapping-debug-summary">
+      <div><span>Mode</span><strong>${escapeHtml(mode)}</strong></div>
+      <div><span>Parsed rows</span><strong>${escapeHtml(String(rowCount))}</strong></div>
+      <div><span>Raw cells</span><strong class="${countClass}">${cells.length} / ${expected}</strong></div>
+      <div><span>Status</span><strong>${escapeHtml(debugState.status)}</strong></div>
+    </div>
+    ${debugState.error ? `<div class="mapping-debug-error">${escapeHtml(debugState.error)}</div>` : ''}
+    <div class="mapping-debug-table-wrap"><table class="mapping-debug-table"><thead><tr><th>#</th><th>Parser position</th><th>Raw cell</th><th>Expected mapping</th><th>Parsed value</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </section>`;
 }
 
 function renderPreview() {
@@ -120,7 +215,11 @@ function renderPreview() {
         </tr>`).join('')}
       </tbody>
     </table></div>` : `<div class="mapping-empty"><strong>Chưa có dữ liệu.</strong><span>Vào Screen → Import &amp; Screen trước, sau đó mở lại tab Mapping.</span></div>`}
+    ${renderDebugPanel()}
   </section>`;
+
+  const debugButton = document.getElementById('mappingDebugRefresh');
+  if (debugButton) debugButton.addEventListener('click', captureDebug);
 }
 
 function activateTab() {
