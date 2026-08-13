@@ -1,30 +1,35 @@
 import { field, setResult, MISSING_SHORT } from './render-common.js';
 
 export function renderNode6B(ctx) {
-  const outputs = ctx.outputs;
-  setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker });
+  const outputs = ctx.outputs || {};
+  setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker, sectorType: ctx.sectorType });
 
   const isScreened = ctx.mode === 'SCREENED';
+  const n1 = outputs.node1 || {};
+  const n2 = outputs.node2 || {};
+  const n3 = outputs.node3 || {};
+  const n4 = outputs.node4 || {};
+  const n5 = outputs.node5 || {};
   const md = [];
-  const ticker = ctx.ticker;
+  const ticker = ctx.ticker || n1.ticker || MISSING_SHORT;
 
-  md.push(`# BÁO CÁO PHÂN TÍCH ${ticker}`);
+  md.push(`# BÁO CÁO PHÂN TÍCH ${ticker} — ${field('node1.company_name')}`);
   md.push(`Cập nhật: ${field('date')} · Kỳ dữ liệu: ${field('node1.data_period')} · Chế độ: ${ctx.mode}`);
   md.push('');
 
   md.push('## 1. Quyết định đầu tư');
   md.push(`- **Khuyến nghị:** ${field('node5.decision')}`);
   md.push(`- **AI Score:** ${field('node5.ai_score.value')}/100 — công thức: ${field('node5.ai_score.formula_shown')}`.replace(/\s+/g, ' '));
-  md.push(`- **Độ tin cậy:** ${field('node5.confidence.value')}% (thành phần: data completeness ${field('node5.confidence.components.data_completeness')}%, source quality ${field('node5.confidence.components.source_quality')}%, cross-source ${field('node5.confidence.components.cross_source_agreement')}%, fundamental consistency ${field('node5.confidence.components.fundamental_consistency')}%, technical confirmation ${field('node5.confidence.components.technical_confirmation')}%, macro clarity ${field('node5.confidence.components.macro_clarity')}%)`);
-  md.push(`- **Động lực chính:** ${(outputs.node5?.drivers || []).join('; ') || MISSING_SHORT}`);
+  md.push(`- **Độ tin cậy:** ${field('node5.confidence.value')}% (thành phần: data completeness ${field('node5.confidence.components.data_completeness')}%, source quality ${field('node5.confidence.components.source_quality')}%, cross-source agreement ${field('node5.confidence.components.cross_source_agreement')}%, fundamental consistency ${field('node5.confidence.components.fundamental_consistency')}%, technical confirmation ${field('node5.confidence.components.technical_confirmation')}%, macro clarity ${field('node5.confidence.components.macro_clarity')}%)`);
+  md.push(`- **Động lực chính:** ${drivers(n5.drivers)}`);
   md.push(`- **Điều kiện vô hiệu hóa luận điểm (fundamental):** ${field('node5.thesis_invalidation')}`);
-  md.push(`- **Ngưỡng cắt lỗ kỹ thuật (trading stop, KHÁC trên):** ${field('node5.trading_stop.price')} — ${field('node5.trading_stop.basis')}`);
+  md.push(`- **Ngưỡng cắt lỗ kỹ thuật (technical, KHÁC với trên):** ${field('node5.trading_stop.price')} — ${field('node5.trading_stop.basis')}`);
   md.push('');
 
   if (isScreened) {
-    const s = outputs.node1?.screening_summary || {};
+    const s = n1.screening_summary || {};
     md.push('## 2. Screening Snapshot');
-    md.push(`> Nguồn: StockScreener (dữ liệu TradingView do người dùng nhập) — bối cảnh ban đầu, KHÔNG phải điểm số CRSM.`);
+    md.push('> Nguồn: StockScreener (dữ liệu người dùng nhập từ TradingView) — đây là bối cảnh sàng lọc ban đầu, KHÔNG phải điểm số của CRSM.');
     md.push('');
     md.push('| Score | Rank | Grade | Quality | Growth | Valuation | Momentum | Mispricing |');
     md.push('|---|---|---|---|---|---|---|---|');
@@ -34,92 +39,86 @@ export function renderNode6B(ctx) {
     md.push('');
   }
 
-  md.push(`## ${isScreened ? 3 : 2}. Tín hiệu tổng hợp (Conflict Detector)`);
-  const cd = outputs.node5?.conflict_detector;
+  const base = isScreened ? 3 : 2;
+  md.push(`## ${base}. Tín hiệu tổng hợp (Conflict Detector)`);
+  const cd = n5.conflict_detector || {};
   md.push('| Cơ bản | Kỹ thuật | Vĩ mô | Thanh khoản | Đồng thuận |');
   md.push('|---|---|---|---|---|');
-  md.push(`| ${cell(cd?.fundamental)} | ${cell(cd?.technical)} | ${cell(cd?.macro)} | ${cell(cd?.liquidity)} | ${cell(cd?.signal_alignment)} |`);
+  md.push(`| ${cell(cd.fundamental)} | ${cell(cd.technical)} | ${cell(cd.macro)} | ${cell(cd.liquidity)} | ${cell(cd.signal_alignment ?? cd.alignment)} |`);
   md.push('');
   md.push(`- **Catalyst gần nhất:** ${field('node5.catalyst_horizon.nearest_catalyst')} (khung: ${field('node5.catalyst_horizon.bucket')})`);
   md.push('');
 
-  md.push(`## ${isScreened ? 4 : 3}. Vĩ mô & Ngành`);
+  md.push(`## ${base + 1}. Vĩ mô & Ngành`);
   md.push(`- Chế độ rủi ro: ${field('node4.risk_regime')}`);
   md.push(`- FED: ${field('node4.macro_indicators.fed_rate.value')} | USD/VND: ${field('node4.macro_indicators.usd_vnd.value')} | Dầu Brent: ${field('node4.macro_indicators.oil_brent.value')} | Lạm phát Mỹ: ${field('node4.macro_indicators.us_inflation.value')}`);
-  md.push(`- Ngành so với benchmark: ${field('node2.sector_vs_market.sector_perf_pct')} vs VN-Index ${field('node2.sector_vs_market.vnindex_perf_pct')} — ${field('node2.sector_vs_market.sector_strength_label')}`);
+  md.push('- Biến số nhạy cảm riêng của doanh nghiệp:');
+  renderSensitivity(md, n4.sensitivity_table);
+  md.push(`- Ngành vs benchmark (${field('node2.sector_vs_market.benchmark_method')}): ${field('node2.sector_vs_market.sector_perf_pct')} vs ${field('node2.sector_vs_market.benchmark_name', 'VN-Index')} ${field('node2.sector_vs_market.vnindex_perf_pct')} — ${field('node2.sector_vs_market.sector_strength_label')}`);
   md.push(`- Nhận định: ${field('node4.macro_view')}`);
   md.push('');
 
-  md.push(`## ${isScreened ? 5 : 4}. Doanh nghiệp & Chất lượng lợi nhuận`);
+  md.push(`## ${base + 2}. Doanh nghiệp & Chất lượng lợi nhuận`);
   md.push(`- Doanh thu: ${field('node1.financial_core_raw.revenue.value')} (${field('node1.financial_core_raw.revenue.period')}, ${field('node1.financial_core_raw.revenue.yoy')})`);
   md.push(`- Lợi nhuận sau thuế: ${field('node1.financial_core_raw.npat.value')} (${field('node1.financial_core_raw.npat.yoy')})`);
   md.push(`- **Chất lượng lợi nhuận:** CFO/NPAT = ${field('node3.earnings_quality.cfo_over_npat')} | FCF/NPAT = ${field('node3.earnings_quality.fcf_over_npat')} | Accrual Ratio = ${field('node3.earnings_quality.accrual_ratio')}`);
-  md.push(`- Cờ đỏ: ${(outputs.node3?.earnings_quality?.red_flags || []).join(', ') || 'Không phát hiện bất thường'}`);
-  if (isScreened && Array.isArray(outputs.node3?.screening_flags) && outputs.node3.screening_flags.length) {
-    md.push('  - Screening triggers đã điều tra: ' + outputs.node3.screening_flags.map(f => `**${f.flag}** (${f.severity}): ${f.observation} — ${f.answer || 'Chưa có dữ liệu'}`).join('; '));
+  md.push(`- Cờ đỏ (nếu có): ${listOrMissing(n3.earnings_quality?.red_flags, 'Không phát hiện bất thường')}`);
+  if (isScreened) {
+    md.push('- Screening triggers đã điều tra:');
+    renderScreeningFlags(md, n3.screening_flags);
   }
-  md.push(`- Phân loại tăng trưởng: ${field('node3.earnings_sustainability.classification')} — ${field('node3.earnings_sustainability.reasoning')}`);
+  md.push(`- **Phân loại tăng trưởng:** ${field('node3.earnings_sustainability.classification')} — ${field('node3.earnings_sustainability.reasoning')}`);
   md.push(`- Lợi thế cạnh tranh: ${field('node3.moat')}`);
   md.push(`- F-Score: ${field('node3.f_score')} | M-Score: ${field('node3.m_score')} (${field('node3.m_score_note')})`);
-  md.push(`- WACC: ${field('node3.capital_efficiency.wacc.value')} (${field('node3.capital_efficiency.wacc.formula_note')}) | ROIC: ${field('node3.capital_efficiency.roic.value')} | Kinh tế biên: ${field('node3.capital_efficiency.economic_spread')}`);
+  md.push(`- WACC: ${field('node3.capital_efficiency.wacc.value')} (công thức: ${field('node3.capital_efficiency.wacc.formula_note')}) | ROIC: ${field('node3.capital_efficiency.roic.value')} | Kinh tế biên: ${field('node3.capital_efficiency.economic_spread')}`);
   md.push('');
 
-  md.push(`## ${isScreened ? 6 : 5}. Định giá & So sánh ngành`);
-  md.push(`- P/E (TTM): ${field('node1.valuation_multiples.pe_ttm')} | P/B: ${field('node1.valuation_multiples.pb_current')}`);
+  md.push(`## ${base + 3}. Định giá & So sánh ngành`);
+  md.push(`- P/E (TTM): ${field('node1.valuation_multiples.pe_ttm')} | P/E trung bình peer: ${peerAverage(n3)}`);
+  md.push(`- P/B: ${field('node1.valuation_multiples.pb_current')} — ${field('node1.valuation_multiples.pb_description')}`);
   md.push(`- DCF Fair Value: ${field('node3.valuation.dcf_fair_value')}`);
-  md.push(`- **Reverse DCF:** giá hiện tại ngầm định FCF CAGR ${field('node3.valuation.reverse_dcf_implied_fcf_cagr')} — ${field('node3.valuation.reverse_dcf_commentary')}`);
-  const peers = outputs.node3?.valuation?.peer_list || [];
-  if (peers.length) {
-    md.push('- Danh sách peer:');
-    md.push('  | Mã | P/E | P/B | ROE | Lý do chọn |');
-    md.push('  |---|---|---|---|---|');
-    peers.forEach(p => md.push(`  | ${cell(p.ticker)} | ${cell(p.pe)} | ${cell(p.pb)} | ${cell(p.roe)} | ${cell(p.peer_selection_reason)} |`));
-  }
+  md.push(`- **Reverse DCF:** giá hiện tại ngầm định FCF CAGR ~${field('node3.valuation.reverse_dcf_implied_fcf_cagr')} — ${field('node3.valuation.reverse_dcf_commentary')}`);
+  md.push('- Danh sách peer (lý do chọn từng mã):');
+  renderPeers(md, n3.valuation?.peer_list || n3.peer_list);
   md.push('');
 
-  md.push(`## ${isScreened ? 7 : 6}. Kỹ thuật & Dòng tiền`);
-  md.push(`- Nguồn: ${field('node2.ohlcv_source.source')} (${field('node2.ohlcv_source.sessions_used')} phiên)`);
-  md.push(`- Xu hướng: ${field('node2.trend_status')} | ${field('node2.sma_200_rel')}`);
-  md.push(`- Khối lượng: ${field('node2.volume_analysis.ratio')} — ${field('node2.volume_analysis.classification')} — ${field('node2.volume_analysis.vsa_signal_candidate')} (chỉ là candidate)`);
-  md.push(`- Giai đoạn: ${field('node2.smart_money_phase')} (vùng ${field('node2.zones.demand')})`);
-  if (isScreened) {
-    md.push(`- Đối chiếu momentum screening: ${field('node2.screening_signal_analysis.momentum_signal.status')} — ${field('node2.screening_signal_analysis.momentum_signal.evidence')}`);
-  }
+  md.push(`## ${base + 4}. Kỹ thuật & Dòng tiền`);
+  md.push(`- Nguồn dữ liệu giá: ${field('node2.ohlcv_source.source')} (${field('node2.ohlcv_source.sessions_used')} phiên, ${field('node2.ohlcv_source.date_range')})`);
+  md.push(`- Xu hướng: ${field('node2.trend_status')} | So với SMA200: ${field('node2.sma_200_rel')}`);
+  md.push(`- Khối lượng: ${field('node2.volume_analysis.ratio')} — phân loại: ${field('node2.volume_analysis.classification')} (chỉ là "candidate", không khẳng định dòng tiền lớn nếu chưa có bằng chứng)`);
+  md.push(`- Giai đoạn: ${field('node2.smart_money_phase')} tại vùng ${field('node2.zones.demand')} — ${field('node2.smart_money_insight')}`);
+  if (isScreened) md.push(`- Đối chiếu momentum screening — trạng thái ${field('node2.screening_signal_analysis.momentum_signal.status')}, bằng chứng: ${field('node2.screening_signal_analysis.momentum_signal.evidence')}`);
   md.push('');
 
-  md.push(`## ${isScreened ? 8 : 7}. Rủi ro`);
+  md.push(`## ${base + 5}. Rủi ro`);
   md.push(`- Doanh nghiệp: ${field('node1.market_data.liquidity_flag')}`);
   md.push(`- Vĩ mô: ${field('node4.risk_regime')}`);
-  md.push(`- Thanh khoản: ${field('node5.liquidity_note') === MISSING_SHORT ? 'Thanh khoản bình thường' : field('node5.liquidity_note')}`);
+  const liquidity = field('node5.liquidity_note');
+  md.push(`- Thanh khoản: ${liquidity === MISSING_SHORT ? 'Thanh khoản bình thường' : liquidity}`);
   md.push('');
 
-  md.push(`## ${isScreened ? 9 : 8}. Phân tích nhân quả`);
+  md.push(`## ${base + 6}. Phân tích nhân quả (tách FACT / INFERENCE / ASSUMPTION)`);
   md.push(`- **Fact:** ${field('node4.causal_chains.0.facts')}`);
   md.push(`- **Suy luận (Inference):** ${field('node4.causal_chains.0.inferences')} — độ tin cậy: ${field('node4.causal_chains.0.inference_confidence')}`);
   md.push(`- **Giả định (Assumption):** ${field('node4.causal_chains.0.assumptions')}`);
   md.push(`- Tóm tắt chuỗi: ${field('node4.causal_chains.0.chain_summary')}`);
   md.push('');
 
-  md.push(`## ${isScreened ? 10 : 9}. Kịch bản`);
-  const scenarios = outputs.node4?.risk_scenarios || [];
-  if (scenarios.length) {
-    md.push('| Kịch bản | Xác suất | Điều kiện |');
-    md.push('|---|---|---|');
-    scenarios.forEach(s => md.push(`| ${cell(s.case)} | ${cell(s.probability_pct)}% | ${cell(s.condition)} |`));
-    md.push('');
-  }
+  md.push(`## ${base + 7}. Kịch bản`);
+  renderScenarios(md, n4.risk_scenarios);
+  md.push('');
 
-  md.push(`## ${isScreened ? 11 : 10}. Chiến lược giao dịch & Quản trị vị thế`);
+  md.push(`## ${base + 8}. Chiến lược giao dịch & Quản trị vị thế`);
   md.push(`- Vùng mua: ${field('node5.strategy.entry_zone')} — ${field('node5.strategy.allocation_plan')}`);
-  md.push(`- Cắt lỗ kỹ thuật: ${field('node5.trading_stop.price')} (${field('node5.trading_stop.basis')})`);
-  md.push(`- Mục tiêu 1: ${field('node5.strategy.tp1')} | Mục tiêu 2: ${field('node5.strategy.tp2')}`);
+  md.push(`- Cắt lỗ kỹ thuật (Trading Stop): ${field('node5.trading_stop.price')} (${field('node5.trading_stop.basis')})`);
+  md.push(`- Mục tiêu 1: ${field('node5.strategy.tp1')} (${field('node5.strategy.tp1_desc')}) | Mục tiêu 2: ${field('node5.strategy.tp2')} (${field('node5.strategy.tp2_desc')})`);
+  md.push(`- Lộ trình giải ngân: ${allocationSteps(n5.strategy?.allocation_plan)}`);
   md.push(`- **Quản trị vị thế:** Rủi ro/lệnh = ${field('node5.strategy.risk_per_trade_pct_nav')} NAV | Tỷ trọng tối đa = ${field('node5.strategy.max_portfolio_weight_pct')} | Loại vị thế: ${field('node5.strategy.position_type')}`);
   md.push('');
 
-  const sources = outputs.node1?.sources || [];
-  md.push(`## ${isScreened ? 12 : 11}. Nguồn dữ liệu`);
+  md.push(`## ${base + 9}. Nguồn dữ liệu`);
   if (isScreened) md.push('- StockScreener (dữ liệu TradingView do người dùng nhập)');
-  sources.forEach(s => md.push(`- ${cell(s.name)} — ${cell(s.date)} — ${cell(s.url_or_ref)}`));
+  renderSources(md, n1.sources);
   md.push('');
   md.push('---');
   md.push(`*Báo cáo tự động, chỉ dùng tham khảo cá nhân — ${field('date')}.*`);
@@ -129,6 +128,99 @@ export function renderNode6B(ctx) {
 }
 
 function cell(value) {
-  if (value == null || value === '') return 'Chưa có dữ liệu';
+  if (value == null || value === '') return MISSING_SHORT;
   return String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+}
+
+function drivers(value) {
+  if (!Array.isArray(value) || value.length === 0) return MISSING_SHORT;
+  return value.slice(0, 3).map(cell).join('; ');
+}
+
+function listOrMissing(value, fallback = MISSING_SHORT) {
+  if (!Array.isArray(value) || value.length === 0) return fallback;
+  return value.map(cell).join('; ');
+}
+
+function renderSensitivity(md, table) {
+  md.push('| Biến số | Độ nhạy | Chiều tác động | Độ tin cậy |');
+  md.push('|---|---|---|---|');
+  if (!Array.isArray(table) || table.length === 0) {
+    md.push(`| ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} |`);
+    return;
+  }
+  table.forEach(x => md.push(`| ${cell(x.variable ?? x.name ?? x.factor)} | ${cell(x.sensitivity)} | ${cell(x.direction ?? x.impact ?? x.direction_of_impact)} | ${cell(x.confidence)} |`));
+}
+
+function renderScreeningFlags(md, flags) {
+  if (!Array.isArray(flags) || flags.length === 0) {
+    md.push(`  - ${MISSING_SHORT}`);
+    return;
+  }
+  md.push('  | Cờ | Mức độ | Quan sát | Câu hỏi điều tra | Câu trả lời |');
+  md.push('  |---|---|---|---|---|');
+  flags.forEach(f => md.push(`  | ${cell(f.flag)} | ${cell(f.severity)} | ${cell(f.observation)} | ${cell(f.question ?? f.investigation_question)} | ${cell(f.answer)} |`));
+}
+
+function peerAverage(n3) {
+  const v = n3.valuation?.pe_peer_avg ?? n3.valuation?.peer_pe_avg ?? n3.pe_peer_avg;
+  if (v != null && v !== '') return cell(v);
+  const peers = n3.valuation?.peer_list || n3.peer_list || [];
+  if (!Array.isArray(peers) || peers.length === 0) return MISSING_SHORT;
+  const nums = peers.map(p => Number(p.pe)).filter(Number.isFinite);
+  return nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2) : MISSING_SHORT;
+}
+
+function renderPeers(md, peers) {
+  md.push('| Mã | P/E | P/B | ROE | Ngày | Lý do chọn peer |');
+  md.push('|---|---|---|---|---|---|');
+  if (!Array.isArray(peers) || peers.length === 0) {
+    md.push(`| ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} | ${MISSING_SHORT} |`);
+    return;
+  }
+  peers.forEach(p => md.push(`| ${cell(p.ticker)} | ${cell(p.pe)} | ${cell(p.pb)} | ${cell(p.roe)} | ${cell(p.date ?? p.as_of_date)} | ${cell(p.peer_selection_reason ?? p.reason)} |`));
+}
+
+function renderScenarios(md, scenarios) {
+  const s = scenarios || {};
+  const rows = [
+    ['Bull', s.bull || s.BULL || {}],
+    ['Base', s.base || s.BASE || {}],
+    ['Bear', s.bear || s.BEAR || {}]
+  ];
+  md.push('| Kịch bản | Xác suất | Điều kiện | Giá mục tiêu |');
+  md.push('|---|---|---|---|');
+  rows.forEach(([name, x]) => {
+    const probability = x.probability_pct ?? x.probability;
+    const target = x.target_price ?? x.price_target ?? x.price;
+    const probabilityText = probability == null || probability === '' ? MISSING_SHORT : `${cell(probability)}%`;
+    md.push(`| ${name} | ${probabilityText} | ${cell(x.condition)} | ${cell(target)} |`);
+  });
+}
+
+function allocationSteps(plan) {
+  if (Array.isArray(plan)) {
+    const steps = plan.slice(0, 3).map(cell);
+    while (steps.length < 3) steps.push(MISSING_SHORT);
+    return `(1) ${steps[0]}  (2) ${steps[1]}  (3) ${steps[2]}`;
+  }
+  if (plan && typeof plan === 'object') {
+    const steps = [plan.step1 ?? plan[0], plan.step2 ?? plan[1], plan.step3 ?? plan[2]].map(cell);
+    return `(1) ${steps[0]}  (2) ${steps[1]}  (3) ${steps[2]}`;
+  }
+  if (typeof plan === 'string' && plan.trim()) {
+    const parts = plan.split(/\s*\(\s*[123]\s*\)\s*/).filter(Boolean).map(x => x.trim());
+    const steps = parts.slice(0, 3);
+    while (steps.length < 3) steps.push(MISSING_SHORT);
+    return `(1) ${steps[0]}  (2) ${steps[1]}  (3) ${steps[2]}`;
+  }
+  return `(1) ${MISSING_SHORT}  (2) ${MISSING_SHORT}  (3) ${MISSING_SHORT}`;
+}
+
+function renderSources(md, sources) {
+  if (!Array.isArray(sources) || sources.length === 0) {
+    md.push(`- ${MISSING_SHORT}`);
+    return;
+  }
+  sources.forEach(s => md.push(`- ${cell(s.name)} — ${cell(s.date)} — ${cell(s.note ?? s.url_or_ref)}`));
 }
