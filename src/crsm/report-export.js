@@ -15,7 +15,7 @@ export async function downloadReportImage(reportHtml, ticker) {
     const source = await prepareReportForImage(reportHtml, ticker);
     const width = Math.min(1800, Math.max(1100, source.width));
     const height = Math.min(40000, Math.max(600, source.height));
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><xhtml:body xmlns:xhtml="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden"><xhtml:div style="width:${width}px;min-height:${height}px;background:#fff">${source.body}</xhtml:div></xhtml:body></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject x="0" y="0" width="${width}" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden">${source.body}</div></foreignObject></svg>`;
     const image = await blobToImage(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
     const canvas = document.createElement('canvas');
     canvas.width = width;
