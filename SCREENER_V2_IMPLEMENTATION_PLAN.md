@@ -1,287 +1,339 @@
-# Screener V2 — Implementation Plan
+# Screener V2.1 — Implementation Plan
 
 ## Purpose
 
-Redesign the Screener for the new StockMind architecture:
+Redesign the StockMind Screener around the **current TradingView dataset**, rather than adapting the old scoring formulas to new fields.
 
-**TradingView → Screener → CRSM**
+Target architecture:
 
-The Screener is a preliminary candidate selector. It still needs a score to distinguish stronger and weaker businesses, but it must not try to replace CRSM's deep research.
+```text
+TradingView
+    ↓
+Import / Parser
+    ↓
+Data Mapping & Normalization
+    ↓
+Screener Evaluation
+    ↓
+Ranking / Classification
+    ↓
+Dashboard / Candidate Gate
+    ↓
+CRSM SCREENED
+    ↓
+Node 1
+```
 
-> **Important:** This document is a plan only. No implementation is specified until a real TradingView export is available and the input mapping has been validated.
+The Screener remains a **preliminary evaluation and candidate-selection layer**. It does not replace CRSM deep research.
+
+> **This document is a plan only. No Screener implementation should begin until the current TradingView export, data mapping, evaluation model and Node 1 JSON contract have been reviewed and approved.**
 
 ---
 
-## 1. Data Contract
+## 1. Scope of This Refactor
 
-### 1.1 TradingView Filter
+The current TradingView dataset has changed enough that the existing Screener formulas and field assumptions are no longer considered authoritative.
 
-Use TradingView only to remove clearly weak businesses and stocks with insufficient liquidity.
+This phase therefore includes three linked redesigns:
 
-Initial filter candidates:
+1. **Data mapping** — map the current TradingView export into a clean internal schema.
+2. **Evaluation method** — redesign the way stocks are filtered, evaluated, scored and classified.
+3. **Screener → Node 1 contract** — redesign the JSON context sent to CRSM/Node 1 so it reflects the new Screener logic.
 
-- Average Volume — minimum liquidity threshold
-- Current Volume — minimum liquidity threshold
-- ROE
-- ROIC
-- Debt/Equity
-- Revenue Growth YoY
-- EPS Growth YoY
-- P/E
+The existing parser/scoring implementation is reference material only and must not be treated as the target design.
 
-Performance and detailed volume behavior are **not hard filters**.
+---
 
-### 1.2 TradingView Data
+## 2. Phase A — TradingView Data Contract
 
-Export as much useful data as TradingView actually provides, without assuming fields that may not exist.
+### A1. Audit current export
 
-Potential groups:
+Identify the actual fields available in the current TradingView Screener table.
 
-- Ticker / Company
-- Sector / Industry
-- Price
-- Performance by available periods
-- Volume
-- Average Volume and available period variants
-- Relative Volume, if available
-- Fundamentals
-- Growth
-- Margins
-- Balance sheet
-- Cash flow
+### A2. Field classification
+
+Classify each field as:
+
+- Raw data
+- Normalized data
+- Evaluation input
+- Context/evidence only
+- Unused
+
+### A3. Mapping
+
+Define:
+
+**TradingView field → internal field → type → unit → intended use → notes**
+
+Validate names, periods, units, signs and missing-value behavior.
+
+### A4. Normalization
+
+Create a deterministic normalized representation that:
+
+- preserves source evidence
+- distinguishes missing from zero
+- preserves negative values
+- preserves period/as-of information
+- does not invent unavailable data
+
+### A5. Data quality contract
+
+Define how missing, invalid, stale or ambiguous fields are represented and exposed to later stages.
+
+**STOP CONDITION:** Do not design final scoring formulas until the real dataset and mapping are approved.
+
+---
+
+## 3. Phase B — Screener Evaluation Redesign
+
+The old scoring model is not assumed to remain valid.
+
+### B1. Define evaluation dimensions
+
+Design the new evaluation framework from the meaning of the available data, rather than from the old field names.
+
+Potential dimensions include:
+
+- Business quality
+- Growth quality
+- Financial strength
 - Valuation
-- Earnings / revenue surprise
+- Market expression
+- Data quality / confidence
 
-The final field list must be based on a real TradingView export.
+The final dimensions must be determined from the actual dataset.
 
----
+### B2. Define metric roles
 
-## 2. Data Mapping
+For each available metric, decide whether it is:
 
-After obtaining a real TradingView export, create a complete mapping:
+- a hard filter
+- a scoring input
+- a signal/anomaly detector
+- contextual evidence
+- unused
 
-**TradingView field → internal field → type → intended use → notes**
+A metric must not be included merely because the old Screener used it.
 
-Validate:
+### B3. Redesign filtering
 
-- field names
-- units and percentage representation
-- positive/negative values
-- `N/A`, `-`, blank and other missing-value forms
-- numeric vs text values
-- currency/unit differences
-- duplicate or ambiguous fields
-- period definitions
+Filtering should remove clearly unsuitable or insufficiently liquid candidates, not aggressively select winners.
 
-Do **not** finalize formulas before this mapping is validated.
+Current Volume must not automatically become a strong hard filter merely because a previous configuration used a threshold such as 30K.
 
----
+Price performance and volume behavior should normally remain evaluation/evidence rather than hard filters unless the validated strategy explicitly requires otherwise.
 
-## 3. Data Normalization
+### B4. Redesign scoring
 
-Normalize the real TradingView input into a stable internal representation.
+Define:
 
-Requirements:
+- normalization method
+- industry-relative treatment where appropriate
+- component scores
+- missing-data handling
+- weighting
+- final score
+- confidence/data-coverage treatment
 
-- preserve original evidence where useful
-- distinguish missing from zero
-- avoid invented replacement values
-- preserve negative values correctly
-- preserve source period information
-- make normalization deterministic
+Do not preserve the existing `50% / 25% / 25%` weighting unless the redesigned evaluation proves it remains appropriate.
 
-No synthetic historical price or volume data should be created from a snapshot.
+### B5. Redesign signals
 
----
+Create explicit screening signals for meaningful patterns, for example:
 
-## 4. Screener Score
+- strong business
+- attractive valuation
+- market underperformance
+- growth divergence
+- leverage concern
+- abnormal valuation
+- insufficient data
 
-The Screener keeps a score, but the score is deliberately simpler than the previous strategy.
+Signals are explanatory evidence and verification prompts, not automatically score penalties.
 
-### 4.1 Business Quality
+### B6. Redesign classification
 
-Candidate inputs:
+Define the conditions for the main Dashboard groups, including the concept of:
 
-- ROE
-- ROIC
-- Revenue Growth
-- EPS Growth
-- Debt/Equity
+- Good / View Now / Potential Buy
+- Good / Undervalued / Underperform
+- Other / Not selected
 
-Purpose:
+Classification must follow the new evaluation model.
 
-> Is this business preliminarily good or weak?
+### B7. Ranking validation
 
-### 4.2 Valuation
+Validate the new evaluation against the real dataset:
 
-Candidate inputs:
+- distribution of scores
+- top candidates
+- sector/industry concentration
+- missing-data effects
+- sensitivity to individual metrics
+- behavior of underperforming but high-quality stocks
 
-- P/E
-- PEG
-- P/B or other valuation fields only if the real input supports them reliably
-
-Purpose:
-
-> Is the current valuation worth attention?
-
-### 4.3 Market Expression
-
-Candidate inputs:
-
-- Performance 1M
-- Performance 3M
-- Performance 6M
-- Performance 1Y
-- available volume evidence
-
-Purpose:
-
-> How is the market currently behaving around the stock?
-
-Volume should be treated as evidence for market behavior, not as a business-quality measure. If only limited volume data is available, do not manufacture additional periods.
-
-### 4.4 Final Screening Score
-
-The final score combines the three components:
-
-- Business Quality
-- Valuation
-- Market Expression
-
-Exact normalization, weighting and handling of missing metrics must be determined **after inspecting real TradingView data**.
-
-The Screener score is a ranking aid, not an investment decision.
+**STOP CONDITION:** Do not implement the final scoring engine until the evaluation framework and ranking behavior are approved.
 
 ---
 
-## 5. Flags
+## 4. Phase C — Screener Result Contract
 
-Missing or unusual data must remain visible rather than being silently replaced.
+The Screener result must contain more than a single final score.
 
-Candidate flags include:
+Conceptual result structure:
 
-- Missing fundamental data
-- Missing valuation data
-- Missing market data
-- EPS / Revenue divergence
-- Excessive leverage
-- Abnormal valuation
-- Insufficient data coverage
-- Other material data anomalies discovered during implementation
+```text
+Stock
+├── normalized/raw evidence
+├── evaluation
+│   ├── business
+│   ├── growth / financial strength (if adopted)
+│   ├── valuation
+│   ├── market
+│   └── overall
+├── signals
+├── data quality
+├── industry context
+└── screening conclusion
+```
 
-A flag does not automatically make a stock bad. It marks something that may require CRSM verification.
-
-Do not silently replace missing company metrics with industry medians in the Screener.
-
----
-
-## 6. Screener → CRSM Data Contract
-
-CRSM should receive both the derived screening information and the underlying TradingView evidence.
-
-Expected conceptual payload:
-
-- raw/normalized TradingView data
-- Business Score
-- Valuation Score
-- Market Score
-- Final Screening Score
-- Rank
-- preliminary classification
-- flags
-- data coverage / integrity information
-
-The Screener should not compress all evidence into scores only.
-
-### Node 1 role
-
-When a stock comes from the Screener, Node 1 should primarily:
-
-- verify missing information
-- investigate flagged or anomalous information
-- retrieve information not available from TradingView
-- obtain newer or authoritative information when necessary
-
-It should **not unnecessarily re-fetch data already supplied by TradingView**.
-
-### Manual check
-
-Manual ticker analysis remains supported. Without Screener data, Node 1 may need to collect and verify the required information from external sources before CRSM analysis.
+The result must remain explainable: downstream CRSM should be able to understand **why the stock was selected and what remains uncertain**.
 
 ---
 
-## 7. Dashboard Contract
+## 5. Phase D — Screener → CRSM / Node 1 JSON Redesign
 
-Dashboard is separate from Screener calculation.
+The existing Screening Context contract is based on the previous Screener model and must be redesigned together with the Screener.
 
-It will contain two ranking tables:
+The new contract should conceptually contain:
 
-### 7.1 Good — View Now / Potential Buy
+```text
+source / version / as-of
+stock identity
+raw or normalized TradingView evidence
+evaluation results
+component scores
+final score / rank / grade
+classification
+signals
+data quality / missing fields / warnings
+industry context
+screening conclusion
+Node 1 verification priorities
+```
 
-Stocks with strong preliminary business quality and favorable current market expression, ranked by Screening Score.
+### Node 1 purpose for SCREENED mode
 
-### 7.2 Good — Undervalued / Underperform
+Node 1 should use the Screener context to:
 
-Stocks with good preliminary business quality and attractive preliminary valuation signals but weak/underperforming market expression.
+- verify important data
+- investigate anomalies and signals
+- investigate missing information
+- retrieve information unavailable from TradingView
+- obtain newer or authoritative information where necessary
+- explain market behavior or valuation anomalies
 
-This table may be empty when no candidates meet the classification criteria.
+Node 1 should **not unnecessarily re-search quantitative data already supplied and current in the Screener context**.
 
-Flags remain attached to stocks and are not used to create a separate Dashboard ranking table.
+### Node 1 verification priorities
 
-Dashboard should show only a small set of key metrics per stock rather than the full Screener dataset.
+The Screener should be able to explicitly pass questions such as:
+
+- Why is a high-quality stock underperforming?
+- Is the valuation justified?
+- Is the reported growth sustainable?
+- What explains an important anomaly?
+- Which missing fields must be verified?
+
+### DIRECT mode
+
+Manual ticker analysis remains supported. Without a Screener context, Node 1 may collect the required information itself.
+
+**STOP CONDITION:** The new JSON contract must be approved before changing the Node 1 implementation/prompt.
 
 ---
 
-## 8. Validation With Real TradingView Data
+## 6. Phase E — Dashboard / Candidate Gate
 
-This phase must happen **before implementation**.
+After the evaluation model is stable:
 
-Use a real export from the newly designed TradingView table to validate:
+1. Update Dashboard classification/output.
+2. Preserve relevant signals and data-quality warnings.
+3. Keep the Dashboard concise; do not expose the entire raw dataset by default.
+4. Define the candidate gate for automatic CRSM handoff.
+5. Allow only selected/high-quality candidates to enter CRSM automatically when the gate is enabled.
 
-1. field availability
-2. field names and mapping
-3. units and formats
-4. missing-value behavior
-5. period definitions
-6. volume fields and units
-7. price/performance fields
-8. score inputs
-9. score behavior with missing metrics
-10. flag behavior
-11. ranking behavior
-12. Dashboard classification inputs
-13. Screener → CRSM payload completeness
-
-Only after this validation should the exact formulas, weights and implementation details be finalized.
+Candidate-gate design is downstream of the new ranking model and should not influence the core Screener formulas prematurely.
 
 ---
 
-## 9. Implementation
+## 7. Phase F — Implementation
 
-After the real-data validation is complete:
+Only after Phases A–E are approved:
 
-1. implement the normalized data contract
-2. implement metric mapping
-3. implement Business Quality scoring
-4. implement Valuation scoring
-5. implement Market Expression scoring
-6. implement final Screening Score and ranking
-7. implement flags and data coverage
-8. update Screener → CRSM payload
-9. update Dashboard classification/output
-10. add tests for the new strategy
+1. Update parser/data mapping.
+2. Update normalization.
+3. Implement the new filter layer.
+4. Implement the new evaluation engine.
+5. Implement signals and data-quality handling.
+6. Implement ranking and classification.
+7. Update Dashboard output.
+8. Redesign Screener → CRSM context construction.
+9. Update Node 1 input handling/prompt as required.
+10. Add regression tests for Screener and SCREENED handoff.
 
-No compatibility requirement with the old AppScript scoring strategy is imposed. The old implementation is reference material only where useful for understanding legacy fields or behavior.
+No code changes should be made during the planning/validation phases.
+
+---
+
+## 8. Validation / Acceptance
+
+Before considering the refactor complete:
+
+- [ ] Current TradingView export is fully mapped.
+- [ ] No unavailable TradingView field is assumed.
+- [ ] Missing values are handled explicitly.
+- [ ] Liquidity filtering does not unnecessarily destroy the candidate universe.
+- [ ] New evaluation dimensions are defined and justified.
+- [ ] New scoring/normalization behavior is validated on real data.
+- [ ] Ranking produces sensible candidates.
+- [ ] Underperforming high-quality candidates remain discoverable.
+- [ ] Signals explain important screening conditions.
+- [ ] Data quality is separate from business quality.
+- [ ] Dashboard classifications match the new evaluation model.
+- [ ] Screener result contract is complete and explainable.
+- [ ] Node 1 JSON contract matches the new Screener model.
+- [ ] SCREENED Node 1 does not unnecessarily duplicate Screener quantitative research.
+- [ ] DIRECT mode remains functional.
+- [ ] Existing CRSM functionality remains stable.
+
+---
+
+## 9. Explicit Non-Goals
+
+This Screener refactor does not include:
+
+- SSI / native market-data integration
+- rewriting CRSM architecture
+- changing CRSM provider/model routing
+- replacing TradingView in this phase
+- restoring legacy AppScript scoring compatibility
+- adding arbitrary metrics merely because they exist in older code
+
+`legacy/` remains reference material only.
 
 ---
 
 ## Guiding Principles
 
-- **Filter less, collect more.**
-- TradingView removes clearly weak / illiquid candidates and supplies hard-to-obtain market data.
-- The Screener scores candidates so stronger and weaker businesses can be ranked.
-- The Screener performs preliminary evaluation only.
-- Missing data is flagged, not invented.
-- Volume and price-performance data are evidence for CRSM, not automatically hard filters.
-- CRSM performs deep verification and investment analysis.
-- Manual ticker analysis remains available outside the Screener flow.
+- **Redesign for the current data, do not retrofit the old formula.**
+- **Map first, evaluate second, code third.**
+- **Filter less, evaluate better.**
+- Missing data is visible, never silently invented.
+- Data quality is separate from investment quality.
+- Scores must remain explainable.
+- Signals should tell CRSM what needs verification.
+- The Screener selects candidates; CRSM performs deep research and investment analysis.
+- The Screener → Node 1 JSON contract is part of the redesign, not an afterthought.
