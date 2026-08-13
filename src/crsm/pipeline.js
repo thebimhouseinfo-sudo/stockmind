@@ -9,6 +9,7 @@ import { node7 } from './nodes/node7.js';
 import { consumePendingUserEvidence, getPendingUserEvidence } from './user-evidence.js';
 import { buildExecutionStages } from './execution-policy.js';
 import { loadSettings } from './settings.js';
+import { crsmState, notifyCRSM } from './state.js';
 
 export const NODES = [
   ['userEvidence', prepareUserEvidence],
@@ -51,30 +52,77 @@ export async function runPipeline({
   const orderedIds = NODES.slice(startIndex).map(([id]) => id);
   const settings = loadSettings();
   const stages = buildRuntimeStages(orderedIds, settings, executionMode);
+  initRuntimeStageState(stages);
 
-  for (const stage of stages) {
+  for (let stageIndex = 0; stageIndex < stages.length; stageIndex += 1) {
+    const stage = stages[stageIndex];
+    markStageRunning(stageIndex, stage);
+
     const result = stage.length === 1
       ? await runNode(stage[0], ctx, { onNodeStart, onNodeDone, onNodeError })
       : await runStage(stage, ctx, { onNodeStart, onNodeDone, onNodeError });
 
-    if (result.failedNode) return { ctx, failedNode: result.failedNode, error: result.error };
+    if (result.failedNode) {
+      markStageFailed(stageIndex, result.failedNode, result.error);
+      return { ctx, failedNode: result.failedNode, error: result.error };
+    }
+
+    markStageDone(stageIndex, stage);
   }
+
+  crsmState.currentNode = null;
+  crsmState.currentStage = null;
+  crsmState.isRunning = false;
+  crsmState.completedAt = new Date().toISOString();
+  notifyCRSM();
 
   return { ctx, failedNode: null, error: null };
 }
 
 function buildRuntimeStages(orderedIds, settings, legacyExecutionMode) {
-  // Dependency-bounded execution policy is authoritative. The legacy global
-  // executionMode is only used as a backwards-compatible override for AI-capable
-  // stages when an explicit stage policy has not yet been configured.
   const stages = buildExecutionStages(orderedIds, settings);
   if (legacyExecutionMode !== 'parallel') return stages.map(stage => [...stage]);
-
-  // Do not widen dependency boundaries. A global "parallel" setting may only
-  // enable parallelism where the stage resolver says it is allowed. Local stages
-  // are already parallel by default; AI stages remain sequential until a future
-  // stage-specific policy explicitly permits them.
   return stages;
+}
+
+function initRuntimeStageState(stages) {
+  crsmState.executionStages = stages.map((nodes, index) => ({
+    index,
+    nodes: [...nodes],
+    mode: nodes.length > 1 ? 'parallel' : 'sequential'
+  }));
+  crsmState.stageStatus = Object.fromEntries(stages.map((_, index) => [index, 'pending']));
+  crsmState.executionMode = stages.some(stage => stage.length > 1) ? 'mixed' : 'sequential';
+  crsmState.currentStage = null;
+  crsmState.currentNode = null;
+  notifyCRSM();
+}
+
+function markStageRunning(stageIndex, stage) {
+  crsmState.currentStage = stageIndex;
+  crsmState.stageStatus[stageIndex] = 'running';
+  stage.forEach(nodeId => {
+    if (crsmState.nodeStatus[nodeId] !== 'done') crsmState.nodeStatus[nodeId] = 'running';
+  });
+  crsmState.currentNode = stage.length === 1 ? stage[0] : null;
+  notifyCRSM();
+}
+
+function markStageDone(stageIndex, stage) {
+  crsmState.stageStatus[stageIndex] = 'done';
+  stage.forEach(nodeId => {
+    if (crsmState.nodeStatus[nodeId] !== 'failed') crsmState.nodeStatus[nodeId] = 'done';
+  });
+  notifyCRSM();
+}
+
+function markStageFailed(stageIndex, failedNode, error) {
+  crsmState.stageStatus[stageIndex] = 'failed';
+  crsmState.failedNode = failedNode;
+  crsmState.error = { node: failedNode, message: error?.message || String(error) };
+  crsmState.currentNode = failedNode;
+  crsmState.isRunning = false;
+  notifyCRSM();
 }
 
 async function runStage(stage, ctx, callbacks) {
@@ -93,22 +141,35 @@ async function runNode(nodeId, ctx, { onNodeStart, onNodeDone, onNodeError }) {
   const status = onNodeStart ? onNodeStart(nodeId) : null;
   if (status === 'skipped') {
     ctx.outputs[nodeId] = null;
+    crsmState.nodeStatus[nodeId] = 'skipped';
     onNodeDone?.(nodeId, null);
+    notifyCRSM();
     return { failedNode: null, error: null };
   }
+
+  crsmState.nodeStatus[nodeId] = 'running';
+  if (!crsmState.currentStage && crsmState.executionStages.length) crsmState.currentStage = crsmState.executionStages.findIndex(s => s.nodes.includes(nodeId));
+  if (crsmState.executionStages[crsmState.currentStage]?.nodes.length === 1) crsmState.currentNode = nodeId;
+  notifyCRSM();
 
   try {
     const output = await fn(ctx);
     ctx.outputs[nodeId] = output;
     if (nodeId === 'node1' && ctx.outputs.userEvidence) {
       ctx.outputs.node1 = { ...output, user_evidence: ctx.outputs.userEvidence };
+      crsmState.nodeOutputs[nodeId] = ctx.outputs.node1;
       onNodeDone?.(nodeId, ctx.outputs.node1);
     } else {
+      crsmState.nodeOutputs[nodeId] = output;
       onNodeDone?.(nodeId, output);
     }
+    crsmState.nodeStatus[nodeId] = 'done';
+    notifyCRSM();
     return { failedNode: null, error: null };
   } catch (error) {
+    crsmState.nodeStatus[nodeId] = 'failed';
     onNodeError?.(nodeId, error);
+    notifyCRSM();
     return { failedNode: nodeId, error };
   }
 }
