@@ -1,32 +1,29 @@
 import { crsmState, notifyCRSM } from '../state.js';
-import { renderProgress } from './progress.js';
+import { renderAnalysisDashboard } from './analysis-dashboard.js';
 import { renderStatusBadge } from './status.js';
 import { renderError } from './error.js';
-import { renderDirectEntry } from './direct.js';
 import { totalUsage } from '../usage.js';
 import { ingestUserEvidence } from '../user-evidence.js';
 
 export function renderCRSMTab() {
   return `<section class="grid crsm-analysis-page">
-    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research &amp; Strategy Machine</h1></div></div>
-    ${renderDirectEntry()}
     <div id="crsmDynamic">${renderDynamicContent()}</div>
   </section>`;
 }
 
 export function renderDynamicContent() {
-  return `${renderProgress()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
+  return `${renderAnalysisDashboard()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
 }
 
 function renderCostStrip() {
   const total = totalUsage();
   if (!crsmState.usage?.length) return '';
-  return `<div class="panel panel-pad crsm-cost-strip"><span><span class="muted">Run cost</span><strong>$${Number(total.cost || 0).toFixed(4)}</strong></span><span><span class="muted">Tokens</span><strong>${((total.input || 0) + (total.output || 0)).toLocaleString('en-US')}</strong></span><span><span class="muted">Requests</span><strong>${crsmState.usage.length}</strong></span></div>`;
+  return `<div class="panel panel-pad crsm-cost-strip"><span><span class="muted">Chi phí lần chạy</span><strong>$${Number(total.cost || 0).toFixed(4)}</strong></span><span><span class="muted">Tokens</span><strong>${((total.input || 0) + (total.output || 0)).toLocaleString('vi-VN')}</strong></span><span><span class="muted">Requests</span><strong>${crsmState.usage.length}</strong></span></div>`;
 }
 
 export function updateDynamicRegion() {
   const region = document.getElementById('crsmDynamic');
-  if (region) { region.innerHTML = renderDynamicContent(); bindDynamicEvents(); }
+  if (region) { region.innerHTML = renderDynamicContent(); bindDynamicEvents(); bindEvidenceUpload(); }
 }
 
 export function bindCRSMUIBindings() {
@@ -45,7 +42,7 @@ function bindEvidenceUpload() {
     if (status) status.textContent = `Đang đọc ${files.length} file…`;
     try {
       const evidence = await ingestUserEvidence(files);
-      if (status) status.textContent = `✓ Đã đọc ${evidence.documents.length} file · ${evidence.totalChars.toLocaleString('vi-VN')} ký tự. Sẽ đưa vào Node 3/4 khi chạy CRSM.`;
+      if (status) status.textContent = `✓ Đã đọc ${evidence.documents.length} file · ${evidence.totalChars.toLocaleString('vi-VN')} ký tự.`;
     } catch (error) {
       if (status) status.textContent = `✖ ${error?.message || error}`;
     }
@@ -70,7 +67,7 @@ async function retryCurrentFailedNode() {
   const mode = crsmState.mode, ticker = crsmState.ticker, startFrom = crsmState.failedNode;
   const existingOutputs = { ...(crsmState.nodeOutputs || {}) };
   if (!mode || !ticker || !startFrom) return showLaunchError('Không có phiên CRSM lỗi để chạy lại.');
-  crsmState.error = null; crsmState.failedNode = null; crsmState.logRows = [...(crsmState.logRows || []), `↻ retry node ${startFrom}`]; notifyCRSM();
+  crsmState.error = null; crsmState.failedNode = null; crsmState.logRows = [...(crsmState.logRows || []), `↻ chạy lại ${startFrom}`]; notifyCRSM();
   const result = await runCRSM({ mode, ticker, screeningContext: mode === 'SCREENED' ? crsmState.screeningContext : null, startFrom, existingOutputs });
   if (result?.error && !result?.outputs) showLaunchError(result.error?.message || String(result.error));
 }
@@ -86,5 +83,3 @@ async function retryCurrentRunFromStart() {
 function showLaunchError(message) {
   crsmState.isRunning = false; crsmState.error = { node: null, message: String(message) }; crsmState.logRows = [...(crsmState.logRows || []), `✖ launch failed: ${message}`]; notifyCRSM();
 }
-
-function escapeHtml(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
