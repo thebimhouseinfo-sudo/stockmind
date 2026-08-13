@@ -1,70 +1,108 @@
 # Screener V2 — Implementation Plan
 
-## 0. Purpose
+> **Status: THEORY / DESIGN PHASE — NOT READY FOR SCORING IMPLEMENTATION**
+>
+> This document is the source of truth for the Screener V2 redesign. It records the decisions reached during design/review so the work does not drift between sessions. **Do not code production scoring/classification until the theory sections marked as pending are completed and explicitly approved.**
 
-Redesign Stock Mind Screener around the current TradingView dataset. Legacy formulas, thresholds and classifications are reference material only.
+---
 
-Target flow:
+# 0. Purpose and Boundary
+
+Screener V2 redesigns Stock Mind around the current TradingView clipboard dataset. Legacy formulas, thresholds and classifications are **reference material only**.
+
+The Screener is a quantitative **data/evaluation engine**, not an AI investment analyst.
 
 ```text
 TradingView clipboard
-  ↓
+        ↓
 Parser / Ingestion
-  ↓
-Internal dataset
-  ↓
-Screener Evaluation V2
-  ↓
-Ranking / Classification
-  ↓
-Dashboard + Ranking
-  ↓
-User selects stock
-  ↓
-Explicit CRSM action
-  ↓
-Node 1
+        ↓
+Internal Dataset
+        ↓
+Evaluation Model V2
+        ↓
+Screener Result Set
+     ┌──┴──────┐
+     ↓         ↓
+ Dashboard   Ranking
+     │
+     ↓
+ User selects stock
+     ↓
+ Explicit CRSM action
+     ↓
+ Node 1
 ```
 
-**Screener never automatically starts CRSM.** Dashboard and Ranking are the end of the automated Screener flow; the user is the decision point before deep analysis.
+**No automatic CRSM handoff.** The user remains the decision point before deep analysis. Node 1 verifies and researches; it does not blindly treat Screener signals as facts.
 
 ---
 
-# 1. Current Checkpoint — TradingView Ingestion
+# 1. Current TradingView Data Contract
 
-## 1.1 Source format
+## 1.1 Source record format
 
-Each TradingView stock record is four lines:
+The TradingView clipboard record is currently interpreted as:
 
-1. Ticker / Symbol
-2. Company name
-3. UI marker `D`
-4. 46 analytical fields separated by TAB
+1. `Symbol` — contains ticker + company name and must be split.
+2. UI marker / metadata line — typically `D`; ignored.
+3. `Sector`.
+4. `Industry`.
+5. The analytical columns in the validated TradingView order.
 
-`D` is UI metadata and is ignored.
+The Mapping tab and reconstructed-table workflow exist because a correct ticker does **not** prove that all following columns are mapped correctly.
 
-Symbol + company are mapped to:
+## 1.2 Current analytical fields
 
-- `ticker`
-- `company_name`
+Validated source fields:
 
-## 1.2 Mapping status
+```text
+Symbol
+Sector
+Industry
+Mkt cap
+Price
+Chg %
+Perf % 1W/1M/3M/6M/1Y/YTD
+High 52W
+Low 52W
+Vol
+Rel vol
+Avg vol 10D/30D/60D
+ROE TTM
+ROA TTM
+Revenue FQ/FY/TTM
+Revenue growth Quarterly YoY
+Revenue growth Annual YoY
+EPS dil TTM
+EPS dil growth TTM YoY
+PEG TTM
+Gross/Op/Net margin % TTM
+FCF TTM
+FCF growth TTM YoY
+Debt/equity FQ/FY
+Current ratio FQ/FY
+Quick ratio FQ/FY
+P/E
+PEG
+P/B
+P/S
+EV/EBITDA
+EV/revenue
+Div yield % TTM
+```
 
-The 46 analytical fields were validated against raw TradingView data using the Mapping tab and raw clipboard inspector.
-
-**Mapping: PASS.**
-
-The Mapping UI exists specifically because a correct ticker does not prove that the remaining columns are correct.
+FQ/FY/TTM fields remain separate intentionally. They are not silently merged.
 
 ---
 
-# 2. Data Contract — Preserve Meaning, Decode Quantities
+# 2. Ingestion Rules — Preserve Meaning, Decode Display Formatting
 
-The ingestion layer restores source meaning. It does not perform investment judgment or scoring transformations.
+The ingestion layer restores source meaning. It does **not** perform investment judgment or scoring transformation.
 
 ## 2.1 Percentage fields
 
-Percentages are stored as **percentage points**.
+TradingView percentage values remain **percentage points**.
 
 ```text
 -0.58%  → -0.58
@@ -73,11 +111,11 @@ Percentages are stored as **percentage points**.
 -37.12% → -37.12
 ```
 
-Never divide these values by 100 during ingestion.
+Never divide by 100 during ingestion.
 
 ## 2.2 Ratio fields
 
-True ratios stay ratios.
+True ratios remain ratios:
 
 ```text
 PEG              0.06
@@ -87,22 +125,20 @@ Relative Volume  0.46
 P/E              29.82
 ```
 
-Never multiply ratios by 100.
+Do not multiply ratios by 100.
 
 ## 2.3 Quantity fields
 
-TradingView uses compact suffixes and separators to save table space. Stock Mind should decode the following quantity fields into full numeric quantities:
+TradingView uses compact suffixes for display. Stock Mind decodes them to full numeric quantities:
 
-- `market_cap`
-- `price`
-- `volume`
-- `avg_volume_10d`
-- `avg_volume_30d`
-- `avg_volume_60d`
-- `revenue_fq`
-- `revenue_fy`
-- `revenue_ttm`
-- `fcf_ttm`
+```text
+Market Cap
+Price
+Volume
+Avg Volume 10D / 30D / 60D
+Revenue FQ / FY / TTM
+FCF TTM
+```
 
 Examples:
 
@@ -111,15 +147,13 @@ Examples:
 6.26 B   → 6,260,000,000
 1.58 M   → 1,580,000
 857.4 K  → 857,400
-41.000   → 41,000
-17.600   → 17,600
 ```
 
-This is **display-format decoding**, not scoring.
+This is display-format decoding, **not scoring**.
 
 ## 2.4 Field-specific parsing
 
-Do not use one generic numeric parser for all fields. The parser must distinguish:
+Do not use one generic parser for every field. Parsing must distinguish:
 
 - percentage
 - ratio
@@ -128,7 +162,7 @@ Do not use one generic numeric parser for all fields. The parser must distinguis
 - missing
 - invalid/unparseable
 
-For example:
+Example:
 
 ```text
 41.000 Price → 41,000
@@ -137,45 +171,57 @@ For example:
 
 Missing never becomes zero.
 
-FQ/FY/TTM remain separate.
-
 ---
 
-# 3. Target Architecture
+# 3. Evaluation Model V2 — Closed Architecture Foundation
+
+The final evaluation architecture is a **typed DAG**, not a mandatory linear pipeline.
 
 ```text
-TradingView Raw
-      ↓
-Ingestion / Parser
-      ↓
-Internal Dataset
-      ├───────────────┐
-      ↓               ↓
-Evaluation       Signal / Anomaly
-      ↓               ↓
-      └───────┬───────┘
-              ↓
-      Screener Result Set
-          ┌────┴────┐
-          ↓         ↓
-      Dashboard   Ranking
-          │         │
-          └────┬────┘
-               ↓
-        User selects stock
-               ↓
-       Explicit CRSM action
-               ↓
-             Node 1
+RAW
+ ↓
+State / Provenance
+ ↓
+Derived
+ ↓
+Signal
+ ↓
+Coverage / Applicability
+ ↓
+Contribution DAG
+ ↓
+Base Factor
+ ↓
+Axis
+ ↓
+Gate
+ ↓
+Classification
 ```
 
-Raw, Derived and Signal representations are separate.
+The implementation must support typed nodes/edges because a raw/derived metric may feed a score, signal, coverage calculation or gate without implying that all paths are equivalent.
+
+Foundation principles are **closed**:
+
+- Typed node/edge.
+- Tri-valued logic: `TRUE / FALSE / UNKNOWN`.
+- Impact budget.
+- Coverage + eligibility.
+- Redundancy analysis before official scoring.
+- Provenance / as-of metadata.
+- Audit lineage.
+- `UNKNOWN` must never silently become `FALSE` or zero.
+- Raw data is never overwritten by scoring transformations.
+- A signal is not automatically a penalty.
+- A trigger is not automatically a veto.
+
+**No new abstraction should be added unless a concrete implementation/test problem requires it.**
 
 ---
 
-# 4. Dashboard and Ranking Boundary
+# 4. Dashboard / Ranking / CRSM Boundary
 
-After evaluation, Dashboard contains exactly four primary tables:
+After evaluation, Dashboard has exactly four primary investment tables:
 
 1. **Core Performers**
 2. **Quality Underperformers**
@@ -184,17 +230,17 @@ After evaluation, Dashboard contains exactly four primary tables:
 
 The existing **Ranking tab remains**.
 
-Dashboard and Ranking must consume the **same Screener Result Set**. They must not calculate separate scores.
+Dashboard and Ranking consume the **same Screener Result Set**. They must not calculate separate scores.
 
 A stock normally has one primary classification and may carry multiple signal tags.
 
-If evidence is insufficient, the stock may remain Watch / Neutral / Unclassified rather than being forced into one of the four investment tables.
+Insufficient evidence must not be forced into a positive/negative investment conclusion. It may remain `Watch / Neutral / Unclassified / UNKNOWN` at the evaluation layer without becoming a fifth primary Dashboard investment table.
 
 ### CRSM
 
 There is **no automatic candidate gate and no automatic handoff**.
 
-When the user explicitly chooses a stock and starts CRSM:
+Only when the user explicitly selects a stock and starts CRSM:
 
 ```text
 Selected stock
@@ -206,266 +252,897 @@ Screener context builder
 Node 1
 ```
 
-Node 1 performs deeper research and verification. Screener does not invent catalysts, legal/project stories or qualitative explanations unavailable from the source data.
+Node 1 performs deeper research, verification and catalyst investigation. Screener must not invent catalysts, legal/project stories, macro explanations or qualitative claims unavailable from its quantitative source data.
 
 ---
 
-# 5. Phase 1 — Freeze and Validate the Data Layer
+# 5. Foundation Contract A — Data State
 
-### Tasks
+Data state must not be a single overloaded enum.
 
-- [x] Four-line TradingView parser is primary parser.
-- [x] Mapping visual verification exists.
-- [x] Raw Clipboard Inspector / Parser Debug exists.
-- [x] Ticker/company separation validated.
-- [x] 46-field mapping validated.
-- [ ] Validate all quantity decoding across the full dataset.
-- [ ] Validate percentage semantics across the full dataset.
-- [ ] Validate missing/invalid states.
-- [ ] Re-run raw TradingView vs reconstructed table after the quantity-decoding update.
-
-### Acceptance
-
-The reconstructed table must match raw TradingView by ticker and field meaning, with full quantities, percentage points, ratios, text and explicit missing values.
-
----
-
-# 6. Phase 2 — Audit Legacy Screener
-
-Inventory:
-
-- filters
-- formulas
-- thresholds
-- weights
-- score ranges
-- ranking rules
-- classification rules
-- missing-data behavior
-- exclusions
-- legacy aliases
-- old Node 1 context
-
-Each legacy rule becomes:
-
-`Keep / Adapt / Replace / Remove / Review`
-
-Legacy is never retained merely because it already exists.
-
----
-
-# 7. Phase 3 — Universe and Row States
-
-Define what enters the evaluation universe.
-
-At minimum distinguish:
+## 5.1 Observation state
 
 ```text
-VALID_SCOREABLE
-VALID_WITH_DATA_GAPS
-INVALID / UNSCOREABLE
+VALID
+MISSING
+INVALID
+NOT_APPLICABLE
 ```
 
-Do not let a row with only a valid ticker receive a fabricated score.
+## 5.2 Quality flags
 
-### Liquidity
-
-Do not automatically preserve a hard filter such as `Volume > 30K`. Liquidity must be evaluated as one or more of:
-
-- risk signal
-- scoring input
-- context
-- limited eligibility rule
-
-The goal is to avoid destroying the candidate universe too early.
-
-The current ~76-stock set is a validation universe, not a list to overfit.
-
----
-
-# 8. Phase 4 — Field Role Mapping
-
-Every current field must have one explicit role:
-
-- Raw Evidence
-- Scoring Input
-- Derived Input
-- Anomaly Trigger
-- Context
-- Unused
-
-For each field document:
+Examples:
 
 ```text
-source label
-internal name
-unit
-period
-missing semantics
-role
-possible factor
-ranking direction
-ranking universe
-anomaly usage
-notes
+LOW_BASE
+STALE
+EXTREME
+UNIT_WARNING
+PARTIAL_INPUT
 ```
 
-FQ/FY/TTM must not be silently merged. Decide whether each is independently scored, compared for consistency/trend, used as signal/context, or unused.
+## 5.3 Usage state
 
----
-
-# 9. Phase 5 — Raw / Derived / Signal Contract
-
-## Raw
-
-Mapped source meaning. Never overwritten for scoring.
-
-## Derived
-
-Evaluation-only calculations, for example:
+Usage can differ by field/factor:
 
 ```text
-FCF Yield
-Volume Trend
-Drawdown from High 52W
-Upside to High 52W
-Momentum Reversal
-Range Volatility
-Growth Divergence
+ELIGIBLE
+SUPPRESSED
+INVALID_FOR_USAGE
+UNAVAILABLE
 ```
-
-## Signal / Anomaly
-
-Machine-readable warnings such as:
-
-```text
-EXTREME_GROWTH
-EARNINGS_QUALITY_CONCERN
-VALUE_TRAP_WARNING
-DEEP_DRAWDOWN
-HIGH_LEVERAGE
-LOW_LIQUIDITY
-DATA_GAP
-```
-
-An anomaly is not automatically a score penalty.
 
 Example:
 
 ```text
-Raw EPS Growth = +640%
-Derived scoring value = robust/ranked representation
-Signal = EXTREME_EPS_GROWTH
+P/E = -4
+
+observation_state = VALID
+usage_state.pe_valuation = INVALID_FOR_USAGE
+reason = NEGATIVE_EARNINGS
 ```
 
----
-
-# 10. Phase 6 — Relative Ranking Design
-
-Relative ranking should replace arbitrary thresholds where appropriate.
-
-## Direction
-
-Every scoring metric declares:
+But:
 
 ```text
-HIGHER_IS_BETTER
-LOWER_IS_BETTER
-TWO_SIDED / OPTIMAL_RANGE
-CONTEXT_ONLY
+FCF = -500B
+
+observation_state = VALID
+usage_state.cash_flow = ELIGIBLE
+signal = NEGATIVE_FCF
 ```
 
-Do not use `1/x` for valuation direction. Use explicit ranking direction to avoid zero/negative-value problems.
+A negative economic value is not automatically invalid data.
 
-## Granularity
+---
 
-Each metric must declare:
+# 6. Foundation Contract B — Provenance
+
+Every evaluation must be traceable to a source snapshot.
+
+Required metadata should include:
 
 ```text
-GLOBAL
-SECTOR
-INDUSTRY
+source_id
+source_schema_version
+retrieved_at
+unit
+currency
+input_snapshot_id
+data_as_of
+reported_as_of
+available_as_of
+restatement_policy
+raw_payload_hash
+parser_version
+mapping_version
+evaluation_version
+classification_version
 ```
 
-Global should be the initial default; sector/industry ranking should be used only when the sample size and metric semantics justify it.
-
-## Extreme values
-
-Do not automatically winsorize everything at 1–99%.
-
-Use bounded transforms, robust ranking or anomaly signals where needed. Raw values remain intact.
+`available_as_of` is distinct from `reported_as_of`. This is required for future historical validation and prevents look-ahead when historical snapshots are eventually introduced.
 
 ---
 
-# 11. Phase 7 — Missing Data and Coverage
+# 7. Foundation Contract C — Raw / Derived / Signal
 
-Missing is not zero and does not automatically mean poor business quality.
+## Raw
 
-Per-factor policy must define whether missing inputs:
+Original mapped source meaning. Preserve it.
 
-- reduce coverage
-- are excluded from the factor
-- create a DATA_GAP signal
-- make the factor unscoreable
-- block classification only when critical
+## Derived
 
-Every factor should expose coverage, e.g.:
+Evaluation-only calculations. Examples:
 
 ```text
-Valuation Score      78
-Valuation Coverage   4/6
-Signal               DATA_GAP_VALUATION
+FCF Yield
+Drawdown_52W
+Upside_to_52W_High
+Position_52W_Range
+Volume Trend
+Momentum Reversal
+Growth Acceleration
+Margin Gap
+FCF / Profit Divergence
+```
+
+## Signal / Anomaly
+
+Machine-readable interpretation or warning:
+
+```text
+SEVERE_DRAWDOWN
+EXTREME_GROWTH
+EARNINGS_QUALITY_CONCERN
+VALUE_TRAP_WARNING
+HIGH_LEVERAGE
+LOW_LIQUIDITY
+DATA_GAP
+PRICE_ABOVE_STORED_52W_HIGH
+```
+
+A signal does not automatically change a score.
+
+---
+
+# 8. Foundation Contract D — Derived Metric Contract
+
+Every derived metric must be specified using:
+
+```text
+Name:
+Family:
+Formula:
+Input fields (raw):
+Purpose:
+Output type:
+Direction:
+Used by Factor(s):
+Coverage rule:
+Invalid condition:
+Low-base condition:
+Low-base behavior:
+Anomaly signal:
+Structural relationship:
+Graduation rule:
+```
+
+Additional contract fields:
+
+```text
+metric_id
+version
+relationship_type
+criticality
+applicability_rule
+source_concept_id
+```
+
+### Derived categories
+
+A derived metric may be:
+
+```text
+Scoring Derived
+Signal Derived
+Context Derived
+```
+
+Do not turn every calculation into a score.
+
+### Direction graduation
+
+`Context initially` is valid. A derived metric may graduate to scoring only when:
+
+1. redundancy analysis shows it is not merely duplicate evidence;
+2. its directional interpretation is reasonably consistent in the Factor Matrix;
+3. the metric has an economically coherent role.
+
+If those conditions are not met, it remains Context/Signal Derived. There is no requirement to force every metric into scoring.
+
+---
+
+# 9. Foundation Contract E — Coverage / Applicability
+
+Coverage is explicit and traceable.
+
+For raw fields:
+
+> Only `Primary Role = Factor Input` is eligible to count toward factor coverage. Secondary role does not create additional coverage.
+
+For derived metrics:
+
+> Coverage/computability follows the highest-criticality raw input required by the formula.
+
+If a Critical input is missing, the derived metric is unavailable; there is no half-coverage.
+
+If an Optional input is missing, the derived metric may become `PARTIAL_INPUT` if the formula/policy permits; otherwise it is unavailable.
+
+Coverage must expose its denominator/version:
+
+```text
+coverage_set_id
+intended_metric_ids
+applicable_metric_ids
+available_metric_ids
+critical_missing_metric_ids
+coverage_formula_version
+```
+
+`NOT_APPLICABLE` may be removed from a denominator only when an explicit applicability rule says so. Missing is not automatically N/A.
+
+Factor scores must expose both score and coverage, e.g.:
+
+```text
+Valuation Score       78
+Valuation Coverage    4/6
+Eligibility            LIMITED
+```
+
+Partial coverage must not be converted into a fake lower score.
+
+---
+
+# 10. Foundation Contract F — Criticality
+
+Each input is classified for evaluation purposes as:
+
+```text
+Critical-for-Factor
+Optional
+```
+
+Criticality does not mean the business is inherently important. It means the field is important for determining whether a particular factor/classification is sufficiently evidenced.
+
+Missing an optional metric should not automatically make a stock unscoreable.
+
+---
+
+# 11. Foundation Contract G — Metric Roles
+
+Use dual roles:
+
+```text
+Primary Role
+Secondary Role
+```
+
+Possible roles:
+
+```text
+Factor Input
+Derived Input
+Anomaly Trigger
+Context
+Unused
+```
+
+Add:
+
+```text
+Counts toward Coverage: Y/N
+Criticality: Critical / Optional
+Used by Factor(s)
+```
+
+Principle:
+
+> One metric may have multiple declared roles, but it may contribute only once to a given factor. Secondary role does not create an additional score contribution or coverage count.
+
+### Cross-factor reuse
+
+If a derived metric is used by two or more factors:
+
+```text
+CROSS_FACTOR_SHARED = true
+```
+
+This does **not** prohibit reuse. It makes reuse explicit and subject to cross-factor redundancy analysis.
+
+For derived families with structural duplication, `Used by Factor(s)` remains `TBD` until the representative metric is selected.
+
+---
+
+# 12. Foundation Contract H — Redundancy / Double-counting
+
+Redundancy is evaluated at four levels:
+
+### 12.1 Structural redundancy
+
+Known mathematical relationship, e.g.:
+
+```text
+Drawdown = P/H - 1
+Upside = H/P - 1
+```
+
+### 12.2 Statistical redundancy
+
+Observed correlation, preferably using robust/rank-based diagnostics where appropriate.
+
+### 12.3 Economic redundancy
+
+Different metrics may still measure substantially the same economic concept.
+
+### 12.4 Contribution redundancy
+
+Different paths may create the same factor/axis/classification effect.
+
+A metric is not automatically deleted because it is correlated. Possible outcomes:
+
+```text
+representative
+supplementary
+context-only
+anomaly-only
+rejected-for-scoring
+```
+
+The reason must be recorded.
+
+**Redundancy analysis occurs before official Anchored Scoring.**
+
+A provisional diagnostic score may be used only for inspection and must be explicitly marked provisional.
+
+---
+
+# 13. Foundation Contract I — Contribution Lineage / Typed DAG
+
+Every score/signal/gate effect must be traceable.
+
+Contribution metadata should include:
+
+```text
+source
+source_concept_id
+target
+target_type
+contribution_type
+condition
+unknown_policy
+transformation
+bounded_effect
+impact_group
+aggregation_policy
+max_effect_per_source_target
+mutual_exclusion
+priority
+veto
+```
+
+Supported contribution concepts include:
+
+```text
+SCORE_DELTA
+SIGNAL_TAG
+GATE_TRIGGER
+VETO
+COVERAGE_EFFECT
+```
+
+### Impact budget
+
+One economic observation must not create unlimited independent penalties simply because it appears in multiple paths.
+
+Example:
+
+```text
+NEGATIVE_FCF
+FCF_YIELD_WEAK
+FCF_PROFIT_DIVERGENCE
+```
+
+may be different metrics/signals but can share the same `source_concept_id` where they represent the same economic evidence.
+
+This is a second-level defense against double-counting beyond metric-level correlation.
+
+### DAG rule
+
+Dependencies must flow upstream → downstream. Cycles are invalid.
+
+---
+
+# 14. Foundation Contract J — Tri-valued Logic
+
+Decision conditions use:
+
+```text
+TRUE
+FALSE
+UNKNOWN
+```
+
+Core logic:
+
+| A | B | AND | OR |
+|---|---|---|---|
+| T | T | T | T |
+| T | F | F | T |
+| T | U | U | T |
+| F | U | F | U |
+| U | U | U | U |
+
+Every rule must define `unknown_policy`.
+
+Examples:
+
+- A missing critical Risk input must not silently trigger a Hard Risk veto.
+- A Core rule requiring unknown evidence does not qualify as TRUE.
+- Data Gate may classify the row as `PARTIALLY_SCOREABLE` or `UNSCOREABLE`.
+
+UNKNOWN is not FALSE.
+
+---
+
+# 15. Foundation Contract K — Data Gate / Eligibility
+
+At minimum:
+
+```text
+SCOREABLE
+PARTIALLY_SCOREABLE
+UNSCOREABLE
+```
+
+`UNKNOWN / INSUFFICIENT_DATA` is a data/evaluation state, not a fifth investment table.
+
+A stock with incomplete evidence should not be forced into Avoid merely because data is missing.
+
+Factor-level states may include:
+
+```text
+FULL
+LIMITED
+UNAVAILABLE
+```
+
+A critical missing field can restrict a factor without automatically excluding the stock from the entire Screener.
+
+---
+
+# 16. Foundation Contract L — Anchored Factor Scores
+
+The model does **not** use a single `overall_score` as the central decision variable.
+
+Primary axes:
+
+```text
+QUALITY SCORE
+OPPORTUNITY SCORE
+RISK SCORE
+```
+
+Supporting composites:
+
+```text
+CORE SCORE
+HIGH REWARD SCORE
+```
+
+Official metric scoring will use **Anchored Scores** rather than arbitrary batch-relative thresholds.
+
+Conceptually:
+
+```text
+Raw Metric
+   ↓
+Absolute / anchored scoring function
+   ↓
+0–100 Anchored Metric Score
+   ↓
+Factor Score
+```
+
+Anchors may be Sector/Industry aware where economically justified.
+
+No final anchor or weight is approved yet.
+
+Anchor registry must eventually record:
+
+```text
+anchor_version
+scope
+effective_date
+source
+calibration_status
 ```
 
 ---
 
-# 12. Phase 8 — Signal / Anomaly Engine
+# 17. Foundation Contract M — Ranking vs Classification
 
-Initial signal families to review:
+These are deliberately separate.
 
-### Earnings quality
-- `EARNINGS_QUALITY_CONCERN`
-- `NEGATIVE_OPERATING_MARGIN`
-- `NET_MARGIN_FAR_ABOVE_OPERATING_MARGIN`
-- `FCF_NEGATIVE_DESPITE_PROFIT`
+### Classification
 
-### Growth
-- `EXTREME_REVENUE_GROWTH`
-- `EXTREME_EPS_GROWTH`
-- `GROWTH_ACCELERATION`
-- `GROWTH_DIVERGENCE`
-- `EXTREME_FCF_GROWTH`
+Uses anchored/fixed evaluation logic so classification does not change merely because the TradingView batch contains more or fewer stocks.
 
-### Financial safety
-- `HIGH_LEVERAGE`
-- `WEAK_CURRENT_RATIO`
-- `WEAK_QUICK_RATIO`
-- `NEGATIVE_FCF`
+### Ranking tab
 
-### Market behavior
-- `DEEP_DRAWDOWN`
-- `MOMENTUM_REVERSAL`
-- `UNUSUAL_RELATIVE_VOLUME`
-- `LOW_LIQUIDITY`
+May use percentile/relative ranking inside the current batch.
 
-### Data quality
-- `DATA_GAP_CRITICAL`
-- `DATA_GAP_VALUATION`
-- `DATA_GAP_FCF`
-- `DATA_GAP_GROWTH`
-- `INVALID_PE`
-- `INVALID_PEG`
-- `PARSE_WARNING`
+Therefore:
 
-Signals should expose severity and evidence fields. They tell the system/user what needs attention; they do not automatically determine the investment outcome.
+```text
+Classification ≠ Batch Percentile
+Ranking       = Relative current-batch view
+```
+
+The current ~76-stock set is a validation sandbox, not a training set and not a basis for overfitting thresholds.
 
 ---
 
-# 13. Phase 9 — Factor Evaluation Model
+# 18. Price Dislocation Family — DEFINED, NOT IMPLEMENTED
 
-Factor architecture must be designed before final weights.
+Price Dislocation is the **first vertical slice for validating the evaluation engine**, not the first production investment factor.
 
-Candidate dimensions:
+Its output must describe a price-dislocation profile. A deep drawdown alone must **not** become `HIGH_REWARD`.
+
+## 18.1 Drawdown_52W
+
+```text
+Name: Drawdown_52W
+Formula: (Price / High_52W) - 1
+Input fields: Price, High_52W
+Output type: Percentage
+Direction: Context initially
+Used by Factor(s): TBD
+Coverage: Price + High_52W; both Critical-for-Factor
+Invalid: Price <= 0; High_52W <= 0; Price > High_52W
+Low-base: N/A
+Candidate anomaly: SEVERE_DRAWDOWN
+```
+
+Potential combined signal:
+
+```text
+Drawdown + poor Quality + negative FCF + high Debt/Equity
+→ VALUE_TRAP_WARNING candidate
+```
+
+Do not assign the final factor(s) until redundancy analysis selects the representative metric.
+
+## 18.2 Upside_to_52W_High
+
+```text
+Name: Upside_to_52W_High
+Formula: (High_52W / Price) - 1
+Input fields: Price, High_52W
+Output type: Percentage
+Direction: Context initially
+Used by Factor(s): TBD
+Coverage: Price + High_52W; both Critical-for-Factor
+Invalid: Price <= 0; High_52W <= 0; Price > High_52W
+Low-base: N/A
+Structural relationship: direct monotonic transformation of Drawdown_52W
+```
+
+Drawdown and Upside contain the same core P/H information but use different nonlinear representations. They must not automatically become independent scoring evidence.
+
+## 18.3 Position_52W_Range
+
+```text
+Name: Position_52W_Range
+Formula: (Price - Low_52W) / (High_52W - Low_52W)
+Input fields: Price, High_52W, Low_52W
+Output type: Ratio, normally 0–1
+Direction: Context initially
+Used by Factor(s): TBD
+Coverage: Price + High_52W + Low_52W; all Critical-for-Factor
+Invalid: High_52W <= Low_52W; Low_52W <= 0
+Low-base: High_52W - Low_52W near zero
+Low-base behavior: LOW_BASE_UNRELIABLE; reduce/withhold scoring contribution according to final policy
+```
+
+Unlike Drawdown/Upside, Position adds Low_52W and may therefore contain partially independent information.
+
+## 18.4 Structural relationship
+
+For:
+
+```text
+D = Drawdown = P/H - 1
+```
+
+then:
+
+```text
+Upside = H/P - 1 = -D / (1 + D)
+```
+
+Therefore the relationship is known mathematically before empirical correlation is run.
+
+Correlation is diagnostic, not an automatic deletion rule.
+
+## 18.5 Price Dislocation output boundary
+
+The vertical slice must produce:
+
+```text
+Dislocation Profile
+```
+
+not an investment thesis.
+
+Possible evaluation states:
+
+```text
+PROFILE_ONLY
+UNKNOWN
+PARTIALLY_SCOREABLE
+UNSCOREABLE
+```
+
+Example:
+
+```text
+Drawdown = -60%
+Position = 0.14
+```
+
+means price is deeply below its stored 52W high and low in the range. It does **not** by itself mean cheap, good, turnaround or High Reward.
+
+## 18.6 Inconsistent 52W reference
+
+Never clamp:
+
+```text
+Price > High_52W
+```
+
+to `Price = High_52W`.
+
+Preserve raw values and emit:
+
+```text
+PRICE_ABOVE_STORED_52W_HIGH
+INCONSISTENT_REFERENCE
+```
+
+Potential causes to investigate:
+
+- stale TradingView field
+- adjustment mismatch
+- snapshot mismatch
+- parser issue
+- source semantics
+
+---
+
+# 19. Vertical Slice MVP — D1 / D2 / D3
+
+These are the first **implementation deliverables after the theory is fully approved**. They are not permission to start production scoring early.
+
+## D1 — Contract Validator
+
+Validate:
+
+```text
+Schema
+State
+Provenance
+Input consistency
+Applicability
+Coverage
+```
+
+No investment scoring.
+
+## D2 — Price Dislocation Evaluator
+
+Inputs:
+
+```text
+Price
+High_52W
+Low_52W
+```
+
+Outputs:
+
+```text
+Drawdown_52W
+Upside_to_52W_High
+Position_52W_Range
+computability
+observation / quality flags
+structural relationship
+coverage
+lineage
+```
+
+## D3 — Diagnostic / Decision Runner
+
+Test:
+
+```text
+TRUE
+FALSE
+UNKNOWN
+```
+
+and:
+
+```text
+PROFILE_ONLY
+UNKNOWN
+PARTIALLY_SCOREABLE
+UNSCOREABLE
+```
+
+No production classification.
+
+### Required scenario tests
+
+1. Normal valid row.
+2. Severe drawdown.
+3. Price near 52W high.
+4. Narrow 52W range.
+5. Missing High_52W.
+6. Invalid/non-positive Price.
+7. Price > High_52W without clamping.
+8. UNKNOWN decision input.
+9. Structural Drawdown/Upside redundancy.
+10. Missing Optional vs Missing Critical input.
+
+---
+
+# 20. Remaining Evaluation Theory — PENDING
+
+After the foundation and Price Dislocation contract, the following must be designed and explicitly approved **before production scoring code**.
+
+## 20.1 Momentum / Volume Family
+
+Candidate raw inputs:
+
+```text
+Perf 1W
+Perf 1M
+Perf 3M
+Perf 6M
+Perf 1Y
+Perf YTD
+Vol
+Rel Vol
+Avg Vol 10D
+Avg Vol 30D
+Avg Vol 60D
+```
+
+Must resolve:
+
+- short/medium/long momentum representation
+- overlap among performance periods
+- raw Rel Vol semantics and baseline
+- Volume Trend definitions
+- price + volume confirmation
+- Reversal definition
+- low-base/near-zero behavior
+- structural/statistical/economic redundancy
+- representative vs supplementary metrics
+- factor usage
+
+Raw Volume/Rel Vol have `Context` direction initially. Volume becomes directional only through derived price-volume signals.
+
+## 20.2 Growth Family
+
+Candidate inputs:
+
+```text
+Revenue Growth Quarterly YoY
+Revenue Growth Annual YoY
+EPS Dil Growth TTM YoY
+FCF Growth TTM YoY
+```
+
+Must resolve:
+
+- growth acceleration
+- growth consistency
+- low-base conditions
+- extreme-growth signals
+- Revenue vs EPS growth redundancy
+- FCF growth treatment
+- scoring vs signal-only roles
+
+## 20.3 Cash Flow Family
+
+Candidate inputs:
+
+```text
+FCF TTM
+Market Cap
+Revenue TTM
+```
+
+Candidates:
+
+```text
+FCF Yield
+FCF / Profit relationship
+FCF quality / divergence
+```
+
+FCF negative is valid data, not invalid data.
+
+FCF Yield may be semantically separated from absolute FCF:
+
+```text
+FCF → cash-flow evidence
+FCF Yield → valuation / cash-generation efficiency
+```
+
+## 20.4 Balance Sheet / Safety Family
+
+Candidate inputs:
+
+```text
+Debt/Equity FQ
+Debt/Equity FY
+Current Ratio FQ/FY
+Quick Ratio FQ/FY
+```
+
+Must resolve:
+
+- FQ vs FY usage
+- leverage trend/change
+- liquidity trend/change
+- optimal-range treatment for Current/Quick Ratio
+- Hard vs Soft Risk evidence
+
+## 20.5 Earnings Quality Family
+
+Candidate inputs:
+
+```text
+ROE
+ROA
+Gross Margin
+Operating Margin
+Net Margin
+EPS
+FCF
+```
+
+Candidates:
+
+```text
+NetOpMarginGap
+Profit_vs_FCF_Divergence
+```
+
+Potential anomaly:
+
+```text
+Net Margin far above Operating Margin
+→ EARNINGS_QUALITY_CONCERN
+```
+
+Do not automatically treat the anomaly as a score penalty.
+
+---
+
+# 21. Factor Model — PENDING THEORY
+
+The architecture is fixed, but factor composition, anchors and weights are not.
+
+Target axes:
+
+```text
+QUALITY SCORE
+OPPORTUNITY SCORE
+RISK SCORE
+```
+
+Supporting composites:
+
+```text
+CORE SCORE
+HIGH REWARD SCORE
+```
+
+Candidate base factors:
 
 ```text
 Quality
@@ -474,347 +1151,297 @@ Financial Safety
 Cash Flow
 Valuation
 Momentum
-High Reward
-Risk
 ```
 
-For each factor define:
+High Reward and Risk should be treated as overlays/composites where appropriate rather than flat copies of all underlying metrics.
+
+For each factor we must eventually define:
 
 ```text
 purpose
-inputs
+metric inputs
 derived inputs
+representative metrics
+supplementary metrics
+signals
+coverage set
+criticality
 missing policy
-coverage
 direction
 ranking universe
-signal interaction
-double-counting risk
+anchored transformation
+contribution policy
+cross-factor reuse
+redundancy controls
 ```
 
-Potential boundaries:
+### Double-counting rule
 
-### Quality
-ROE, ROA, Gross Margin, Operating Margin, Net Margin
+> One piece of evidence has one primary factor role. Reuse elsewhere must be explicit, traceable and bounded.
 
-### Growth
-Revenue Growth Quarterly YoY, Revenue Growth Annual YoY, EPS Growth TTM YoY, FCF Growth only if robust enough
+### Correlation cluster
 
-### Financial Safety
-Debt/Equity FQ/FY, Current Ratio FQ/FY, Quick Ratio FQ/FY
-
-### Cash Flow
-FCF TTM, FCF Yield, cash/profit consistency where justified
-
-### Valuation
-P/E, PEG TTM/PEG, P/B, P/S, EV/EBITDA, EV/Revenue, Dividend Yield if justified
-
-### Momentum
-Perf 1W/1M/3M/6M/1Y/YTD, volume trend, reversal/stabilization
-
-### High Reward
-Overlay based on growth acceleration, price dislocation, valuation optionality, turnaround momentum and a minimum quality floor.
-
-### Risk
-Overlay based on leverage, liquidity, cash-flow weakness, volatility proxy, size/liquidity, earnings-quality concerns and severe data gaps where appropriate.
-
-No final weights are approved at this stage.
-
----
-
-# 14. Phase 10 — Double-Counting Review
-
-Before weights, check correlated evidence:
-
-- ROE / ROA
-- Revenue FQ / FY / TTM
-- Current Ratio / Quick Ratio
-- PEG TTM / PEG
-- overlapping momentum periods
-- Quality / Cash Flow
-- Growth / High Reward
-- Momentum / High Reward
-- Safety / Risk
-
-Rule:
-
-> One piece of evidence should have one primary factor role; reuse elsewhere must be intentional.
-
----
-
-# 15. Phase 11 — Classification Model
-
-Primary Dashboard classifications:
+Before official factor weights:
 
 ```text
-Core Performers
-Quality Underperformers
-High Reward / High Risk
-Avoid / Value Trap
+Derived metrics
+   ↓
+Correlation / redundancy matrix
+   ↓
+Clusters
+   ↓
+Representative / supplementary / context roles
+   ↓
+Factor matrix
 ```
 
-A stock normally has one primary classification and may carry multiple secondary signal tags.
+Known candidates to inspect include:
 
-Classification must be derived from V2 evaluation, not copied from legacy.
-
-Important rules:
-
-- severe evidence-based Avoid conditions may override a positive composite score
-- data gaps do not automatically mean Avoid
-- quality underperformers must remain discoverable
-- High Reward / High Risk must not become a list of low-quality speculative stocks
-- insufficient evidence may remain Watch / Neutral / Unclassified
-
-Each classification should expose confidence:
-
-`High / Medium / Low / Insufficient Data`
+```text
+ROE ↔ ROA
+Revenue Growth ↔ EPS Growth
+P/E ↔ PEG
+P/B ↔ ROE
+P/S ↔ Net Margin
+EV/Revenue ↔ P/S
+Operating Margin ↔ Net Margin
+FCF ↔ FCF Yield
+Performance-period overlaps
+Volume-derived overlaps
+Growth ↔ High Reward
+Momentum ↔ High Reward
+Safety ↔ Risk
+```
 
 ---
 
-# 16. Phase 12 — Shared Screener Result Set
+# 22. Risk Model — PENDING THEORY
 
-Dashboard and Ranking consume one result object.
-
-Conceptual structure:
+Risk is split into two layers:
 
 ```text
-identity
-component scores
-overall score
-rank
-classification
-signals
-coverage
+HARD RISK
+→ catastrophic / combined evidence
+→ may block classification
+
+SOFT RISK
+→ elevated but non-catastrophic
+→ affects internal ranking / context
+```
+
+A single weak metric should not automatically become a Hard Risk veto.
+
+Example concept:
+
+```text
+Negative FCF alone
+→ NEGATIVE_FCF signal
+
+Negative FCF
++ high leverage
++ liquidity stress
+→ HARD_RISK / VALUE_TRAP candidate
+```
+
+The exact thresholds, combinations and veto semantics remain pending.
+
+---
+
+# 23. Classification Model — PENDING THEORY
+
+The primary decision tree is:
+
+```text
+1. DATA GATE
+       ↓
+2. HARD RISK / VALUE TRAP GATE
+       ↓
+3. HIGH REWARD GATE
+       ↓
+4. CORE GATE
+       ↓
+5. UNDERPERFORM GATE
+       ↓
+6. WATCH / NEUTRAL / UNKNOWN
+```
+
+The second branch is explicitly **Hard Avoid / Value Trap**, not simply `Risk high = Avoid`.
+
+Reason:
+
+```text
+High Risk + strong Quality/Growth + strong Momentum
+→ potentially High Reward / High Risk
+```
+
+not automatically Avoid.
+
+Decision rules must specify:
+
+```text
+precedence
+veto
+unknown policy
+minimum coverage
+eligibility
 confidence
-relevant evidence
 reason codes
-version metadata
 ```
 
-Recommended version metadata:
+No final thresholds are approved.
+
+---
+
+# 24. Classification Confidence — PENDING
+
+Each primary classification should eventually expose:
 
 ```text
-parser_version
-mapping_version
-evaluation_version
-classification_version
-dataset_import_id
-dataset_as_of
+High
+Medium
+Low
+Insufficient Data
 ```
 
----
-
-# 17. Phase 13 — User-Initiated Node 1 Context
-
-Node 1 context is generated only after the user explicitly starts CRSM for a selected stock.
-
-It should contain:
-
-- identity
-- classification and confidence
-- rank
-- factor scores and coverage
-- signals/anomalies
-- relevant current metrics
-- warnings
-- verification priorities
-
-Node 1 should verify important Screener conclusions, investigate anomalies, fill data gaps and research information unavailable from TradingView.
-
-Node 1 must not treat Screener signals as confirmed facts.
-
-DIRECT mode remains supported independently.
+Confidence must reflect evidence quality/coverage and rule clarity, not simply the magnitude of a score.
 
 ---
 
-# 18. Phase 14 — Validation
+# 25. Ranking Tab — PENDING FINAL FACTOR MODEL
 
-### Data validation
+Ranking remains independent from classification.
+
+Ranking may expose:
 
 ```text
-field position = correct
-field meaning  = correct
-quantity      = full numeric quantity
-percentage    = percentage points
-ratio         = ratio
+batch percentile
+factor rank
+axis rank
+signal tags
 ```
 
-### Evaluation validation
-
-Use representative cases:
-
-- strong quality / strong growth
-- strong quality / weak momentum
-- high growth / expensive valuation
-- cheap / weak business
-- high leverage
-- negative FCF
-- missing valuation data
-- extreme growth
-- deep drawdown
-- low liquidity
-- earnings-quality anomaly
-
-### Ranking validation
-
-Inspect:
-
-- score distribution
-- top/bottom ranks
-- sector/industry concentration
-- missing-data effects
-- metric sensitivity
-- current validation cases
-
-Do not alter formulas merely to force specific tickers into desired groups.
-
-### UI consistency
-
-Dashboard and Ranking must display the same Screener Result Set.
-
-### CRSM boundary
-
-Confirm no automatic CRSM start occurs after Screener evaluation.
+It must not alter the classification merely because the current batch size changes.
 
 ---
 
-# 19. Developer / Validation Tools
+# 26. Historical / Forward-return Validation — FUTURE
 
-Retain during V2 implementation:
+The current ~76-stock dataset is a validation sandbox, not a training set.
+
+It is sufficient for:
+
+- parser/evaluation debugging
+- distribution inspection
+- redundancy discovery
+- anomaly inspection
+- classification logic inspection
+- bias/coverage inspection
+
+It is not sufficient to prove predictive power or optimize thresholds statistically.
+
+Forward-return validation is deferred until historical Screener snapshots exist:
+
+```text
+snapshot date
+→ score/classification
+→ forward 1M / 3M return
+```
+
+Do not pretend to have statistical validation without historical snapshots.
+
+---
+
+# 27. Implementation Order — AFTER THEORY FREEZE
+
+**Do not start this phase until all PENDING THEORY sections above are approved.**
+
+```text
+1. Finalize data/state/provenance contracts
+2. Finalize all Derived Metric Families
+3. Finalize redundancy / representative metrics
+4. Finalize signal/anomaly rules
+5. Finalize factor matrix
+6. Finalize anchored scoring functions
+7. Finalize Hard/Soft Risk model
+8. Finalize classification decision tree
+9. Finalize ranking model
+10. Freeze implementation specification
+11. Implement D1 Contract Validator
+12. Implement D2 Price Dislocation Evaluator
+13. Implement D3 Diagnostic Runner
+14. Run scenario tests
+15. Expand evaluator family-by-family
+16. Replace legacy production scoring only after validation
+17. Verify Dashboard + Ranking use one result set
+18. Verify explicit-only CRSM handoff
+```
+
+---
+
+# 28. Developer / QA Tools
+
+Keep these tools during V2 development:
 
 - Mapping tab
 - Raw Clipboard Inspector
 - Parser Debug
 - reconstructed table
 - full-table copy/export validation
+- scenario/debug panel
+- result/lineage inspection
 
-These are QA/developer tools, not part of the analytical model. Keep them until the new evaluation engine passes real-data validation.
-
----
-
-# 20. Artifacts Before Final Scoring
-
-Create reviewable artifacts in this order:
-
-1. `screener_v2_data_dictionary.md`
-2. `screener_v2_legacy_audit.md`
-3. `screener_v2_field_role_mapping.md`
-4. `screener_v2_derived_metrics.md`
-5. `screener_v2_signals.md`
-6. `screener_v2_factor_spec.md`
-7. `screener_v2_classification_model.md`
-8. `screener_v2_result_contract.md`
-9. `screener_v2_decision_log.md`
-10. `screener_v2_validation_plan.md`
-
-No final scoring weights are coded before these decisions are reviewed.
+They are QA/developer tools, not part of the investment model. Do not remove them until the new engine passes real-data validation.
 
 ---
 
-# 21. Implementation Order
+# 29. Required Review Artifacts
+
+Create/update these artifacts as the theory is finalized:
 
 ```text
-1. Freeze/validate ingestion
-2. Audit legacy
-3. Define universe/row states
-4. Map field roles
-5. Define Raw / Derived / Signal
-6. Define ranking direction/granularity
-7. Define missing-data/coverage
-8. Define anomaly taxonomy
-9. Define factor architecture
-10. Review double-counting
-11. Define classification
-12. Define shared result set
-13. Define user-initiated Node 1 context
-14. Validate on real data
-15. Implement final evaluation/scoring
+screener_v2_data_dictionary.md
+screener_v2_legacy_audit.md
+screener_v2_field_role_mapping.md
+screener_v2_derived_metrics.md
+screener_v2_signals.md
+screener_v2_factor_spec.md
+screener_v2_classification_model.md
+screener_v2_result_contract.md
+screener_v2_decision_log.md
+screener_v2_validation_plan.md
 ```
 
-Do not jump directly from the new dataset to scoring formulas.
+These documents should not duplicate implementation code. They capture the decisions that must survive across sessions.
 
 ---
 
-# 22. Explicit Non-Goals
+# 30. Final Definition of Done
 
-This phase does not include:
+The Screener V2 theory phase is complete only when:
 
-- automatic CRSM handoff
-- automatic Node 1 execution after Screener
-- SSI / future native market-data integration
-- replacing TradingView as current source
-- rewriting CRSM architecture
-- changing CRSM provider/model routing
-- redesigning unrelated CRSM nodes
-- reproducing legacy scoring for compatibility
-- inventing catalysts or qualitative narratives inside Screener
+- [x] TradingView mapping contract is established.
+- [x] Percentage/ratio/quantity parsing semantics are established.
+- [x] Dashboard/Ranking/CRSM boundary is established.
+- [x] Overall score is no longer the central architecture.
+- [x] Quality / Opportunity / Risk axes are established.
+- [x] Typed DAG architecture is established.
+- [x] Data state / UNKNOWN concept is established.
+- [x] Coverage / Criticality concept is established.
+- [x] Provenance concept is established.
+- [x] Contribution lineage / impact budget concept is established.
+- [x] Redundancy-before-scoring principle is established.
+- [x] Price Dislocation Family is defined as the first vertical slice.
+- [ ] Momentum / Volume Family finalized.
+- [ ] Growth Family finalized.
+- [ ] Cash Flow Family finalized.
+- [ ] Balance Sheet / Safety Family finalized.
+- [ ] Earnings Quality Family finalized.
+- [ ] Correlation/redundancy decisions finalized.
+- [ ] Anchored metric scoring finalized.
+- [ ] Factor Matrix finalized.
+- [ ] Hard/Soft Risk rules finalized.
+- [ ] Classification rules finalized.
+- [ ] Ranking rules finalized.
+- [ ] Final implementation specification frozen.
 
-`legacy/` is reference material only.
-
----
-
-# 23. Definition of Done
-
-## Data
-
-- [ ] Four-line TradingView format parsed reliably.
-- [ ] Ticker/company separation correct.
-- [ ] All 46 analytical fields mapped correctly.
-- [ ] Market Cap / Price / Volume / Avg Volume / Revenue / FCF decoded to full quantities.
-- [ ] Percentage fields remain percentage points.
-- [ ] Ratio fields remain ratios.
-- [ ] Missing and invalid states are explicit.
-- [ ] FQ/FY/TTM remain separate.
-- [ ] Raw TradingView comparison passes after quantity-decoding update.
-
-## Evaluation
-
-- [ ] Legacy audited.
-- [ ] Every field has a documented role or is intentionally unused.
-- [ ] Universe states defined.
-- [ ] Liquidity policy defined.
-- [ ] Ranking direction/granularity defined.
-- [ ] Missing-data/coverage defined.
-- [ ] Signal taxonomy defined.
-- [ ] Factors defined.
-- [ ] Double-counting reviewed.
-- [ ] Final weights justified and validated.
-- [ ] Classification validated.
-- [ ] Ranking validated on real data.
-
-## Dashboard / Ranking
-
-- [ ] Four Dashboard tables use one result set.
-- [ ] Ranking uses the same result set.
-- [ ] Data-gap/ambiguous stocks are not forced into investment tables.
-- [ ] Signals/confidence are visible where appropriate.
-
-## CRSM
-
-- [ ] No automatic CRSM handoff.
-- [ ] User explicitly starts CRSM from a selected stock.
-- [ ] Node 1 context is generated from the shared result set.
-- [ ] Node 1 receives verification priorities.
-- [ ] DIRECT mode remains functional.
-
----
-
-# 24. Golden Rules
-
-1. **Map first, evaluate second, code third.**
-2. **Preserve TradingView meaning.**
-3. **Decode quantity formatting; do not change financial semantics.**
-4. **Percentages are percentage points; never divide by 100 during ingestion.**
-5. **Ratios remain ratios.**
-6. **Missing is not zero.**
-7. **FQ/FY/TTM are not merged prematurely.**
-8. **Raw, Derived and Signal are separate.**
-9. **Do not use `1/x` to reverse ranking direction.**
-10. **Do not blindly winsorize extreme values.**
-11. **Avoid double-counting correlated evidence.**
-12. **Data quality is separate from business quality.**
-13. **Dashboard and Ranking use the same Screener Result Set.**
-14. **Screener never automatically starts CRSM.**
-15. **Node 1 context is created only after explicit user action.**
-16. **Screener does not invent catalysts or qualitative stories unavailable in source data.**
-17. **Legacy is reference, not specification.**
+**Only after the final implementation specification is frozen should production Screener V2 code be changed.**
