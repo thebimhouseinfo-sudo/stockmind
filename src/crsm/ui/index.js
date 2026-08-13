@@ -1,29 +1,21 @@
 import { crsmState, notifyCRSM } from '../state.js';
 import { renderProgress } from './progress.js';
-import { renderSnapshot } from './snapshot.js';
 import { renderStatusBadge } from './status.js';
 import { renderError } from './error.js';
 import { renderDirectEntry } from './direct.js';
 import { totalUsage } from '../usage.js';
-import { ingestUserEvidence, getPendingUserEvidence } from '../user-evidence.js';
+import { ingestUserEvidence } from '../user-evidence.js';
 
 export function renderCRSMTab() {
   return `<section class="grid crsm-analysis-page">
-    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research &amp; Strategy Machine</h1>${renderSourceBadge()}</div></div>
+    <div class="crsm-head"><div><p class="eyebrow">CRSM</p><h1>Capital Research &amp; Strategy Machine</h1></div></div>
     ${renderDirectEntry()}
     <div id="crsmDynamic">${renderDynamicContent()}</div>
   </section>`;
 }
 
-function renderSourceBadge() {
-  if (!crsmState.mode) return '<p class="muted">Screening → CRSM hoặc Direct Analysis</p>';
-  const screened = crsmState.mode === 'SCREENED';
-  return `<div class="crsm-source ${screened ? 'screened' : 'direct'}"><strong>${screened ? 'SCREENED · từ Ranking' : 'DIRECT · nhập tay'}</strong>${crsmState.ticker ? `<span>${escapeHtml(crsmState.ticker)}</span>` : ''}</div>`;
-}
-
 export function renderDynamicContent() {
-  const hasScreening = crsmState.mode === 'SCREENED' && crsmState.screeningContext;
-  return `${hasScreening ? renderSnapshot() : ''}${renderProgress()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
+  return `${renderProgress()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
 }
 
 function renderCostStrip() {
