@@ -26,8 +26,8 @@ const GEMINI_3_FLASH = {
 export const DEFAULT_SETTINGS = {
   theme: 'light',
   crsm: {
-    // Legacy field kept for migration/backward compatibility. The engine now
-    // resolves execution from dependency stages + executionPolicy below.
+    // Legacy field kept for backward compatibility. Execution now uses the
+    // dependency-bounded executionPolicy below.
     executionMode: 'sequential',
     executionPolicy: {
       default: 'auto',
