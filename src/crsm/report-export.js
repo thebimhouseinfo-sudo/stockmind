@@ -1,3 +1,72 @@
+export function markdownToHtml(markdown) {
+  const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n');
+  const html = [];
+  let inList = false;
+  let tableRows = null;
+
+  const closeList = () => { if (inList) { html.push('</ul>'); inList = false; } };
+  const inlineFormat = text => escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const flushTable = () => {
+    if (!tableRows || !tableRows.length) { tableRows = null; return; }
+    const [headerCells, , ...bodyRows] = tableRows;
+    html.push('<table><thead><tr>' + headerCells.map(c => `<th>${inlineFormat(c)}</th>`).join('') + '</tr></thead><tbody>');
+    bodyRows.forEach(row => { html.push('<tr>' + row.map(c => `<td>${inlineFormat(c)}</td>`).join('') + '</tr>'); });
+    html.push('</tbody></table>');
+    tableRows = null;
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const isTableRow = /^\|.*\|$/.test(line);
+
+    if (isTableRow) {
+      closeList();
+      const cells = line.slice(1, -1).split('|').map(c => c.trim());
+      if (!tableRows) tableRows = [];
+      tableRows.push(cells);
+      continue;
+    }
+    if (tableRows) flushTable();
+
+    if (!line) { closeList(); continue; }
+    if (line === '---') { closeList(); html.push('<hr>'); continue; }
+
+    const heading = line.match(/^(#{1,6})\s+(.*)$/);
+    if (heading) {
+      closeList();
+      const level = heading[1].length;
+      html.push(`<h${level}>${inlineFormat(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    const listItem = line.match(/^-\s+(.*)$/);
+    if (listItem) {
+      if (!inList) { html.push('<ul>'); inList = true; }
+      html.push(`<li>${inlineFormat(listItem[1])}</li>`);
+      continue;
+    }
+
+    closeList();
+    html.push(`<p>${inlineFormat(line)}</p>`);
+  }
+  closeList();
+  if (tableRows) flushTable();
+  return html.join('\n');
+}
+
+export function buildWordHtmlDocument(markdown, ticker) {
+  const body = markdownToHtml(markdown);
+  const styles = `body{font-family:'Times New Roman',Times,serif;color:#111;line-height:1.5;max-width:900px;margin:0 auto;padding:24px}
+h1{font-size:22pt;margin-bottom:4px}h2{font-size:16pt;border-bottom:1px solid #ccc;padding-bottom:4px;margin-top:24px}
+h3{font-size:13pt;margin-top:18px}p{font-size:11pt;margin:6px 0}
+ul{margin:6px 0;padding-left:22px}li{font-size:11pt;margin:2px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0}th,td{border:1px solid #999;padding:6px 8px;font-size:10pt;text-align:left}
+th{background:#f0f0f0}hr{border:none;border-top:1px solid #ccc;margin:18px 0}`;
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>CRSM ${escapeHtml(ticker)}</title><style>${styles}</style></head><body>${body}</body></html>`;
+}
+
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -146,6 +215,17 @@ export function downloadWordReport(reportHtml, ticker) {
   const html = normalizeHtmlDocument(reportHtml, ticker);
   const { styles, body } = extractStylesAndBody(html);
   const word = `<!doctype html><html><head><meta charset="utf-8"><meta name="ProgId" content="Word.Document"><title>CRSM ${escapeHtml(ticker)}</title><style>${styles}\n@page{size:A4;margin:18mm}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page{max-width:none!important;margin:0!important}</style></head><body>${body}</body></html>`;
+  downloadBlob(new Blob([word], { type: 'application/msword' }), `CRSM_${safeName(ticker)}_${dateStamp()}.doc`);
+}
+
+// Node 6B is the locked, text-first Markdown report. This produces the actual
+// downloadable "Word" document from it, instead of reusing the Node 6A HTML report.
+export function downloadWordReportFromMarkdown(markdown, ticker) {
+  if (!markdown) return;
+  const word = buildWordHtmlDocument(markdown, ticker).replace(
+    '<head>',
+    '<head><meta name="ProgId" content="Word.Document">'
+  );
   downloadBlob(new Blob([word], { type: 'application/msword' }), `CRSM_${safeName(ticker)}_${dateStamp()}.doc`);
 }
 

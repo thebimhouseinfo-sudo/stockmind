@@ -78,4 +78,15 @@ export function resolvePath(obj, path) {
   return cur;
 }
 
+// Node 5's `decision` field is a fixed machine enum (BUY/HOLD/SELL/...), kept in
+// English so downstream logic and the Decision Log stay unambiguous. Every
+// human-facing renderer (Node 6A HTML, Node 6B Markdown, Decision Log) must
+// translate it through this single map rather than displaying it raw.
+const DECISION_LABELS = { BUY: 'MUA', SELL: 'BÁN', HOLD: 'NẮM GIỮ', 'BUY ON DIP': 'MUA KHI ĐIỀU CHỈNH', WATCH: 'THEO DÕI' };
+
+export function decisionLabel(value) {
+  const v = String(value ?? '').trim();
+  return DECISION_LABELS[v.toUpperCase()] || v || MISSING_SHORT;
+}
+
 export { MISSING_SHORT };
