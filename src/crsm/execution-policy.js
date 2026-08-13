@@ -1,4 +1,5 @@
 import { NODES_LOCAL, loadSettings } from './settings.js';
+import './ui/settings-polish.js';
 
 // Dependency stages are fixed by data requirements. Execution policy may only
 // choose how independently runnable tasks inside a stage are scheduled.
