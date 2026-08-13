@@ -5,14 +5,38 @@ import { totalUsage, usageByNode, usageByModel, filterUsageHistory, usageSummary
 // Settings is compact: CRSM Engine controls execution and node assignments;
 // Providers manages API connections/model registry; Usage and Cost are monitoring views.
 const TAB_DEFS = [['engine', 'CRSM Engine'], ['providers', 'Providers'], ['usage', 'Usage'], ['cost', 'Cost']];
+let draftSettings = null;
+let savedSnapshot = '';
+
+function getDraftSettings() {
+  if (!draftSettings) {
+    const source = loadSettings();
+    draftSettings = typeof structuredClone === 'function' ? structuredClone(source) : JSON.parse(JSON.stringify(source));
+    savedSnapshot = JSON.stringify(draftSettings);
+  }
+  return draftSettings;
+}
+
+function settingsDirty() {
+  return JSON.stringify(draftSettings || {}) !== savedSnapshot;
+}
+
+function discardDraft() {
+  draftSettings = null;
+  savedSnapshot = '';
+}
 
 export function renderSettings(activeTab = 'engine', period = '7d') {
-  const settings = loadSettings();
+  const settings = getDraftSettings();
   const active = TAB_DEFS.some(([id]) => id === activeTab) ? activeTab : 'engine';
   return `<div class="panel panel-pad settings-panel">
-    <div class="title-row"><div><p class="eyebrow">CRSM Control Center</p><h2>Cấu hình & theo dõi hệ thống</h2></div><button class="btn" id="crsmSettingsClose">✕ Đóng</button></div>
+    <div class="title-row"><div><p class="eyebrow">CRSM Control Center</p><h2>Cấu hình & theo dõi hệ thống</h2></div></div>
     <div class="settings-tabs" role="tablist">${TAB_DEFS.map(([id, label]) => `<button class="settings-tab ${id === active ? 'active' : ''}" data-setting-tab="${id}" role="tab">${label}</button>`).join('')}</div>
     <div class="settings-tab-content">${active === 'engine' ? renderEngineTab(settings) : ''}${active === 'providers' ? renderProvidersTab(settings) : ''}${active === 'usage' ? renderUsageTab() : ''}${active === 'cost' ? renderCostTab(settings, period) : ''}</div>
+    <div class="settings-footer">
+      <div class="settings-save-state">${settingsDirty() ? 'Có thay đổi chưa lưu' : 'Đã lưu'}</div>
+      <div class="settings-footer-actions"><button class="btn" id="crsmSettingsClose">Đóng</button><button class="btn primary" id="crsmSettingsSave">Save Changes</button></div>
+    </div>
   </div>`;
 }
 
@@ -84,8 +108,8 @@ function metric(label, value) { return `<div class="panel metric"><p class="metr
 export function bindSettingsEvents() {
   document.querySelectorAll('.settings-panel [data-setting-tab]').forEach(btn => btn.addEventListener('click', ev => replaceSettings(ev.currentTarget.dataset.settingTab)));
   document.querySelectorAll('.settings-panel [data-cost-period]').forEach(btn => btn.addEventListener('click', ev => replaceSettings('cost', ev.currentTarget.dataset.costPeriod)));
-  document.querySelectorAll('.settings-panel [data-execution-mode]').forEach(input => input.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.executionMode = ev.target.checked ? 'parallel' : 'sequential'; saveSettings(settings); }));
-  document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('change', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; const settings = loadSettings(); settings.crsm.providers[provider].apiKey = ev.target.value.trim() || null; saveSettings(settings); }));
+  document.querySelectorAll('.settings-panel [data-execution-mode]').forEach(input => input.addEventListener('change', ev => { const settings = getDraftSettings(); settings.crsm.executionMode = ev.target.checked ? 'parallel' : 'sequential'; replaceSettings('engine'); }));
+  document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('input', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; getDraftSettings().crsm.providers[provider].apiKey = ev.target.value.trim() || null; updateSaveState(); }));
   document.querySelectorAll('.settings-panel [data-addmodel]').forEach(btn => btn.addEventListener('click', ev => {
     const provider = ev.target.dataset.addmodel;
     const id = prompt(`Model ID cho ${PROVIDER_INFO[provider]?.label || provider}:`);
@@ -93,39 +117,55 @@ export function bindSettingsEvents() {
     const inputPrice = prompt('Input USD / 1M tokens (để trống nếu chưa biết):', '');
     const outputPrice = prompt('Output USD / 1M tokens (để trống nếu chưa biết):', '');
     const hasGrounding = confirm(`${id.trim()} — model hỗ trợ web grounding? OK = Có.`);
-    const settings = loadSettings();
+    const settings = getDraftSettings();
     settings.crsm.providers[provider].models = settings.crsm.providers[provider].models || [];
     settings.crsm.providers[provider].models.push({ id:id.trim(), displayName:id.trim(), builtin:false, pricing:{ inputPer1M:parsePrice(inputPrice), outputPer1M:parsePrice(outputPrice), currency:'USD' }, capabilities:{ webGrounding:hasGrounding, structuredOutput:true, reasoning:false } });
-    saveSettings(settings);
     replaceSettings('providers');
   }));
   document.querySelectorAll('.settings-panel [data-removemodel]').forEach(btn => btn.addEventListener('click', ev => {
     const modelId = ev.target.dataset.removemodel;
     const provider = ev.target.closest('[data-provider]')?.dataset.provider;
-    const settings = loadSettings();
+    const settings = getDraftSettings();
     settings.crsm.providers[provider].models = (settings.crsm.providers[provider].models || []).filter(m => m.id !== modelId);
-    saveSettings(settings);
     replaceSettings('providers');
   }));
   document.querySelectorAll('.settings-panel [data-assign]').forEach(ctl => ctl.addEventListener('change', ev => {
     const row = ev.target.closest('[data-node]'); const nodeId = row?.dataset.node; if (!nodeId) return;
-    const field = ev.target.dataset.assign; const settings = loadSettings(); const a = settings.crsm.nodeAssignment[nodeId];
+    const field = ev.target.dataset.assign; const settings = getDraftSettings(); const a = settings.crsm.nodeAssignment[nodeId];
     if (field === 'provider') { a.provider = ev.target.value; a.model = settings.crsm.providers[a.provider]?.models?.[0]?.id || null; }
     else if (field === 'model') a.model = ev.target.value;
     else if (field === 'enabled') a.enabled = ev.target.checked;
-    saveSettings(settings); replaceSettings('engine');
+    replaceSettings('engine');
   }));
-  const budget = document.getElementById('crsmBudgetInput'); if (budget) budget.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.costControl.monthlyBudgetUsd = Math.max(0, Number(ev.target.value) || 0); saveSettings(settings); replaceSettings('cost'); });
-  const threshold = document.getElementById('crsmBudgetThreshold'); if (threshold) threshold.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.costControl.warningThresholdPct = Math.min(100, Math.max(1, Number(ev.target.value) || 80)); saveSettings(settings); replaceSettings('cost'); });
+  const budget = document.getElementById('crsmBudgetInput'); if (budget) budget.addEventListener('input', ev => { const settings = getDraftSettings(); settings.crsm.costControl.monthlyBudgetUsd = Math.max(0, Number(ev.target.value) || 0); updateSaveState(); });
+  const threshold = document.getElementById('crsmBudgetThreshold'); if (threshold) threshold.addEventListener('input', ev => { const settings = getDraftSettings(); settings.crsm.costControl.warningThresholdPct = Math.min(100, Math.max(1, Number(ev.target.value) || 80)); updateSaveState(); });
   const clearRun = document.getElementById('crsmClearUsage'); if (clearRun) clearRun.addEventListener('click', () => { crsmState.usage = []; replaceSettings('usage'); });
   const clearHistory = document.getElementById('crsmClearHistory'); if (clearHistory) clearHistory.addEventListener('click', () => { if (confirm('Xóa toàn bộ lịch sử usage/cost trên trình duyệt này?')) { clearUsageHistory(); replaceSettings('cost','all'); } });
-  const close = document.getElementById('crsmSettingsClose'); if (close) close.addEventListener('click', () => { const panel = document.querySelector('.settings-panel'); if (panel) panel.outerHTML = ''; });
+  const save = document.getElementById('crsmSettingsSave'); if (save) save.addEventListener('click', () => { const settings = getDraftSettings(); saveSettings(settings); savedSnapshot = JSON.stringify(settings); updateSaveState(); });
+  const close = document.getElementById('crsmSettingsClose'); if (close) close.addEventListener('click', () => {
+    if (settingsDirty() && !confirm('Bạn có thay đổi chưa lưu. Đóng và bỏ các thay đổi này?')) return;
+    discardDraft();
+    const toggle = document.getElementById('openSettings');
+    if (toggle) toggle.click();
+    else { const panel = document.querySelector('.settings-panel'); if (panel) panel.remove(); }
+  });
 }
 
-function replaceSettings(tab = 'engine', period = '7d') { const panel = document.querySelector('.settings-panel'); if (!panel) return; panel.outerHTML = renderSettings(tab, period); bindSettingsEvents(); }
+function updateSaveState() {
+  const state = document.querySelector('.settings-save-state');
+  if (state) state.textContent = settingsDirty() ? 'Có thay đổi chưa lưu' : 'Đã lưu';
+}
+
+function replaceSettings(tab = 'engine', period = '7d') {
+  const panel = document.querySelector('.settings-panel');
+  if (!panel) return;
+  panel.outerHTML = renderSettings(tab, period);
+  bindSettingsEvents();
+}
+
 function parsePrice(value) { if (value == null || value.trim() === '') return null; const n = Number(value); return Number.isFinite(n) && n >= 0 ? n : null; }
 function formatNumber(value) { return Number(value || 0).toLocaleString('en-US'); }
 function formatCost(value) { return `$${Number(value || 0).toFixed(4)}`; }
 function formatDuration(ms) { if (!Number.isFinite(ms)) return '—'; return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`; }
 function escapeHtml(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escapeAttr(value) { return escapeHtml(value).replace(/"/g,'&quot;'); }
+function escapeAttr(value) { return escapeHtml(value).replace(/\"/g,'&quot;'); }
