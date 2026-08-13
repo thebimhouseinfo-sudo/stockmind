@@ -1,15 +1,18 @@
 import { crsmState, notifyCRSM } from '../state.js';
 import { renderAnalysisDashboard } from './analysis-dashboard.js';
+import { ensureAnalysisUiPolish } from './analysis-ui-polish.js';
 import { renderStatusBadge } from './status.js';
 import { ingestUserEvidence } from '../user-evidence.js';
 
 export function renderCRSMTab() {
+  ensureAnalysisUiPolish();
   return `<section class="grid crsm-analysis-page">
     <div id="crsmDynamic">${renderDynamicContent()}</div>
   </section>`;
 }
 
 export function renderDynamicContent() {
+  ensureAnalysisUiPolish();
   return `${renderAnalysisDashboard()}${renderStatusBadge()}`;
 }
 
@@ -19,6 +22,7 @@ export function updateDynamicRegion() {
 }
 
 export function bindCRSMUIBindings() {
+  ensureAnalysisUiPolish();
   bindDynamicEvents();
   bindEvidenceUpload();
 }
