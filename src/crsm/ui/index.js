@@ -1,8 +1,6 @@
 import { crsmState, notifyCRSM } from '../state.js';
 import { renderAnalysisDashboard } from './analysis-dashboard.js';
 import { renderStatusBadge } from './status.js';
-import { renderError } from './error.js';
-import { totalUsage } from '../usage.js';
 import { ingestUserEvidence } from '../user-evidence.js';
 
 export function renderCRSMTab() {
@@ -12,13 +10,9 @@ export function renderCRSMTab() {
 }
 
 export function renderDynamicContent() {
-  return `${renderAnalysisDashboard()}${renderStatusBadge()}${renderCostStrip()}${renderError()}`;
-}
-
-function renderCostStrip() {
-  const total = totalUsage();
-  if (!crsmState.usage?.length) return '';
-  return `<div class="panel panel-pad crsm-cost-strip"><span><span class="muted">Chi phí lần chạy</span><strong>$${Number(total.cost || 0).toFixed(4)}</strong></span><span><span class="muted">Tokens</span><strong>${((total.input || 0) + (total.output || 0)).toLocaleString('vi-VN')}</strong></span><span><span class="muted">Requests</span><strong>${crsmState.usage.length}</strong></span></div>`;
+  // Analysis dashboard now owns the run-cost card and inline retry actions.
+  // Keep only the small screening-vs-CRSM status badge as a separate block.
+  return `${renderAnalysisDashboard()}${renderStatusBadge()}`;
 }
 
 export function updateDynamicRegion() {
