@@ -2,39 +2,22 @@ import { loadSettings, saveSettings, PROVIDER_INFO, NODES_LLM } from '../setting
 import { crsmState } from '../state.js';
 import { totalUsage, usageByNode, usageByModel, filterUsageHistory, usageSummary, clearUsageHistory } from '../usage.js';
 
-// Settings stays compact: execution is grouped under System; only AI nodes expose model assignment.
-const TAB_DEFS = [['system', 'System'], ['nodes', 'AI Nodes'], ['usage', 'Usage'], ['cost', 'Cost']];
+// Settings is compact: CRSM Engine controls execution and node assignments;
+// Providers manages API connections/model registry; Usage and Cost are monitoring views.
+const TAB_DEFS = [['engine', 'CRSM Engine'], ['providers', 'Providers'], ['usage', 'Usage'], ['cost', 'Cost']];
 
-export function renderSettings(activeTab = 'system', period = '7d') {
+export function renderSettings(activeTab = 'engine', period = '7d') {
   const settings = loadSettings();
-  const active = TAB_DEFS.some(([id]) => id === activeTab) ? activeTab : 'system';
+  const active = TAB_DEFS.some(([id]) => id === activeTab) ? activeTab : 'engine';
   return `<div class="panel panel-pad settings-panel">
     <div class="title-row"><div><p class="eyebrow">CRSM Control Center</p><h2>Cấu hình & theo dõi hệ thống</h2></div><button class="btn" id="crsmSettingsClose">✕ Đóng</button></div>
     <div class="settings-tabs" role="tablist">${TAB_DEFS.map(([id, label]) => `<button class="settings-tab ${id === active ? 'active' : ''}" data-setting-tab="${id}" role="tab">${label}</button>`).join('')}</div>
-    <div class="settings-tab-content">${active === 'system' ? renderSystemTab(settings) : ''}${active === 'nodes' ? renderNodesTab(settings) : ''}${active === 'usage' ? renderUsageTab() : ''}${active === 'cost' ? renderCostTab(settings, period) : ''}</div>
+    <div class="settings-tab-content">${active === 'engine' ? renderEngineTab(settings) : ''}${active === 'providers' ? renderProvidersTab(settings) : ''}${active === 'usage' ? renderUsageTab() : ''}${active === 'cost' ? renderCostTab(settings, period) : ''}</div>
   </div>`;
 }
 
-function renderSystemTab(settings) {
+function renderEngineTab(settings) {
   const parallel = settings.crsm.executionMode === 'parallel';
-  const providers = Object.entries(settings.crsm.providers).map(([id, cfg]) => `<div class="settings-block" data-provider="${id}">
-    <div class="settings-row">
-      <div><strong>${PROVIDER_INFO[id]?.label || id}</strong><div class="muted settings-caption">${PROVIDER_INFO[id]?.subtitle || 'API provider'}</div></div>
-      <label class="settings-label">API Key<input type="password" class="search" data-field="apikey" value="${escapeAttr(cfg.apiKey || '')}" placeholder="API key" autocomplete="off"></label>
-    </div>
-  </div>`).join('');
-  return `<div class="settings-section">
-    <div class="settings-section-head"><div><h3>PIPELINE</h3><p class="muted">Các thiết lập chung của CRSM.</p></div></div>
-    <div class="settings-row execution-row">
-      <div><strong>Execution mode</strong><div class="muted settings-caption">Parallel chỉ chạy khi dependency cho phép; backend vẫn kiểm soát thứ tự thực thi.</div></div>
-      <label class="settings-check execution-toggle"><span>Sequential</span><input type="checkbox" id="crsmExecutionMode" data-execution-mode ${parallel ? 'checked' : ''}><span>Parallel</span></label>
-    </div>
-    <div class="settings-section-head settings-subsection-head"><div><h3>API PROVIDERS</h3><p class="muted">API key được cấu hình tại đây. Model được chọn ở tab AI Nodes.</p></div></div>
-    ${providers}
-  </div>`;
-}
-
-function renderNodesTab(settings) {
   const rows = NODES_LLM.map(nodeId => {
     const a = settings.crsm.nodeAssignment[nodeId] || {};
     const label = { node1: 'Node 1', node2: 'Node 2', node3: 'Node 3', node4: 'Node 4', node5: 'Node 5' }[nodeId] || nodeId;
@@ -49,11 +32,31 @@ function renderNodesTab(settings) {
       <label class="settings-check"><input type="checkbox" data-assign="enabled" ${a.enabled !== false ? 'checked' : ''}> bật</label>
     </div>`;
   }).join('');
+
   return `<div class="settings-section">
-    <div class="settings-section-head"><div><h3>AI NODE MODEL ASSIGNMENT</h3><p class="muted">Chỉ các node thực sự gọi AI xuất hiện ở đây.</p></div></div>
+    <div class="settings-section-head"><div><h3>CRSM ENGINE</h3><p class="muted">Điều khiển cách pipeline chạy và model được dùng cho từng node.</p></div></div>
+    <div class="settings-row execution-row">
+      <div><strong>Execution mode</strong><div class="muted settings-caption">Parallel chỉ chạy khi dependency cho phép; backend vẫn kiểm soát thứ tự thực thi.</div></div>
+      <label class="settings-check execution-toggle"><span>Sequential</span><input type="checkbox" id="crsmExecutionMode" data-execution-mode ${parallel ? 'checked' : ''}><span>Parallel</span></label>
+    </div>
+    <div class="settings-section-head settings-subsection-head"><div><h3>NODE MODEL ASSIGNMENT</h3><p class="muted">Chỉ Node 1–5 sử dụng AI. Node 6A, 6B và Node 7 là local.</p></div></div>
     ${rows}
-    <div class="notice settings-notice">Node 6A, 6B và Node 7 là local pipeline nên không có cấu hình model trong Settings.</div>
   </div>`;
+}
+
+function renderProvidersTab(settings) {
+  const providers = Object.entries(settings.crsm.providers).map(([id, cfg]) => `<div class="settings-block" data-provider="${id}">
+    <div class="settings-row"><div><strong>${PROVIDER_INFO[id]?.label || id}</strong><div class="muted settings-caption">${PROVIDER_INFO[id]?.subtitle || 'API provider'}</div></div>
+      <label class="settings-label">API Key<input type="password" class="search" data-field="apikey" value="${escapeAttr(cfg.apiKey || '')}" placeholder="API key" autocomplete="off"></label>
+    </div>
+    <div class="settings-models">${(cfg.models || []).map(model => renderModelRow(model)).join('')}<button class="btn" data-addmodel="${id}">+ Add model</button></div>
+  </div>`).join('');
+  return `<div class="settings-section"><div class="settings-section-head"><div><h3>PROVIDERS & MODELS</h3><p class="muted">API connection và model registry. Assignment cho từng node nằm trong CRSM Engine.</p></div></div><div class="notice settings-notice">Capability và pricing được lưu cùng model để router và cost monitor sử dụng.</div>${providers}</div>`;
+}
+
+function renderModelRow(model) {
+  const p = model.pricing || {};
+  return `<div class="settings-model"><div><strong>${escapeHtml(model.displayName || model.id)}</strong><span class="muted">${escapeHtml(model.id)}${model.builtin ? ' · built-in' : ' · user-declared'}</span><span class="settings-mini">${p.inputPer1M != null && p.outputPer1M != null ? `$${p.inputPer1M}/M in · $${p.outputPer1M}/M out` : 'Chưa có giá'}</span></div>${model.builtin ? '' : `<button class="btn danger" data-removemodel="${escapeAttr(model.id)}">Xóa</button>`}</div>`;
 }
 
 function renderUsageTab() {
@@ -83,7 +86,35 @@ export function bindSettingsEvents() {
   document.querySelectorAll('.settings-panel [data-cost-period]').forEach(btn => btn.addEventListener('click', ev => replaceSettings('cost', ev.currentTarget.dataset.costPeriod)));
   document.querySelectorAll('.settings-panel [data-execution-mode]').forEach(input => input.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.executionMode = ev.target.checked ? 'parallel' : 'sequential'; saveSettings(settings); }));
   document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('change', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; const settings = loadSettings(); settings.crsm.providers[provider].apiKey = ev.target.value.trim() || null; saveSettings(settings); }));
-  document.querySelectorAll('.settings-panel [data-assign]').forEach(ctl => ctl.addEventListener('change', ev => { const row = ev.target.closest('[data-node]'); const nodeId = row?.dataset.node; if (!nodeId) return; const field = ev.target.dataset.assign; const settings = loadSettings(); const a = settings.crsm.nodeAssignment[nodeId]; if (field === 'provider') { a.provider = ev.target.value; a.model = settings.crsm.providers[a.provider]?.models?.[0]?.id || null; } else if (field === 'model') a.model = ev.target.value; else if (field === 'enabled') a.enabled = ev.target.checked; saveSettings(settings); replaceSettings('nodes'); }));
+  document.querySelectorAll('.settings-panel [data-addmodel]').forEach(btn => btn.addEventListener('click', ev => {
+    const provider = ev.target.dataset.addmodel;
+    const id = prompt(`Model ID cho ${PROVIDER_INFO[provider]?.label || provider}:`);
+    if (!id?.trim()) return;
+    const inputPrice = prompt('Input USD / 1M tokens (để trống nếu chưa biết):', '');
+    const outputPrice = prompt('Output USD / 1M tokens (để trống nếu chưa biết):', '');
+    const hasGrounding = confirm(`${id.trim()} — model hỗ trợ web grounding? OK = Có.`);
+    const settings = loadSettings();
+    settings.crsm.providers[provider].models = settings.crsm.providers[provider].models || [];
+    settings.crsm.providers[provider].models.push({ id:id.trim(), displayName:id.trim(), builtin:false, pricing:{ inputPer1M:parsePrice(inputPrice), outputPer1M:parsePrice(outputPrice), currency:'USD' }, capabilities:{ webGrounding:hasGrounding, structuredOutput:true, reasoning:false } });
+    saveSettings(settings);
+    replaceSettings('providers');
+  }));
+  document.querySelectorAll('.settings-panel [data-removemodel]').forEach(btn => btn.addEventListener('click', ev => {
+    const modelId = ev.target.dataset.removemodel;
+    const provider = ev.target.closest('[data-provider]')?.dataset.provider;
+    const settings = loadSettings();
+    settings.crsm.providers[provider].models = (settings.crsm.providers[provider].models || []).filter(m => m.id !== modelId);
+    saveSettings(settings);
+    replaceSettings('providers');
+  }));
+  document.querySelectorAll('.settings-panel [data-assign]').forEach(ctl => ctl.addEventListener('change', ev => {
+    const row = ev.target.closest('[data-node]'); const nodeId = row?.dataset.node; if (!nodeId) return;
+    const field = ev.target.dataset.assign; const settings = loadSettings(); const a = settings.crsm.nodeAssignment[nodeId];
+    if (field === 'provider') { a.provider = ev.target.value; a.model = settings.crsm.providers[a.provider]?.models?.[0]?.id || null; }
+    else if (field === 'model') a.model = ev.target.value;
+    else if (field === 'enabled') a.enabled = ev.target.checked;
+    saveSettings(settings); replaceSettings('engine');
+  }));
   const budget = document.getElementById('crsmBudgetInput'); if (budget) budget.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.costControl.monthlyBudgetUsd = Math.max(0, Number(ev.target.value) || 0); saveSettings(settings); replaceSettings('cost'); });
   const threshold = document.getElementById('crsmBudgetThreshold'); if (threshold) threshold.addEventListener('change', ev => { const settings = loadSettings(); settings.crsm.costControl.warningThresholdPct = Math.min(100, Math.max(1, Number(ev.target.value) || 80)); saveSettings(settings); replaceSettings('cost'); });
   const clearRun = document.getElementById('crsmClearUsage'); if (clearRun) clearRun.addEventListener('click', () => { crsmState.usage = []; replaceSettings('usage'); });
@@ -91,9 +122,10 @@ export function bindSettingsEvents() {
   const close = document.getElementById('crsmSettingsClose'); if (close) close.addEventListener('click', () => { const panel = document.querySelector('.settings-panel'); if (panel) panel.outerHTML = ''; });
 }
 
-function replaceSettings(tab = 'system', period = '7d') { const panel = document.querySelector('.settings-panel'); if (!panel) return; panel.outerHTML = renderSettings(tab, period); bindSettingsEvents(); }
+function replaceSettings(tab = 'engine', period = '7d') { const panel = document.querySelector('.settings-panel'); if (!panel) return; panel.outerHTML = renderSettings(tab, period); bindSettingsEvents(); }
+function parsePrice(value) { if (value == null || value.trim() === '') return null; const n = Number(value); return Number.isFinite(n) && n >= 0 ? n : null; }
 function formatNumber(value) { return Number(value || 0).toLocaleString('en-US'); }
 function formatCost(value) { return `$${Number(value || 0).toFixed(4)}`; }
 function formatDuration(ms) { if (!Number.isFinite(ms)) return '—'; return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`; }
-function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function escapeAttr(value) { return escapeHtml(value).replace(/"/g, '&quot;'); }
+function escapeHtml(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeAttr(value) { return escapeHtml(value).replace(/"/g,'&quot;'); }
