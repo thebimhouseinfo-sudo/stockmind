@@ -1,4 +1,4 @@
-import { field, setResult, MISSING_SHORT } from './render-common.js';
+import { field, setResult, MISSING_SHORT, decisionLabel } from './render-common.js';
 
 // Node 6B is the locked, text-first Word report template.
 // legacy/CRSM/NODE_6B.md is reference-only and must never be modified.
@@ -209,12 +209,6 @@ function renderSources(md, sources) {
     return;
   }
   sources.forEach(s => md.push(`- ${cell(s.name ?? s.source ?? s.title)} — ${cell(s.date ?? s.data_date ?? s.published_date)} — ${cell(s.note ?? s.notes ?? s.description)}`));
-}
-
-function decisionLabel(value) {
-  const map = { BUY: 'MUA', SELL: 'BÁN', HOLD: 'NẮM GIỮ', 'BUY ON DIP': 'MUA KHI ĐIỀU CHỈNH', WATCH: 'THEO DÕI' };
-  const v = String(value ?? '').trim();
-  return map[v.toUpperCase()] || v || MISSING_SHORT;
 }
 
 function screenStatusLabel(value) {

@@ -35,6 +35,41 @@ The localization map is presentation data only. It MUST NOT affect the six-facto
 score, confidence calculation, conflict detector, decision, or any numeric output.
 `;
 
+const NODE5_OWN_LANGUAGE_INSTRUCTION = `
+
+# NODE 5 OUTPUT LANGUAGE — REQUIRED
+Every free-text field Node 5 itself writes must be in Vietnamese, because Node
+6A, Node 6B and Node 7 display these fields as-is with no further translation
+step. This applies to (non-exhaustive, apply the same rule to any other prose
+field in the output structure):
+- \`ai_score.formula_shown\`
+- \`conflict_detector.override_applied\`
+- \`catalyst_horizon.nearest_catalyst\`
+- \`drivers\` (each item)
+- \`thesis_invalidation\`
+- \`trading_stop.basis\`
+- \`liquidity_note\`
+- \`strategy.entry_zone\`, \`strategy.allocation_plan\`, \`strategy.position_size_note\`
+- \`screen_vs_crsm.interpretation\`
+- \`full_reasoning\`
+
+You MAY keep finance/technical terminology in its standard English or
+abbreviated form where that is how Vietnamese analysts actually write it
+(e.g. "P/E", "ROIC", "WACC", "stop-loss", "breakout", "P/B", "FCF yield",
+source names like SSI/VNDirect/Bloomberg) — do not force-translate jargon
+into awkward Vietnamese. But sentence structure, connecting words and
+explanations must be Vietnamese, not English prose.
+
+Do NOT translate the following — they are fixed machine-control enums the
+pipeline and Decision Log parse programmatically, and downstream nodes are
+responsible for their display translation:
+- \`decision\` (BUY / HOLD / SELL / "BUY ON DIP" / WATCH)
+- \`conflict_detector.fundamental/technical/macro/liquidity\` (🟢/🟡/🔴)
+- \`screen_vs_crsm.status\` (CONFIRMED / PARTIAL / DIVERGENT)
+- \`strategy.position_type\` (Initial / Add-on)
+Leave these exactly as specified in the OUTPUT STRUCTURE section.
+`;
+
 export async function node5(ctx) {
   const outputs = ctx.outputs;
   const sectorType = detectSectorType(ctx.screeningContext?.industry || ctx.industry);
@@ -66,7 +101,7 @@ explanations, no markdown fences.
   const result = await runLLM({
     nodeId: 'node5',
     prompt: userPrompt,
-    systemInstruction: `${node5Prompt}${NODE5_LOCALIZATION_INSTRUCTION}`,
+    systemInstruction: `${node5Prompt}${NODE5_LOCALIZATION_INSTRUCTION}${NODE5_OWN_LANGUAGE_INSTRUCTION}`,
     responseFormat: 'json'
   });
 
