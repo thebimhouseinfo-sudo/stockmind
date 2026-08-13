@@ -49,9 +49,6 @@ const FIELD_ALIASES = {
   dividend_yield_ttm: ['div yield % ttm', 'dividend yield % ttm', 'dividend yield ttm']
 };
 
-// Temporary compatibility aliases keep the existing UI/scoring runtime working
-// while the new evaluation model is redesigned. They are derived from the new
-// normalized fields and must not be treated as the new data contract.
 const LEGACY_ALIASES = {
   TICKER: 'ticker',
   COMPANY_NAME: 'company_name',
@@ -83,26 +80,35 @@ export function parseTradingViewPaste(text) {
     return { rows: [], errors: ['Chua co du lieu de xu ly.'], columns: {} };
   }
 
-  const watchlistRows = parseTradingViewWatchlist(lines);
-  if (watchlistRows.length) {
-    return { rows: watchlistRows, errors: [], columns: { mode: 'tradingview-watchlist' } };
-  }
-
+  // Prefer the full TradingView table whenever its header is present.
+  // The legacy watchlist format has a very different row layout and must
+  // never be allowed to reinterpret a full screener export.
   const delimiter = detectDelimiter(lines[0]);
   const table = lines.map(line => splitLine(line, delimiter));
   const headerIndex = findHeaderIndex(table);
   const headers = table[headerIndex] || [];
   const columns = mapColumns(headers);
-  const missing = ['ticker', 'sector', 'industry', 'price'].filter(field => columns[field] == null);
-  const errors = missing.length ? [`Thieu cot bat buoc: ${missing.join(', ')}`] : [];
+  const headerFieldCount = Object.keys(columns).length;
+  const hasFullTableHeader = headerFieldCount >= 10 && columns.ticker != null && columns.industry != null;
 
-  const rows = table
-    .slice(headerIndex + 1)
-    .filter(cells => !isSeparatorRow(cells))
-    .map((cells, rowIndex) => normalizeRow(cells, columns, rowIndex + headerIndex + 2))
-    .filter(row => row.ticker);
+  if (hasFullTableHeader) {
+    const missing = ['ticker', 'sector', 'industry', 'price'].filter(field => columns[field] == null);
+    const errors = missing.length ? [`Thieu cot bat buoc: ${missing.join(', ')}`] : [];
+    const rows = table
+      .slice(headerIndex + 1)
+      .filter(cells => !isSeparatorRow(cells))
+      .map((cells, rowIndex) => normalizeRow(cells, columns, rowIndex + headerIndex + 2))
+      .filter(row => row.ticker);
 
-  return { rows, errors, columns };
+    return { rows, errors, columns: { ...columns, mode: 'tradingview-table' } };
+  }
+
+  const watchlistRows = parseTradingViewWatchlist(lines);
+  if (watchlistRows.length) {
+    return { rows: watchlistRows, errors: [], columns: { mode: 'tradingview-watchlist' } };
+  }
+
+  return { rows: [], errors: ['Khong nhan dien duoc bang TradingView.'], columns };
 }
 
 function parseTradingViewWatchlist(lines) {
@@ -195,7 +201,7 @@ function findWatchlistDataLine(lines, startIndex) {
   for (let index = startIndex; index < Math.min(lines.length, startIndex + 8); index += 1) {
     const line = lines[index];
     const normalized = stripMarkdown(line);
-    const numericHits = (normalized.match(/[+\-−]?\d[\d,.]*\s*[KMB]?|[+\-−]?\d[\d,.]*%/gi) || []).length;
+    const numericHits = (normalized.match(/[+\-−]?\d[\d,.]*\s*[KMBT]?|[+\-−]?\d[\d,.]*%/gi) || []).length;
     if (numericHits >= 10 && normalized.includes('%')) return line;
   }
   return null;
@@ -203,7 +209,7 @@ function findWatchlistDataLine(lines, startIndex) {
 
 function splitWatchlistDataLine(line) {
   const stripped = stripMarkdown(line).replace(/\u202f/g, ' ').replace(/\u00a0/g, ' ');
-  if (stripped.includes('\t')) return stripped.split('\t').map(cell => cell.trim()).filter(Boolean);
+  if (stripped.includes('\t')) return stripped.split('\t').map(cell => cell.trim());
   return stripped.split(/\s{2,}/).map(cell => cell.trim()).filter(Boolean);
 }
 
@@ -252,7 +258,6 @@ function mapColumns(headers) {
     if (index >= 0) result[field] = index;
   }
 
-  // Symbol is intentionally one source column but yields two internal fields.
   if (result.ticker == null) result.ticker = result.company_name;
   if (result.company_name == null) result.company_name = result.ticker;
 
