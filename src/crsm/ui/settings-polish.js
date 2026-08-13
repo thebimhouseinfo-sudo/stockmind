@@ -4,30 +4,40 @@ if (!document.getElementById(STYLE_ID)) {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* Settings: centered, compact, aligned. */
+    /* Settings: centered within the available page, not pinned to the left. */
     .settings-panel {
-      width: min(1120px, calc(100% - 32px));
-      margin-left: auto;
-      margin-right: auto;
+      width: min(1120px, calc(100% - 32px)) !important;
+      max-width: 1120px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      justify-self: center !important;
+      box-sizing: border-box;
     }
 
-    /* Keep the execution policy readable without repeating implementation details. */
+    /* Remove any accidental highlight/mark treatment from the settings UI. */
+    .settings-panel mark,
+    .settings-panel .highlight,
+    .settings-panel [data-highlight] {
+      background: transparent !important;
+      color: inherit !important;
+      box-shadow: none !important;
+    }
+
+    /* Compact execution policy without extra explanatory text. */
     .settings-panel .execution-policy-card {
       padding: 14px 16px;
     }
     .settings-panel .execution-policy-head > div > .muted,
-    .settings-panel .execution-policy-note {
-      display: none;
-    }
+    .settings-panel .execution-policy-note,
     .settings-panel .settings-section-head > div > p.muted {
-      display: none;
+      display: none !important;
     }
 
-    /* Model assignment rows stay aligned across every function. */
+    /* Model assignment rows: fixed columns so the enable controls line up exactly. */
     .settings-panel .assignment {
-      display: grid;
-      grid-template-columns: minmax(230px, 1fr) minmax(170px, 0.8fr) minmax(220px, 1fr) 72px;
-      align-items: center;
+      display: grid !important;
+      grid-template-columns: minmax(230px, 1fr) minmax(170px, 0.8fr) minmax(220px, 1fr) 64px !important;
+      align-items: center !important;
       column-gap: 14px;
       row-gap: 8px;
     }
@@ -35,22 +45,33 @@ if (!document.getElementById(STYLE_ID)) {
     .settings-panel .assignment .settings-label,
     .settings-panel .assignment .settings-check {
       min-width: 0;
-      margin: 0;
+      margin: 0 !important;
     }
     .settings-panel .assignment .settings-check {
-      justify-self: stretch;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 64px !important;
+      height: 40px !important;
+      min-height: 40px !important;
+      justify-self: end !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       gap: 6px;
       white-space: nowrap;
-      min-height: 40px;
+      box-sizing: border-box;
     }
     .settings-panel .assignment .settings-check input {
-      margin: 0;
+      width: auto !important;
+      height: auto !important;
+      margin: 0 !important;
+      flex: 0 0 auto;
+    }
+    .settings-panel .assignment .settings-check label {
+      margin: 0 !important;
+      line-height: 1 !important;
+      white-space: nowrap;
     }
 
-    /* Make the three execution choices sit on one clean line. */
+    /* Execution choices remain on one clean line. */
     .settings-panel .execution-policy-controls {
       display: flex;
       align-items: center;
@@ -72,20 +93,21 @@ if (!document.getElementById(STYLE_ID)) {
 
     @media (max-width: 900px) {
       .settings-panel .assignment {
-        grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) minmax(200px, 1fr) 64px;
+        grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) minmax(200px, 1fr) 64px !important;
       }
     }
 
     @media (max-width: 720px) {
       .settings-panel {
-        width: min(100% - 16px, 680px);
+        width: min(100% - 16px, 680px) !important;
       }
       .settings-panel .assignment {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
       }
       .settings-panel .assignment .settings-check {
-        justify-self: start;
-        justify-content: flex-start;
+        width: auto !important;
+        justify-self: start !important;
+        justify-content: flex-start !important;
       }
     }
   `;
