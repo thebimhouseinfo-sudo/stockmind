@@ -1,240 +1,209 @@
-# Stock Mind — Architecture Reference
+# Stock Mind Architecture
 
-> Fast architectural briefing. Read this before inspecting source files.
->
-> `reference/` and other historical material are **reference only**. They describe old data, prompts, rules or implementations and are not runtime truth unless explicitly adopted.
+This is the current architecture reference. It is the orientation document for future work. Old current-phase specs, TODOs, and implementation plans were removed because the implemented system is now the source of truth. `IMPLEMENTATION_PHASE2.md` is intentionally kept as future-scope planning because Phase 2 has not been implemented yet.
 
-## 1. Purpose
+## 1. Product Shape
 
-Stock Mind is a browser-first Vietnamese stock analysis system with two layers:
+Stock Mind has two layers:
 
-1. **Screening** — deterministic import, calculation, filtering and ranking.
-2. **CRSM** — deep research and investment decision analysis for selected tickers.
+1. **Screener**: deterministic TradingView import, normalization, scoring, ranking, dashboard grouping, and candidate selection.
+2. **CRSM**: deeper AI-assisted analysis for selected tickers, using the screener snapshot when the ticker came from the screener.
 
-Core principle: do cheap deterministic screening first; spend LLM/web-research cost only on selected candidates.
+The core rule is simple: the screener is cheap, deterministic, and transparent; CRSM is expensive, research-heavy, and only runs after the user chooses candidates.
 
-## 2. System flow
+## 2. Main Flow
 
 ```text
-TradingView data
-      ↓
-Parser
-      ↓
-Deterministic Screener
-      ↓
-Ranking / Candidate Selection
-      ├──────────────→ CRSM SCREENED
-      │
-      └──────────────→ CRSM DIRECT (manual ticker)
-                              ↓
-                         CRSM Engine
-                              ↓
-                    Node 1 → Node 5
-                              ↓
-                    Node 6A / 6B / 7
-                              ↓
-                       Report / Decision
+TradingView table
+  -> parser
+  -> Screener V2 scoring
+  -> Dashboard / Ranking
+  -> selected ticker(s)
+  -> CRSM SCREENED mode
+  -> report / decision log
+
+Manual ticker
+  -> CRSM DIRECT mode
+  -> report / decision log
 ```
 
-SCREENED and DIRECT use the same CRSM engine. Direct mode must remain available.
+SCREENED and DIRECT share the same CRSM engine. DIRECT must remain available even when no screener data exists.
 
-## 3. Screening architecture
+## 3. Current Runtime Files
 
-The screener is deterministic and independent from CRSM.
+Core app:
+
+- `index.html`: app shell and script/style loading.
+- `src/app.js`: top-level UI state, tabs, import/share flow, dashboard/ranking/detail/CRSM handoff.
+- `src/parser.js`: TradingView paste parser and field normalization.
+- `src/scoring.js`: deterministic Screener V2 entrypoint and app-facing score/stat helpers.
+- `src/share-code.js`: local, file-based screener export/import codec.
+- `tests/core.test.mjs`: parser, Screener V2, and share round-trip tests.
+
+Screener V2 modules:
+
+- `src/screener-v2/registry.js`: thresholds, metadata, calibration status.
+- `src/screener-v2/contract-validator.js`: input contract and data-quality state.
+- `src/screener-v2/price-dislocation.js`: 52-week price/dislocation profile.
+- `src/screener-v2/momentum-volume.js`: momentum and volume profile.
+- `src/screener-v2/full-evaluation.js`: full row evaluation.
+- `src/screener-v2/diagnostic-runner.js`: diagnostics.
+- `src/screener-v2/state.js`: shared Screener V2 constants/state helpers.
+
+CRSM:
+
+- `src/crsm/context.js`: builds the trusted screening snapshot for CRSM.
+- `src/crsm/engine.js`: public CRSM run entrypoint.
+- `src/crsm/pipeline.js`: node orchestration.
+- `src/crsm/router.js`: provider/model resolution and capability checks.
+- `src/crsm/llm.js`: shared LLM call abstraction.
+- `src/crsm/providers/`: provider adapters.
+- `src/crsm/model-discovery.js`: model discovery for configured API keys.
+- `src/crsm/settings.js`: model/provider/node settings.
+- `src/crsm/nodes/`: CRSM node implementations.
+- `src/crsm/ui/`: CRSM UI, settings UI, reports, progress, error states.
+
+Removed historical/test UI and docs:
+
+- Mapping preview tab and export scripts were removed from runtime.
+- Current-phase spec, TODO, and implementation-plan documents were removed. Use this file plus source code instead.
+- `IMPLEMENTATION_PHASE2.md` remains as future-scope planning only.
+
+## 4. Screener Rules
+
+The screener is deterministic. It must not call LLMs or depend on CRSM.
 
 Responsibilities:
-- Parse/normalize TradingView data.
-- Calculate screening metrics and composite scores.
-- Rank candidates.
-- Show score breakdown and data integrity.
-- Build the `screeningContext` handed to CRSM.
 
-Main files:
-- `src/parser.js` — import/parser.
-- `src/scoring.js` — deterministic scoring/statistics.
-- `src/app.js` — application state, Ranking UI and CRSM handoff.
+- Parse TradingView data.
+- Normalize fields into the app schema.
+- Validate critical inputs.
+- Produce Screener V2 scores, rank, grade, group, flags, and notes.
+- Show full ranking for inspection.
+- Show dashboard candidate groups for action.
+- Build a trusted snapshot for CRSM.
 
-### Screening snapshot contract
+Dashboard is the primary action surface. Ranking is for full-universe inspection. User actions:
 
-CRSM receives the selected stock's screening result as a snapshot. CRSM must **not silently recalculate or overwrite deterministic screening scores**.
+- Click a ticker: run single SCREENED CRSM.
+- Select multiple tickers on Dashboard: batch SCREENED CRSM.
+- Use Ranking to inspect all rows.
 
-`screeningContext` includes ticker, industry, screening date, rank, grade, final score, Quality/Growth/Valuation/Micro/Momentum/Opportunity scores, available stock-level metrics, data-integrity flags, references/benchmarks and missing-field verification requests.
+## 5. Share / Import
 
-Missing stock metrics must be independently researched where required. Industry benchmarks are references, not substitutes for missing stock values.
+Stock Mind supports local, no-cloud screener sharing.
 
-## 4. Current improvement plan
-
-### Phase A — Improve Screener **NOW**
-
-The screener is currently an active development target. Improvements should make candidate selection more reliable and useful before deep CRSM analysis.
-
-Focus areas:
-- Improve screening data quality/integrity handling.
-- Improve deterministic scoring/filtering and candidate ranking.
-- Reduce ambiguity in what constitutes a high-quality CRSM candidate.
-- Preserve the screening snapshot contract.
-- Ensure the screener outputs the information Node 1 actually needs, avoiding duplicated research.
-- Validate the full Screening → SCREENED CRSM handoff after changes.
-
-### Phase B — Adjust Node 1 **NOW / coupled with Phase A**
-
-Node 1 is directly coupled to the screener because it is the first CRSM research node and consumes `screeningContext`.
-
-When improving the screener, Node 1 must be reviewed at the same time where its input contract, verification tasks, research scope or interpretation of screening results is affected.
-
-Goal:
-- Make Node 1 understand and exploit the improved screener output.
-- Do not make Node 1 redo deterministic screening work.
-- Use web research to verify missing/current stock facts and investigate discrepancies.
-- Preserve clear separation between screening evidence and Node 1 research findings.
-
-### Phase C — CRSM refinement
-
-After the screener + Node 1 contract is stable:
-- refine Node 2–5 research/reasoning boundaries;
-- improve evidence flow and provenance;
-- optimize execution/cost;
-- refine reports and decision quality.
-
-### Future — SSI phase
-
-**SSI is future scope, not a current implementation phase.**
-
-Do not design current work around SSI integration unless a specific change requires an explicit compatibility decision. SSI should be treated as a future data/source/integration phase and should not distract from improving the current TradingView-based screening pipeline.
-
-## 5. CRSM pipeline
+Screen tab layout:
 
 ```text
-userEvidence (when present)
-        ↓
-Node 1
-        ↓
-Node 2 ─────┐
-            ├─ parallel stage when enabled
-Node 3 ─────┘
-        ↓
-Node 4
-        ↓
-Node 5
-        ↓
-Node 6A → HTML report
-Node 6B → Word report
-Node 7  → decision log
+[Open TradingView] [Import & Screen]
+TradingView -> Ctrl+A -> Ctrl+C -> Import & Screen
+[Share Screen] [Import Screen]
 ```
 
-Node 6A/6B/7 are local operations, not LLM nodes. Default execution is sequential; currently only Node 2 + Node 3 are explicitly parallelizable.
+Rules:
 
-## 6. LLM/provider architecture
+- `Share Screen` exports a `.stockmind` file.
+- `Import Screen` opens a file picker and imports a `.stockmind` file.
+- The file contains screener rows/scores only.
+- The file must not contain API keys, CRSM settings, provider settings, or private CRSM reports.
+- Imported files replace the current screener dataset and rerun deterministic scoring.
 
-All LLM nodes use the shared abstraction:
+## 6. CRSM Screening Snapshot Contract
+
+When CRSM runs in SCREENED mode, it receives a snapshot generated from the selected screener row. CRSM must treat this snapshot as trusted user-provided screening context.
+
+Node 1 uses the snapshot as verified internal evidence and should only search for:
+
+- missing critical stock facts;
+- current facts that may have changed;
+- direct/manual ticker data when the user did not come through the screener;
+- verification or explanation of important discrepancies.
+
+CRSM must not silently recalculate or overwrite screener scores, rank, grade, or deterministic classifications.
+
+## 7. CRSM Pipeline
 
 ```text
-Node → runLLM() → router → provider adapter → model API
+Node 1: company/data/current fact grounding
+Node 2: technical and smart money
+Node 3: fundamentals and valuation
+Node 4: macro/causal context
+Node 5: synthesis and decision
+Node 6A: HTML report
+Node 6B: Word report
+Node 7: decision log
 ```
 
-Nodes must not directly implement provider API calls.
+Node 6A, Node 6B, and Node 7 are local/reporting operations. They are not provider-model assignment targets.
 
-Settings separates:
+## 8. Provider And Model Settings
 
-- **Models** — available providers, API keys, model IDs, capabilities and pricing.
-- **Nodes** — provider/model assignment for each node.
-- **Usage** — current-run token telemetry.
-- **Cost** — historical cost, model breakdown, budget and warning threshold.
+Settings separates availability from assignment:
 
-Mental model:
+- Providers: API key and model inventory.
+- Model inventory: models available per provider.
+- CRSM Engine: provider/model assignment per node.
+- Usage: current-run telemetry.
+- Cost: historical cost and budget monitoring.
+
+Auto model discovery:
+
+- Gemini and OpenAI can auto-scan available models after the user enters an API key.
+- Ollama Cloud is excluded from auto-scan.
+- Auto-scan updates provider model inventory.
+- If a node's selected model is no longer available after scanning, the app moves that node to the first available model for that provider.
+
+Provider calls must stay behind:
 
 ```text
-Models = what is available
-Nodes  = what each node uses
+node -> runLLM() -> router -> provider adapter -> model API
 ```
 
-Current node capability requirements:
+Nodes must never call provider APIs directly.
 
-| Node | Web grounding | Structured output |
-|---|---:|---:|
-| 1 | required | required |
-| 2 | required | required |
-| 3 | not required | required |
-| 4 | required | required |
-| 5 | not required | required |
-
-The router must reject incompatible models rather than silently substitute another model.
-
-## 7. Cost / observability
-
-Each LLM request records node, provider, model, ticker, mode, input/output tokens, estimated cost and duration.
-
-Usage can be viewed per request, per node, per model/provider and by time period. Current cost accounting is token-based; provider-specific search/grounding charges are not automatically included.
-
-## 8. Cache
-
-Completed CRSM runs are cached. Cache identity distinguishes at least SCREENED/DIRECT, ticker, analysis date, relevant configuration/model fingerprint and cache version.
-
-Runs containing new user evidence bypass the normal cache path.
-
-Stale cached research must never be presented as fresh research.
-
-## 9. UI / user flow
-
-Main tabs:
-
-```text
-Screen | Dashboard | Ranking | CRSM | Reports | Settings
-```
-
-Ranking supports:
-- click ticker → automatic SCREENED CRSM handoff;
-- select multiple candidates → batch CRSM;
-- manual search/filtering.
-
-CRSM retains Direct mode for tickers outside the current screening dataset.
-
-## 10. Data ownership
+## 9. Data Ownership
 
 | Data | Owner | Rule |
 |---|---|---|
-| Imported TradingView rows | Screener | Source for deterministic screening |
-| Screening scores/rank/grade | Screener | Immutable CRSM snapshot |
-| External current research | CRSM nodes | Search/verify |
-| Reasoning/interpretation | CRSM | Analyze, do not replace screener scores |
-| Reports | Local nodes | Render/export |
-| Model configuration | Settings | Route, not hard-code in nodes |
-| Token/cost telemetry | Usage | Observability only |
-| Historical/old material | `reference/` | Reference only |
+| TradingView pasted data | Screener | Raw user import source |
+| Parsed rows | Parser | Normalized app input |
+| Scores/rank/grade/group | Screener V2 | Deterministic, trusted snapshot |
+| External current facts | CRSM Node 1+ | Search and verify |
+| Analysis/decision | CRSM Node 5 | Interpret evidence |
+| Reports | Local report nodes | Render/export only |
+| Provider/API settings | Settings | Never include in share files |
+| Usage/cost telemetry | CRSM usage | Observability only |
 
-## 11. Development rules
+## 10. Development Rules
 
-1. Keep screening deterministic, cheap and transparent.
-2. Do not move deterministic screening calculations into CRSM just because an LLM can perform them.
-3. CRSM receives selected stock context, not the whole screener dataset.
-4. Preserve both SCREENED and DIRECT modes.
-5. When screener fields change, review Node 1 because its input contract is coupled to the screener.
-6. Keep provider calls behind `runLLM()` and router/provider adapters.
-7. Keep model registry separate from node assignment.
-8. Enforce model capabilities in the router.
-9. Never silently substitute incompatible/unavailable models.
-10. Treat missing stock data as a verification task, not an invitation to invent/substitute.
-11. Preserve usage/cost telemetry when changing pipeline behavior.
-12. Keep local report rendering independent from LLM provider selection.
-13. Treat `reference/` as historical reference, not current runtime truth.
-14. Prefer small changes with explicit input/output contracts.
-15. Before modifying a node, inspect its upstream inputs and downstream consumers.
+1. Keep screener logic deterministic.
+2. Do not move deterministic scoring into CRSM.
+3. Preserve both SCREENED and DIRECT CRSM modes.
+4. Treat the screener snapshot as trusted context, not as a prompt suggestion.
+5. When changing screener output, review `src/crsm/context.js`, Node 1, and Node 1 prompt.
+6. Do not let missing non-critical TradingView data create noisy warnings.
+7. Only flag missing data strongly when it affects critical scoring or CRSM reliability.
+8. Keep Dashboard as the candidate action surface.
+9. Keep Ranking as full-universe inspection.
+10. Keep provider calls behind router/provider adapters.
+11. Never store or export API keys in share/import artifacts.
+12. Avoid reviving removed Mapping preview code unless explicitly requested for parser debugging.
+13. Before pushing, run `npm test`.
 
-## 12. Quick orientation
+## 11. Quick Orientation
 
-For most future tasks, read only:
+For most future tasks, start with:
 
 ```text
 architect.md
 src/app.js
+src/parser.js
 src/scoring.js
+src/screener-v2/
 src/crsm/context.js
-src/crsm/engine.js
-src/crsm/pipeline.js
 src/crsm/settings.js
 src/crsm/router.js
 ```
 
-Then inspect only the specific node/provider/UI files relevant to the requested change.
-
-Do not read the entire repository or historical/reference material unless the task specifically requires it.
+Then inspect only the specific UI, node, provider, or scoring module needed for the requested change.
