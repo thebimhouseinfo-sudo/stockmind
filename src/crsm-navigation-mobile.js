@@ -64,7 +64,7 @@ style.textContent = `
 
   .crsm-shell.settings-view-open > .crsm-analysis-page,
   .crsm-shell.settings-view-open > .reports-page { display: none !important; }
-  .crsm-inline-settings { width: 100%; }
+  .crsm-inline-settings { width: 100%; scroll-margin-top: 78px; padding-top: 10px; }
   .crsm-inline-settings .settings-panel { width: 100%; margin: 0; }
 
   @media (max-width: 900px) {
@@ -135,15 +135,15 @@ function openCRSMMenu() {
   crsmMenu.setAttribute('role', 'menu');
   const activeView = shell.querySelector('.crsm-analysis-page') ? 'analysis' : shell.querySelector('.reports-page') ? 'reports' : 'settings';
 
-  crsmMenu.appendChild(menuButton('Analysis', '↗', () => {
+  crsmMenu.appendChild(menuButton('Analysis', 'A', () => {
     closeInlineSettings();
     document.querySelector('.crsm-subnav [data-crsm-view="analysis"]')?.click();
   }, activeView === 'analysis'));
-  crsmMenu.appendChild(menuButton('Reports', '▤', () => {
+  crsmMenu.appendChild(menuButton('Reports', 'R', () => {
     closeInlineSettings();
     document.querySelector('.crsm-subnav [data-crsm-view="reports"]')?.click();
   }, activeView === 'reports'));
-  crsmMenu.appendChild(menuButton('Settings', '⚙', () => openInlineSettings(), activeView === 'settings'));
+  crsmMenu.appendChild(menuButton('Settings', 'S', () => openInlineSettings(), activeView === 'settings'));
 
   host.appendChild(crsmMenu);
   menuOpen = true;
@@ -203,9 +203,7 @@ document.addEventListener('click', event => {
       toggleCRSMMenu();
       return;
     }
-    window.setTimeout(() => {
-      if (document.querySelector('[data-tab="crsm"].active')) openCRSMMenu();
-    }, 0);
+    closeCRSMMenu();
   } else if (topTab && menuOpen) {
     closeCRSMMenu();
     closeInlineSettings();

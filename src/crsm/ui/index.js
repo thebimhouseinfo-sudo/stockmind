@@ -1,4 +1,5 @@
 import { crsmState, notifyCRSM } from '../state.js';
+import { runCRSM } from '../engine.js';
 import { renderAnalysisDashboard } from './analysis-dashboard.js';
 import { ensureAnalysisUiPolish } from './analysis-ui-polish.js';
 import { renderStatusBadge } from './status.js';

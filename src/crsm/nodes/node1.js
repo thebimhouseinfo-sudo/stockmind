@@ -28,6 +28,9 @@ export async function node1(ctx) {
 ## Missing-data verification rule
 If SCREENING_CONTEXT.data_integrity.missing_fields contains any fields, actively search external sources for those exact stock-level fields. Do not replace a missing value with an industry median, estimate, or inferred/back-solved value. Industry benchmarks are reference-only.
 
+## Trusted screener rule
+In SCREENED mode, TradingView / StockScreener values in SCREENING_CONTEXT.trusted_screener_snapshot are already verified user-provided inputs. Carry them forward unchanged and spend search effort only on missing fields, additional raw financial data, and anomaly signals requested by verification_request.
+
 ## Task
 Execute the Node 1 instructions exactly (DATA COMPLETION mode if SCREENED,
 full research mode if DIRECT). Output ONLY the specified JSON object — no
@@ -45,12 +48,11 @@ explanatory text, no markdown fences.
 
   if (ctx.screeningContext) {
     parsed.analysis_mode = 'SCREENED';
-    parsed.screening_metrics = {
-      ...ctx.screeningContext.metrics,
-      industry_benchmarks: ctx.screeningContext.industry_benchmarks
-    };
+    parsed.screening_metrics = buildScreeningMetrics(ctx.screeningContext);
     parsed.screening_summary = ctx.screeningContext.screening_summary;
+    parsed.trusted_screener_snapshot = buildTrustedScreenerSnapshot(ctx.screeningContext);
     parsed.data_integrity = ctx.screeningContext.data_integrity;
+    parsed.screening_as_of = ctx.screeningContext.screening_as_of;
     parsed.ticker = parsed.ticker || ctx.ticker;
   } else {
     parsed.analysis_mode = 'DIRECT';
@@ -66,18 +68,63 @@ function buildNode1ScreeningPayload(context) {
     ticker: context.ticker,
     industry: context.industry,
     screening_as_of: context.screening_as_of,
-    screen_score: summary.screen_score ?? null,
-    screen_rank: summary.screen_rank ?? null,
-    screen_grade: summary.screen_grade ?? null,
-    quality_score: summary.quality_score ?? null,
-    growth_score: summary.growth_score ?? null,
-    valuation_score: summary.valuation_score ?? null,
-    micro_score: summary.micro_score ?? null,
-    momentum_score: summary.momentum_score ?? null,
-    mispricing_score: summary.opportunity_score ?? null,
-    metrics: context.metrics,
-    industry_benchmarks: context.industry_benchmarks,
+    screening_summary: summary,
+    screening_metrics: buildScreeningMetrics(context),
+    trusted_screener_snapshot: buildTrustedScreenerSnapshot(context),
     data_integrity: context.data_integrity,
     verification_request: context.verification_request
+  };
+}
+
+function buildScreeningMetrics(context) {
+  if (context.source === 'StockScreenerV2') {
+    return {
+      raw_metrics: context.raw_metrics ?? {},
+      factors: context.factors ?? {},
+      axes: context.axes ?? {},
+      risk_gate: context.risk_gate ?? {},
+      classification: context.classification ?? {},
+      price_dislocation: context.price_dislocation ?? {},
+      momentum_volume: context.momentum_volume ?? {},
+      ranking: context.ranking ?? null
+    };
+  }
+
+  return {
+    ...(context.metrics ?? {}),
+    industry_benchmarks: context.industry_benchmarks ?? {}
+  };
+}
+
+function buildTrustedScreenerSnapshot(context) {
+  if (context.source === 'StockScreenerV2') {
+    return {
+      source: context.source,
+      registry: context.registry ?? null,
+      ticker: context.ticker,
+      industry: context.industry,
+      screening_as_of: context.screening_as_of,
+      screening_summary: context.screening_summary ?? null,
+      raw_metrics: context.raw_metrics ?? {},
+      factors: context.factors ?? {},
+      axes: context.axes ?? {},
+      risk_gate: context.risk_gate ?? {},
+      classification: context.classification ?? {},
+      price_dislocation: context.price_dislocation ?? {},
+      momentum_volume: context.momentum_volume ?? {},
+      ranking: context.ranking ?? null,
+      data_integrity: context.data_integrity ?? null
+    };
+  }
+
+  return {
+    source: context.source,
+    ticker: context.ticker,
+    industry: context.industry,
+    screening_as_of: context.screening_as_of,
+    screening_summary: context.screening_summary ?? null,
+    metrics: context.metrics ?? {},
+    industry_benchmarks: context.industry_benchmarks ?? {},
+    data_integrity: context.data_integrity ?? null
   };
 }

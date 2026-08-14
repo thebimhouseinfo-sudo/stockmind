@@ -36,7 +36,7 @@ if (!document.getElementById(STYLE_ID)) {
     /* Model assignment rows: fixed columns so the enable controls line up exactly. */
     .settings-panel .assignment {
       display: grid !important;
-      grid-template-columns: minmax(230px, 1fr) minmax(170px, 0.8fr) minmax(220px, 1fr) 64px !important;
+      grid-template-columns: minmax(230px, 1fr) minmax(170px, 0.8fr) minmax(220px, 1fr) 44px !important;
       align-items: center !important;
       column-gap: 14px;
       row-gap: 8px;
@@ -48,14 +48,16 @@ if (!document.getElementById(STYLE_ID)) {
       margin: 0 !important;
     }
     .settings-panel .assignment .settings-check {
-      width: 64px !important;
-      height: 40px !important;
-      min-height: 40px !important;
+      width: 38px !important;
+      min-width: 38px !important;
+      height: 38px !important;
+      min-height: 38px !important;
       justify-self: end !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 6px;
+      gap: 0;
+      padding: 0 !important;
       white-space: nowrap;
       box-sizing: border-box;
     }
@@ -93,7 +95,7 @@ if (!document.getElementById(STYLE_ID)) {
 
     @media (max-width: 900px) {
       .settings-panel .assignment {
-        grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) minmax(200px, 1fr) 64px !important;
+        grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) minmax(200px, 1fr) 44px !important;
       }
     }
 

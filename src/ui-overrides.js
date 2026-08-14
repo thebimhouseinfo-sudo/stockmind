@@ -2,6 +2,8 @@ import { renderSettings, bindSettingsEvents } from './crsm/ui/settings.js';
 
 const DATA_KEY = 'stock-mind.dataset.v1';
 let observerScheduled = false;
+let activeDashboardGroup = 'CORE';
+const selectedDashboardTickers = new Set();
 
 const app = document.getElementById('app');
 
@@ -20,7 +22,7 @@ function escapeHtml(value) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;')
+    .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
 
@@ -37,9 +39,24 @@ function hasFlags(row) {
   return Array.isArray(row?.DATA_FLAGS) && row.DATA_FLAGS.length > 0;
 }
 
+function noteSummary(row) {
+  const notes = Array.isArray(row?.DATA_NOTES) ? row.DATA_NOTES : [];
+  return !hasFlags(row) && notes.length ? `${notes.length} notes` : '';
+}
+
 function flagSummary(row) {
   if (!hasFlags(row)) return '';
-  return row.DATA_FLAGS.slice(0, 2).map(flag => String(flag).split(':')[0].replaceAll('_', ' ')).join(' · ');
+  return row.DATA_FLAGS.slice(0, 2).map(flag => String(flag).replaceAll('_', ' ')).join(' / ');
+}
+
+function classificationLabel(value) {
+  return ({
+    CORE: 'Core Performer',
+    QUALITY_UNDERPERFORMER: 'Quality Underperformer',
+    HIGH_REWARD_HIGH_RISK: 'High Reward / High Risk',
+    AVOID_VALUE_TRAP: 'Avoid / Value Trap',
+    WATCH_NEUTRAL: 'Watch / Neutral'
+  })[value] || value || '-';
 }
 
 function metric(label, value) {
@@ -48,33 +65,68 @@ function metric(label, value) {
 
 function rankingRow(row, localRank) {
   const flag = hasFlags(row);
+  const note = noteSummary(row);
+  const checked = selectedDashboardTickers.has(row.TICKER);
   return `<article class="ranking-row ${flag ? 'flagged' : 'clean'}">
+    <label class="candidate-check" title="Chon ${escapeHtml(row.TICKER)}"><input type="checkbox" data-dashboard-select="${escapeHtml(row.TICKER)}" ${checked ? 'checked' : ''}></label>
     <div class="ranking-rank">#${String(localRank).padStart(2, '0')}<span>R${fmt(row.RANK)}</span></div>
     <div class="ranking-main">
       <div class="ranking-head">
         <button class="ranking-ticker" data-showcase-ticker="${escapeHtml(row.TICKER)}">${escapeHtml(row.TICKER)}</button>
         <span class="ranking-industry">${escapeHtml(row.INDUSTRY || '')}</span>
-        ${flag ? `<span class="flag-badge">⚠ ${escapeHtml(flagSummary(row))}</span>` : ''}
+        <span class="classification-chip">${escapeHtml(classificationLabel(row.SCREENING_GROUP))}</span>
+        ${flag ? `<span class="flag-badge">! ${escapeHtml(flagSummary(row))}</span>` : ''}
+        ${note ? `<span class="note-badge">${escapeHtml(note)}</span>` : ''}
       </div>
       <div class="ranking-metrics">
-        ${metric('Giá', fmt(row.PRICE))}
-        ${metric('P/E', fmt(row.PE))}
-        ${metric('Score', fmt(row.FINALSCORE))}
-        ${metric('Hạng', `#${fmt(row.RANK)}`)}
+        ${metric('Price', fmt(row.PRICE))}
+        ${metric('Quality', fmt(row.QUALITY_SCORE))}
+        ${metric('Opportunity', fmt(row.MISPRICING))}
+        ${metric('V2 Score', fmt(row.FINALSCORE))}
       </div>
     </div>
     <div class="ranking-score"><strong>${fmt(row.FINALSCORE)}</strong><span class="badge ${gradeClass(row.GRADE)}">${escapeHtml(row.GRADE || '-')}</span></div>
   </article>`;
 }
 
-function renderRankingPanel(title, subtitle, rows, tone) {
+function renderRankingPanel(title, subtitle, rows, tone, activeGroupRows) {
+  const selectedInGroup = activeGroupRows.filter(row => selectedDashboardTickers.has(row.TICKER));
+  const allSelected = activeGroupRows.length > 0 && selectedInGroup.length === activeGroupRows.length;
   return `<section class="ranking-panel ${tone}">
     <div class="ranking-panel-head">
       <div><p class="eyebrow">${title}</p><h2>${subtitle}</h2></div>
-      <span class="ranking-count">${rows.length} mã</span>
+      <span class="ranking-count">${rows.length} ma</span>
     </div>
-    ${rows.length ? rows.map((row, index) => rankingRow(row, index + 1)).join('') : `<div class="ranking-empty"><strong>Không có mã phù hợp</strong><span>Nhóm này sẽ để trống khi không có ứng viên trong điều kiện hiện tại.</span></div>`}
+    <div class="dashboard-actions">
+      <button class="btn" type="button" data-dashboard-select-group="${allSelected ? 'clear' : 'all'}">${allSelected ? 'Bo chon nhom' : 'Chon ca nhom'}</button>
+      <button class="btn primary" type="button" data-dashboard-analyze-selected ${selectedDashboardTickers.size ? '' : 'disabled'}>Analyze selected${selectedDashboardTickers.size ? ` (${selectedDashboardTickers.size})` : ''}</button>
+      ${selectedDashboardTickers.size ? '<button class="btn" type="button" data-dashboard-clear>Bo chon</button>' : ''}
+    </div>
+    ${rows.length ? rows.map((row, index) => rankingRow(row, index + 1)).join('') : `<div class="ranking-empty"><strong>Chua co ung vien</strong><span>Nhom nay se de trong neu dataset hien tai khong co ma phu hop.</span></div>`}
   </section>`;
+}
+
+const DASHBOARD_GROUPS = [
+  ['CORE', 'Core', 'Core Performers', 'clean-panel'],
+  ['QUALITY_UNDERPERFORMER', 'Underperform', 'Quality Underperformers', 'neutral-panel'],
+  ['HIGH_REWARD_HIGH_RISK', 'High Reward', 'High Reward / High Risk', 'review-panel'],
+  ['AVOID_VALUE_TRAP', 'Avoid', 'Avoid / Value Trap', 'flagged-panel'],
+  ['WATCH_NEUTRAL', 'Watch', 'Watch / Neutral', 'watch-panel']
+];
+
+function groupRows(rows, group) {
+  return rows.filter(row => row.SCREENING_GROUP === group).slice(0, 25);
+}
+
+function renderDashboardTabs(allRows) {
+  return `<div class="dashboard-tabs" role="tablist">
+    ${DASHBOARD_GROUPS.map(([group, label]) => {
+      const count = allRows.filter(row => row.SCREENING_GROUP === group).length;
+      return `<button class="dashboard-tab ${activeDashboardGroup === group ? 'active' : ''}" type="button" data-dashboard-group="${group}" role="tab" aria-selected="${activeDashboardGroup === group ? 'true' : 'false'}">
+        <span>${escapeHtml(label)}</span><strong>${count}</strong>
+      </button>`;
+    }).join('')}
+  </div>`;
 }
 
 function renderShowcase() {
@@ -85,19 +137,34 @@ function renderShowcase() {
   if (!section || section.dataset.showcaseEnhanced === '1') return;
   section.dataset.showcaseEnhanced = '1';
 
-  const cleanTop10 = allRows.filter(row => !hasFlags(row)).slice(0, 10);
-  const flaggedTop20 = allRows.filter(row => hasFlags(row) && Number(row.RANK || 9999) <= 20).slice(0, 10);
+  const criticalFlags = allRows.filter(hasFlags).length;
+  if (!DASHBOARD_GROUPS.some(([group]) => group === activeDashboardGroup)) activeDashboardGroup = 'CORE';
+  const activeMeta = DASHBOARD_GROUPS.find(([group]) => group === activeDashboardGroup) || DASHBOARD_GROUPS[0];
+  const activeRows = groupRows(allRows, activeDashboardGroup);
+  const allActiveGroupRows = allRows.filter(row => row.SCREENING_GROUP === activeDashboardGroup);
 
   section.innerHTML = `<div class="showcase-wrap">
     <div class="showcase-header">
-      <div><p class="eyebrow">Market Showcase</p><h1>Ứng viên từ Screener</h1><p class="showcase-lead">Hai bảng tách biệt: mã sạch để ưu tiên xem xét và mã có flag nhưng vẫn nằm trong Top 20 để CRSM xác minh.</p></div>
-      <div class="showcase-summary">${metric('Universe', allRows.length)}<span class="showcase-divider"></span>${metric('Clean Top 1', cleanTop10[0] ? fmt(cleanTop10[0].FINALSCORE) : '-')}<span class="showcase-divider"></span>${metric('Flagged Top 20', flaggedTop20.length)}</div>
+      <div><p class="eyebrow">Screener V2 Dashboard</p><h1>Nhom ung vien</h1><p class="showcase-lead">Flag chi noi bat khi la bat thuong quan trong. Missing data thong thuong duoc xem nhu coverage note va de CRSM xac minh sau.</p></div>
+      <div class="showcase-summary">${metric('Universe', allRows.length)}<span class="showcase-divider"></span>${metric('Top Score', allRows[0] ? fmt(allRows[0].FINALSCORE) : '-')}<span class="showcase-divider"></span>${metric('Critical Flags', criticalFlags)}</div>
     </div>
-    <div class="ranking-layout">
-      ${renderRankingPanel('CLEAN CANDIDATES', 'Top 10 — Không có flag', cleanTop10, 'clean-panel')}
-      ${renderRankingPanel('REVIEW CANDIDATES', 'Top 20 — Có flag', flaggedTop20, 'flagged-panel')}
+    ${renderDashboardTabs(allRows)}
+    <div class="ranking-layout single-panel">
+      ${renderRankingPanel(activeMeta[1].toUpperCase(), activeMeta[2], activeRows, activeMeta[3], allActiveGroupRows)}
     </div>
   </div>`;
+}
+
+function rerenderDashboard() {
+  const section = document.querySelector('.main > section.grid');
+  if (section) {
+    section.dataset.showcaseEnhanced = '0';
+    renderShowcase();
+  }
+}
+
+function requestAnalyze(tickers) {
+  document.dispatchEvent(new CustomEvent('stockmind:analyze-tickers', { detail: { tickers } }));
 }
 
 function openSettingsOverlay() {
@@ -137,13 +204,52 @@ document.addEventListener('keydown', event => {
 });
 
 document.addEventListener('click', event => {
+  const dashboardTab = event.target.closest?.('[data-dashboard-group]');
+  if (dashboardTab) {
+    event.preventDefault();
+    activeDashboardGroup = dashboardTab.dataset.dashboardGroup;
+    rerenderDashboard();
+    return;
+  }
+
+  const selectGroup = event.target.closest?.('[data-dashboard-select-group]');
+  if (selectGroup) {
+    event.preventDefault();
+    const rows = readRows().filter(row => row.SCREENING_GROUP === activeDashboardGroup);
+    if (selectGroup.dataset.dashboardSelectGroup === 'clear') rows.forEach(row => selectedDashboardTickers.delete(row.TICKER));
+    else rows.forEach(row => selectedDashboardTickers.add(row.TICKER));
+    rerenderDashboard();
+    return;
+  }
+
+  const clearButton = event.target.closest?.('[data-dashboard-clear]');
+  if (clearButton) {
+    event.preventDefault();
+    selectedDashboardTickers.clear();
+    rerenderDashboard();
+    return;
+  }
+
+  const analyzeSelected = event.target.closest?.('[data-dashboard-analyze-selected]');
+  if (analyzeSelected) {
+    event.preventDefault();
+    requestAnalyze([...selectedDashboardTickers]);
+    return;
+  }
+
   const ticker = event.target.closest?.('[data-showcase-ticker]');
   if (!ticker) return;
-  const rankingTab = document.querySelector('[data-tab="list"]');
-  if (!rankingTab) return;
-  rankingTab.click();
-  const symbol = ticker.dataset.showcaseTicker;
-  window.setTimeout(() => document.querySelector(`[data-crsm="${CSS.escape(symbol)}"]`)?.click(), 0);
+  event.preventDefault();
+  requestAnalyze([ticker.dataset.showcaseTicker]);
+});
+
+document.addEventListener('change', event => {
+  const checkbox = event.target.closest?.('[data-dashboard-select]');
+  if (!checkbox) return;
+  const ticker = checkbox.dataset.dashboardSelect;
+  if (checkbox.checked) selectedDashboardTickers.add(ticker);
+  else selectedDashboardTickers.delete(ticker);
+  rerenderDashboard();
 });
 
 function scheduleEnhancement() {

@@ -282,6 +282,47 @@ tr.clickable:hover {
   letter-spacing: 0.04em;
 }
 
+.ticker-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.ticker-link:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.data-flags {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 13px;
+  height: 13px;
+  margin-left: 3px;
+  padding: 0 3px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 0;
+  vertical-align: super;
+}
+
+.data-flags-soft {
+  background: #eef2f7;
+  color: #64748b;
+}
+
+.data-flags-critical {
+  background: #fff1f2;
+  color: #b42318;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

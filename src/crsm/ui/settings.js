@@ -1,12 +1,16 @@
 import { loadSettings, saveSettings, PROVIDER_INFO, NODES_LLM } from '../settings.js';
 import { crsmState } from '../state.js';
 import { totalUsage, usageByNode, usageByModel, filterUsageHistory, usageSummary, clearUsageHistory } from '../usage.js';
+import { discoverProviderModels, mergeDiscoveredModels } from '../model-discovery.js';
 
 // Settings is compact: CRSM Engine controls execution policy and model assignments;
 // Providers manages API connections/model registry; Usage and Cost are monitoring views.
 const TAB_DEFS = [['engine', 'CRSM Engine'], ['providers', 'Providers'], ['usage', 'Usage'], ['cost', 'Cost']];
 let draftSettings = null;
 let savedSnapshot = '';
+let providerScanStatus = {};
+let providerScanTimers = {};
+let providerScanControllers = {};
 
 const EXECUTION_GROUPS = [
   {
@@ -77,29 +81,22 @@ function renderEngineTab(settings) {
     const modelOptions = (cfg.models || []).map(m => `<option value="${escapeAttr(m.id)}" ${m.id === a.model ? 'selected' : ''}>${escapeHtml(m.displayName || m.id)}</option>`).join('');
     return `<div class="settings-row assignment" data-node="${nodeId}">
       <div class="assignment-title"><strong>${label}</strong><span class="muted">${requirement}</span></div>
-      <label class="settings-label">Provider<select class="search" data-assign="provider">${providerDrop}</select></label>
-      <label class="settings-label">Model<select class="search" data-assign="model">${modelOptions}</select></label>
-      <label class="settings-check"><input type="checkbox" data-assign="enabled" ${a.enabled !== false ? 'checked' : ''}> bật</label>
+      <label class="settings-label"><select class="search" data-assign="provider">${providerDrop}</select></label>
+      <label class="settings-label"><select class="search" data-assign="model">${modelOptions}</select></label>
+      <label class="settings-check" title="Bật node"><input type="checkbox" data-assign="enabled" ${a.enabled !== false ? 'checked' : ''}><span class="sr-only">Bật node</span></label>
     </div>`;
   }).join('');
 
   const executionPolicy = settings.crsm.executionPolicy || {};
   const stageCards = EXECUTION_GROUPS.map(group => {
     const mode = executionPolicy.parallelStages?.[group.key] || 'auto';
-    const modeLabel = mode === 'parallel' ? 'Song song' : mode === 'sequential' ? 'Tuần tự' : 'Tự động';
-    const autoNote = group.key === 'reports'
-      ? 'Hiện tại các đầu ra là local nên Tự động = song song. Nếu sau này có AI, engine sẽ chuyển về tuần tự trừ khi bạn cho phép song song.'
-      : 'Khi có nhiều tác vụ AI trong cùng stage, Tự động ưu tiên tuần tự để kiểm soát API; local vẫn có thể chạy song song.';
     return `<div class="execution-policy-card" data-execution-stage="${group.key}">
       <div class="execution-policy-head">
-        <div><strong>${group.title}</strong><span class="muted">${group.description}</span></div>
-        <span class="execution-policy-badge">${modeLabel}</span>
+        <div><strong>${group.title}</strong></div>
       </div>
-      <div class="execution-policy-members">${group.members.map(member => `<span>${member}</span>`).join('')}</div>
       <div class="execution-policy-controls">
         ${['auto','parallel','sequential'].map(value => `<label class="policy-option"><input type="radio" name="execution-${group.key}" value="${value}" data-execution-stage="${group.key}" data-execution-policy ${mode === value ? 'checked' : ''}><span>${value === 'auto' ? 'Tự động' : value === 'parallel' ? 'Cho phép song song' : 'Buộc tuần tự'}</span></label>`).join('')}
       </div>
-      <p class="muted execution-policy-note">${autoNote}</p>
     </div>`;
   }).join('');
 
@@ -114,18 +111,78 @@ function renderEngineTab(settings) {
 }
 
 function renderProvidersTab(settings) {
-  const providers = Object.entries(settings.crsm.providers).map(([id, cfg]) => `<div class="settings-block" data-provider="${id}">
-    <div class="settings-row"><div><strong>${PROVIDER_INFO[id]?.label || id}</strong><div class="muted settings-caption">${PROVIDER_INFO[id]?.subtitle || 'API provider'}</div></div>
-      <label class="settings-label">API Key<input type="password" class="search" data-field="apikey" value="${escapeAttr(cfg.apiKey || '')}" placeholder="API key" autocomplete="off"></label>
+  const entries = Object.entries(settings.crsm.providers);
+  const providerCards = entries.map(([id, cfg]) => renderProviderCard(id, cfg)).join('');
+  const modelInventory = entries.map(([id, cfg]) => renderModelInventory(id, cfg)).join('');
+  return `<div class="settings-section provider-console">
+    <div class="settings-section-head"><div><h3>PROVIDERS & MODELS</h3></div></div>
+    <div class="provider-grid">${providerCards}</div>
+    <div class="model-inventory">
+      <div class="model-inventory-head"><h3>MODEL INVENTORY</h3><span>${entries.reduce((total, [, cfg]) => total + (cfg.models || []).length, 0)} models</span></div>
+      ${modelInventory}
     </div>
-    <div class="settings-models">${(cfg.models || []).map(model => renderModelRow(model)).join('')}<button class="btn" data-addmodel="${id}">+ Add model</button></div>
-  </div>`).join('');
-  return `<div class="settings-section"><div class="settings-section-head"><div><h3>PROVIDERS & MODELS</h3><p class="muted">API connection và model registry. Assignment theo chức năng nằm trong CRSM Engine.</p></div></div><div class="notice settings-notice">Capability và pricing được lưu cùng model để router và cost monitor sử dụng.</div>${providers}</div>`;
+  </div>`;
 }
 
-function renderModelRow(model) {
+function renderProviderCard(providerId, cfg) {
+  const info = PROVIDER_INFO[providerId] || {};
+  const hasKey = Boolean(cfg.apiKey);
+  const models = cfg.models || [];
+  const scanLabel = providerId === 'ollamaCloud' ? 'Quét thủ công' : 'Tự quét khi nhập key';
+  return `<section class="provider-card ${hasKey ? 'connected' : ''}" data-provider="${providerId}">
+    <div class="provider-card-head">
+      <div>
+        <strong>${escapeHtml(info.label || providerId)}</strong>
+        <span>${escapeHtml(info.subtitle || 'API provider')}</span>
+      </div>
+      <em>${hasKey ? 'Đã có key' : 'Chưa có key'}</em>
+    </div>
+    <label class="provider-key-field">
+      <span>API key</span>
+      <input type="password" class="search" data-field="apikey" value="${escapeAttr(cfg.apiKey || '')}" placeholder="Dán API key" autocomplete="off">
+    </label>
+    ${renderProviderScanStatus(providerId)}
+    <div class="provider-card-foot">
+      <span>${models.length} model</span>
+      <span>${scanLabel}</span>
+      <button class="btn" data-addmodel="${providerId}">+ Model</button>
+    </div>
+  </section>`;
+}
+
+function renderProviderScanStatus(providerId) {
+  if (providerId === 'ollamaCloud') return '';
+  const status = providerScanStatus[providerId];
+  if (!status) return `<div class="settings-scan-status muted" data-scan-status="${providerId}">Nhập API key để tự quét model khả dụng.</div>`;
+  const cls = status.type === 'error' ? 'error' : status.type === 'success' ? 'success' : 'loading';
+  return `<div class="settings-scan-status ${cls}" data-scan-status="${providerId}">${escapeHtml(status.message)}</div>`;
+}
+
+function renderModelInventory(providerId, cfg) {
+  const models = cfg.models || [];
+  const providerLabel = PROVIDER_INFO[providerId]?.label || providerId;
+  return `<section class="model-provider-group" data-provider="${providerId}">
+    <div class="model-provider-head"><strong>${escapeHtml(providerLabel)}</strong><span>${models.length} model</span></div>
+    <div class="settings-models">${models.length ? models.map(model => renderModelRow(model, providerId)).join('') : '<div class="empty-state">Chưa có model nào.</div>'}</div>
+  </section>`;
+}
+
+function renderModelRow(model, providerId) {
   const p = model.pricing || {};
-  return `<div class="settings-model"><div><strong>${escapeHtml(model.displayName || model.id)}</strong><span class="muted">${escapeHtml(model.id)}${model.builtin ? ' · built-in' : ' · user-declared'}</span><span class="settings-mini">${p.inputPer1M != null && p.outputPer1M != null ? `$${p.inputPer1M}/M in · $${p.outputPer1M}/M out` : 'Chưa có giá'}</span></div>${model.builtin ? '' : `<button class="btn danger" data-removemodel="${escapeAttr(model.id)}">Xóa</button>`}</div>`;
+  const caps = model.capabilities || {};
+  const capText = [
+    caps.webGrounding ? 'Web' : '',
+    caps.structuredOutput ? 'JSON' : '',
+    caps.reasoning ? 'Reasoning' : ''
+  ].filter(Boolean).join(' · ') || 'Basic';
+  const priceText = p.inputPer1M != null && p.outputPer1M != null ? `$${p.inputPer1M}/M in · $${p.outputPer1M}/M out` : 'Chưa có giá';
+  return `<div class="settings-model" data-provider="${providerId}">
+    <div><strong>${escapeHtml(model.displayName || model.id)}</strong><span class="muted">${escapeHtml(model.id)}</span></div>
+    <span class="model-capability">${escapeHtml(capText)}</span>
+    <span class="settings-mini">${escapeHtml(priceText)}</span>
+    <span class="model-source">${model.builtin ? 'available' : 'manual'}</span>
+    ${model.builtin ? '<span></span>' : `<button class="btn danger" data-removemodel="${escapeAttr(model.id)}">Xóa</button>`}
+  </div>`;
 }
 
 function renderUsageTab() {
@@ -162,7 +219,14 @@ export function bindSettingsEvents() {
     settings.crsm.executionPolicy.parallelStages[stage] = ev.target.value;
     replaceSettings('engine');
   }));
-  document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('input', ev => { const provider = ev.target.closest('[data-provider]')?.dataset.provider; if (!provider) return; getDraftSettings().crsm.providers[provider].apiKey = ev.target.value.trim() || null; updateSaveState(); }));
+  document.querySelectorAll('.settings-panel [data-field="apikey"]').forEach(input => input.addEventListener('input', ev => {
+    const provider = ev.target.closest('[data-provider]')?.dataset.provider;
+    if (!provider) return;
+    const apiKey = ev.target.value.trim();
+    getDraftSettings().crsm.providers[provider].apiKey = apiKey || null;
+    updateSaveState();
+    scheduleProviderModelScan(provider, apiKey);
+  }));
   document.querySelectorAll('.settings-panel [data-addmodel]').forEach(btn => btn.addEventListener('click', ev => {
     const provider = ev.target.dataset.addmodel;
     const id = prompt(`Model ID cho ${PROVIDER_INFO[provider]?.label || provider}:`);
@@ -201,6 +265,72 @@ export function bindSettingsEvents() {
     const toggle = document.getElementById('openSettings');
     if (toggle) toggle.click();
     else { const panel = document.querySelector('.settings-panel'); if (panel) panel.remove(); }
+  });
+}
+
+function scheduleProviderModelScan(provider, apiKey) {
+  if (provider === 'ollamaCloud') return;
+  clearTimeout(providerScanTimers[provider]);
+  if (providerScanControllers[provider]) providerScanControllers[provider].abort();
+  if (!apiKey) {
+    providerScanStatus = { ...providerScanStatus, [provider]: null };
+    updateProviderScanStatus(provider);
+    return;
+  }
+  providerScanStatus = { ...providerScanStatus, [provider]: { type: 'loading', message: 'Đang quét model khả dụng...' } };
+  updateProviderScanStatus(provider);
+  providerScanTimers[provider] = setTimeout(() => scanProviderModels(provider, apiKey), 900);
+}
+
+async function scanProviderModels(provider, apiKey) {
+  const controller = new AbortController();
+  providerScanControllers[provider] = controller;
+  try {
+    const discovered = await discoverProviderModels(provider, apiKey, { signal: controller.signal });
+    const settings = getDraftSettings();
+    const cfg = settings.crsm.providers[provider];
+    cfg.models = mergeDiscoveredModels(cfg.models || [], discovered);
+    ensureAssignmentsUseAvailableModel(settings, provider);
+    providerScanStatus = {
+      ...providerScanStatus,
+      [provider]: { type: 'success', message: `Đã quét ${discovered.length} model khả dụng.` }
+    };
+    updateSaveState();
+    replaceSettings('providers');
+  } catch (error) {
+    if (error?.name === 'AbortError') return;
+    providerScanStatus = {
+      ...providerScanStatus,
+      [provider]: { type: 'error', message: `Không quét được model: ${error?.message || error}` }
+    };
+    refreshProviderBlock(provider);
+  } finally {
+    if (providerScanControllers[provider] === controller) providerScanControllers[provider] = null;
+  }
+}
+
+function refreshProviderBlock(provider) {
+  const current = document.querySelector('[data-setting-tab="providers"].active');
+  if (current) replaceSettings('providers');
+}
+
+function updateProviderScanStatus(provider) {
+  const el = document.querySelector(`[data-scan-status="${provider}"]`);
+  if (!el) return;
+  const status = providerScanStatus[provider];
+  el.className = `settings-scan-status ${status?.type || 'muted'}`;
+  el.textContent = status?.message || 'Nhập API key để tự quét model khả dụng.';
+}
+
+function ensureAssignmentsUseAvailableModel(settings, provider) {
+  const models = settings.crsm.providers[provider]?.models || [];
+  const firstModel = models[0]?.id || null;
+  if (!firstModel) return;
+  NODES_LLM.forEach(nodeId => {
+    const assignment = settings.crsm.nodeAssignment[nodeId];
+    if (assignment?.provider === provider && !models.some(model => model.id === assignment.model)) {
+      assignment.model = firstModel;
+    }
   });
 }
 

@@ -12,6 +12,8 @@ const TRADINGVIEW_COLUMNS = [
 const QUANTITY_FIELDS = new Set([
   'market_cap',
   'price',
+  'high_52w',
+  'low_52w',
   'volume',
   'avg_volume_10d',
   'avg_volume_30d',
@@ -22,9 +24,48 @@ const QUANTITY_FIELDS = new Set([
   'fcf_ttm'
 ]);
 
+const PERCENT_FIELDS = new Set([
+  'change_pct',
+  'perf_1w',
+  'perf_1m',
+  'perf_3m',
+  'perf_6m',
+  'perf_1y',
+  'perf_ytd',
+  'roe_ttm',
+  'roa_ttm',
+  'revenue_growth_quarterly_yoy',
+  'revenue_growth_annual_yoy',
+  'eps_dil_growth_ttm_yoy',
+  'gross_margin_ttm',
+  'operating_margin_ttm',
+  'net_margin_ttm',
+  'fcf_growth_ttm_yoy',
+  'dividend_yield_ttm'
+]);
+
+const RATIO_FIELDS = new Set([
+  'relative_volume',
+  'peg_ttm',
+  'debt_equity_fq',
+  'debt_equity_fy',
+  'current_ratio_fq',
+  'current_ratio_fy',
+  'quick_ratio_fq',
+  'quick_ratio_fy',
+  'pe',
+  'peg',
+  'pb',
+  'ps',
+  'ev_ebitda',
+  'ev_revenue'
+]);
+
 const LEGACY_ALIASES = {
   TICKER:'ticker', COMPANY_NAME:'company_name', SECTOR:'sector', INDUSTRY:'industry', PRICE:'price', VOL:'volume', AVGVOL:'avg_volume_30d', ROE:'roe_ttm', ROIC:null,
-  REVGROWTH:'revenue_growth_annual_yoy', EPSGROWTH:'eps_dil_growth_ttm_yoy', DEBT:'debt_equity_fq', PE:'pe', PEG:'peg', RET1M:'perf_1m', RET3M:'perf_3m', RET6M:'perf_6m', RET12M:'perf_1y'
+  REVGROWTH:'revenue_growth_annual_yoy', EPSGROWTH:'eps_dil_growth_ttm_yoy', DEBT:'debt_equity_fq', PE:'pe', PEG:'peg',
+  RET1W:'perf_1w', RET1M:'perf_1m', RET3M:'perf_3m', RET6M:'perf_6m', RET12M:'perf_1y', RETYTD:'perf_ytd',
+  HIGH_52W:'high_52w', LOW_52W:'low_52w', RELATIVE_VOLUME:'relative_volume', AVGVOL10D:'avg_volume_10d', AVGVOL60D:'avg_volume_60d'
 };
 
 const HEADER_ALIASES = {
@@ -48,7 +89,7 @@ export function parseTradingViewPaste(text) {
   if(!rawLines.length)return{rows:[],errors:['Chua co du lieu de xu ly.'],columns:{}};
   const screener=parseTradingViewFourLine(rawLines); if(screener.rows.length)return screener;
   const table=rawLines.map(line=>splitLine(line,detectDelimiter(line))); const headerIndex=findHeaderIndex(table); const columns=mapColumns(table[headerIndex]||[]);
-  if(Object.keys(columns).length>=10&&columns.ticker!=null){
+  if(columns.ticker!=null&&(columns.price!=null||columns.high_52w!=null||Object.keys(columns).length>=10)){
     const rows=table.slice(headerIndex+1).filter(cells=>!isSeparatorRow(cells)).map((cells,i)=>normalizeHeaderRow(cells,columns,i+headerIndex+2)).filter(row=>row.ticker);
     return{rows,errors:[],columns:{...columns,mode:'tradingview-table'},mode:'tradingview-table'};
   }
@@ -67,7 +108,7 @@ function parseTradingViewFourLine(lines){
     const row={sourceRow:i+1,ticker,company_name:cleanText(companyLine),ui_marker:markerLine==='D'?'D':markerLine||null};
     for(let index=0;index<TRADINGVIEW_COLUMNS.length;index+=1){
       const field=TRADINGVIEW_COLUMNS[index]; const value=cells[index]??null;
-      row[field]=field==='sector'||field==='industry'?cleanText(value):(QUANTITY_FIELDS.has(field)?cleanQuantity(value):cleanText(value));
+      row[field]=cleanFieldValue(field,value);
     }
     if(!row.industry)row.industry='Unknown'; applyLegacyAliases(row); rows.push(row); i+=3;
   }
@@ -77,7 +118,7 @@ function parseTradingViewFourLine(lines){
 
 function buildScreenerColumns(){const columns={mode:'tradingview-four-line-tab',ticker:-1,company_name:-1};TRADINGVIEW_COLUMNS.forEach((field,index)=>{columns[field]=index;});return columns;}
 function extractPlainTicker(line){const value=stripMarkdown(line).replace(/\s+D\s*$/i,'').trim();if(/^[A-Z0-9]{2,8}$/.test(value)&&!['VN','HOSE','HNX','UPCOM'].includes(value))return value;return null;}
-function normalizeHeaderRow(cells,columns,sourceRow){const row={sourceRow};for(const field of Object.keys(HEADER_ALIASES)){const index=columns[field];const raw=index==null?null:cells[index];if(field==='ticker')row.ticker=extractPlainTicker(raw)||cleanText(raw);else if(field==='company_name'||field==='sector'||field==='industry')row[field]=cleanText(raw);else row[field]=QUANTITY_FIELDS.has(field)?cleanQuantity(raw):cleanText(raw);}if(!row.industry)row.industry='Unknown';applyLegacyAliases(row);return row;}
+function normalizeHeaderRow(cells,columns,sourceRow){const row={sourceRow};for(const field of Object.keys(HEADER_ALIASES)){const index=columns[field];const raw=index==null?null:cells[index];if(field==='ticker')row.ticker=extractPlainTicker(raw)||cleanText(raw);else row[field]=cleanFieldValue(field,raw);}if(!row.industry)row.industry='Unknown';applyLegacyAliases(row);return row;}
 function applyLegacyAliases(row){for(const [legacy,source] of Object.entries(LEGACY_ALIASES))row[legacy]=source?row[source]??null:null;return row;}
 function mapColumns(headers){const normalized=headers.map(normalizeHeader);const result={};for(const [field,aliases] of Object.entries(HEADER_ALIASES)){const index=normalized.findIndex(header=>aliases.includes(header));if(index>=0)result[field]=index;}if(result.ticker==null&&result.company_name!=null)result.ticker=result.company_name;return result;}
 function findHeaderIndex(table){let bestIndex=0,bestScore=-1;table.slice(0,12).forEach((cells,index)=>{const score=Object.keys(mapColumns(cells)).length;if(score>bestScore){bestScore=score;bestIndex=index;}});return bestIndex;}
@@ -87,6 +128,32 @@ function splitLine(line,delimiter){return delimiter instanceof RegExp?line.split
 function isSeparatorRow(cells){return cells.length>0&&cells.every(cell=>/^\s*:?-{1,}:?\s*$/.test(cell)||cell==='');}
 function stripMarkdown(value){return String(value||'').replace(/\[\*\*([^\]]+)\*\*\]\([^)]+\)/g,'$1').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\*\*/g,'');}
 function cleanText(value){const text=stripMarkdown(value).trim();return isMissing(text)?null:text||null;}
+
+function cleanFieldValue(field,value){
+  if(field==='company_name'||field==='sector'||field==='industry')return cleanText(value);
+  if(QUANTITY_FIELDS.has(field))return cleanQuantity(value);
+  if(PERCENT_FIELDS.has(field))return cleanPercent(value);
+  if(RATIO_FIELDS.has(field))return cleanRatio(value);
+  return cleanText(value);
+}
+
+export function cleanPercent(value){
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  let text=stripMarkdown(value).trim();
+  if(!text||isMissing(text))return null;
+  text=text.replace(/\u2212/g,'-').replace(/âˆ’/g,'-').replace(/\u202f/g,'').replace(/\u00a0/g,'').replace(/\s/g,'').replace(/^\+/,'').replace('%','').replace(/,/g,'');
+  const number=Number.parseFloat(text);
+  return Number.isFinite(number)?number:null;
+}
+
+export function cleanRatio(value){
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  let text=stripMarkdown(value).trim();
+  if(!text||isMissing(text))return null;
+  text=text.replace(/\u2212/g,'-').replace(/âˆ’/g,'-').replace(/\u202f/g,'').replace(/\u00a0/g,'').replace(/\s/g,'').replace(/^\+/,'').replace(/,/g,'');
+  const number=Number.parseFloat(text);
+  return Number.isFinite(number)?number:null;
+}
 
 export function cleanQuantity(value){
   if(typeof value==='number'&&Number.isFinite(value))return value;
