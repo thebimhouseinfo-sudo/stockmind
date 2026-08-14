@@ -53,7 +53,9 @@ export const DEFAULT_SETTINGS = {
       node2: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
       node3: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
       node4: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
-      node5: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true }
+      node5: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
+      node6a: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true },
+      node6b: { provider: 'gemini', model: 'gemini-2.5-flash', enabled: true }
     }
   }
 };
@@ -63,8 +65,8 @@ export const PROVIDER_INFO = {
   openai: { label: 'OpenAI', subtitle: 'Reasoning layer' },
   ollamaCloud: { label: 'Ollama Cloud', subtitle: 'Cloud reasoning alternatives' }
 };
-export const NODES_LLM = ['node1', 'node2', 'node3', 'node4', 'node5'];
-export const NODES_LOCAL = ['node6a', 'node6b', 'node7'];
+export const NODES_LLM = ['node1', 'node2', 'node3', 'node4', 'node5', 'node6a', 'node6b'];
+export const NODES_LOCAL = ['node7'];
 export const NODES_ALL = [...NODES_LLM, ...NODES_LOCAL];
 
 export function loadSettings() {

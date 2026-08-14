@@ -94,6 +94,7 @@ function mountReportFrame(frame) {
   const parsed = new DOMParser().parseFromString(srcdoc, 'text/html');
   const body = parsed.body;
   if (!body) return;
+  if (!parsed.getElementById('report')) return;
 
   const host = document.createElement('div');
   host.className = `${HOST_CLASS} ${body.className || ''}`.trim();
@@ -133,6 +134,7 @@ function mountReportFrame(frame) {
 
   frame.replaceWith(host);
   localizeReport(host);
+  repairSignalIcons(host);
   runScriptsInOrder(scriptQueue, host);
 }
 
@@ -143,6 +145,7 @@ function runScriptsInOrder(queue, host) {
   const next = () => {
     if (index >= queue.length) {
       localizeReport(host);
+      repairSignalIcons(host);
       return;
     }
     const item = queue[index++];
@@ -153,7 +156,7 @@ function runScriptsInOrder(queue, host) {
       script.src = item.src;
       script.async = false;
       script.dataset.crsmReportAsset = `${ASSET_MARK}-script`;
-      script.onload = () => { localizeReport(host); next(); };
+      script.onload = () => { localizeReport(host); repairSignalIcons(host); next(); };
       script.onerror = next;
       document.head.appendChild(script);
     } else {
@@ -167,11 +170,47 @@ function runScriptsInOrder(queue, host) {
         console.warn('[CRSM] Report inline script failed:', error);
       }
       localizeReport(host);
+      repairSignalIcons(host);
       next();
     }
   };
 
   next();
+}
+
+function repairSignalIcons(root) {
+  if (!root) return;
+  const replacements = new Map([
+    ['🟢', ['#16a34a', 'Tích cực']],
+    ['🟡', ['#eab308', 'Trung lập']],
+    ['🔴', ['#dc2626', 'Tiêu cực']],
+    ['⚪', ['#d1d5db', 'Chưa có dữ liệu']],
+    ['⚫', ['#6b7280', 'Không xác định']]
+  ]);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {
+    const value = node.nodeValue || '';
+    const icon = [...replacements.keys()].find(item => value.includes(item));
+    if (!icon || !node.parentNode) return;
+    const [color, title] = replacements.get(icon);
+    const fragment = document.createDocumentFragment();
+    value.split(icon).forEach((part, index, parts) => {
+      if (part) fragment.appendChild(document.createTextNode(part));
+      if (index < parts.length - 1) fragment.appendChild(createSignalDot(color, title));
+    });
+    node.parentNode.replaceChild(fragment, node);
+  });
+}
+
+function createSignalDot(color, title) {
+  const dot = document.createElement('span');
+  dot.className = 'crsm-signal-dot';
+  dot.title = title;
+  dot.setAttribute('aria-label', title);
+  dot.style.cssText = `display:inline-block;width:12px;height:12px;border-radius:9999px;background:${color};vertical-align:middle;`;
+  return dot;
 }
 
 function scopeBodyRule(css) {

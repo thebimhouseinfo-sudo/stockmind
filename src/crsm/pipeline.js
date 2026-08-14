@@ -3,8 +3,8 @@ import { node2 } from './nodes/node2.js';
 import { node3 } from './nodes/node3.js';
 import { node4 } from './nodes/node4.js';
 import { node5 } from './nodes/node5.js';
-import { renderNode6A } from './nodes/node6a.js';
-import { renderNode6B } from './nodes/node6b.js';
+import { node6a } from './nodes/node6a.js';
+import { node6b } from './nodes/node6b.js';
 import { node7 } from './nodes/node7.js';
 import { consumePendingUserEvidence, getPendingUserEvidence } from './user-evidence.js';
 import { buildExecutionStages } from './execution-policy.js';
@@ -19,8 +19,8 @@ export const NODES = [
   ['node3', node3],
   ['node4', node4],
   ['node5', node5],
-  ['node6a', renderNode6A],
-  ['node6b', renderNode6B],
+  ['node6a', node6a],
+  ['node6b', node6b],
   ['node7', node7]
 ];
 

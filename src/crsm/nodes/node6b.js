@@ -1,7 +1,26 @@
 import { field, setResult, MISSING_SHORT, decisionLabel } from './render-common.js';
+import { runLLM } from '../llm.js';
+import { node6bPrompt } from '../prompts/node6b.js';
 
 // Node 6B is the locked, text-first Word report template.
 // legacy/CRSM/NODE_6B.md is reference-only and must never be modified.
+export async function node6b(ctx) {
+  try {
+    const { text } = await runLLM({
+      nodeId: 'node6b',
+      systemInstruction: buildNode6BSystemInstruction(),
+      prompt: buildNode6BPrompt(ctx),
+      responseFormat: 'text'
+    });
+    const markdown = cleanMarkdown(text);
+    if (isUsableMarkdown(markdown)) return markdown;
+    console.warn('[node6b] LLM output was not usable Markdown. Falling back to local renderer.');
+  } catch (error) {
+    console.warn('[node6b] LLM render failed. Falling back to local renderer.', error);
+  }
+  return renderNode6B(ctx);
+}
+
 export function renderNode6B(ctx) {
   const outputs = ctx.outputs || {};
   setResult({ ...outputs, screeningContext: ctx.screeningContext, mode: ctx.mode, ticker: ctx.ticker, sectorType: ctx.sectorType });
@@ -112,9 +131,9 @@ export function renderNode6B(ctx) {
   md.push('');
 
   md.push(`## ${base + 8}. Chiến lược giao dịch & Quản trị vị thế`);
-  md.push(`- Vùng mua: ${field('node5.strategy.entry_zone')} — ${field('node5.strategy.allocation_plan')}`);
+  md.push(`- Vùng mua: ${field('node5.strategy.entry_zone')} — ${allocationNote(n5.strategy?.allocation_plan)}`);
   md.push(`- Cắt lỗ kỹ thuật (Trading Stop): ${field('node5.trading_stop.price')} (${field('node5.trading_stop.basis')})`);
-  md.push(`- Mục tiêu 1: ${field('node5.strategy.tp1')} (${field('node5.strategy.tp1_desc')}) | Mục tiêu 2: ${field('node5.strategy.tp2')} (${field('node5.strategy.tp2_desc')})`);
+  md.push(`- Mục tiêu 1: ${targetValue(n5.strategy?.tp1)} (${targetRationale(n5.strategy?.tp1)}) | Mục tiêu 2: ${targetValue(n5.strategy?.tp2)} (${targetRationale(n5.strategy?.tp2)})`);
   md.push(`- Lộ trình giải ngân: ${allocationSteps(n5.strategy?.allocation_plan)}`);
   md.push(`- **Quản trị vị thế:** Rủi ro/lệnh = ${field('node5.strategy.risk_per_trade_pct_nav')} NAV | Tỷ trọng tối đa = ${field('node5.strategy.max_portfolio_weight_pct')} | Loại vị thế: ${positionLabel(field('node5.strategy.position_type'))}`);
   md.push('');
@@ -187,17 +206,76 @@ function renderPeers(md, peers) {
 function renderScenarios(md, scenarios) {
   md.push('| Kịch bản | Xác suất | Điều kiện | Giá mục tiêu |');
   md.push('|---|---|---|---|');
-  const s = Array.isArray(scenarios) ? scenarios : [];
-  const find = key => s.find(x => String(x.scenario ?? x.label ?? x.name ?? '').toLowerCase().includes(key));
-  [['Tăng (Bull)', find('bull')], ['Cơ sở (Base)', find('base')], ['Giảm (Bear)', find('bear')]].forEach(([label, x]) => {
-    md.push(`| ${label} | ${cell(x?.probability ?? x?.prob)} | ${cell(x?.condition ?? x?.conditions)} | ${cell(x?.target_price ?? x?.price_target ?? x?.target ?? x?.bear_price)} |`);
+  const s = Array.isArray(scenarios) ? scenarios : Object.values(scenarios || {});
+  const get = (key, objectKey) => scenarios?.[objectKey] || s.find(x => String(x.scenario ?? x.label ?? x.name ?? '').toLowerCase().includes(key));
+  [['Tăng (Bull)', get('bull', 'bull')], ['Cơ sở (Base)', get('base', 'base')], ['Giảm (Bear)', get('bear', 'bear')]].forEach(([label, x]) => {
+    md.push(`| ${label} | ${cell(x?.probability ?? x?.prob)} | ${cell(x?.condition ?? x?.conditions ?? x?.description)} | ${cell(x?.target ?? x?.target_price ?? x?.price_target ?? x?.bear_price ?? x?.stop_loss)} |`);
   });
+}
+
+function buildNode6BSystemInstruction() {
+  return `${node6bPrompt}
+
+ADDITIONAL PROJECT RULES:
+- Write the report primarily in Vietnamese with full diacritics for Vietnamese readers.
+- You may keep professional bilingual terms in parentheses when useful, for example Trade Setup, Reverse DCF, Smart Money, Bull/Base/Bear case.
+- Do not output Vietnamese without diacritics.
+- Output only one Word-ready Markdown document. No wrapper text, no code fences.
+- Use all available Node 1-5 data, especially scenarios, trade setup, allocation plan, risk notes, source notes, and screening snapshot when mode is SCREENED.
+- Keep the tone concise, institutional, and actionable. Do not make the Word report a loose summary of the HTML report.
+- Missing data must be shown as "Chưa có dữ liệu", never as raw null, undefined, N/A, or blank text.
+- Do not invent numbers. If a value is inferred from upstream text, make the uncertainty visible.`;
+}
+
+function buildNode6BPrompt(ctx) {
+  return `Generate the final CRSM Word-ready Markdown report from this combined analysis JSON.
+
+COMBINED_ANALYSIS_JSON:
+${JSON.stringify(reportPayload(ctx), null, 2)}`;
+}
+
+function reportPayload(ctx) {
+  return {
+    ticker: ctx.ticker,
+    mode: ctx.mode,
+    sectorType: ctx.sectorType,
+    screeningContext: ctx.screeningContext || null,
+    outputs: ctx.outputs || {}
+  };
+}
+
+function cleanMarkdown(value) {
+  return String(value || '').trim().replace(/^```(?:markdown|md)?\s*/i, '').replace(/\s*```$/i, '').trim();
+}
+
+function isUsableMarkdown(value) {
+  const markdown = String(value || '').trim();
+  if (!markdown.startsWith('#')) return false;
+  if (!/báo cáo|bao cao/i.test(markdown)) return false;
+  if (/\[[A-Z0-9_]{3,}\]/.test(markdown)) return false;
+  return markdown.length > 500;
+}
+
+function targetValue(value) {
+  if (value == null) return MISSING_SHORT;
+  if (typeof value === 'object') return cell(value.price ?? value.value ?? value.target ?? value.target_price);
+  return cell(value);
+}
+
+function targetRationale(value) {
+  if (value && typeof value === 'object') return cell(value.rationale ?? value.basis ?? value.description);
+  return MISSING_SHORT;
+}
+
+function allocationNote(value) {
+  if (value && typeof value === 'object') return cell(value.note || allocationSteps(value));
+  return cell(value);
 }
 
 function allocationSteps(value) {
   if (Array.isArray(value)) return value.map((x, i) => `(${i + 1}) ${cell(x)}`).join('  ');
   if (value && typeof value === 'object') {
-    const values = Object.values(value).filter(v => v != null && v !== '');
+    const values = Array.isArray(value.steps) ? value.steps : Object.values(value).filter(v => v != null && v !== '' && !Array.isArray(v));
     if (values.length) return values.map((x, i) => `(${i + 1}) ${cell(x)}`).join('  ');
   }
   return value != null && value !== '' ? cell(value) : MISSING_SHORT;

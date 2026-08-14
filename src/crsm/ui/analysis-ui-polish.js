@@ -12,13 +12,8 @@ export function ensureAnalysisUiPolish() {
     .crsm-pipeline-card{height:100%!important;display:flex;flex-direction:column}
     .crsm-tree{flex:1 1 auto}
 
-    /* Cleaner heading: remove the extra AI suffix. */
-    .crsm-hero h2{font-size:0!important}
-    .crsm-hero h2::after{content:'Phân tích chuyên sâu';font-size:27px;line-height:1.2;color:#132341}
-
-    /* Shorter activity heading. */
-    .crsm-activity-card .crsm-side-title{font-size:0!important}
-    .crsm-activity-card .crsm-side-title::after{content:'HOẠT ĐỘNG';font-size:11px;letter-spacing:.05em;font-weight:950;color:#183e77}
+    .crsm-hero h2{font-size:27px!important;line-height:1.16!important;color:#132341}
+    .crsm-activity-card .crsm-side-title{font-size:11px!important;letter-spacing:.05em;font-weight:950;color:#183e77}
 
     /* The small dependency reminder is redundant with the pipeline structure. */
     .crsm-pipeline-note{display:none!important}
@@ -29,9 +24,9 @@ export function ensureAnalysisUiPolish() {
     .crsm-dashboard-run::after{content:'Phân tích bằng CRSM';font-size:10px;line-height:1;font-weight:850}
 
     @media(max-width:760px){
-      .crsm-hero h2::after{font-size:22px}
+      .crsm-hero h2{font-size:22px!important}
       .crsm-left-rail,.crsm-pipeline-card{height:auto!important}
-      .crsm-activity-card .crsm-side-title::after{font-size:10px}
+      .crsm-activity-card .crsm-side-title{font-size:10px!important}
       .crsm-dashboard-run::after{font-size:11px}
     }
   `;

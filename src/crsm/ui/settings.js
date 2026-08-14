@@ -67,14 +67,18 @@ function renderEngineTab(settings) {
       node2: 'Kỹ thuật & Smart Money',
       node3: 'Cơ bản & Định giá',
       node4: 'Vĩ mô & Nhân quả',
-      node5: 'Tổng hợp & Quyết định'
+      node5: 'Tổng hợp & Quyết định',
+      node6a: 'Báo cáo HTML',
+      node6b: 'Báo cáo Word'
     }[nodeId] || nodeId;
     const requirement = {
       node1: 'Web grounding + JSON',
       node2: 'Web grounding + JSON',
       node3: 'JSON / reasoning',
       node4: 'Web grounding + JSON',
-      node5: 'JSON / reasoning'
+      node5: 'JSON / reasoning',
+      node6a: 'HTML writer',
+      node6b: 'Markdown writer'
     }[nodeId] || 'AI';
     const providerDrop = Object.keys(PROVIDER_INFO).map(id => `<option value="${id}" ${id === a.provider ? 'selected' : ''}>${PROVIDER_INFO[id].label}</option>`).join('');
     const cfg = settings.crsm.providers[a.provider] || { models: [] };

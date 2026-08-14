@@ -83,7 +83,7 @@ function downloadBlob(blob, filename) {
 export async function downloadReportImage(reportHtml, ticker) {
   if (!reportHtml) return;
   try {
-    const source = await prepareReportForImage(reportHtml, ticker);
+    const source = await withTimeout(prepareReportForImage(reportHtml, ticker), 7000, 'Render ảnh quá lâu.');
     const width = Math.min(1800, Math.max(1100, source.width));
     const height = Math.min(40000, Math.max(600, source.height));
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject x="0" y="0" width="${width}" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden">${source.body}</div></foreignObject></svg>`;
@@ -103,6 +103,14 @@ export async function downloadReportImage(reportHtml, ticker) {
     console.warn('[CRSM] Image export failed:', error);
     downloadReportImageFallback(reportHtml, ticker);
   }
+}
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 async function prepareReportForImage(reportHtml, ticker) {
@@ -200,7 +208,9 @@ function blobToImage(blob) {
 
 function downloadReportImageFallback(reportHtml, ticker) {
   const text = extractReportText(reportHtml), lines = wrapLines(text, 92), width = 1600, lineHeight = 30, top = 150, bottom = 70;
-  const height = Math.max(520, top + lines.length * lineHeight + bottom);
+  const visibleLines = lines.slice(0, 520);
+  if (lines.length > 520) visibleLines.push('... Nội dung quá dài, ảnh snapshot đã được rút gọn.');
+  const height = Math.max(520, top + visibleLines.length * lineHeight + bottom);
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d'); if (!ctx) return;
@@ -208,8 +218,14 @@ function downloadReportImageFallback(reportHtml, ticker) {
   ctx.fillStyle = '#172033'; ctx.font = '700 36px Arial'; ctx.fillText(`CRSM — ${ticker}`, 70, 62);
   ctx.font = '18px Arial'; ctx.fillStyle = '#667085'; ctx.fillText(`Báo cáo phân tích · ${new Date().toLocaleDateString('vi-VN')}`, 70, 98);
   ctx.strokeStyle = '#dbe2ec'; ctx.beginPath(); ctx.moveTo(70, 120); ctx.lineTo(width - 70, 120); ctx.stroke();
-  ctx.fillStyle = '#172033'; ctx.font = '18px Arial'; lines.forEach((line, i) => ctx.fillText(line, 70, top + i * lineHeight));
-  canvas.toBlob(blob => { if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`); }, 'image/png');
+  ctx.fillStyle = '#172033'; ctx.font = '18px Arial'; visibleLines.forEach((line, i) => ctx.fillText(line, 70, top + i * lineHeight));
+  canvas.toBlob(blob => {
+    if (blob) {
+      downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+    } else {
+      downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), `CRSM_${safeName(ticker)}_${dateStamp()}.txt`);
+    }
+  }, 'image/png');
 }
 
 export function downloadWordReport(reportHtml, ticker) {

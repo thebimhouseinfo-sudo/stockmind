@@ -1,6 +1,7 @@
 import { crsmState } from './state.js';
 
 const STYLE_ID = 'crsm-report-runtime-fixes';
+let syncQueued = false;
 
 ensureStyles();
 installCaptureHandlers();
@@ -26,12 +27,35 @@ function installCaptureHandlers() {
       event.preventDefault();
       event.stopImmediatePropagation();
       try {
-        await downloadHtmlImage(crsmState.finalReport || crsmState.nodeOutputs?.node6a || '', crsmState.ticker || 'CRSM');
+        const visibleReport = activeReportElement();
+        if (visibleReport) {
+          try {
+            await downloadVisibleReportImage(visibleReport, crsmState.ticker || 'CRSM');
+            return;
+          } catch (error) {
+            console.warn('[CRSM] Visible report capture failed, retrying from report HTML:', error);
+          }
+        }
+        await downloadHtmlImage(activeReportHtml(), crsmState.ticker || 'CRSM');
       } catch (error) {
         console.warn('[CRSM] Image export fix failed:', error);
+        downloadImageFallback(activeReportHtml(), crsmState.ticker || 'CRSM');
       }
     }
   }, true);
+}
+
+function activeReportHtml() {
+  const fromState = crsmState.finalReport || crsmState.nodeOutputs?.node6a || '';
+  if (fromState) return fromState;
+  const frame = document.querySelector('.crsm-report-frame');
+  return frame?.getAttribute('srcdoc') || frame?.srcdoc || '';
+}
+
+function activeReportElement() {
+  const htmlTab = document.querySelector('.report-tab.active[data-report-tab="html"]');
+  if (!htmlTab) return null;
+  return document.querySelector('.crsm-report-host #report') || document.querySelector('.crsm-report-host');
 }
 
 function installObserver() {
@@ -39,7 +63,6 @@ function installObserver() {
   observer.observe(document.documentElement, { childList: true, subtree: true });
 }
 
-let syncQueued = false;
 function queueSync() {
   if (syncQueued) return;
   syncQueued = true;
@@ -131,7 +154,7 @@ async function downloadMarkdownWord(markdown, ticker) {
 async function downloadHtmlImage(reportHtml, ticker) {
   if (!reportHtml) return;
   try {
-    const source = await prepareReportForImage(reportHtml, ticker);
+    const source = await withTimeout(prepareReportForImage(reportHtml, ticker), 7000, 'Render ảnh quá lâu.');
     if (source.canvas) {
       const png = await new Promise(resolve => source.canvas.toBlob(resolve, 'image/png'));
       if (!png) throw new Error('Không tạo được PNG.');
@@ -158,6 +181,36 @@ async function downloadHtmlImage(reportHtml, ticker) {
     console.warn('[CRSM] Image export fell back to text snapshot:', error);
     downloadImageFallback(reportHtml, ticker);
   }
+}
+
+async function downloadVisibleReportImage(reportElement, ticker) {
+  const html2canvas = window.html2canvas;
+  if (typeof html2canvas !== 'function') throw new Error('html2canvas chưa sẵn sàng.');
+
+  await waitForVisibleImages(reportElement);
+  if (document.fonts?.ready) await document.fonts.ready.catch(() => {});
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  const canvas = await withTimeout(html2canvas(reportElement, {
+    backgroundColor: '#f5f7fb',
+    scale: Math.min(2, window.devicePixelRatio || 1),
+    useCORS: true,
+    logging: false,
+    windowWidth: Math.max(document.documentElement.scrollWidth, reportElement.scrollWidth, 1100),
+    windowHeight: Math.max(document.documentElement.scrollHeight, reportElement.scrollHeight, 600)
+  }), 12000, 'Chụp report đang hiển thị quá lâu.');
+
+  const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!png) throw new Error('Không tạo được PNG từ report đang hiển thị.');
+  downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+}
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 async function prepareReportForImage(reportHtml, ticker) {
@@ -249,13 +302,28 @@ function wordStyles() {
   return `@page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#1f2937;line-height:1.55;margin:0}h1{color:#1e3a8a;font-size:22pt;border-bottom:1px solid #dbe2ec;padding-bottom:8pt}h2{color:#1e3a8a;font-size:15pt;margin-top:18pt;page-break-after:avoid}h3{color:#334e7a;font-size:12pt;margin-top:14pt;page-break-after:avoid}p{margin:6pt 0}ul{margin:6pt 0 10pt 18pt;padding-left:0}li{margin:3pt 0}blockquote{margin:8pt 0;padding:7pt 10pt;border-left:3pt solid #3b82f6;background:#eff6ff}.crsm-word-table-wrap{overflow:visible}table{width:100%;border-collapse:collapse;margin:8pt 0;table-layout:fixed;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #cfd8e3;padding:5pt 6pt;vertical-align:top;word-break:break-word}th{background:#edf3fb;font-weight:700}code{font-family:Consolas,monospace}`;
 }
 
+async function waitForVisibleImages(root) {
+  const images = [...root.querySelectorAll('img')];
+  if (!images.length) return;
+  await Promise.all(images.map(image => {
+    if (image.complete) return Promise.resolve();
+    return new Promise(resolve => {
+      image.addEventListener('load', resolve, { once: true });
+      image.addEventListener('error', resolve, { once: true });
+    });
+  }));
+}
+
 function downloadImageFallback(reportHtml, ticker) {
   const text = extractReportText(reportHtml);
   const lines = wrapLines(text, 92);
   const width = 1600;
   const lineHeight = 30;
   const top = 150;
-  const height = Math.max(520, top + lines.length * lineHeight + 70);
+  const maxLines = 520;
+  const visibleLines = lines.slice(0, maxLines);
+  if (lines.length > maxLines) visibleLines.push('... Nội dung quá dài, ảnh snapshot đã được rút gọn.');
+  const height = Math.max(520, top + visibleLines.length * lineHeight + 70);
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -276,8 +344,18 @@ function downloadImageFallback(reportHtml, ticker) {
   ctx.stroke();
   ctx.fillStyle = '#172033';
   ctx.font = '18px Arial';
-  lines.forEach((line, i) => ctx.fillText(line, 70, top + i * lineHeight));
-  canvas.toBlob(blob => { if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`); }, 'image/png');
+  visibleLines.forEach((line, i) => ctx.fillText(line, 70, top + i * lineHeight));
+  canvas.toBlob(blob => {
+    if (blob) {
+      downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+    } else {
+      downloadTextFallback(text, ticker);
+    }
+  }, 'image/png');
+}
+
+function downloadTextFallback(text, ticker) {
+  downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), `CRSM_${safeName(ticker)}_${dateStamp()}.txt`);
 }
 
 function extractReportText(html) {

@@ -5,7 +5,9 @@ export const NODE_REQUIREMENTS = {
   node2: { webGrounding: true, structuredOutput: true },
   node3: { webGrounding: false, structuredOutput: true },
   node4: { webGrounding: true, structuredOutput: true },
-  node5: { webGrounding: false, structuredOutput: true }
+  node5: { webGrounding: false, structuredOutput: true },
+  node6a: { webGrounding: false, structuredOutput: false },
+  node6b: { webGrounding: false, structuredOutput: false }
 };
 
 export async function resolveProviderModel(nodeId, settings) {

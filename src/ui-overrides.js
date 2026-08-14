@@ -173,6 +173,19 @@ function rerenderDashboard() {
   }
 }
 
+function enhanceRankingPage() {
+  const panel = document.querySelector('.main > section.panel.panel-pad');
+  const listTabActive = document.querySelector('[data-tab="list"].active');
+  if (!panel || !listTabActive || panel.dataset.rankingEnhanced === '1') return;
+  const toolbar = panel.querySelector(':scope > .toolbar');
+  const tableWrap = panel.querySelector(':scope > .table-wrap');
+  if (!toolbar || !tableWrap) return;
+
+  panel.dataset.rankingEnhanced = '1';
+  toolbar.classList.add('ranking-title-card');
+  tableWrap.classList.add('ranking-content-card');
+}
+
 function requestAnalyze(tickers) {
   document.dispatchEvent(new CustomEvent('stockmind:analyze-tickers', { detail: { tickers } }));
 }
@@ -194,13 +207,6 @@ function closeSettingsOverlay() {
 }
 
 document.addEventListener('click', event => {
-  const settingsButton = event.target.closest?.('#openSettings');
-  if (settingsButton) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    openSettingsOverlay();
-    return;
-  }
   const closeButton = event.target.closest?.('#crsmSettingsClose');
   if (closeButton && document.getElementById('settingsOverlay')) {
     event.preventDefault();
@@ -268,6 +274,7 @@ function scheduleEnhancement() {
   requestAnimationFrame(() => {
     observerScheduled = false;
     if (document.querySelector('[data-tab="dashboard"].active')) renderShowcase();
+    if (document.querySelector('[data-tab="list"].active')) enhanceRankingPage();
   });
 }
 

@@ -30,7 +30,7 @@ export async function runLLM({ nodeId, prompt, systemInstruction, responseFormat
         model: resolved.model,
         apiKey: resolved.apiKey,
         webGrounding: resolved.webGrounding,
-        structuredOutput: resolved.structuredOutput,
+        structuredOutput: responseFormat === 'json' && resolved.structuredOutput,
         responseFormat,
         signal
       });

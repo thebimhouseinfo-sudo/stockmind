@@ -129,9 +129,16 @@ Do not translate numbers, tickers, dates, source names, or technical abbreviatio
   "liquidity_note": "",
   "strategy": {
     "entry_zone": "",
-    "allocation_plan": "",
-    "tp1": null,
-    "tp2": null,
+    "allocation_plan": {
+      "note": "",
+      "steps": [
+        "Bước 1: ...",
+        "Bước 2: ...",
+        "Bước 3: ..."
+      ]
+    },
+    "tp1": {"price": null, "rationale": ""},
+    "tp2": {"price": null, "rationale": ""},
     "risk_per_trade_pct_nav": null,
     "position_size_note": "",
     "max_portfolio_weight_pct": null,
