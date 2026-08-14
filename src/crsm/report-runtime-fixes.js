@@ -74,32 +74,33 @@ function markdownToHtml(markdown) {
   while (i < lines.length) {
     const line = lines[i];
     if (!line.trim()) { closeList(); i += 1; continue; }
+    const trimmed = line.trimStart();
 
-    if (/^---+$/.test(line.trim())) { closeList(); out.push('<hr>'); i += 1; continue; }
-    if (/^#\s+/.test(line)) { closeList(); out.push(`<h1>${inlineMarkdown(line.replace(/^#\s+/, ''))}</h1>`); i += 1; continue; }
-    if (/^##\s+/.test(line)) { closeList(); out.push(`<h2>${inlineMarkdown(line.replace(/^##\s+/, ''))}</h2>`); i += 1; continue; }
-    if (/^###\s+/.test(line)) { closeList(); out.push(`<h3>${inlineMarkdown(line.replace(/^###\s+/, ''))}</h3>`); i += 1; continue; }
-    if (/^>\s?/.test(line)) { closeList(); out.push(`<blockquote>${inlineMarkdown(line.replace(/^>\s?/, ''))}</blockquote>`); i += 1; continue; }
+    if (/^---+$/.test(trimmed.trim())) { closeList(); out.push('<hr>'); i += 1; continue; }
+    if (/^###\s+/.test(trimmed)) { closeList(); out.push(`<h3>${inlineMarkdown(trimmed.replace(/^###\s+/, ''))}</h3>`); i += 1; continue; }
+    if (/^##\s+/.test(trimmed)) { closeList(); out.push(`<h2>${inlineMarkdown(trimmed.replace(/^##\s+/, ''))}</h2>`); i += 1; continue; }
+    if (/^#\s+/.test(trimmed)) { closeList(); out.push(`<h1>${inlineMarkdown(trimmed.replace(/^#\s+/, ''))}</h1>`); i += 1; continue; }
+    if (/^>\s?/.test(trimmed)) { closeList(); out.push(`<blockquote>${inlineMarkdown(trimmed.replace(/^>\s?/, ''))}</blockquote>`); i += 1; continue; }
 
-    if (/^\|/.test(line) && i + 1 < lines.length && /^\|?\s*:?-+:?/.test(lines[i + 1])) {
+    if (/^\|/.test(trimmed) && i + 1 < lines.length && /^\|?\s*:?-+:?/.test(lines[i + 1].trimStart())) {
       closeList();
-      const headers = parseTableRow(line);
+      const headers = parseTableRow(trimmed);
       i += 2;
       const rows = [];
-      while (i < lines.length && /^\|/.test(lines[i])) { rows.push(parseTableRow(lines[i])); i += 1; }
+      while (i < lines.length && /^\|/.test(lines[i].trimStart())) { rows.push(parseTableRow(lines[i].trimStart())); i += 1; }
       out.push(`<div class="crsm-word-table-wrap"><table><thead><tr>${headers.map(cell => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${inlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
       continue;
     }
 
-    if (/^[-*]\s+/.test(line)) {
+    if (/^[-*]\s+/.test(trimmed)) {
       if (!listOpen) { out.push('<ul>'); listOpen = true; }
-      out.push(`<li>${inlineMarkdown(line.replace(/^[-*]\s+/, ''))}</li>`);
+      out.push(`<li>${inlineMarkdown(trimmed.replace(/^[-*]\s+/, ''))}</li>`);
       i += 1;
       continue;
     }
 
     closeList();
-    out.push(`<p>${inlineMarkdown(line)}</p>`);
+    out.push(`<p>${inlineMarkdown(trimmed)}</p>`);
     i += 1;
   }
 
@@ -122,29 +123,41 @@ function parseTableRow(line) {
 async function downloadMarkdownWord(markdown, ticker) {
   if (!markdown) return;
   const body = markdownToHtml(markdown);
-  const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="ProgId" content="Word.Document"><title>CRSM ${escapeHtml(ticker)}</title><style>${wordStyles()}</style></head><body><h1>CRSM — ${escapeHtml(ticker)}</h1>${body}</body></html>`;
+  const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="ProgId" content="Word.Document"><title>CRSM ${escapeHtml(ticker)}</title><style>${wordStyles()}</style></head><body>${body}</body></html>`;
   const blob = new Blob([html], { type: 'application/msword' });
   downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.doc`);
 }
 
 async function downloadHtmlImage(reportHtml, ticker) {
   if (!reportHtml) return;
-  const source = await prepareReportForImage(reportHtml, ticker);
-  const width = Math.min(1800, Math.max(1100, source.width));
-  const height = Math.min(40000, Math.max(600, source.height));
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject x="0" y="0" width="${width}" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden">${source.body}</div></foreignObject></svg>`;
-  const image = await blobToImage(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Không tạo được canvas.');
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(image, 0, 0, width, height);
-  const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  if (!png) throw new Error('Không tạo được PNG.');
-  downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+  try {
+    const source = await prepareReportForImage(reportHtml, ticker);
+    if (source.canvas) {
+      const png = await new Promise(resolve => source.canvas.toBlob(resolve, 'image/png'));
+      if (!png) throw new Error('Không tạo được PNG.');
+      downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+      return;
+    }
+
+    const width = Math.min(1800, Math.max(1100, source.width));
+    const height = Math.min(40000, Math.max(600, source.height));
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject x="0" y="0" width="${width}" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden">${source.body}</div></foreignObject></svg>`;
+    const image = await blobToImage(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Không tạo được canvas.');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!png) throw new Error('Không tạo được PNG.');
+    downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
+  } catch (error) {
+    console.warn('[CRSM] Image export fell back to text snapshot:', error);
+    downloadImageFallback(reportHtml, ticker);
+  }
 }
 
 async function prepareReportForImage(reportHtml, ticker) {
@@ -164,6 +177,18 @@ async function prepareReportForImage(reportHtml, ticker) {
     await waitForImages(doc);
 
     const body = doc.body;
+    const report = doc.getElementById('report') || body;
+    const html2canvas = doc.defaultView?.html2canvas;
+    if (typeof html2canvas === 'function') {
+      const canvas = await html2canvas(report, {
+        backgroundColor: '#f5f7fb',
+        scale: Math.min(2, window.devicePixelRatio || 1),
+        useCORS: true,
+        logging: false
+      });
+      return { canvas };
+    }
+
     const width = Math.ceil(Math.max(body.scrollWidth, body.offsetWidth, 1100));
     const height = Math.ceil(Math.max(body.scrollHeight, body.offsetHeight, 600));
     const clone = body.cloneNode(true);
@@ -221,7 +246,59 @@ function normalizeHtmlDocument(reportHtml, ticker) {
 }
 
 function wordStyles() {
-  return `body{font-family:Arial,sans-serif;color:#1f2937;line-height:1.55;margin:18mm}h1{color:#1e3a8a;font-size:22pt;border-bottom:1px solid #dbe2ec;padding-bottom:8pt}h2{color:#1e3a8a;font-size:15pt;margin-top:18pt}h3{color:#334e7a;font-size:12pt;margin-top:14pt}p{margin:6pt 0}ul{margin:6pt 0 10pt 18pt}li{margin:3pt 0}blockquote{margin:8pt 0;padding:7pt 10pt;border-left:3pt solid #3b82f6;background:#eff6ff}.crsm-word-table-wrap{overflow:visible}table{width:100%;border-collapse:collapse;margin:8pt 0}th,td{border:1px solid #cfd8e3;padding:5pt 6pt;vertical-align:top}th{background:#edf3fb;font-weight:700}code{font-family:Consolas,monospace}`;
+  return `@page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#1f2937;line-height:1.55;margin:0}h1{color:#1e3a8a;font-size:22pt;border-bottom:1px solid #dbe2ec;padding-bottom:8pt}h2{color:#1e3a8a;font-size:15pt;margin-top:18pt;page-break-after:avoid}h3{color:#334e7a;font-size:12pt;margin-top:14pt;page-break-after:avoid}p{margin:6pt 0}ul{margin:6pt 0 10pt 18pt;padding-left:0}li{margin:3pt 0}blockquote{margin:8pt 0;padding:7pt 10pt;border-left:3pt solid #3b82f6;background:#eff6ff}.crsm-word-table-wrap{overflow:visible}table{width:100%;border-collapse:collapse;margin:8pt 0;table-layout:fixed;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #cfd8e3;padding:5pt 6pt;vertical-align:top;word-break:break-word}th{background:#edf3fb;font-weight:700}code{font-family:Consolas,monospace}`;
+}
+
+function downloadImageFallback(reportHtml, ticker) {
+  const text = extractReportText(reportHtml);
+  const lines = wrapLines(text, 92);
+  const width = 1600;
+  const lineHeight = 30;
+  const top = 150;
+  const height = Math.max(520, top + lines.length * lineHeight + 70);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#172033';
+  ctx.font = '700 36px Arial';
+  ctx.fillText(`CRSM - ${ticker}`, 70, 62);
+  ctx.font = '18px Arial';
+  ctx.fillStyle = '#667085';
+  ctx.fillText(`Báo cáo phân tích - ${new Date().toLocaleDateString('vi-VN')}`, 70, 98);
+  ctx.strokeStyle = '#dbe2ec';
+  ctx.beginPath();
+  ctx.moveTo(70, 120);
+  ctx.lineTo(width - 70, 120);
+  ctx.stroke();
+  ctx.fillStyle = '#172033';
+  ctx.font = '18px Arial';
+  lines.forEach((line, i) => ctx.fillText(line, 70, top + i * lineHeight));
+  canvas.toBlob(blob => { if (blob) downloadBlob(blob, `CRSM_${safeName(ticker)}_${dateStamp()}.png`); }, 'image/png');
+}
+
+function extractReportText(html) {
+  const doc = new DOMParser().parseFromString(normalizeHtmlDocument(html, 'CRSM'), 'text/html');
+  return (doc.body?.innerText || '').replace(/\s+/g, ' ').trim();
+}
+
+function wrapLines(text, maxChars) {
+  const lines = [];
+  let current = '';
+  for (const word of String(text || '').split(' ')) {
+    const candidate = `${current} ${word}`.trim();
+    if (candidate.length > maxChars) {
+      if (current) lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
 }
 
 function ensureStyles() {

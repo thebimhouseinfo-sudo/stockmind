@@ -18,7 +18,7 @@ export function markdownToHtml(markdown) {
   };
 
   for (const rawLine of lines) {
-    const line = rawLine.trim();
+    const line = rawLine.trimStart().trimEnd();
     const isTableRow = /^\|.*\|$/.test(line);
 
     if (isTableRow) {
@@ -58,12 +58,14 @@ export function markdownToHtml(markdown) {
 
 export function buildWordHtmlDocument(markdown, ticker) {
   const body = markdownToHtml(markdown);
-  const styles = `body{font-family:'Times New Roman',Times,serif;color:#111;line-height:1.5;max-width:900px;margin:0 auto;padding:24px}
-h1{font-size:22pt;margin-bottom:4px}h2{font-size:16pt;border-bottom:1px solid #ccc;padding-bottom:4px;margin-top:24px}
-h3{font-size:13pt;margin-top:18px}p{font-size:11pt;margin:6px 0}
-ul{margin:6px 0;padding-left:22px}li{font-size:11pt;margin:2px 0}
-table{border-collapse:collapse;width:100%;margin:12px 0}th,td{border:1px solid #999;padding:6px 8px;font-size:10pt;text-align:left}
-th{background:#f0f0f0}hr{border:none;border-top:1px solid #ccc;margin:18px 0}`;
+  const styles = `@page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#1f2937;line-height:1.55;margin:0}
+h1{color:#1e3a8a;font-size:22pt;border-bottom:1px solid #dbe2ec;padding-bottom:8pt}
+h2{color:#1e3a8a;font-size:15pt;margin-top:18pt;page-break-after:avoid}h3{color:#334e7a;font-size:12pt;margin-top:14pt;page-break-after:avoid}
+p{font-size:11pt;margin:6pt 0}ul{margin:6pt 0 10pt 18pt;padding-left:0}li{font-size:11pt;margin:3pt 0}
+blockquote{margin:8pt 0;padding:7pt 10pt;border-left:3pt solid #3b82f6;background:#eff6ff}
+table{border-collapse:collapse;width:100%;table-layout:fixed;margin:8pt 0;page-break-inside:auto}
+tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #cfd8e3;padding:5pt 6pt;font-size:9.5pt;text-align:left;vertical-align:top;word-break:break-word}
+th{background:#edf3fb;font-weight:700}hr{border:none;border-top:1px solid #dbe2ec;margin:18pt 0}`;
   return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>CRSM ${escapeHtml(ticker)}</title><style>${styles}</style></head><body>${body}</body></html>`;
 }
 

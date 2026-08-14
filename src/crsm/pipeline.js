@@ -154,11 +154,11 @@ async function runNode(nodeId, ctx, { onNodeStart, onNodeDone, onNodeError }) {
   notifyCRSM();
 
   try {
-    const nodeCtx = nodeId === 'node6a'
+    const nodeCtx = nodeId === 'node6a' || nodeId === 'node6b'
       ? { ...ctx, outputs: prepareNode6AOutputs(ctx.outputs) }
       : ctx;
     const rawOutput = await fn(nodeCtx);
-    const output = nodeId === 'node6a' && typeof rawOutput === 'string'
+    const output = (nodeId === 'node6a' || nodeId === 'node6b') && typeof rawOutput === 'string'
       ? localizeReportText(rawOutput)
       : rawOutput;
     ctx.outputs[nodeId] = output;
