@@ -59,6 +59,16 @@ function classificationLabel(value) {
   })[value] || value || '-';
 }
 
+function classificationDescription(value) {
+  return ({
+    CORE: 'Nền tảng và điểm tổng hợp tốt, phù hợp đưa vào danh sách ưu tiên để CRSM xác nhận thêm thesis.',
+    QUALITY_UNDERPERFORMER: 'Doanh nghiệp có chất lượng tương đối ổn nhưng thị giá hoặc động lượng chưa ủng hộ, nên theo dõi điểm đảo chiều.',
+    HIGH_REWARD_HIGH_RISK: 'Có dư địa hoặc tín hiệu hấp dẫn nhưng rủi ro dữ liệu, tài chính, định giá hoặc biến động cao hơn bình thường.',
+    AVOID_VALUE_TRAP: 'Điểm rủi ro hoặc chất lượng yếu, dễ là bẫy giá rẻ; chỉ xem lại khi có catalyst thật rõ.',
+    WATCH_NEUTRAL: 'Chưa đủ mạnh để ưu tiên nhưng cũng chưa xấu; giữ trong watchlist để chờ thêm dữ kiện.'
+  })[value] || 'Nhóm ứng viên được phân loại theo Screener V2.';
+}
+
 function metric(label, value) {
   return `<div class="showcase-metric"><span>${label}</span><strong>${value}</strong></div>`;
 }
@@ -68,7 +78,7 @@ function rankingRow(row, localRank) {
   const note = noteSummary(row);
   const checked = selectedDashboardTickers.has(row.TICKER);
   return `<article class="ranking-row ${flag ? 'flagged' : 'clean'}">
-    <label class="candidate-check" title="Chon ${escapeHtml(row.TICKER)}"><input type="checkbox" data-dashboard-select="${escapeHtml(row.TICKER)}" ${checked ? 'checked' : ''}></label>
+    <label class="candidate-check" title="Chọn ${escapeHtml(row.TICKER)}"><input type="checkbox" data-dashboard-select="${escapeHtml(row.TICKER)}" ${checked ? 'checked' : ''}></label>
     <div class="ranking-rank">#${String(localRank).padStart(2, '0')}<span>R${fmt(row.RANK)}</span></div>
     <div class="ranking-main">
       <div class="ranking-head">
@@ -94,15 +104,15 @@ function renderRankingPanel(title, subtitle, rows, tone, activeGroupRows) {
   const allSelected = activeGroupRows.length > 0 && selectedInGroup.length === activeGroupRows.length;
   return `<section class="ranking-panel ${tone}">
     <div class="ranking-panel-head">
-      <div><p class="eyebrow">${title}</p><h2>${subtitle}</h2></div>
-      <span class="ranking-count">${rows.length} ma</span>
+      <div><p class="eyebrow">${title}</p><h2>${subtitle}</h2><p class="ranking-panel-description">${escapeHtml(classificationDescription(activeDashboardGroup))}</p></div>
+      <span class="ranking-count">${rows.length} stocks</span>
     </div>
     <div class="dashboard-actions">
-      <button class="btn" type="button" data-dashboard-select-group="${allSelected ? 'clear' : 'all'}">${allSelected ? 'Bo chon nhom' : 'Chon ca nhom'}</button>
+      <button class="btn" type="button" data-dashboard-select-group="${allSelected ? 'clear' : 'all'}">${allSelected ? 'Bỏ chọn nhóm' : 'Chọn cả nhóm'}</button>
       <button class="btn primary" type="button" data-dashboard-analyze-selected ${selectedDashboardTickers.size ? '' : 'disabled'}>Analyze selected${selectedDashboardTickers.size ? ` (${selectedDashboardTickers.size})` : ''}</button>
-      ${selectedDashboardTickers.size ? '<button class="btn" type="button" data-dashboard-clear>Bo chon</button>' : ''}
+      ${selectedDashboardTickers.size ? '<button class="btn" type="button" data-dashboard-clear>Bỏ chọn</button>' : ''}
     </div>
-    ${rows.length ? rows.map((row, index) => rankingRow(row, index + 1)).join('') : `<div class="ranking-empty"><strong>Chua co ung vien</strong><span>Nhom nay se de trong neu dataset hien tai khong co ma phu hop.</span></div>`}
+    ${rows.length ? rows.map((row, index) => rankingRow(row, index + 1)).join('') : `<div class="ranking-empty"><strong>Chưa có ứng viên</strong><span>Nhóm này sẽ để trống nếu dataset hiện tại không có mã phù hợp.</span></div>`}
   </section>`;
 }
 
@@ -145,7 +155,7 @@ function renderShowcase() {
 
   section.innerHTML = `<div class="showcase-wrap">
     <div class="showcase-header">
-      <div><p class="eyebrow">Screener V2 Dashboard</p><h1>Nhom ung vien</h1><p class="showcase-lead">Flag chi noi bat khi la bat thuong quan trong. Missing data thong thuong duoc xem nhu coverage note va de CRSM xac minh sau.</p></div>
+      <div><p class="eyebrow">Screener V2 Dashboard</p><h1>Candidate Groups</h1></div>
       <div class="showcase-summary">${metric('Universe', allRows.length)}<span class="showcase-divider"></span>${metric('Top Score', allRows[0] ? fmt(allRows[0].FINALSCORE) : '-')}<span class="showcase-divider"></span>${metric('Critical Flags', criticalFlags)}</div>
     </div>
     ${renderDashboardTabs(allRows)}

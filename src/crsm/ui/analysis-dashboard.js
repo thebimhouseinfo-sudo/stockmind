@@ -32,7 +32,7 @@ const STYLE_ID = 'crsm-analysis-dashboard-style';
 export function renderAnalysisDashboard() {
   ensureStyles();
   const descriptors = getExecutionDescriptor(loadSettings());
-  const statuses = crsmState.nodeStatus || {};
+  const statuses = visibleNodeStatuses();
   const total = descriptors.reduce((sum, d) => sum + d.nodes.length, 0);
   const done = descriptors.reduce((sum, d) => sum + d.nodes.filter(id => statuses[id] === 'done').length, 0);
   const percent = total ? Math.round(done / total * 100) : 0;
@@ -119,6 +119,14 @@ export function renderAnalysisDashboard() {
         </aside>
       </section>
     </div>`;
+}
+
+function visibleNodeStatuses() {
+  const statuses = { ...(crsmState.nodeStatus || {}) };
+  if (crsmState.mode === 'SCREENED' && crsmState.screeningContext && statuses.userEvidence !== 'running' && statuses.userEvidence !== 'failed') {
+    statuses.userEvidence = 'done';
+  }
+  return statuses;
 }
 
 function renderExistingDirectEntry() {
