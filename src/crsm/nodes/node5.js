@@ -105,8 +105,7 @@ explanations, no markdown fences.
     responseFormat: 'json'
   });
 
-  const parsed = validateJsonObject(extractJson(result.text));
-  parsed.ticker = ctx.ticker;
+  const parsed = normalizeNode5ReportOutput(validateJsonObject(extractJson(result.text)), ctx.ticker);
 
   if (ctx.screeningContext) {
     const screenScore = num(outputs.node1?.screening_summary?.screen_score ?? ctx.screeningContext.screen_score);
@@ -127,6 +126,49 @@ explanations, no markdown fences.
   }
 
   return parsed;
+}
+
+export function normalizeNode5ReportOutput(value, ticker = null) {
+  const out = value && typeof value === 'object' ? { ...value } : {};
+  out.ticker = ticker || out.ticker || null;
+
+  const conflict = out.conflict_detector && typeof out.conflict_detector === 'object'
+    ? { ...out.conflict_detector }
+    : {};
+  const alignment = conflict.signal_alignment ?? conflict.alignment ?? conflict.signalAlignment ?? null;
+  conflict.signal_alignment = alignment;
+  // Compatibility alias for fixed/local report renderers that historically read `alignment`.
+  conflict.alignment = alignment;
+  out.conflict_detector = conflict;
+
+  const catalyst = out.catalyst_horizon && typeof out.catalyst_horizon === 'object'
+    ? { ...out.catalyst_horizon }
+    : {};
+  catalyst.nearest_catalyst = catalyst.nearest_catalyst ?? catalyst.nearestCatalyst ?? catalyst.catalyst ?? '';
+  catalyst.bucket = catalyst.bucket ?? catalyst.horizon ?? catalyst.time_bucket ?? '';
+  out.catalyst_horizon = catalyst;
+
+  const stop = out.trading_stop && typeof out.trading_stop === 'object'
+    ? { ...out.trading_stop }
+    : {};
+  stop.price = stop.price ?? stop.value ?? stop.stop_price ?? null;
+  stop.basis = stop.basis ?? stop.rationale ?? stop.reason ?? '';
+  out.trading_stop = stop;
+
+  if (!Array.isArray(out.drivers)) {
+    out.drivers = out.drivers == null || out.drivers === '' ? [] : [out.drivers];
+  }
+  out.drivers = out.drivers.slice(0, 3).map(item => {
+    if (typeof item === 'string') return item;
+    if (!item || typeof item !== 'object') return String(item ?? '');
+    return item.description ?? item.reason ?? item.driver ?? item.value ?? item.name ?? JSON.stringify(item);
+  });
+
+  if (!out.localized_upstream || typeof out.localized_upstream !== 'object' || Array.isArray(out.localized_upstream)) {
+    out.localized_upstream = {};
+  }
+
+  return out;
 }
 
 export function deriveStatus(scoreDifference) {
