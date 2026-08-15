@@ -83,25 +83,82 @@ function downloadBlob(blob, filename) {
 export async function downloadReportImage(reportHtml, ticker) {
   if (!reportHtml) return;
   try {
-    const source = await withTimeout(prepareReportForImage(reportHtml, ticker), 7000, 'Render ảnh quá lâu.');
-    const width = Math.min(1800, Math.max(1100, source.width));
-    const height = Math.min(40000, Math.max(600, source.height));
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject x="0" y="0" width="${width}" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;background:#fff;overflow:hidden">${source.body}</div></foreignObject></svg>`;
-    const image = await blobToImage(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Không tạo được canvas.');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
-    ctx.drawImage(image, 0, 0, width, height);
-    const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!png) throw new Error('Không tạo được PNG.');
+    const png = await withTimeout(renderReportToPng(reportHtml, ticker), 20000, 'Render ảnh quá lâu.');
     downloadBlob(png, `CRSM_${safeName(ticker)}_${dateStamp()}.png`);
   } catch (error) {
     console.warn('[CRSM] Image export failed:', error);
     downloadReportImageFallback(reportHtml, ticker);
+  }
+}
+
+async function renderReportToPng(reportHtml, ticker) {
+  const iframe = document.createElement('iframe');
+  Object.assign(iframe.style, {
+    position: 'fixed',
+    left: '-100000px',
+    top: '0',
+    width: '1800px',
+    height: '1200px',
+    border: '0',
+    opacity: '0',
+    pointerEvents: 'none'
+  });
+  document.body.appendChild(iframe);
+
+  try {
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      iframe.srcdoc = normalizeHtmlDocument(reportHtml, ticker);
+    });
+
+    const doc = iframe.contentDocument;
+    const win = iframe.contentWindow;
+    if (!doc || !win) throw new Error('Không truy cập được report document.');
+
+    await settleDocument(doc);
+    const html2canvas = await ensureHtml2Canvas(win, doc);
+    await settleDocument(doc);
+
+    const report = doc.getElementById('report') || doc.body;
+    const rect = report.getBoundingClientRect();
+    const width = Math.ceil(Math.max(report.scrollWidth, report.offsetWidth, rect.width, 1100));
+    const height = Math.ceil(Math.max(report.scrollHeight, report.offsetHeight, rect.height, 600));
+
+    // Keep the PNG sharp without exceeding common browser canvas limits.
+    const maxCanvasDimension = 30000;
+    const maxScaleByHeight = maxCanvasDimension / Math.max(height, 1);
+    const maxScaleByWidth = maxCanvasDimension / Math.max(width, 1);
+    const scale = Math.max(1, Math.min(1.5, maxScaleByHeight, maxScaleByWidth));
+
+    const canvas = await html2canvas(report, {
+      backgroundColor: '#f5f7fb',
+      scale,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      foreignObjectRendering: false,
+      scrollX: 0,
+      scrollY: 0,
+      width,
+      height,
+      windowWidth: Math.max(1800, width),
+      windowHeight: Math.max(1200, height),
+      onclone: clonedDoc => {
+        clonedDoc.querySelectorAll('script,iframe,object,embed,noscript').forEach(node => node.remove());
+        const clonedReport = clonedDoc.getElementById('report') || clonedDoc.body;
+        clonedReport.style.transform = 'none';
+        clonedReport.style.filter = 'none';
+        clonedReport.style.animation = 'none';
+        clonedReport.style.transition = 'none';
+      }
+    });
+
+    const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!png) throw new Error('Không tạo được PNG.');
+    return png;
+  } finally {
+    iframe.remove();
   }
 }
 
@@ -113,74 +170,42 @@ function withTimeout(promise, ms, message) {
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-async function prepareReportForImage(reportHtml, ticker) {
-  const iframe = document.createElement('iframe');
-  Object.assign(iframe.style, {
-    position: 'fixed', left: '-100000px', top: '0', width: '1800px', height: '1200px',
-    border: '0', visibility: 'hidden', pointerEvents: 'none'
+async function settleDocument(doc) {
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (doc.fonts?.ready) await doc.fonts.ready.catch(() => {});
+  await waitForImages(doc);
+}
+
+async function ensureHtml2Canvas(win, doc) {
+  if (typeof win.html2canvas === 'function') return win.html2canvas;
+
+  const existing = [...doc.scripts].find(script => /html2canvas/i.test(script.src || ''));
+  if (existing) {
+    await waitFor(() => typeof win.html2canvas === 'function', 3000).catch(() => {});
+    if (typeof win.html2canvas === 'function') return win.html2canvas;
+  }
+
+  await new Promise((resolve, reject) => {
+    const script = doc.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Không tải được html2canvas.'));
+    doc.head.appendChild(script);
   });
-  document.body.appendChild(iframe);
-  try {
-    await new Promise((resolve, reject) => {
-      iframe.onload = resolve;
-      iframe.onerror = reject;
-      iframe.srcdoc = normalizeHtmlDocument(reportHtml, ticker);
-    });
-    const doc = iframe.contentDocument;
-    if (!doc) throw new Error('Không truy cập được report document.');
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    if (doc.fonts?.ready) await doc.fonts.ready.catch(() => {});
-    await waitForImages(doc);
 
-    const body = doc.body;
-    const width = Math.ceil(Math.max(body.scrollWidth, body.offsetWidth, 1100));
-    const height = Math.ceil(Math.max(body.scrollHeight, body.offsetHeight, 600));
-    const clone = body.cloneNode(true);
-    clone.removeAttribute('style');
-    clone.style.cssText = `margin:0;background:#fff;width:${width}px;min-height:${height}px;overflow:hidden;font-family:Arial,sans-serif;`;
-
-    // Inline computed styles so SVG foreignObject does not depend on external
-    // stylesheets, Tailwind runtime, or cross-origin CSS at rasterization time.
-    inlineComputedStyles(body, clone);
-    stripUnsupportedNodes(clone);
-
-    return { width, height, body: clone.innerHTML };
-  } finally {
-    iframe.remove();
-  }
+  if (typeof win.html2canvas !== 'function') throw new Error('html2canvas không khả dụng.');
+  return win.html2canvas;
 }
 
-function inlineComputedStyles(sourceRoot, cloneRoot) {
-  const sourceNodes = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
-  const cloneNodes = [cloneRoot, ...cloneRoot.querySelectorAll('*')];
-  const count = Math.min(sourceNodes.length, cloneNodes.length);
-  for (let i = 0; i < count; i++) {
-    const source = sourceNodes[i];
-    const clone = cloneNodes[i];
-    if (!(source instanceof Element) || !(clone instanceof Element)) continue;
-    const computed = source.ownerDocument.defaultView?.getComputedStyle(source);
-    if (!computed) continue;
-    const css = [
-      'display','position','top','right','bottom','left','box-sizing','width','min-width','max-width',
-      'height','min-height','max-height','margin','margin-top','margin-right','margin-bottom','margin-left',
-      'padding','padding-top','padding-right','padding-bottom','padding-left','font-family','font-size',
-      'font-weight','font-style','line-height','letter-spacing','text-align','text-transform','white-space',
-      'color','background','background-color','background-image','background-size','background-position',
-      'border','border-top','border-right','border-bottom','border-left','border-radius','box-shadow',
-      'opacity','overflow','vertical-align','grid-template-columns','grid-template-rows','grid-column',
-      'grid-row','gap','column-gap','row-gap','flex-direction','flex-wrap','justify-content','align-items',
-      'align-self','flex','flex-grow','flex-shrink','flex-basis','object-fit'
-    ];
-    clone.style.cssText = css.map(name => `${name}:${computed.getPropertyValue(name)};`).join('');
-  }
-}
-
-function stripUnsupportedNodes(root) {
-  root.querySelectorAll('script,link,iframe,object,embed,noscript').forEach(node => node.remove());
-  root.querySelectorAll('*').forEach(node => {
-    node.removeAttribute('onclick');
-    node.removeAttribute('onload');
-    node.removeAttribute('onerror');
+function waitFor(predicate, timeoutMs = 3000) {
+  return new Promise((resolve, reject) => {
+    const started = Date.now();
+    const tick = () => {
+      if (predicate()) return resolve();
+      if (Date.now() - started >= timeoutMs) return reject(new Error('Timeout.'));
+      setTimeout(tick, 50);
+    };
+    tick();
   });
 }
 
@@ -194,16 +219,6 @@ async function waitForImages(doc) {
       image.addEventListener('error', resolve, { once: true });
     });
   }));
-}
-
-function blobToImage(blob) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.onload = () => { URL.revokeObjectURL(url); resolve(image); };
-    image.onerror = error => { URL.revokeObjectURL(url); reject(error); };
-    image.src = url;
-  });
 }
 
 function downloadReportImageFallback(reportHtml, ticker) {
@@ -251,25 +266,33 @@ function extractStylesAndBody(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   return { styles: [...doc.querySelectorAll('style')].map(s => s.textContent || '').join('\n'), body: doc.body?.innerHTML || '' };
 }
+
 function extractReportText(html) {
   const doc = new DOMParser().parseFromString(normalizeHtmlDocument(html, 'CRSM'), 'text/html');
   return (doc.body?.innerText || '').replace(/\s+/g, ' ').trim();
 }
+
 function wrapLines(text, maxChars) {
-  const lines = []; let current = '';
+  const lines = [];
+  let current = '';
   for (const word of String(text || '').split(' ')) {
     const candidate = `${current} ${word}`.trim();
-    if (candidate.length > maxChars) { if (current) lines.push(current); current = word; } else current = candidate;
+    if (candidate.length > maxChars) {
+      if (current) lines.push(current);
+      current = word;
+    } else current = candidate;
   }
   if (current) lines.push(current);
   return lines;
 }
+
 function normalizeHtmlDocument(reportHtml, ticker) {
   const source = String(reportHtml || '').trim();
   return /^<!doctype\s+html/i.test(source) || /<html[\s>]/i.test(source)
     ? source
     : `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>CRSM ${escapeHtml(ticker)}</title></head><body>${source}</body></html>`;
 }
+
 function safeName(value) { return String(value || 'report').replace(/[^a-zA-Z0-9_-]/g, '_'); }
 function dateStamp() { return new Date().toISOString().slice(0, 10); }
 function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;'); }
