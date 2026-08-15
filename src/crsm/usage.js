@@ -96,15 +96,21 @@ export function totalUsage() {
   return { input: summary.input, output: summary.output, cost: summary.cost };
 }
 
+export function usageNodeGroup(nodeId) {
+  return nodeId === 'node6a' || nodeId === 'node6b' ? 'node6' : nodeId;
+}
+
 export function usageByNode(usage = crsmState.usage) {
   const map = {};
   usage.forEach(u => {
-    const row = map[u.nodeId] || { nodeId: u.nodeId, runs: 0, inputTokens: 0, outputTokens: 0, totalCost: 0 };
+    const nodeId = usageNodeGroup(u.nodeId);
+    const row = map[nodeId] || { nodeId, runs: 0, inputTokens: 0, outputTokens: 0, totalCost: 0, childNodes: [] };
     row.runs += 1;
     row.inputTokens += u.inputTokens || 0;
     row.outputTokens += u.outputTokens || 0;
     row.totalCost += u.totalCost || 0;
-    map[u.nodeId] = row;
+    if (u.nodeId && !row.childNodes.includes(u.nodeId)) row.childNodes.push(u.nodeId);
+    map[nodeId] = row;
   });
   return Object.values(map);
 }
