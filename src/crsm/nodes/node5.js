@@ -1,7 +1,7 @@
 import { runLLM } from '../llm.js';
 import { node5Prompt } from '../prompts/node5.js';
 import { currentDateDDMMYYYY, detectSectorType } from './common.js';
-import { extractJson, validateJsonObject, num } from './json.js';
+import { extractJson, validateJsonObject } from './json.js';
 
 const NODE5_LOCALIZATION_INSTRUCTION = `
 
@@ -20,8 +20,7 @@ Rules for \`localized_upstream\`:
 2. Translate human-readable English text into natural, concise Vietnamese.
 3. Preserve the original meaning, numbers, units, dates, caveats and uncertainty.
 4. Do NOT translate ticker symbols, source names, URLs, formulas, numeric values,
-   field identifiers, or machine-control enums such as BUY/HOLD/SELL,
-   CONFIRMED/PARTIAL/DIVERGENT.
+   field identifiers, or machine-control enums such as BUY/HOLD/SELL.
 5. If a source value is already Vietnamese, keep it unchanged.
 6. For arrays of prose, return an array with each item translated.
 7. Do not invent missing data. Omit a key when the source field is null/missing.
@@ -50,7 +49,6 @@ field in the output structure):
 - \`trading_stop.basis\`
 - \`liquidity_note\`
 - \`strategy.entry_zone\`, \`strategy.allocation_plan\`, \`strategy.position_size_note\`
-- \`screen_vs_crsm.interpretation\`
 - \`full_reasoning\`
 
 You MAY keep finance/technical terminology in its standard English or
@@ -65,9 +63,22 @@ pipeline and Decision Log parse programmatically, and downstream nodes are
 responsible for their display translation:
 - \`decision\` (BUY / HOLD / SELL / "BUY ON DIP" / WATCH)
 - \`conflict_detector.fundamental/technical/macro/liquidity\` (🟢/🟡/🔴)
-- \`screen_vs_crsm.status\` (CONFIRMED / PARTIAL / DIVERGENT)
 - \`strategy.position_type\` (Initial / Add-on)
 Leave these exactly as specified in the OUTPUT STRUCTURE section.
+`;
+
+const NODE5_SCREENING_ROLE_INSTRUCTION = `
+
+# SCREENING CONTEXT ROLE — CURRENT ARCHITECTURE, OVERRIDES LEGACY COMPARISON TEXT
+When ANALYSIS_MODE is SCREENED, Screener V2 is candidate-selection context only.
+Its score/rank/grade are NOT on the same scale or methodology as CRSM AI Score.
+Therefore:
+- Do NOT compare CRSM AI Score with any Screener score.
+- Do NOT calculate score_difference.
+- Do NOT produce CONFIRMED / PARTIAL / DIVERGENT status.
+- Do NOT produce a screen_vs_crsm object.
+- Screener metrics/signals may still be used as trusted upstream context to investigate facts and risks, but never as a benchmark for the final CRSM score.
+If any earlier instruction in the base prompt requests screen_vs_crsm comparison, ignore that instruction; this section is the current architecture rule.
 `;
 
 export async function node5(ctx) {
@@ -91,46 +102,28 @@ export async function node5(ctx) {
 Execute Node 5 instructions: score the SIX factors with the fixed weights,
 compute AI Score (0-100) with formula shown, calculate confidence components,
 run the Conflict Detector, catalyst horizon, liquidity check, and produce a
-final decision with trade strategy. If SCREENED, compare ai_score against Node 1
-screening_summary.screen_score and produce screen_vs_crsm (status derived
-exactly from |score_difference| — you may compute it, but it will be
-re-verified deterministically). Output ONLY the specified JSON object — no
-explanations, no markdown fences.
+final decision with trade strategy. In SCREENED mode, use Screener data only as
+candidate-selection/research context; do not compare its score with CRSM AI Score.
+Output ONLY the specified JSON object — no explanations, no markdown fences.
 `.trim();
 
   const result = await runLLM({
     nodeId: 'node5',
     prompt: userPrompt,
-    systemInstruction: `${node5Prompt}${NODE5_LOCALIZATION_INSTRUCTION}${NODE5_OWN_LANGUAGE_INSTRUCTION}`,
+    systemInstruction: `${node5Prompt}${NODE5_LOCALIZATION_INSTRUCTION}${NODE5_OWN_LANGUAGE_INSTRUCTION}${NODE5_SCREENING_ROLE_INSTRUCTION}`,
     responseFormat: 'json'
   });
 
-  const parsed = normalizeNode5ReportOutput(validateJsonObject(extractJson(result.text)), ctx.ticker);
-
-  if (ctx.screeningContext) {
-    const screenScore = num(outputs.node1?.screening_summary?.screen_score ?? ctx.screeningContext.screen_score);
-    const crsmScore = num(parsed.ai_score?.value);
-    const scoreDifference = crsmScore != null && screenScore != null ? Math.round((crsmScore - screenScore) * 100) / 100 : null;
-    const status = deriveStatus(scoreDifference);
-
-    parsed.screen_vs_crsm = {
-      screen_score: screenScore,
-      crsm_score: crsmScore,
-      score_difference: scoreDifference,
-      status,
-      interpretation:
-        typeof parsed.screen_vs_crsm?.interpretation === 'string' ? parsed.screen_vs_crsm.interpretation : ''
-    };
-  } else {
-    parsed.screen_vs_crsm = null;
-  }
-
-  return parsed;
+  return normalizeNode5ReportOutput(validateJsonObject(extractJson(result.text)), ctx.ticker);
 }
 
 export function normalizeNode5ReportOutput(value, ticker = null) {
   const out = value && typeof value === 'object' ? { ...value } : {};
   out.ticker = ticker || out.ticker || null;
+
+  // Legacy screen-vs-CRSM comparison is intentionally removed. Screener V2
+  // selects candidates; CRSM owns the deep-analysis score and decision.
+  delete out.screen_vs_crsm;
 
   const conflict = out.conflict_detector && typeof out.conflict_detector === 'object'
     ? { ...out.conflict_detector }
@@ -169,12 +162,4 @@ export function normalizeNode5ReportOutput(value, ticker = null) {
   }
 
   return out;
-}
-
-export function deriveStatus(scoreDifference) {
-  if (scoreDifference == null) return null;
-  const abs = Math.abs(scoreDifference);
-  if (abs <= 5) return 'CONFIRMED';
-  if (abs <= 15) return 'PARTIAL';
-  return 'DIVERGENT';
 }
