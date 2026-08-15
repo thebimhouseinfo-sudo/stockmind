@@ -60,6 +60,7 @@ CRSM:
 - `src/crsm/providers/`: provider adapters.
 - `src/crsm/model-discovery.js`: model discovery for configured API keys.
 - `src/crsm/settings.js`: model/provider/node settings.
+- `src/crsm/usage.js`: token and cost telemetry; Node 6A and 6B usage is grouped under Node 6 for node-level totals.
 - `src/crsm/nodes/`: CRSM node implementations.
 - `src/crsm/ui/`: CRSM UI, settings UI, reports, progress, error states.
 
@@ -130,12 +131,14 @@ Node 2: technical and smart money
 Node 3: fundamentals and valuation
 Node 4: macro/causal context
 Node 5: synthesis and decision
-Node 6A: HTML report
-Node 6B: Word report
-Node 7: decision log
+Node 6A: LLM-assisted HTML report
+Node 6B: LLM-assisted Word/Markdown report
+Node 7: local decision log
 ```
 
-Node 6A, Node 6B, and Node 7 are local/reporting operations. They are not provider-model assignment targets.
+Node 6A and Node 6B are report-generation nodes that use the shared LLM routing layer and can be assigned provider/model independently in Settings. Their raw request telemetry remains identifiable as `node6a` and `node6b`, while node-level usage/cost summaries aggregate both under **Node 6**.
+
+Both report nodes retain deterministic local renderers as fallbacks if the selected model fails or returns unusable output. Node 7 remains local-only and is not a provider-model assignment target.
 
 ## 8. Provider And Model Settings
 
@@ -143,8 +146,8 @@ Settings separates availability from assignment:
 
 - Providers: API key and model inventory.
 - Model inventory: models available per provider.
-- CRSM Engine: provider/model assignment per node.
-- Usage: current-run telemetry.
+- CRSM Engine: provider/model assignment per AI node, including Node 6A and Node 6B.
+- Usage: current-run telemetry; Node 6 totals combine 6A + 6B.
 - Cost: historical cost and budget monitoring.
 
 Auto model discovery:
@@ -171,9 +174,9 @@ Nodes must never call provider APIs directly.
 | Scores/rank/grade/group | Screener V2 | Deterministic, trusted snapshot |
 | External current facts | CRSM Node 1+ | Search and verify |
 | Analysis/decision | CRSM Node 5 | Interpret evidence |
-| Reports | Local report nodes | Render/export only |
+| Reports | CRSM Node 6A/6B | LLM-assisted render with deterministic local fallback |
 | Provider/API settings | Settings | Never include in share files |
-| Usage/cost telemetry | CRSM usage | Observability only |
+| Usage/cost telemetry | CRSM usage | Observability only; 6A + 6B aggregate as Node 6 at node-summary level |
 
 ## 10. Development Rules
 
@@ -186,10 +189,12 @@ Nodes must never call provider APIs directly.
 7. Only flag missing data strongly when it affects critical scoring or CRSM reliability.
 8. Keep Dashboard as the candidate action surface.
 9. Keep Ranking as full-universe inspection.
-10. Keep provider calls behind router/provider adapters.
-11. Never store or export API keys in share/import artifacts.
-12. Avoid reviving removed Mapping preview code unless explicitly requested for parser debugging.
-13. Before pushing, run `npm test`.
+10. Keep provider calls behind router/provider adapters, including report-generation calls from Node 6A/6B.
+11. Keep deterministic local report renderers as fallback paths for Node 6A/6B.
+12. Aggregate Node 6A + Node 6B usage/cost under Node 6 for node-level monitoring while retaining raw request provenance.
+13. Never store or export API keys in share/import artifacts.
+14. Avoid reviving removed Mapping preview code unless explicitly requested for parser debugging.
+15. Before pushing, run `npm test`.
 
 ## 11. Quick Orientation
 
@@ -204,6 +209,7 @@ src/screener-v2/
 src/crsm/context.js
 src/crsm/settings.js
 src/crsm/router.js
+src/crsm/usage.js
 ```
 
 Then inspect only the specific UI, node, provider, or scoring module needed for the requested change.
