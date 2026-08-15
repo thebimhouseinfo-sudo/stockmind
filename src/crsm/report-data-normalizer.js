@@ -60,6 +60,12 @@ export function localizeReportText(value) {
 export function prepareNode6AOutputs(outputs) {
   const cloned = cloneValue(outputs || {});
   const n5 = cloned.node5 || {};
+
+  // Node 5 is the semantic localization layer for report-facing prose from
+  // Nodes 1-4. Apply that map before any fixed renderer or report LLM reads
+  // the upstream data, otherwise the map exists but never affects reports.
+  applyLocalizedUpstream(cloned, n5.localized_upstream);
+
   const n3 = cloned.node3 || {};
   const n4 = cloned.node4 || {};
 
@@ -84,6 +90,40 @@ export function prepareNode6AOutputs(outputs) {
   cloned.node3 = n3;
   cloned.node4 = n4;
   return cloned;
+}
+
+export function applyLocalizedUpstream(target, localizationMap) {
+  if (!target || typeof target !== 'object') return target;
+  if (!localizationMap || typeof localizationMap !== 'object' || Array.isArray(localizationMap)) return target;
+
+  Object.entries(localizationMap).forEach(([path, localizedValue]) => {
+    if (!/^node[1-4](?:\.|$)/.test(path)) return;
+    const segments = path.split('.').filter(Boolean);
+    applyLocalizedPath(target, segments, localizedValue);
+  });
+  return target;
+}
+
+function applyLocalizedPath(current, segments, localizedValue) {
+  if (!current || !segments.length) return;
+  const [head, ...rest] = segments;
+
+  if (head === '*') {
+    if (!Array.isArray(current)) return;
+    current.forEach((item, index) => {
+      const nextValue = Array.isArray(localizedValue) ? localizedValue[index] : localizedValue;
+      if (!rest.length) current[index] = nextValue;
+      else applyLocalizedPath(item, rest, nextValue);
+    });
+    return;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(current, head)) return;
+  if (!rest.length) {
+    current[head] = cloneValue(localizedValue);
+    return;
+  }
+  applyLocalizedPath(current[head], rest, localizedValue);
 }
 
 function normalizeSensitivityRow(row) {
@@ -123,6 +163,7 @@ function normalizeConflictDetector(value) {
   if (!value || typeof value !== 'object') return value;
   const copy = { ...value };
   copy.alignment = copy.alignment ?? copy.signal_alignment ?? copy.signalAlignment;
+  copy.signal_alignment = copy.signal_alignment ?? copy.alignment;
   return copy;
 }
 
@@ -233,7 +274,7 @@ function normalizeScenarios(value) {
     return {
       bull: normalizeScenario(find('bull', 'tăng', 'upside')),
       base: normalizeScenario(find('base', 'cơ sở', 'neutral')),
-      bear: normalizeScenario(find('bear', 'giảm', 'downside'))
+      bear: normalizeScenario(find('bear', 'giảm', 'downside')),
     };
   }
   return {};
