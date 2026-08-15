@@ -2,7 +2,6 @@ import { crsmState, notifyCRSM } from '../state.js';
 import { runCRSM } from '../engine.js';
 import { renderAnalysisDashboard } from './analysis-dashboard.js';
 import { ensureAnalysisUiPolish } from './analysis-ui-polish.js';
-import { renderStatusBadge } from './status.js';
 import { ingestUserEvidence } from '../user-evidence.js';
 
 export function renderCRSMTab() {
@@ -14,7 +13,7 @@ export function renderCRSMTab() {
 
 export function renderDynamicContent() {
   ensureAnalysisUiPolish();
-  return `${renderAnalysisDashboard()}${renderStatusBadge()}`;
+  return renderAnalysisDashboard();
 }
 
 export function updateDynamicRegion() {
