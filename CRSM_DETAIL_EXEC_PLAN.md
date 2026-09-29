@@ -1,8 +1,10 @@
 # Stockmind CRSM — Detail Execution Plan
 
-Status: DRAFT FOR REVIEW  
+Status: REVIEWED / READY  
 Parent architecture Job: J-2AC0 rev2  
 Execution Job: J-1C2B rev2  
+Planning review: PASS  
+Verification: `01a0ed5e-de8c-749f-8961-233e5315c941`  
 Architecture source: `CRSM_VERCEL_PLUGIN_MIGRATION_PLAN.md`
 
 ## Execution rules
