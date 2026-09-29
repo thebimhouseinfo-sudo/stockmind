@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import { submitRun, retryFailedItem } from '../api/_memo-service.js';
-import { stockmindMcpBoundary } from '../api/_mcp-server.js';
+import { stockmindMcpBoundary } from '../api/_mcp-config.js';
 import {
   claimItem,
   completeItem,
