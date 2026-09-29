@@ -196,7 +196,7 @@ failed = transitionItem(
     error: { code: 'FIXTURE', message: 'fixture fail' }
   }
 );
-assert.equal(failed.state, RUN_STATES.PARTIAL);
+assert.equal(failed.state, RUN_STATES.FAILED);
 await runtime.updateJson(memoPaths(request.run_id).status, failed, statusFile.sha);
 statusFile = await runtime.readJson(memoPaths(request.run_id).status);
 
@@ -204,7 +204,7 @@ statusFile = await runtime.readJson(memoPaths(request.run_id).status);
 const currentBeforeRetry = await runtime.readJson('memo/current.json');
 await runtime.updateJson('memo/current.json', {
   ...currentBeforeRetry.value,
-  state: RUN_STATES.PARTIAL,
+  state: RUN_STATES.FAILED,
   updated_at: '2026-09-29T14:12:00.000Z'
 }, currentBeforeRetry.sha);
 
