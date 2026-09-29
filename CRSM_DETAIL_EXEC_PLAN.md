@@ -247,15 +247,16 @@ Owner: **Coder**
 Requires: PACK 1 + PACK 3 + PACK 4.
 
 Page 2:
-- current run summary;
-- ticker READY/PROCESSING/COMPLETED/FAILED;
-- historical runs;
-- selected result;
+- one selected ticker report viewer at a time;
+- compact ticker switcher for all tickers in the selected run;
+- compact Run selector for history instead of a long sidebar/list;
+- ticker READY/PROCESSING/COMPLETED/FAILED state on the switcher;
 - Visual Report;
 - Detail Report;
 - Decision Log;
-- retry failed ticker;
+- retry failed ticker inside that ticker's viewer;
 - repairable index-error state.
+- Settings is removed from normal webapp navigation because provider/model configuration is obsolete in the target architecture.
 
 Polling:
 - start only when Results visible;
@@ -267,8 +268,11 @@ Create result adapter so existing report/export renderers can consume immutable 
 
 Exit gate:
 - fixture results render without `runCRSM()`;
+- multi-ticker run renders only the currently selected ticker report body;
+- ticker switching does not append multiple reports vertically;
 - canonical decision_record drives Decision Log;
 - completed sibling result is unchanged by retry;
+- Settings is absent from normal webapp navigation;
 - exactly two normal CRSM pages remain.
 
 ## PACK 6 — Web-compatible Stockmind skill plugin + GitHub Memo admission
@@ -368,7 +372,8 @@ Verify:
 - Dashboard;
 - Ranking;
 - Analysis List;
-- Results;
+- Results single-report ticker switcher + Run selector;
+- Settings is absent from top navigation;
 - webapp api bridge;
 - assets/modules;
 - runtime Memo commits do not trigger preview/deploy churn;
