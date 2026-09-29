@@ -44,7 +44,7 @@ Bounded write tools:
 - `stockmind_fail_item`: PROCESSING -> FAILED with exact status SHA.
 - `stockmind_complete_item`: create/verify one immutable result, then update status/current/history.
 
-Write tools are implemented but disabled by default in PACK 6. They require the server-side `STOCKMIND_MCP_WRITES_ENABLED=true` gate after the private connection/auth checkpoint. The plugin package never contains GitHub credentials.
+Write tools are enabled by default in PACK 6, per the owner decision. `STOCKMIND_MCP_WRITES_ENABLED=false` is an emergency server-side kill switch only. The plugin package never contains GitHub credentials.
 
 ## Contracts
 
@@ -62,7 +62,7 @@ Whenever Stockmind is explicitly invoked:
 1. Call `stockmind_get_current` before responding.
 2. Never ask the user to select a ticker/run when an actionable current item exists.
 3. Never ask for repository, branch, folder, path, provider, model, API key or output location.
-4. READY means claim next when write capability is enabled; PROCESSING means resume the same item.
+4. READY means claim the next item immediately; PROCESSING means resume the same item.
 5. With PACK 6 only, do not perform CRSM analysis yet. Report that the run/item is detected and ready for the CRSM worker migration in PACK 7.
 6. No actionable work -> concise status only.
 
@@ -70,7 +70,7 @@ Whenever Stockmind is explicitly invoked:
 
 - GitHub token exists only in Vercel server environment.
 - Browser and plugin package contain no GitHub/model-provider secrets.
-- MCP writes are locked by default at PACK 6.
+- MCP read/write is enabled by default but remains hard-bounded to the fixed runtime Memo namespace; a server-side `STOCKMIND_MCP_WRITES_ENABLED=false` kill switch can stop mutations without repackaging the plugin.
 - Runtime client itself rejects repository/branch overrides and non-Memo paths.
 - Every status mutation uses expected blob SHA.
 - Evidence ownership and result ownership are validated server-side.
