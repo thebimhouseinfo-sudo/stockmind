@@ -15,8 +15,24 @@ import {
   removeItem,
   saveDraft
 } from './crsm/draft-list.js';
-import { fetchMemoCurrent, isActiveMemoRun, submitMemoRun } from './crsm/memo-client.js';
+import {
+  fetchMemoCurrent,
+  fetchMemoHistory,
+  fetchMemoMaintenance,
+  fetchMemoRun,
+  isActiveMemoRun,
+  repairMemoHistory,
+  retryMemoItem,
+  submitMemoRun
+} from './crsm/memo-client.js';
 import { bindAnalysisListPage, renderAnalysisListPage } from './crsm/ui/analysis-list.js';
+import { bindResultsPage, renderResultsPage } from './crsm/ui/results.js';
+import {
+  normalizeMemoRun,
+  selectDefaultTicker,
+  selectedRunItem
+} from './crsm/result-adapter.js';
+import { createResultsPoller } from './crsm/results-poller.js';
 import { extractUserEvidence } from './crsm/user-evidence.js';
 import { renderSettings, bindSettingsEvents } from './crsm/ui/settings.js';
 import { loadLog } from './crsm/nodes/node7.js';
@@ -46,9 +62,21 @@ let state = {
   memoError:null,
   crsmNotice:null,
   crsmSubmitting:false,
-  draftBusyItem:null
+  draftBusyItem:null,
+  resultsCurrentRun:null,
+  resultsHistory:[],
+  resultsSelectedRun:null,
+  resultsSelectedRunId:null,
+  resultsSelectedTicker:null,
+  resultsLoading:false,
+  resultsError:null,
+  resultsUpdatedAt:null,
+  resultsRetryingItemId:null,
+  resultsMaintenance:null,
+  resultsRepairing:false
 };
 const app=document.getElementById('app');
+const resultsPoller=createResultsPoller({poll:()=>refreshResults({background:true})});
 document.addEventListener('stockmind:analyze-tickers',event=>analyzeDashboardTickers(event.detail?.tickers||[]));
 subscribeCRSM(()=>{
   if (crsmState.completedAt && crsmState.finalReport && !crsmState.isRunning && !crsmState.failedNode && !crsmState.error) {
@@ -59,7 +87,15 @@ subscribeCRSM(()=>{
 });
 render();
 
-function render(){ const content=state.settingsOpen?renderSettings():`${state.tab==='import'?renderImport():''}${state.tab==='dashboard'?renderDashboard():''}${state.tab==='list'?renderList():''}${state.tab==='detail'?renderDetail():''}${state.tab==='crsm'?renderCRSMSection():''}`; app.innerHTML=`<div class="shell">${renderTopbar()}<main class="main">${content}</main></div>`; bindEvents(); if(state.settingsOpen) bindSettingsEvents(); }
+function render(){
+  const content=state.settingsOpen
+    ?renderSettings()
+    :`${state.tab==='import'?renderImport():''}${state.tab==='dashboard'?renderDashboard():''}${state.tab==='list'?renderList():''}${state.tab==='detail'?renderDetail():''}${state.tab==='crsm'?renderCRSMSection():''}`;
+  app.innerHTML=`<div class="shell">${renderTopbar()}<main class="main">${content}</main></div>`;
+  bindEvents();
+  if(state.settingsOpen)bindSettingsEvents();
+  syncResultsPolling();
+}
 function renderTopbar(){ const tabs=[['import','Screen'],['dashboard','Dashboard'],['list','Ranking'],['crsm','CRSM']]; return `<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">↗</div><span>Stock Mind</span></div><nav class="tabs">${tabs.map(([id,label])=>`<button class="tab ${state.tab===id?'active':''}" data-tab="${id}">${label}</button>`).join('')}<button class="tab ${state.settingsOpen?'active':''}" id="openSettings" type="button">⚙ Settings</button></nav></div></header>`; }
 function renderCRSMSection(){
   const active=state.crsmView==='reports'?'reports':'analysis';
@@ -69,7 +105,19 @@ function renderCRSMSection(){
       <button class="crsm-subtab ${active==='reports'?'active':''}" data-crsm-view="reports">Results</button>
     </div>
     ${active==='reports'
-      ? renderReports()
+      ? renderResultsPage({
+          currentRun:state.resultsCurrentRun,
+          history:state.resultsHistory,
+          selectedRun:state.resultsSelectedRun,
+          selectedTicker:state.resultsSelectedTicker,
+          reportTab:state.reportTab,
+          loading:state.resultsLoading,
+          error:state.resultsError,
+          updatedAt:state.resultsUpdatedAt,
+          retryingItemId:state.resultsRetryingItemId,
+          maintenance:state.resultsMaintenance,
+          repairing:state.resultsRepairing
+        })
       : renderAnalysisListPage({
           draft:state.crsmDraft,
           memoCurrent:state.memoCurrent,
@@ -101,7 +149,7 @@ function renderReports(){
 function renderDecisionLog(rows){ const columns=[['date','Ngày phân tích'],['ticker','Mã'],['mode','Chế độ'],['price_at_analysis','Giá tại thời điểm PT'],['screen_score','Screen Score'],['screen_rank','Screen Rank'],['screen_grade','Screen Grade'],['decision','Quyết định'],['ai_score','AI Score'],['confidence','Confidence'],['score_difference','CRSM−Screen Diff'],['entry_zone','Entry'],['trading_stop','Trading Stop'],['tp1','TP1'],['tp2','TP2'],['thesis_invalidation','Điều kiện vô hiệu hóa']]; return `<div class="panel panel-pad decision-log-panel"><div class="title-row"><div><p class="eyebrow">DECISION LOG</p><h2>${rows.length} lần phân tích</h2><p class="muted">Append-only history · DIRECT dùng — cho các trường không áp dụng.</p></div></div>${rows.length?`<div class="table-wrap decision-log-wrap"><table class="decision-log-table"><thead><tr>${columns.map(([,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${columns.map(([key])=>`<td>${formatLogValue(row[key],key)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">Chưa có decision log.</div>'}</div>`; }
 function formatLogValue(value,key){ if(value==null||value==='')return '—'; if(key==='decision')return escapeHtml(decisionLabel(value)); if(typeof value==='number')return Number.isFinite(value)?value.toLocaleString('vi-VN',{maximumFractionDigits:2}):'—'; return escapeHtml(String(value)); }
 function updateReportsRegion(){ if(state.tab==='crsm'&&state.crsmView==='reports') render(); }
-function bindEvents(){ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;if(state.tab==='crsm'){state.crsmView='analysis';render();void refreshMemoCurrent();return;}render();})); document.querySelectorAll('[data-crsm-view]').forEach(b=>b.addEventListener('click',()=>{state.crsmView=b.dataset.crsmView;render();if(state.crsmView==='analysis')void refreshMemoCurrent();})); document.querySelectorAll('[data-report-tab]').forEach(b=>b.addEventListener('click',()=>{state.reportTab=b.dataset.reportTab;render();})); document.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedTicker=b.dataset.detail;state.tab='detail';render();})); document.querySelectorAll('[data-crsm]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();launchScreenedCRSM(b.dataset.crsm);})); document.querySelectorAll('[data-select-ticker]').forEach(i=>i.addEventListener('change',e=>toggleSelectedTicker(e.target.dataset.selectTicker,e.target.checked))); bind('openTradingView','click',()=>window.open('https://www.tradingview.com/screener/','_blank','noopener,noreferrer')); bind('importClipboard','click',importFromClipboard); bind('exportShareCode','click',exportShareCode); bind('importShareCode','click',()=>document.getElementById('shareFileInput')?.click()); bind('copyPrompt','click',copyPrompt); bind('crsmRunDirect','click',runDirectCRSM); bind('openSettings','click',()=>{state.settingsOpen=!state.settingsOpen;render();}); bind('selectAllCRSM','change',e=>selectVisible(e.target.checked)); bind('selectVisibleCRSM','click',selectAllVisibleToggle); bind('clearSelectedCRSM','click',()=>{state.selectedTickers=[];render();}); bind('runSelectedCRSM','click',runSelectedCRSM); bind('crsmDownloadImage','click',async()=>downloadReportImage(crsmState.finalReport||crsmState.nodeOutputs.node6a,crsmState.ticker)); bind('crsmDownloadWord','click',()=>{ const md=crsmState.nodeOutputs.node6b; if(md){ downloadWordReportFromMarkdown(md,crsmState.ticker); } else { downloadWordReport(crsmState.finalReport||crsmState.nodeOutputs.node6a,crsmState.ticker); } }); bindAnalysisListBindings(); const shareFileInput=document.getElementById('shareFileInput'); if(shareFileInput)shareFileInput.addEventListener('change',importShareCodeFile); const crsmTickerInput=document.getElementById('crsmTickerInput'); if(crsmTickerInput)crsmTickerInput.addEventListener('keydown',e=>{if(e.key==='Enter')runDirectCRSM();}); const searchInput=document.getElementById('searchInput'); if(searchInput)searchInput.addEventListener('input',e=>{const value=e.target.value,s=e.target.selectionStart??value.length;state.search=value;render();const next=document.getElementById('searchInput');if(next){next.focus();try{next.setSelectionRange(s,s)}catch{}}}); }
+function bindEvents(){ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;if(state.tab==='crsm'){state.crsmView='analysis';render();void refreshMemoCurrent();return;}render();})); document.querySelectorAll('[data-crsm-view]').forEach(b=>b.addEventListener('click',()=>{state.crsmView=b.dataset.crsmView;render();if(state.crsmView==='analysis')void refreshMemoCurrent();})); document.querySelectorAll('[data-report-tab]').forEach(b=>b.addEventListener('click',()=>{state.reportTab=b.dataset.reportTab;render();})); document.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedTicker=b.dataset.detail;state.tab='detail';render();})); document.querySelectorAll('[data-crsm]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();launchScreenedCRSM(b.dataset.crsm);})); document.querySelectorAll('[data-select-ticker]').forEach(i=>i.addEventListener('change',e=>toggleSelectedTicker(e.target.dataset.selectTicker,e.target.checked))); bind('openTradingView','click',()=>window.open('https://www.tradingview.com/screener/','_blank','noopener,noreferrer')); bind('importClipboard','click',importFromClipboard); bind('exportShareCode','click',exportShareCode); bind('importShareCode','click',()=>document.getElementById('shareFileInput')?.click()); bind('copyPrompt','click',copyPrompt); bind('crsmRunDirect','click',runDirectCRSM); bind('openSettings','click',()=>{state.settingsOpen=!state.settingsOpen;render();}); bind('selectAllCRSM','change',e=>selectVisible(e.target.checked)); bind('selectVisibleCRSM','click',selectAllVisibleToggle); bind('clearSelectedCRSM','click',()=>{state.selectedTickers=[];render();}); bind('runSelectedCRSM','click',runSelectedCRSM); bind('crsmDownloadImage','click',async()=>downloadReportImage(crsmState.finalReport||crsmState.nodeOutputs.node6a,crsmState.ticker)); bind('crsmDownloadWord','click',()=>{ const md=crsmState.nodeOutputs.node6b; if(md){ downloadWordReportFromMarkdown(md,crsmState.ticker); } else { downloadWordReport(crsmState.finalReport||crsmState.nodeOutputs.node6a,crsmState.ticker); } }); bindAnalysisListBindings(); bindResultsBindings(); const shareFileInput=document.getElementById('shareFileInput'); if(shareFileInput)shareFileInput.addEventListener('change',importShareCodeFile); const crsmTickerInput=document.getElementById('crsmTickerInput'); if(crsmTickerInput)crsmTickerInput.addEventListener('keydown',e=>{if(e.key==='Enter')runDirectCRSM();}); const searchInput=document.getElementById('searchInput'); if(searchInput)searchInput.addEventListener('input',e=>{const value=e.target.value,s=e.target.selectionStart??value.length;state.search=value;render();const next=document.getElementById('searchInput');if(next){next.focus();try{next.setSelectionRange(s,s)}catch{}}}); }
 function bind(id,event,handler){const n=document.getElementById(id);if(n)n.addEventListener(event,handler)}
 async function importFromClipboard(){state.errors=[];try{if(!navigator.clipboard?.readText)throw new Error('Trình duyệt không hỗ trợ đọc Clipboard.');const text=await navigator.clipboard.readText();if(!text.trim())throw new Error('Clipboard đang trống.');const result=parseTradingViewPaste(text);state.errors=result.errors;if(result.errors.length||!result.rows.length){state.importStatus=null;render();return;}state.pasteText=text;state.rows=scoreStocks(result.rows);state.selectedTicker=state.rows[0]?.TICKER||null;state.selectedTickers=[];state.importStatus={count:state.rows.length,columns:result.rows[0]?Object.keys(result.rows[0]).length:null,time:new Date().toLocaleString('vi-VN')};localStorage.setItem(STORAGE_KEY,JSON.stringify(state.rows));state.tab='dashboard';render()}catch(error){state.errors=[error?.message||'Không thể đọc dữ liệu từ Clipboard.'];render()}}
 async function exportShareCode(){if(!state.rows.length)return;state.errors=[];try{state.shareStatus='Đang tạo file share...';render();const code=await encodeShareCode(state.rows,{source:'Stock Mind',count:state.rows.length});downloadTextFile(code,`stockmind-screener-${new Date().toISOString().slice(0,10)}.stockmind`);state.shareStatus='Đã tải file share.';render()}catch(error){state.errors=[error?.message||'Không thể tạo file share.'];state.shareStatus=null;render()}}
@@ -266,6 +314,211 @@ async function refreshMemoCurrent(){
     state.memoLoading=false;
     if(state.tab==='crsm'&&state.crsmView==='analysis')render();
   }
+}
+
+function bindResultsBindings(){
+  if(!isResultsVisible())return;
+  bindResultsPage({
+    onRefresh:handleResultsRefresh,
+    onRepair:handleResultsRepair,
+    onSelectRun:selectResultsRun,
+    onSelectTicker:selectResultsTicker,
+    onRetry:handleResultsRetry,
+    onReportTab:tab=>{state.reportTab=tab;render();},
+    onDownloadImage:downloadSelectedResultImage,
+    onDownloadWord:downloadSelectedResultWord
+  });
+}
+
+function isResultsVisible(){
+  return state.tab==='crsm'&&state.crsmView==='reports'&&!state.settingsOpen;
+}
+
+function syncResultsPolling(){
+  if(!isResultsVisible()||state.resultsError){
+    resultsPoller.stop();
+    return;
+  }
+  const started=resultsPoller.start();
+  if(started&&!state.resultsUpdatedAt&&!state.resultsLoading){
+    void refreshResults();
+  }
+}
+
+async function refreshResults({background=false}={}){
+  if(state.resultsLoading)return;
+  state.resultsLoading=true;
+  if(!background&&isResultsVisible())render();
+
+  try{
+    const tasks=[
+      fetchMemoCurrent(),
+      fetchMemoHistory(),
+      background&&state.resultsMaintenance
+        ? Promise.resolve(state.resultsMaintenance)
+        : fetchMemoMaintenance()
+    ];
+    const [currentResult,historyResult,maintenanceResult]=await Promise.allSettled(tasks);
+
+    if(currentResult.status!=='fulfilled')throw currentResult.reason;
+    const currentData=currentResult.value;
+    state.memoCurrent=currentData.current;
+
+    let currentRun=null;
+    if(currentData.current?.run_id){
+      currentRun=normalizeMemoRun(await fetchMemoRun(currentData.current.run_id));
+    }
+    state.resultsCurrentRun=currentRun;
+
+    const warnings=[];
+    if(historyResult.status==='fulfilled'){
+      state.resultsHistory=historyResult.value.index?.runs||[];
+    }else{
+      warnings.push(historyResult.reason?.message||String(historyResult.reason));
+    }
+
+    if(maintenanceResult.status==='fulfilled'){
+      state.resultsMaintenance=maintenanceResult.value;
+    }else{
+      warnings.push(maintenanceResult.reason?.message||String(maintenanceResult.reason));
+    }
+
+    const available=new Set([
+      ...(currentRun?.run_id?[currentRun.run_id]:[]),
+      ...state.resultsHistory.map(run=>run.run_id)
+    ]);
+    if(!state.resultsSelectedRunId||!available.has(state.resultsSelectedRunId)){
+      state.resultsSelectedRunId=currentRun?.run_id||state.resultsHistory[0]?.run_id||null;
+      state.resultsSelectedTicker=null;
+    }
+
+    if(state.resultsSelectedRunId){
+      if(currentRun?.run_id===state.resultsSelectedRunId){
+        state.resultsSelectedRun=currentRun;
+      }else if(state.resultsSelectedRun?.run_id!==state.resultsSelectedRunId){
+        state.resultsSelectedRun=normalizeMemoRun(await fetchMemoRun(state.resultsSelectedRunId));
+      }
+      state.resultsSelectedTicker=selectDefaultTicker(
+        state.resultsSelectedRun,
+        state.resultsSelectedTicker
+      );
+    }else{
+      state.resultsSelectedRun=null;
+      state.resultsSelectedTicker=null;
+    }
+
+    state.resultsUpdatedAt=new Date().toISOString();
+    state.resultsError=warnings[0]||null;
+    if(state.resultsError)resultsPoller.stop();
+  }catch(error){
+    state.resultsError=error?.message||String(error);
+    resultsPoller.stop();
+  }finally{
+    state.resultsLoading=false;
+    if(isResultsVisible())render();
+  }
+}
+
+async function handleResultsRefresh(){
+  state.resultsError=null;
+  state.resultsMaintenance=null;
+  resultsPoller.stop();
+  await refreshResults();
+}
+
+async function selectResultsRun(runId){
+  if(!runId||state.resultsLoading)return;
+  state.resultsSelectedRunId=runId;
+  state.resultsSelectedTicker=null;
+
+  if(state.resultsCurrentRun?.run_id===runId){
+    state.resultsSelectedRun=state.resultsCurrentRun;
+    state.resultsSelectedTicker=selectDefaultTicker(state.resultsSelectedRun);
+    render();
+    return;
+  }
+
+  state.resultsLoading=true;
+  render();
+  try{
+    state.resultsSelectedRun=normalizeMemoRun(await fetchMemoRun(runId));
+    state.resultsSelectedTicker=selectDefaultTicker(state.resultsSelectedRun);
+    state.resultsError=null;
+  }catch(error){
+    state.resultsError=error?.message||String(error);
+    resultsPoller.stop();
+  }finally{
+    state.resultsLoading=false;
+    render();
+  }
+}
+
+async function selectResultsTicker(runId,ticker){
+  if(runId&&runId!==state.resultsSelectedRunId){
+    await selectResultsRun(runId);
+  }
+  if(!state.resultsSelectedRun)return;
+  state.resultsSelectedTicker=selectDefaultTicker(state.resultsSelectedRun,ticker);
+  render();
+}
+
+async function handleResultsRetry(runId,itemId){
+  const current=state.resultsCurrentRun;
+  if(!current||current.run_id!==runId||!current.status_sha)return;
+  state.resultsRetryingItemId=itemId;
+  state.resultsError=null;
+  render();
+  try{
+    await retryMemoItem({
+      run_id:runId,
+      item_id:itemId,
+      expected_status_sha:current.status_sha
+    });
+    await refreshResults();
+  }catch(error){
+    state.resultsError=error?.message||String(error);
+    resultsPoller.stop();
+  }finally{
+    state.resultsRetryingItemId=null;
+    if(isResultsVisible())render();
+  }
+}
+
+async function handleResultsRepair(){
+  if(state.resultsRepairing)return;
+  state.resultsRepairing=true;
+  state.resultsError=null;
+  render();
+  try{
+    await repairMemoHistory();
+    state.resultsMaintenance=null;
+    await refreshResults();
+  }catch(error){
+    state.resultsError=error?.message||String(error);
+    resultsPoller.stop();
+  }finally{
+    state.resultsRepairing=false;
+    if(isResultsVisible())render();
+  }
+}
+
+function selectedMemoResult(){
+  return selectedRunItem(
+    state.resultsSelectedRun,
+    state.resultsSelectedTicker
+  )?.result||null;
+}
+
+async function downloadSelectedResultImage(){
+  const result=selectedMemoResult();
+  if(result?.visualReport)await downloadReportImage(result.visualReport,result.ticker);
+}
+
+function downloadSelectedResultWord(){
+  const result=selectedMemoResult();
+  if(!result)return;
+  if(result.detailReport)downloadWordReportFromMarkdown(result.detailReport,result.ticker);
+  else if(result.visualReport)downloadWordReport(result.visualReport,result.ticker);
 }
 
 function persistCrsmDraft(draft){
