@@ -425,6 +425,11 @@
   text-align: left;
 }
 
+.results-ticker-row {
+  padding: 0;
+  overflow: hidden;
+}
+
 .results-ticker-row:hover,
 .results-history-row:hover,
 .results-ticker-row.selected,
@@ -433,15 +438,28 @@
   background: #eff6ff;
 }
 
+.results-ticker-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 11px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.results-ticker-select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .16);
+  outline-offset: -3px;
+}
+
 .results-ticker-main,
-.results-ticker-state,
 .results-history-row > span {
   display: grid;
   gap: 4px;
-}
-
-.results-ticker-state {
-  justify-items: end;
 }
 
 .results-ticker-main small,
@@ -459,9 +477,11 @@
 }
 
 .results-retry-wrap {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
+  padding: 0 10px 9px;
 }
 
 .results-retry-button {
