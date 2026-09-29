@@ -90,7 +90,7 @@ export function bindResultsPage({
     node.addEventListener('click', event => {
       event.stopPropagation();
       onRetry?.(
-        node.dataset.resultsRun,
+        node.dataset.resultsRetryRun,
         node.dataset.resultsRetry
       );
     });
@@ -131,26 +131,26 @@ function renderTickerRow(run, item, selectedRunId, selectedTicker, retryingItemI
   const retrying = retryingItemId === item.item_id;
   const error = item.error?.message || item.error || null;
 
-  return `<button class="results-ticker-row ${selected ? 'selected' : ''}" type="button"
-    data-results-run="${escapeHtml(run.run_id)}"
-    data-results-ticker="${escapeHtml(item.ticker)}">
-    <span class="results-ticker-main">
-      <strong>${escapeHtml(item.ticker)}</strong>
-      <small>${escapeHtml(sourceLabel(item.analysis_source))}</small>
-    </span>
-    <span class="results-ticker-state">
+  return `<div class="results-ticker-row ${selected ? 'selected' : ''}">
+    <button class="results-ticker-select" type="button"
+      data-results-run="${escapeHtml(run.run_id)}"
+      data-results-ticker="${escapeHtml(item.ticker)}">
+      <span class="results-ticker-main">
+        <strong>${escapeHtml(item.ticker)}</strong>
+        <small>${escapeHtml(sourceLabel(item.analysis_source))}</small>
+      </span>
       <span class="results-status status-${statusClass(item.state)}">${escapeHtml(item.state)}</span>
-      ${item.state === 'FAILED'
-        ? `<span class="results-retry-wrap">
-            ${error ? `<small class="results-error-short">${escapeHtml(error)}</small>` : ''}
-            <span class="btn results-retry-button" role="button" tabindex="0"
-              data-results-run="${escapeHtml(run.run_id)}"
-              data-results-retry="${escapeHtml(item.item_id)}"
-              aria-label="Retry ${escapeHtml(item.ticker)}">${retrying ? 'Retrying…' : 'Retry'}</span>
-          </span>`
-        : ''}
-    </span>
-  </button>`;
+    </button>
+    ${item.state === 'FAILED'
+      ? `<div class="results-retry-wrap">
+          ${error ? `<small class="results-error-short">${escapeHtml(error)}</small>` : ''}
+          <button class="btn results-retry-button" type="button"
+            data-results-retry-run="${escapeHtml(run.run_id)}"
+            data-results-retry="${escapeHtml(item.item_id)}"
+            aria-label="Retry ${escapeHtml(item.ticker)}" ${retrying ? 'disabled' : ''}>${retrying ? 'Retrying…' : 'Retry'}</button>
+        </div>`
+      : ''}
+  </div>`;
 }
 
 function renderHistory(history, selectedRunId) {
