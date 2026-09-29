@@ -22,14 +22,12 @@ export const RUN_STATES = Object.freeze({
   READY: 'READY',
   PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
-  PARTIAL: 'PARTIAL',
-  FAILED: 'FAILED'
+  PARTIAL: 'PARTIAL'
 });
 
 export const TERMINAL_RUN_STATES = Object.freeze([
   RUN_STATES.COMPLETED,
-  RUN_STATES.PARTIAL,
-  RUN_STATES.FAILED
+  RUN_STATES.PARTIAL
 ]);
 
 const ITEM_TRANSITIONS = Object.freeze({
@@ -299,7 +297,6 @@ export function deriveRunState(items) {
   const states = items.map(item => item.state);
   if (states.every(state => state === ITEM_STATES.READY)) return RUN_STATES.READY;
   if (states.every(state => state === ITEM_STATES.COMPLETED)) return RUN_STATES.COMPLETED;
-  if (states.every(state => state === ITEM_STATES.FAILED)) return RUN_STATES.FAILED;
   if (states.every(state => state === ITEM_STATES.COMPLETED || state === ITEM_STATES.FAILED)) {
     return RUN_STATES.PARTIAL;
   }
