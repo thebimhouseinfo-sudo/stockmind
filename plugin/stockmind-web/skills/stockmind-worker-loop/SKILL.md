@@ -23,8 +23,8 @@ Repeat until no actionable item remains:
 2. If item is READY, atomically update it to PROCESSING.
 3. Re-read status after the write and retain the new SHA.
 4. Load the item's canonical source inputs.
-5. Run the installed CRSM methodology for exactly that ticker.
-6. Build a contract-valid immutable result.
+5. Load and execute `stockmind-crsm-methodology` for exactly that ticker.
+6. Build a contract-valid immutable result using the methodology outputs and `stockmind-result-contract`.
 7. Commit result/status/current/history through GitHub.
 8. Re-read current/request/status.
 9. Continue automatically to the next actionable item.
