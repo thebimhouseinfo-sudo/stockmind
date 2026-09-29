@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build:prompts": "node build-prompts.js",
-    "test": "node tests/core.test.mjs && node tests/crsm-contract.test.mjs && node tests/memo-protocol.test.mjs",
+    "test": "node tests/core.test.mjs && node tests/crsm-contract.test.mjs && node tests/memo-protocol.test.mjs && node tests/memo-bridge.test.mjs",
     "check": "npm run build:prompts && npm test",
     "dev": "npm run build:prompts && python -m http.server 4321",
     "start": "npm run build:prompts && python -m http.server 4321",
