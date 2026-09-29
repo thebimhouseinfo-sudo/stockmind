@@ -88,6 +88,39 @@ assert.match(rendered, /VCB/);
 assert.match(rendered, /Visual Report/);
 assert.match(rendered, /VCB visual report fixture/);
 
+const secondItem = {
+  ...run.items[0],
+  item_id: 'item-hpg-001',
+  ticker: 'HPG',
+  result: {
+    ...run.items[0].result,
+    itemId: 'item-hpg-001',
+    ticker: 'HPG',
+    visualReport: '<section>HPG visual report fixture</section>',
+    detailReport: '# HPG detail report fixture',
+    decisionRecord: { ...run.items[0].result.decisionRecord, ticker: 'HPG' }
+  }
+};
+const multiRun = { ...run, items: [run.items[0], secondItem] };
+const multiRendered = renderResultsPage({
+  currentRun: multiRun,
+  history: [],
+  selectedRun: multiRun,
+  selectedTicker: 'VCB',
+  reportTab: 'html'
+});
+assert.match(multiRendered, /data-results-ticker="VCB"/);
+assert.match(multiRendered, /data-results-ticker="HPG"/);
+assert.match(multiRendered, /VCB visual report fixture/);
+assert.doesNotMatch(multiRendered, /HPG visual report fixture/);
+assert.doesNotMatch(multiRendered, /results-ticker-list/);
+assert.match(multiRendered, /memoResultsRunSelect/);
+
+const appSource = readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
+assert.doesNotMatch(appSource, /openSettings/);
+assert.doesNotMatch(appSource, /renderSettings/);
+assert.doesNotMatch(appSource, /settingsOpen/);
+
 const failedRun = {
   ...run,
   state: 'PARTIAL',
