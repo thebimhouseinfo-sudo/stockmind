@@ -1,0 +1,55 @@
+{
+  "request": {
+    "request_version": "crsm-request.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-screened-001",
+    "items": [
+      {
+        "item_id": "item-vcb-screened",
+        "ticker": "VCB",
+        "analysis_source": "SCREENED_WEB",
+        "screening_context": {
+          "source": "StockScreenerV2",
+          "ticker": "VCB",
+          "screening_as_of": "2026-09-29",
+          "screening_summary": {
+            "screen_score": 78,
+            "screen_rank": 1,
+            "screen_grade": "A"
+          }
+        },
+        "evidence_refs": []
+      }
+    ]
+  },
+  "result": {
+    "result_version": "crsm-result.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-screened-001",
+    "item_id": "item-vcb-screened",
+    "ticker": "VCB",
+    "analysis_source": "SCREENED_WEB",
+    "outputs": {
+      "node1": {"company_name": "Vietcombank", "market_data": {"price": {"value": 100}}},
+      "node2": {"trend_status": "UPTREND"},
+      "node3": {"moat": "Strong deposit franchise"},
+      "node4": {"macro_view": "Neutral to supportive"},
+      "node5": {"decision": "HOLD", "ai_score": {"value": 76}, "confidence": {"value": 74}, "strategy": {"entry_zone": "95-98", "tp1": 110, "tp2": 118}, "trading_stop": {"price": 91}, "thesis_invalidation": "Credit quality deteriorates"},
+      "node6a": "<html><body>VCB visual report fixture</body></html>",
+      "node6b": "# Báo cáo VCB\nFixture"
+    },
+    "decision_record": {
+      "date": "29/09/2026",
+      "ticker": "VCB",
+      "price_at_analysis": 100,
+      "decision": "HOLD",
+      "ai_score": 76,
+      "confidence": 74,
+      "entry_zone": "95-98",
+      "trading_stop": 91,
+      "tp1": 110,
+      "tp2": 118,
+      "thesis_invalidation": "Credit quality deteriorates"
+    }
+  }
+}
