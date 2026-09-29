@@ -1,345 +1,426 @@
-# Stockmind CRSM — Vercel + ChatGPT Plugin Migration Plan
+# Stockmind CRSM — Single-User GitHub Memo + Vercel + ChatGPT Plugin Plan
 
 Status: REVIEWED / READY  
-GSA Job: J-035A  
+GSA Job: J-47BD  
 Planning revision: 3  
-Planning review: PASS
+Planning review: PASS  
+Previous plan J-035A: SUPERSEDED
 
-## 1. Objective
+## 1. Product model
 
-Migrate Stockmind CRSM from browser-side direct model-provider execution to a Vercel-hosted two-page workflow:
+Stockmind is a **personal single-user app**.
 
-1. **Analysis List**
-2. **Results**
+There is:
+- one Stockmind repository;
+- one fixed GitHub Memo folder;
+- one submitted active Analysis List at a time;
+- no tenant/account-linking layer;
+- no Supabase/database queue;
+- no multiple pending Analysis Lists.
 
-The Screener remains computationally unchanged. It only changes how selected tickers are handed to CRSM.
+The Screener remains deterministic. CRSM becomes a two-page web workflow, while ChatGPT executes the analysis.
 
-ChatGPT becomes the CRSM execution brain. Invoking the Stockmind plugin is the only ChatGPT-side action required: the plugin automatically scans pending Memo work, claims eligible items, executes the CRSM pipeline, and writes durable results back for the webapp to render.
+## 2. Final flow
 
-## 2. Final user flow
-
-### 2.1 SCREENED flow
+### SCREENED
 
 ```text
 TradingView
   -> Parser
   -> Screener V2
   -> Dashboard / Ranking
-  -> select one or many tickers
+  -> select ticker(s)
   -> Analyze Selected / ticker action
-  -> add ticker(s) to CRSM Analysis List
+  -> add to CRSM Analysis List
   -> optionally add more tickers manually
   -> Analyze
-  -> write one analysis job + N items to Memo
-  -> Stockmind plugin invocation
-  -> automatic scan / claim / CRSM execution
-  -> write durable result(s)
-  -> CRSM Results page renders status and reports
+  -> Vercel writes one current list into GitHub Memo
+  -> invoke Stockmind plugin
+  -> plugin reads current list
+  -> ticker 1: full CRSM pipeline -> result
+  -> ticker 2: full CRSM pipeline -> result
+  -> ...
+  -> update GitHub Memo after each ticker
+  -> Results page polls GitHub Memo and renders output
 ```
 
-### 2.2 DIRECT flow
+### DIRECT
 
 ```text
 CRSM Analysis List
   -> manually add ticker
-  -> ticker is DIRECT
+  -> DIRECT item
   -> Analyze
-  -> Memo job
-  -> Stockmind plugin
-  -> result
-  -> Results page
+  -> GitHub Memo current list
+  -> invoke Stockmind plugin
+  -> sequential CRSM execution
+  -> Results
 ```
 
-## 3. Product boundary
-
-### Screener stays unchanged
+## 3. Screener boundary
 
 Do not change:
-- TradingView import format
-- parser semantics
-- Screener V2 formulas
-- weights
-- ranking
-- grade
-- classification
-- deterministic scoring
+- TradingView import;
+- parser semantics;
+- Screener V2 formulas;
+- thresholds/weights;
+- ranking;
+- grade;
+- classification;
+- deterministic score computation.
 
 Only change the handoff:
-- single ticker action adds the ticker to CRSM Analysis List
-- Dashboard **Analyze Selected** adds selected tickers to CRSM Analysis List
-- neither action starts AI analysis
+- single ticker action adds that ticker to CRSM Analysis List;
+- Dashboard **Analyze Selected** adds all selected tickers to the same CRSM Analysis List;
+- these actions never start CRSM AI execution.
 
-## 4. CRSM UI: exactly two pages
+## 4. CRSM UI — exactly two pages
 
 ### Page 1 — Analysis List
 
-Purpose: build the editable list that will become the next analysis job.
+Purpose: build the one draft list to submit.
 
-Required UI:
-- current ticker list
-- manual ticker input
-- Add action
-- source badge: SCREENED / MANUAL
-- screening-context indicator for SCREENED items
-- remove ticker
-- clear list
-- selected count
-- one primary **Analyze** button
+Required controls:
+- ticker list;
+- manual ticker input;
+- Add;
+- source badge: SCREENED / MANUAL;
+- screening-context marker;
+- optional evidence attachment per ticker;
+- remove ticker;
+- clear draft;
+- selected count;
+- one primary **Analyze** button.
 
 Rules:
-- SCREENED ticker carries an immutable screening snapshot captured when it enters the list
-- manual ticker becomes DIRECT
-- duplicate ticker appears once
-- if the same ticker is added manually and from Screener, SCREENED context wins
-- adding a ticker never starts AI execution
-- Analyze is the only submission action
-- Analyze writes one durable analysis job containing independent ticker items
-- clear the draft only after Memo confirms successful submission
-- failed submission must leave the draft intact
-
-Draft persistence:
-- draft is separate from Memo
-- use a versioned browser-local draft schema
-- draft survives navigation and reload before Analyze
-
-Responsive behavior:
-- desktop: efficient list layout and compact controls
-- tablet: stacked sections
-- mobile: card-based rows and reachable primary actions
-
-There must be no third CRSM Queue/Progress page.
+- SCREENED items retain frozen Screener context;
+- manual items are DIRECT;
+- duplicates appear once;
+- if the same ticker is added manually and from Screener, SCREENED context wins;
+- draft survives navigation/reload using a versioned browser-local schema;
+- initial maximum list size is **10 tickers**;
+- adding tickers never runs AI;
+- only one submitted active list may exist;
+- while GitHub `memo/current.json` is READY or PROCESSING, Analyze is disabled;
+- Analyze clears the local draft only after GitHub write succeeds;
+- failed submission preserves the draft.
 
 ### Page 2 — Results
 
-Purpose: one place for job status, history and completed analysis.
+This is the only runtime status/history/result page.
 
-Contains:
-- pending
-- processing
-- partial
-- completed
-- failed
-- retry state
-- latest-first history
-- filters: ticker / mode / status / date
-- selected result detail
-- Visual Report
-- Detail Report
-- Decision Log
+It shows:
+- current list state;
+- ticker READY / PROCESSING / COMPLETED / FAILED;
+- historical results;
+- Visual Report;
+- Detail Report;
+- Decision Log;
+- retry for failed ticker only.
 
 Synchronization:
-- prefer realtime subscription
-- reconnect automatically
-- bounded polling fallback if realtime is unavailable
-- user should not need manual refresh for normal status transitions
+- bounded polling while Results is visible;
+- polling stops while page is hidden;
+- manual refresh fallback on error;
+- no realtime database;
+- no third Queue/Progress page.
 
-Results is the only queue/status/history/result surface.
+## 5. GitHub Memo contract
 
-## 5. Memo Store contract
+The `stockmind` repository is private.
 
-Initial implementation target: Supabase.
+Runtime state uses a **dedicated runtime branch** in the same repository, separate from the Vercel deployment branch.
 
-Canonical records:
-- `analysis_jobs`
-- `analysis_items`
-- `analysis_results`
+Canonical paths:
 
-One Analyze action maps to:
 ```text
-1 analysis_job
-  -> N analysis_items
-  -> 0..N immutable analysis_results
+memo/
+  current.json
+
+  results/
+    index.json
+    <run_id>/
+      <ticker>.json
+
+  evidence/
+    <run_id>/
+      <ticker>/
+        ...
 ```
 
-Core identifiers and versions:
-- analysis_id
-- item_id
-- request_version
-- result_version
-- pipeline_version
-- mode
-- ticker
-- screening_context
-- evidence references
-- created_at / updated_at
-- retry lineage
-- decision_record
+### current.json
 
-Required server-side operations:
-- create_job
-- list_jobs
-- get_job
-- claim_item
-- heartbeat / update_item
-- write_result
-- fail_item
-- retry_failed
-- cancel_pending
+Contains:
+- schema_version;
+- run_id;
+- state;
+- created_at;
+- updated_at;
+- ordered items.
 
-Concurrency rules:
-- claim must be atomic
-- one item cannot be processed twice
-- lease / heartbeat protects in-progress work
-- stale lease can be recovered
-- completed result is immutable
-- retry must not overwrite completed siblings
-- partial batch results remain valid
+Each item contains:
+- ticker;
+- mode: SCREENED | DIRECT;
+- screening_context when SCREENED;
+- evidence_refs;
+- item_status;
+- error;
+- result_ref.
 
-## 6. Vercel architecture
+### State rules
 
-Vercel is the primary deployment surface.
+Only one current list is active.
 
-Responsibilities:
-- host the webapp
-- expose privileged Stockmind server-side routes/functions
-- keep privileged credentials server-side
-- provide preview deployments for QA
-- support production promote / rollback
+A new current list may be created/replaced only when the previous list is not READY or PROCESSING.
 
-Secrets:
-- Supabase service-role credentials remain server-side
-- plugin/server secrets remain server-side
-- no privileged secret in browser bundle
-- no model-provider API keys in browser settings after cutover
+Per ticker:
 
-## 7. Stockmind ChatGPT plugin contract
+```text
+READY
+  -> PROCESSING
+  -> COMPLETED
+     or FAILED
+```
 
-User behavior:
+Before analyzing a ticker:
+1. read current.json;
+2. exact-SHA update that ticker to PROCESSING;
+3. run CRSM;
+4. write immutable result file;
+5. exact-SHA update ticker to COMPLETED + result_ref.
+
+This ordering prevents a COMPLETED state without a durable result.
+
+Repeated plugin invocation:
+- reads the same current.json;
+- skips completed items;
+- resumes the first unfinished/retriable item;
+- never creates another list.
+
+## 6. User evidence
+
+Existing CRSM evidence support is preserved.
+
+Evidence is **per ticker**, never implicitly shared across all tickers.
+
+The existing browser extraction flow may continue converting supported files such as PDF/XLSX/CSV/TXT/MD/JSON into normalized evidence.
+
+On Analyze:
+- extracted evidence is persisted under the ticker's GitHub evidence path;
+- current.json stores evidence_refs;
+- plugin loads only the refs belonging to the ticker currently being processed.
+
+A retry uses the same evidence refs unless the user explicitly replaces the draft before a new run.
+
+## 7. Stockmind ChatGPT plugin
+
+Stockmind is a **private plugin** for this personal app.
+
+Its admission contract is intentionally simple.
+
+User action:
 
 ```text
 invoke Stockmind plugin
-  -> scan pending eligible work
-  -> claim work
-  -> execute CRSM
-  -> write result
-  -> continue through discovered pending work
 ```
 
-No additional user step is allowed.
+Plugin behavior:
+
+```text
+read fixed repo / runtime branch / memo/current.json
+  -> validate schema/state
+  -> find first unfinished ticker
+  -> mark PROCESSING
+  -> run CRSM pipeline
+  -> write result
+  -> mark COMPLETED or FAILED
+  -> move to next ticker
+  -> continue sequentially
+  -> update results/index.json
+  -> finish
+```
 
 The plugin must not ask the user to:
-- select a job
-- select a ticker
-- confirm
-- type run/start
-- issue a second command
+- choose a list;
+- choose a ticker;
+- type run/start;
+- confirm;
+- issue another command.
 
-If no work is pending:
-- return a concise no-pending-work status
+If no active list exists, return a concise no-work status.
 
-Internal tools may include:
-- list_pending
-- get_job
-- claim_item
-- heartbeat
-- write_result
-- fail_item
-- retry_failed
+Plugin implementation must include:
+- private plugin/harness creation;
+- binding to the fixed repository/runtime branch/Memo folder;
+- required GitHub connector permissions;
+- installation/connection verification;
+- read/write verification against the configured Memo paths.
 
-These are agent tools, not user-facing commands.
+## 8. Sequential CRSM execution
 
-## 8. CRSM execution migration
+Tickers are sequential.
 
-Move Node 1–6 execution from browser/provider adapters into ChatGPT/plugin orchestration.
+For each ticker, preserve the existing CRSM analytical methodology and dependency graph.
 
-Preserve:
-- SCREENED trusted-context semantics
-- DIRECT behavior
-- user evidence behavior
-- analytical methodology
-- Node 6A / 6B output compatibility
+Conceptually:
 
-Canonical result:
-- exactly one immutable `decision_record` per completed ticker
-- webapp renders this record
-- Node 7 localStorage append is no longer canonical
+```text
+Ticker A
+  -> Node 1
+  -> Node 2 / Node 3 as methodology permits
+  -> Node 4
+  -> Node 5
+  -> Node 6A / Node 6B
+  -> immutable result + decision_record
+  -> COMPLETE A
 
-Deterministic report formatting/export may remain in the webapp as long as it only transforms returned result data.
+Ticker B
+  -> full pipeline
+  -> COMPLETE B
+```
 
-## 9. Legacy provider cutover
+The plugin must finish one ticker before starting the next ticker.
 
-Do not delete the current provider path immediately.
+Node-level internal parallelism may remain only where the existing CRSM dependency model already permits it. That does not change the ticker-level sequential rule.
 
-Temporary migration state:
-- plugin path = normal target path
-- existing browser/provider path = internal rollback/comparison only
+Each completed ticker has exactly:
+- one immutable result;
+- one canonical `decision_record`.
 
-Cutover gate must verify:
-- SCREENED single
-- SCREENED batch
-- DIRECT
-- pending -> processing -> result lifecycle
-- partial batch failure
-- retry
-- Visual Report
-- Detail Report
-- Decision Log
-- zero-step plugin behavior
+Node 7 localStorage append is no longer the canonical Decision Log write path.
 
-Reviewer + Tester must pass the Vercel preview before deleting legacy provider code.
+## 9. Vercel architecture
+
+Vercel hosts:
+- the webapp;
+- server-side GitHub bridge routes.
+
+Server routes cover:
+- write current list;
+- read current list;
+- read result history/result files;
+- persist evidence;
+- retry a failed item.
+
+GitHub credentials:
+- stay in Vercel environment variables;
+- never enter browser code.
+
+### Owner-only access
+
+This is a single-user personal application, but privileged routes still require access control.
+
+Production/preview access and privileged API routes must use an **owner-only gate**, such as Vercel Authentication / Deployment Protection or an equivalent server-validated owner session.
+
+Unauthenticated requests must be rejected **before any GitHub API call**.
+
+### Runtime branch deployment isolation
+
+The GitHub runtime Memo branch must be explicitly excluded from Vercel Git deployment generation.
+
+It is not sufficient to merely make it a non-production branch.
+
+Verification must prove:
+
+```text
+commit memo/current.json on runtime branch
+  -> no Vercel production deploy
+  -> no Vercel preview deploy
+```
+
+## 10. Legacy provider cutover
+
+Do not delete the current browser-provider CRSM path immediately.
+
+During migration:
+- new plugin/GitHub path = target normal flow;
+- legacy direct provider path = internal comparison/rollback only.
+
+Cutover verifies:
+- SCREENED;
+- DIRECT;
+- one ticker;
+- capped multi-ticker list;
+- sequential order;
+- evidence scoping;
+- failure/retry;
+- reinvocation/resume;
+- Visual Report;
+- Detail Report;
+- Decision Log;
+- Results polling;
+- bare plugin invocation.
+
+Reviewer + Tester must PASS before deleting legacy provider runtime.
 
 After PASS remove:
-- Gemini/OpenAI/Ollama API-key UI
-- model discovery
-- node model assignment
-- provider adapters
-- router
-- runLLM active browser path
-- provider-specific pricing/cost controls
-- obsolete provider telemetry/cache fingerprints
-- Node 7 localStorage ownership
+- Gemini/OpenAI/Ollama API-key UI;
+- provider/model discovery;
+- node model assignment;
+- provider adapters;
+- router;
+- browser `runLLM`;
+- provider pricing/cost controls;
+- obsolete provider telemetry/cache fingerprints;
+- Node 7 localStorage canonical ownership.
 
-## 10. Implementation stages
+## 11. Implementation stages
 
-1. Freeze current CRSM analytical/render contracts and create SCREENED + DIRECT golden fixtures.
-2. Designer finalizes the exact two-page CRSM shell.
-3. Define Memo schema, security, RLS, state machine and Vercel transport.
-4. Implement Page 1 Analysis List and change Screener handoff to add-to-list.
-5. Implement Page 2 Results with realtime/poll fallback.
-6. Implement Stockmind plugin zero-step admission.
-7. Move Node 1–6 execution into plugin orchestration.
-8. Configure Vercel preview deployment and server-side transport.
-9. Run compatibility/cutover review on preview.
-10. Remove legacy direct-provider runtime after PASS.
-11. Run production verification, promote preview, inspect logs and preserve rollback target.
+1. Freeze existing CRSM analytical/render contracts and create golden fixtures.
+2. Designer finalizes the exact two-page, single-list UI.
+3. Define GitHub Memo schema/state/exact-SHA rules.
+4. Implement Analysis List and Screener add-to-list handoff.
+5. Implement Results over GitHub Memo.
+6. Create/register/connect the private Stockmind plugin.
+7. Move Node 1–6 into sequential plugin execution.
+8. Add Vercel deployment, owner-only GitHub bridge, and runtime-branch deploy exclusion.
+9. Run Reviewer + Tester compatibility/cutover gate.
+10. Remove legacy provider runtime.
+11. Production verification and release.
 
-## 11. Verification
+## 12. Verification
 
-Required checks:
-- baseline and final `npm test`
-- baseline and final `npm run check`
-- Screener regression: calculations unchanged
-- Analyze Selected -> add-to-list behavior
-- manual add / multi-add / dedupe / remove / clear
-- draft persistence across navigation/reload
-- failed Analyze submission preserves draft
-- one list -> one job + N items
-- atomic claim / duplicate invocation
-- stale lease recovery
-- partial failure
-- retry
-- immutable completed result
-- authorization / RLS failure cases
-- no privileged secret in client bundle
-- Results realtime update + polling fallback
-- desktop / tablet / mobile browser QA on Vercel preview
-- plugin no-work / SCREENED single / batch / DIRECT / partial / retry
-- production smoke test
-- Vercel deployment/log inspection
-- recorded rollback target
+Required:
+- baseline/final `npm test`;
+- baseline/final `npm run check`;
+- Screener regression unchanged;
+- Analyze Selected -> add-to-list;
+- manual add;
+- dedupe/remove/clear;
+- draft survives reload;
+- failed GitHub submission preserves draft;
+- one-active-list guard;
+- 10-item cap;
+- exact-SHA READY->PROCESSING->COMPLETED transitions;
+- result-before-COMPLETED ordering;
+- per-ticker evidence isolation;
+- retry failed ticker without touching completed siblings;
+- repeated plugin invocation skips completed work;
+- Results polling/history/render;
+- private plugin registration/connection;
+- bare invocation with no list;
+- bare invocation with one ticker;
+- bare invocation with capped multi-ticker list;
+- owner-only route negative test;
+- no GitHub secret in browser;
+- runtime branch commit creates no Vercel deployment;
+- desktop/tablet/mobile preview QA;
+- production smoke/log inspection;
+- rollback target retained.
 
-## 12. Hard acceptance rules
+## 13. Hard acceptance rules
 
-The migration is not complete unless all are true:
-- Screener computation is unchanged
-- CRSM has exactly two pages
-- Analyze Selected only adds to Analysis List
-- manual tickers can be added to the same list
-- Analyze writes the list to Memo and does not execute AI in browser
-- Results is the only status/history/result page
-- invoking Stockmind plugin is the only ChatGPT-side user action
-- plugin automatically scans and processes pending work
-- completed ticker has one immutable result + decision_record
-- Vercel hosts the production app
-- privileged secrets remain server-side
-- legacy browser model-provider path is removed only after Reviewer/Tester PASS
+Migration is complete only when:
+- Screener calculations are unchanged;
+- CRSM has exactly two pages;
+- exactly one active submitted list exists;
+- Screener and manual tickers feed the same Analysis List;
+- Analyze writes GitHub Memo and does not run AI in browser;
+- plugin invocation is the only ChatGPT-side user action;
+- plugin reads the fixed current list directly from GitHub;
+- tickers are processed sequentially;
+- results are immutable and written back to GitHub;
+- Results is the sole status/history/result page;
+- privileged Vercel routes are owner-only;
+- runtime Memo commits do not generate Vercel deployments;
+- legacy provider runtime is removed only after Reviewer/Tester PASS.
