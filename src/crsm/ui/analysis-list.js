@@ -40,7 +40,7 @@ export function renderAnalysisListPage({
     </div>
 
     ${renderMemoState({ memoCurrent, memoLoading, memoError, activeRun })}
-    ${notice ? `<div class="analysis-list-notice ${escapeHtml(notice.type || 'info')}" aria-live="polite">${escapeHtml(notice.message || '')}${notice.viewResults ? '<button class="btn" id="analysisViewResults" type="button">View Results</button>' : ''}</div>` : ''}
+    ${notice ? `<div class="analysis-list-notice ${escapeHtml(notice.type || 'info')}" aria-live="polite">${escapeHtml(notice.message || '')}${notice.viewResults ? '<button class="btn" id="analysisNoticeViewResults" type="button">View Results</button>' : ''}</div>` : ''}
 
     <div class="panel panel-pad analysis-list-composer">
       <label class="analysis-field-label" for="analysisTickerInput">Add ticker</label>
@@ -118,6 +118,7 @@ export function bindAnalysisListPage({
   bindClick('analysisClearList', () => onClear?.());
   bindClick('analysisSubmit', () => onAnalyze?.());
   bindClick('analysisViewResults', () => onViewResults?.());
+  bindClick('analysisNoticeViewResults', () => onViewResults?.());
 }
 
 function renderItem(item, busyItemId) {
