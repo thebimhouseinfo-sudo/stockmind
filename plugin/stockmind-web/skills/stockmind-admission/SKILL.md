@@ -14,7 +14,7 @@ Before normal Stockmind work, require these layers in order:
 1. `stockmind-admission`
 2. `stockmind-github-runtime`
 3. `stockmind-worker-loop`
-4. CRSM methodology layer when installed
+4. `stockmind-crsm-methodology`
 5. `stockmind-result-contract`
 
 If GitHub runtime access is unavailable, do not invent a local substitute.
@@ -35,6 +35,6 @@ Immediately enter the GitHub Memo workflow.
 
 ## Completion
 
-Process the eligible Analysis List sequentially until no READY/PROCESSING item remains or a hard contract/infrastructure blocker prevents safe progress.
+Process the eligible Analysis List sequentially until no READY/PROCESSING item remains or a hard contract/infrastructure blocker prevents safe progress. The CRSM methodology layer is mandatory for every claimed ticker; never substitute a generic stock-analysis answer.
 
 The final chat response is only a concise operational summary. The repository result is the durable output consumed by the webapp.
