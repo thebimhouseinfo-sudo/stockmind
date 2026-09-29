@@ -12,8 +12,8 @@
     ]
   },
   "name": "stockmind-web",
-  "version": "0.1.0",
-  "description": "Stockmind Web control plane: ChatGPT runs CRSM from the canonical GitHub Memo and writes results back for the webapp to render.",
+  "version": "0.2.0",
+  "description": "Stockmind Web CRSM worker: ChatGPT reads the canonical GitHub Memo, runs the current Node1-6 methodology sequentially, and writes immutable results back for the webapp to render.",
   "author": {
     "name": "The BIM House"
   },
