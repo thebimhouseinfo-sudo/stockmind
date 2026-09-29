@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import {
   createGitHubRuntimeClient,
   GitHubRuntimeError,
-  STOCKMIND_RUNTIME
+  STOCKMIND_RUNTIME,
+  assertMemoPath
 } from '../api/_github-runtime.js';
 import {
   getCurrentRun,
@@ -195,8 +196,17 @@ failed = transitionItem(
     error: { code: 'FIXTURE', message: 'fixture fail' }
   }
 );
+assert.equal(failed.state, RUN_STATES.PARTIAL);
 await runtime.updateJson(memoPaths(request.run_id).status, failed, statusFile.sha);
 statusFile = await runtime.readJson(memoPaths(request.run_id).status);
+
+// Simulate plugin terminal summary so retry must reopen both status and current.
+const currentBeforeRetry = await runtime.readJson('memo/current.json');
+await runtime.updateJson('memo/current.json', {
+  ...currentBeforeRetry.value,
+  state: RUN_STATES.PARTIAL,
+  updated_at: '2026-09-29T14:12:00.000Z'
+}, currentBeforeRetry.sha);
 
 await assert.rejects(
   () => retryFailedItem(runtime, {
@@ -214,14 +224,47 @@ const retried = await retryFailedItem(runtime, {
   now: '2026-09-29T14:13:00.000Z'
 });
 assert.equal(retried.status.items[0].state, ITEM_STATES.READY);
+assert.equal(retried.current.state, RUN_STATES.READY);
+const reopenedCurrent = await runtime.readJson('memo/current.json');
+assert.equal(reopenedCurrent.value.state, RUN_STATES.READY);
 
-const directEvidenceRuntime = makeRuntime();
+const directEvidenceRuntime = makeRuntime({
+  [memoPaths(request.run_id).request]: request
+});
 const evidenceWrite = await writeEvidence(directEvidenceRuntime, {
   run_id: request.run_id,
-  item: request.items[0],
+  item_id: request.items[0].item_id,
+  ticker: request.items[0].ticker,
   evidence: evidenceFixture.evidence_payload
 });
 assert.equal(evidenceWrite.path, evidenceFixture.evidence_payload.repository_path);
+
+const fabricatedEvidenceRuntime = makeRuntime({
+  [memoPaths(request.run_id).request]: request
+});
+await assert.rejects(
+  () => writeEvidence(fabricatedEvidenceRuntime, {
+    run_id: request.run_id,
+    item_id: 'fake-item',
+    ticker: request.items[0].ticker,
+    evidence: evidenceFixture.evidence_payload
+  }),
+  error => error.code === 'ITEM_NOT_FOUND'
+);
+
+const metadataMismatchRuntime = makeRuntime({
+  'memo/current.json': createEmptyCurrent(),
+  'memo/index.json': createEmptyIndex()
+});
+const metadataMismatch = clone(evidenceFixture.evidence_payload);
+metadataMismatch.checksum = 'tampered-checksum';
+await assert.rejects(
+  () => submitRun(metadataMismatchRuntime, {
+    request,
+    evidence_payloads: [metadataMismatch]
+  }),
+  error => error.code === 'EVIDENCE_METADATA_MISMATCH'
+);
 
 const webFixture = fixture('web-only');
 const webRequest = clone(webFixture.request);
@@ -261,6 +304,18 @@ const rebuilt = await rebuildHistoryIndex(terminalRuntime, {
 });
 assert.equal(rebuilt.index.runs.length, 1);
 assert.equal(rebuilt.index.runs[0].run_id, webRequest.run_id);
+assert.deepEqual(rebuilt.skipped, []);
+
+await terminalRuntime.createJson(
+  'memo/runs/run-malformed-001/request.json',
+  { invalid: true }
+);
+const rebuiltWithMalformed = await rebuildHistoryIndex(terminalRuntime, {
+  now: '2026-09-29T14:24:00.000Z'
+});
+assert.equal(rebuiltWithMalformed.index.runs.length, 1);
+assert.equal(rebuiltWithMalformed.skipped.length, 1);
+assert.equal(rebuiltWithMalformed.skipped[0].run_id, 'run-malformed-001');
 
 const history = await getHistory(terminalRuntime);
 assert.equal(history.index.runs.length, 1);
@@ -292,6 +347,13 @@ await assert.rejects(
   error => error instanceof GitHubRuntimeError
     && error.code === 'GITHUB_RUNTIME_PATH_DENIED'
 );
+assert.throws(
+  () => assertMemoPath('memo/arbitrary.json'),
+  error => error instanceof GitHubRuntimeError
+    && error.code === 'GITHUB_RUNTIME_PATH_DENIED'
+);
+assert.equal(assertMemoPath('memo/current.json'), 'memo/current.json');
+assert.equal(assertMemoPath('memo/runs', { allowDirectory: true }), 'memo/runs');
 
 assert.throws(
   () => createGitHubRuntimeClient({
