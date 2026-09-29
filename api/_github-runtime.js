@@ -27,15 +27,26 @@ export function createGitHubRuntimeClient({
   if (typeof fetchImpl !== 'function') {
     throw new GitHubRuntimeError('GITHUB_FETCH_UNAVAILABLE', 'fetch is unavailable');
   }
-  if (owner !== STOCKMIND_RUNTIME.owner || repo !== STOCKMIND_RUNTIME.repo || branch !== STOCKMIND_RUNTIME.branch) {
-    throw new GitHubRuntimeError('GITHUB_RUNTIME_BOUNDARY', 'Runtime repository/branch override is not allowed', 403);
+  if (
+    owner !== STOCKMIND_RUNTIME.owner
+    || repo !== STOCKMIND_RUNTIME.repo
+    || branch !== STOCKMIND_RUNTIME.branch
+  ) {
+    throw new GitHubRuntimeError(
+      'GITHUB_RUNTIME_BOUNDARY',
+      'Runtime repository/branch override is not allowed',
+      403
+    );
   }
 
   const base = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents';
 
   async function readJson(path) {
     const safe = assertMemoPath(path);
-    const response = await request('GET', base + '/' + encodeGitHubPath(safe) + '?ref=' + encodeURIComponent(branch));
+    const response = await request(
+      'GET',
+      base + '/' + encodeGitHubPath(safe) + '?ref=' + encodeURIComponent(branch)
+    );
     const data = await response.json();
     if (Array.isArray(data)) {
       throw new GitHubRuntimeError('GITHUB_EXPECTED_FILE', 'Expected file at ' + safe, 500);
@@ -58,10 +69,17 @@ export function createGitHubRuntimeClient({
 
   async function list(path) {
     const safe = assertMemoPath(path, { allowDirectory: true });
-    const response = await request('GET', base + '/' + encodeGitHubPath(safe) + '?ref=' + encodeURIComponent(branch));
+    const response = await request(
+      'GET',
+      base + '/' + encodeGitHubPath(safe) + '?ref=' + encodeURIComponent(branch)
+    );
     const data = await response.json();
     if (!Array.isArray(data)) {
-      throw new GitHubRuntimeError('GITHUB_EXPECTED_DIRECTORY', 'Expected directory at ' + safe, 500);
+      throw new GitHubRuntimeError(
+        'GITHUB_EXPECTED_DIRECTORY',
+        'Expected directory at ' + safe,
+        500
+      );
     }
     return data.map(entry => ({
       name: entry.name,
@@ -75,7 +93,12 @@ export function createGitHubRuntimeClient({
     const safe = assertMemoPath(path);
     const existing = await readJsonOrNull(safe);
     if (existing) {
-      throw new GitHubRuntimeError('GITHUB_CREATE_CONFLICT', safe + ' already exists', 409, { sha: existing.sha });
+      throw new GitHubRuntimeError(
+        'GITHUB_CREATE_CONFLICT',
+        safe + ' already exists',
+        409,
+        { sha: existing.sha }
+      );
     }
     return write(safe, value, message, null);
   }
@@ -86,23 +109,39 @@ export function createGitHubRuntimeClient({
     try {
       assertExactSha(expectedSha, existing.sha);
     } catch (error) {
-      throw new GitHubRuntimeError(error.code || 'MEMO_SHA_CONFLICT', error.message, 409, error.details || null);
+      throw new GitHubRuntimeError(
+        error.code || 'MEMO_SHA_CONFLICT',
+        error.message,
+        409,
+        error.details || null
+      );
     }
     return write(safe, value, message, existing.sha);
   }
 
   async function write(path, value, message, sha) {
     if (!token) {
-      throw new GitHubRuntimeError('GITHUB_TOKEN_MISSING', 'STOCKMIND_GITHUB_TOKEN is not configured', 500);
+      throw new GitHubRuntimeError(
+        'GITHUB_TOKEN_MISSING',
+        'STOCKMIND_GITHUB_TOKEN is not configured',
+        500
+      );
     }
+
     const body = {
       message: message || 'Update Stockmind Memo',
       branch,
       content: encodeBase64(JSON.stringify(value, null, 2) + '\n')
     };
     if (sha) body.sha = sha;
-    const response = await request('PUT', base + '/' + encodeGitHubPath(path), body);
+
+    const response = await request(
+      'PUT',
+      base + '/' + encodeGitHubPath(path),
+      body
+    );
     const data = await response.json();
+
     return {
       path,
       sha: data.content && data.content.sha ? data.content.sha : null,
@@ -127,7 +166,9 @@ export function createGitHubRuntimeClient({
 
     if (!response.ok) {
       let details = null;
-      try { details = await response.json(); } catch {}
+      try {
+        details = await response.json();
+      } catch {}
       throw new GitHubRuntimeError(
         response.status === 404 ? 'GITHUB_NOT_FOUND' : 'GITHUB_REQUEST_FAILED',
         'GitHub ' + method + ' failed with HTTP ' + response.status,
@@ -135,89 +176,65 @@ export function createGitHubRuntimeClient({
         details
       );
     }
+
     return response;
   }
 
-  return { readJson, readJsonOrNull, list, createJson, updateJson };
+  return {
+    readJson,
+    readJsonOrNull,
+    list,
+    createJson,
+    updateJson
+  };
 }
 
 export function assertMemoPath(path, { allowDirectory = false } = {}) {
   if (typeof path !== 'string' || !path.startsWith(STOCKMIND_RUNTIME.memoPrefix)) {
-    throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Only memo/ paths are allowed', 403);
+    throw new GitHubRuntimeError(
+      'GITHUB_RUNTIME_PATH_DENIED',
+      'Only memo/ paths are allowed',
+      403
+    );
   }
+
   if (path.includes('..') || path.includes('\\') || path.includes('//')) {
-    throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Unsafe Memo path', 403);
+    throw new GitHubRuntimeError(
+      'GITHUB_RUNTIME_PATH_DENIED',
+      'Unsafe Memo path',
+      403
+    );
   }
 
   const normalized = path.replace(/\/$/, '');
   const segment = '[A-Za-z0-9._-]+';
-  const fileAllowed = (
-    normalized === 'memo/current.json'
-    || normalized === 'memo/index.json'
-    || new RegExp('^memo/runs/' + segment + '/(?:request|status)\\.json
 
-function encodeGitHubPath(path) {
-  return path.split('/').map(encodeURIComponent).join('/');
-}
+  const filePatterns = [
+    /^memo\/current\.json$/,
+    /^memo\/index\.json$/,
+    new RegExp('^memo/runs/' + segment + '/(?:request|status)\\.json$'),
+    new RegExp('^memo/runs/' + segment + '/results/' + segment + '\\.json$'),
+    new RegExp(
+      '^memo/runs/' + segment + '/evidence/' + segment + '/' + segment + '\\.json$'
+    )
+  ];
 
-function encodeBase64(text) {
-  return Buffer.from(text, 'utf8').toString('base64');
-}
+  const directoryPatterns = [
+    /^memo\/runs$/
+  ];
 
-function decodeBase64(text) {
-  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
-}
-).test(normalized)
-    || new RegExp('^memo/runs/' + segment + '/results/' + segment + '\\.json
+  const allowed = allowDirectory
+    ? directoryPatterns.some(pattern => pattern.test(normalized))
+    : filePatterns.some(pattern => pattern.test(normalized));
 
-function encodeGitHubPath(path) {
-  return path.split('/').map(encodeURIComponent).join('/');
-}
-
-function encodeBase64(text) {
-  return Buffer.from(text, 'utf8').toString('base64');
-}
-
-function decodeBase64(text) {
-  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
-}
-).test(normalized)
-    || new RegExp('^memo/runs/' + segment + '/evidence/' + segment + '/' + segment + '\\.json
-
-function encodeGitHubPath(path) {
-  return path.split('/').map(encodeURIComponent).join('/');
-}
-
-function encodeBase64(text) {
-  return Buffer.from(text, 'utf8').toString('base64');
-}
-
-function decodeBase64(text) {
-  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
-}
-).test(normalized)
-  );
-  const directoryAllowed = (
-    normalized === 'memo/runs'
-    || new RegExp('^memo/runs/' + segment + '
-
-function encodeGitHubPath(path) {
-  return path.split('/').map(encodeURIComponent).join('/');
-}
-
-function encodeBase64(text) {
-  return Buffer.from(text, 'utf8').toString('base64');
-}
-
-function decodeBase64(text) {
-  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
-}
-).test(normalized)
-  );
-
-  if (allowDirectory ? !directoryAllowed : !fileAllowed) {
-    throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Memo path is outside the approved runtime shape', 403);
+  if (!allowed) {
+    throw new GitHubRuntimeError(
+      'GITHUB_RUNTIME_PATH_DENIED',
+      'Memo path is outside the approved runtime shape',
+      403
+    );
   }
+
   return normalized;
 }
 
