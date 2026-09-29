@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "stockmind": {
+      "type": "streamable-http",
+      "url": "https://stockmind-git-crsm-memo-m-35b978-thebimhouseinfo-sudos-projects.vercel.app/api/mcp"
+    }
+  }
+}
