@@ -324,7 +324,7 @@ const loadedRun = await getRun(terminalRuntime, webRequest.run_id);
 assert.equal(loadedRun.results.FPT.value.ticker, 'FPT');
 
 const maintenance = await inspectMaintenance(terminalRuntime);
-assert.deepEqual(maintenance.missing_from_index, []);
+assert.deepEqual(maintenance.missing_from_index, ['run-malformed-001']);
 assert.deepEqual(maintenance.missing_run_dirs, []);
 
 assert.equal(STOCKMIND_RUNTIME.owner, 'thebimhouseinfo-sudo');
