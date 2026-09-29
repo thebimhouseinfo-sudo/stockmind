@@ -9,6 +9,7 @@ import {
   summarizeMemoRun
 } from '../src/crsm/result-adapter.js';
 import { createResultsPoller } from '../src/crsm/results-poller.js';
+import { renderResultsPage } from '../src/crsm/ui/results.js';
 
 const screened = JSON.parse(readFileSync(new URL('./fixtures/crsm/screened-web.json', import.meta.url), 'utf8'));
 const evidence = JSON.parse(readFileSync(new URL('./fixtures/crsm/evidence-web.json', import.meta.url), 'utf8'));
@@ -65,6 +66,47 @@ assert.equal(selectDefaultTicker(run), 'VCB');
 assert.equal(selectedRunItem(run, 'vcb').ticker, 'VCB');
 assert.equal(decisionLogRows(run.items[0]).length, 1);
 assert.equal(decisionLogRows(run.items[0])[0].decision, 'HOLD');
+
+const rendered = renderResultsPage({
+  currentRun: run,
+  history: [{
+    run_id: run.run_id,
+    created_at: run.created_at,
+    state: run.state,
+    tickers: ['VCB'],
+    item_count: 1,
+    completed_count: 1,
+    failed_count: 0
+  }],
+  selectedRun: run,
+  selectedTicker: 'VCB',
+  reportTab: 'html',
+  updatedAt: '2026-09-29T15:10:00.000Z'
+});
+assert.match(rendered, /Results/);
+assert.match(rendered, /VCB/);
+assert.match(rendered, /Visual Report/);
+assert.match(rendered, /VCB visual report fixture/);
+
+const failedRun = {
+  ...run,
+  state: 'PARTIAL',
+  items: [{
+    ...run.items[0],
+    state: 'FAILED',
+    result: null,
+    result_ref: null,
+    error: { message: 'fixture failure' }
+  }]
+};
+const failedRendered = renderResultsPage({
+  currentRun: failedRun,
+  selectedRun: failedRun,
+  selectedTicker: 'VCB',
+  retryingItemId: null
+});
+assert.match(failedRendered, /data-results-retry-run="run-screened-001"/);
+assert.doesNotMatch(failedRendered, /data-results-run="run-screened-001"[^>]*data-results-retry=/);
 
 let intervalCalls = 0;
 let clearCalls = 0;
