@@ -49,7 +49,7 @@ assert.match(methodologyRef, /Risk: 10%/);
 assert.match(methodologyRef, /do not output `screen_vs_crsm`/);
 assert.match(methodologyRef, /legacy Node 7 side effect/);
 assert.match(methodologyRef, /decision_record/);
-assert.match(methodologyRef, /node1\.\.node6b/);
+assert.match(methodology, /node1\.\.node6b/);
 
 assert.match(admission, /stockmind-crsm-methodology/);
 assert.match(worker, /stockmind-crsm-methodology/);
