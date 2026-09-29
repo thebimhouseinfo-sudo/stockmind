@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "build:prompts": "node build-prompts.js",
-    "test": "node tests/core.test.mjs && node tests/crsm-contract.test.mjs && node tests/memo-protocol.test.mjs && node tests/memo-bridge.test.mjs && node tests/draft-list.test.mjs",
+    "test": "node tests/core.test.mjs && node tests/crsm-contract.test.mjs && node tests/memo-protocol.test.mjs && node tests/memo-bridge.test.mjs && node tests/draft-list.test.mjs && node tests/results.test.mjs",
     "check": "npm run build:prompts && npm test && npm run check:syntax",
     "dev": "npm run build:prompts && python -m http.server 4321",
     "start": "npm run build:prompts && python -m http.server 4321",
     "prebuild": "npm run build:prompts",
-    "check:syntax": "node --check src/app.js && node --check src/runtime-fixes.js && node --check src/crsm-navigation-mobile.js && node --check src/crsm/draft-list.js && node --check src/crsm/memo-client.js && node --check src/crsm/user-evidence.js && node --check src/crsm/ui/analysis-list.js"
+    "check:syntax": "node --check src/app.js && node --check src/runtime-fixes.js && node --check src/crsm-navigation-mobile.js && node --check src/crsm/draft-list.js && node --check src/crsm/memo-client.js && node --check src/crsm/user-evidence.js && node --check src/crsm/ui/analysis-list.js && node --check src/crsm/result-adapter.js && node --check src/crsm/results-poller.js && node --check src/crsm/ui/results.js"
   }
 }
