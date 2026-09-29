@@ -2,24 +2,64 @@
 
 ## Value Proposition
 
-Stockmind uses ChatGPT Web as the reasoning surface for CRSM while the webapp remains the deterministic Screener, Analysis List creator, status observer and Results renderer.
+Stockmind uses ChatGPT Web as the CRSM reasoning engine while the webapp remains the deterministic Screener, Analysis List creator, status observer, and Results renderer.
 
-The plugin removes the manual handoff between the webapp and ChatGPT. A bare Stockmind invocation immediately inspects the canonical Memo run and continues the current item without asking the user to retype tickers, choose repositories, or confirm a run command.
+The repository Memo is the only durable handoff surface between webapp and GPT. ChatGPT does not return analysis payloads for the user to copy anywhere. The plugin reads the current Memo run, processes it, writes canonical results back to the repository, and the webapp renders those repository results.
 
-## Why ChatGPT
+## Runtime UX
 
-The webapp owns deterministic screening and durable workflow state. ChatGPT contributes reasoning and synthesis over the canonical request/evidence. The plugin supplies the missing bounded data/actions: inspect the current run, read canonical evidence, claim one item, and persist a validated immutable result.
+User runtime interaction is exactly:
 
-## UX Flow
+```text
+@Stockmind
+```
 
-1. User creates/submits an Analysis List in the Stockmind webapp.
-2. User invokes Stockmind in ChatGPT.
-3. Admission immediately calls `stockmind_get_current`.
-4. If no actionable item exists, return a concise current status.
-5. If a READY/PROCESSING item exists, continue that item without a second user command.
-6. PACK 6 stops at admission/connectivity. CRSM methodology execution is added in PACK 7.
+After that invocation there is no second user command.
 
-No plugin UI view is required. The webapp is the visual surface; the plugin uses tools only.
+The plugin must continue autonomously inside the same ChatGPT turn/workflow:
+
+```text
+@Stockmind
+  -> stockmind_get_current
+  -> choose canonical next actionable item
+  -> claim READY item
+  -> read canonical request/evidence
+  -> run CRSM methodology for that ticker
+  -> stockmind_complete_item(result)
+  -> re-read current Memo
+  -> next ticker
+  -> repeat until no actionable item remains
+  -> return one concise completion/status summary
+```
+
+If an item cannot produce a contract-valid result, the plugin writes FAILED for that item and continues according to the pipeline failure policy. It never asks the user to choose the next ticker.
+
+## Durable Output Ownership
+
+The repository is authoritative.
+
+For each completed ticker the plugin writes:
+
+```text
+runtime:memo/runs/<run_id>/results/<TICKER>.json
+```
+
+and updates:
+
+```text
+runtime:memo/runs/<run_id>/status.json
+runtime:memo/current.json
+runtime:memo/index.json
+```
+
+The webapp reads those records through the bounded bridge and renders:
+- current ticker status
+- Visual Report
+- Detail Report
+- canonical Decision Log
+- history
+
+The plugin does not own a separate result UI or separate result store.
 
 ## Fixed Boundary
 
@@ -33,44 +73,58 @@ No MCP tool accepts repository, branch, arbitrary path, Git command, shell input
 
 ## Tool Surface
 
-Read-only tools:
+Read-only:
 - `stockmind_get_current`
 - `stockmind_status_roundtrip`
 - `stockmind_get_item_evidence`
 - `stockmind_get_history`
 
-Bounded write tools:
-- `stockmind_claim_item`: READY -> PROCESSING with exact status SHA.
-- `stockmind_fail_item`: PROCESSING -> FAILED with exact status SHA.
-- `stockmind_complete_item`: create/verify one immutable result, then update status/current/history.
+Bounded writes:
+- `stockmind_claim_item`: READY -> PROCESSING using exact status SHA
+- `stockmind_fail_item`: PROCESSING -> FAILED using exact status SHA
+- `stockmind_complete_item`: validate/create immutable result, then update status/current/history
 
-Write tools are enabled by default in PACK 6, per the owner decision. `STOCKMIND_MCP_WRITES_ENABLED=false` is an emergency server-side kill switch only. The plugin package never contains GitHub credentials.
+Read/write is enabled by default. `STOCKMIND_MCP_WRITES_ENABLED=false` is an emergency server-side kill switch only.
 
 ## Contracts
 
-Canonical schemas remain:
+Canonical schemas:
 - `crsm-request.v1`
 - `crsm-result.v1`
 - `crsm-pipeline.v1`
 - `stockmind-memo.v1`
 
-Result ownership must match the canonical request item's `run_id`, `item_id`, `ticker`, and `analysis_source`. Completed results are immutable. Duplicate completion is accepted only when the existing immutable JSON is identical.
+Result ownership must match canonical `run_id`, `item_id`, `ticker`, and `analysis_source`.
+
+Completed results are immutable. A repeated completion is idempotent only when the existing JSON is identical.
+
+## Source Modes
+
+The GPT worker must honor the request source exactly:
+
+- `SCREENED_WEB`: use the frozen TradingView/Screener snapshot as trusted screening context plus web research.
+- `EVIDENCE_WEB`: use only evidence bound to that item/ticker plus web research.
+- `WEB_ONLY`: use web research without Screener snapshot or uploaded evidence.
+
+No source mode may silently borrow another ticker's evidence or synthesize missing Screener data.
 
 ## Zero-step Admission
 
 Whenever Stockmind is explicitly invoked:
-1. Call `stockmind_get_current` before responding.
-2. Never ask the user to select a ticker/run when an actionable current item exists.
-3. Never ask for repository, branch, folder, path, provider, model, API key or output location.
-4. READY means claim the next item immediately; PROCESSING means resume the same item.
-5. With PACK 6 only, do not perform CRSM analysis yet. Report that the run/item is detected and ready for the CRSM worker migration in PACK 7.
-6. No actionable work -> concise status only.
+
+1. Call `stockmind_get_current` before any normal reply.
+2. Never ask the user to choose ticker/run/repository/branch/folder/path/provider/model/API key/output location.
+3. READY item -> claim immediately using the latest status SHA.
+4. PROCESSING item -> resume it.
+5. After each completion/failure, re-read canonical Memo state and continue automatically.
+6. Stop only when there is no actionable READY/PROCESSING item or a hard infrastructure/contract blocker prevents safe continuation.
+7. Return only a concise final status summary to the user; repository results are for the webapp to render.
 
 ## Security
 
-- GitHub token exists only in Vercel server environment.
+- GitHub token exists only in the Vercel server environment.
 - Browser and plugin package contain no GitHub/model-provider secrets.
-- MCP read/write is enabled by default but remains hard-bounded to the fixed runtime Memo namespace; a server-side `STOCKMIND_MCP_WRITES_ENABLED=false` kill switch can stop mutations without repackaging the plugin.
-- Runtime client itself rejects repository/branch overrides and non-Memo paths.
-- Every status mutation uses expected blob SHA.
-- Evidence ownership and result ownership are validated server-side.
+- MCP access remains hard-bounded to fixed `runtime:memo/`.
+- Every mutation uses exact SHA concurrency.
+- Evidence ownership and result ownership are server-validated.
+- The GPT worker never receives generic GitHub write capability.
