@@ -304,3 +304,17 @@ assert.throws(
 );
 
 console.log('Vercel GitHub bridge tests passed.');
+
+
+for (const route of [
+  'crsm-submit',
+  'crsm-current',
+  'crsm-history',
+  'crsm-run',
+  'crsm-retry',
+  'crsm-evidence',
+  'crsm-maintenance'
+]) {
+  const mod = await import('../api/' + route + '.js');
+  assert.equal(typeof mod.default, 'function', route + ' must export a Vercel handler');
+}
