@@ -26,7 +26,7 @@ export const STOCKMIND_MCP_TOOL_NAMES = Object.freeze([
 
 export function buildStockmindMcpServer({
   runtime = createGitHubRuntimeClient(),
-  writesEnabled = process.env.STOCKMIND_MCP_WRITES_ENABLED === 'true'
+  writesEnabled = process.env.STOCKMIND_MCP_WRITES_ENABLED !== 'false'
 } = {}) {
   const server = new McpServer(
     {
@@ -191,7 +191,8 @@ export function stockmindMcpBoundary() {
     repo: STOCKMIND_RUNTIME.repo,
     branch: STOCKMIND_RUNTIME.branch,
     path_prefix: STOCKMIND_RUNTIME.memoPrefix,
-    writes_enabled_by_default: false,
+    writes_enabled_by_default: true,
+    write_kill_switch: 'STOCKMIND_MCP_WRITES_ENABLED=false',
     tools: [...STOCKMIND_MCP_TOOL_NAMES]
   };
 }
@@ -200,7 +201,7 @@ async function runWriteTool(enabled, operation) {
   if (!enabled) {
     return toolFailure(
       'STOCKMIND_WRITES_DISABLED',
-      'Write tools are locked until the private plugin connection/auth checkpoint is explicitly enabled.'
+      'Write tools are disabled by the emergency STOCKMIND_MCP_WRITES_ENABLED=false kill switch.'
     );
   }
 
