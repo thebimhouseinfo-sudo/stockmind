@@ -54,7 +54,7 @@ assert.match(methodology, /node1\.\.node6b/);
 assert.match(admission, /stockmind-crsm-methodology/);
 assert.match(worker, /stockmind-crsm-methodology/);
 assert.match(githubRuntime, /thebimhouseinfo-sudo\/stockmind/);
-assert.match(githubRuntime, /branch:\s*`runtime`/);
+assert.match(githubRuntime, /Branch:\s*\n`runtime`/);
 assert.match(githubRuntime, /`memo\/`/);
 
 assert.doesNotMatch(methodology, /runLLM\(/);
