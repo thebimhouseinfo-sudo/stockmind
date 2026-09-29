@@ -34,6 +34,18 @@ export async function retryMemoItem(payload, fetchImpl = globalThis.fetch) {
   });
 }
 
+export async function fetchMemoMaintenance(fetchImpl = globalThis.fetch) {
+  return requestJson(fetchImpl, '/api/crsm-maintenance', { method: 'GET' });
+}
+
+export async function repairMemoHistory(fetchImpl = globalThis.fetch) {
+  return requestJson(fetchImpl, '/api/crsm-maintenance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'rebuild-index' })
+  });
+}
+
 export function isActiveMemoRun(current) {
   return Boolean(
     current?.run_id
