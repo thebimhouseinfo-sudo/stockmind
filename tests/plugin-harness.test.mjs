@@ -57,8 +57,8 @@ assert.match(githubRuntime, /thebimhouseinfo-sudo\/stockmind/);
 assert.match(githubRuntime, /Branch:\s*\n`runtime`/);
 assert.match(githubRuntime, /`memo\/`/);
 
-assert.doesNotMatch(methodology, /runLLM\(/);
-assert.doesNotMatch(methodologyRef, /runLLM\(/);
+assert.match(methodology, /runLLM\(\).*Do \*\*not\*\* reproduce that layer/s);
+assert.match(methodology, /Do not use browser model-provider API keys/);
 assert.doesNotMatch(admission, /custom MCP/i);
 assert.match(resultContract, /repository result is the durable output|analysis destination is GitHub/i);
 
