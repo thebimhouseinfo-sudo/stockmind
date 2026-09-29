@@ -148,10 +148,77 @@ export function assertMemoPath(path, { allowDirectory = false } = {}) {
   if (path.includes('..') || path.includes('\\') || path.includes('//')) {
     throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Unsafe Memo path', 403);
   }
-  if (!allowDirectory && path.endsWith('/')) {
-    throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Expected Memo file path', 403);
+
+  const normalized = path.replace(/\/$/, '');
+  const segment = '[A-Za-z0-9._-]+';
+  const fileAllowed = (
+    normalized === 'memo/current.json'
+    || normalized === 'memo/index.json'
+    || new RegExp('^memo/runs/' + segment + '/(?:request|status)\\.json
+
+function encodeGitHubPath(path) {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+function encodeBase64(text) {
+  return Buffer.from(text, 'utf8').toString('base64');
+}
+
+function decodeBase64(text) {
+  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
+}
+).test(normalized)
+    || new RegExp('^memo/runs/' + segment + '/results/' + segment + '\\.json
+
+function encodeGitHubPath(path) {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+function encodeBase64(text) {
+  return Buffer.from(text, 'utf8').toString('base64');
+}
+
+function decodeBase64(text) {
+  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
+}
+).test(normalized)
+    || new RegExp('^memo/runs/' + segment + '/evidence/' + segment + '/' + segment + '\\.json
+
+function encodeGitHubPath(path) {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+function encodeBase64(text) {
+  return Buffer.from(text, 'utf8').toString('base64');
+}
+
+function decodeBase64(text) {
+  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
+}
+).test(normalized)
+  );
+  const directoryAllowed = (
+    normalized === 'memo/runs'
+    || new RegExp('^memo/runs/' + segment + '
+
+function encodeGitHubPath(path) {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+function encodeBase64(text) {
+  return Buffer.from(text, 'utf8').toString('base64');
+}
+
+function decodeBase64(text) {
+  return Buffer.from(String(text).replace(/\n/g, ''), 'base64').toString('utf8');
+}
+).test(normalized)
+  );
+
+  if (allowDirectory ? !directoryAllowed : !fileAllowed) {
+    throw new GitHubRuntimeError('GITHUB_RUNTIME_PATH_DENIED', 'Memo path is outside the approved runtime shape', 403);
   }
-  return path.replace(/\/$/, '');
+  return normalized;
 }
 
 function encodeGitHubPath(path) {
