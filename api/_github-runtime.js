@@ -127,7 +127,6 @@ export function createGitHubRuntimeClient({
         500
       );
     }
-
     const body = {
       message: message || 'Update Stockmind Memo',
       branch,
@@ -135,13 +134,8 @@ export function createGitHubRuntimeClient({
     };
     if (sha) body.sha = sha;
 
-    const response = await request(
-      'PUT',
-      base + '/' + encodeGitHubPath(path),
-      body
-    );
+    const response = await request('PUT', base + '/' + encodeGitHubPath(path), body);
     const data = await response.json();
-
     return {
       path,
       sha: data.content && data.content.sha ? data.content.sha : null,
@@ -176,17 +170,10 @@ export function createGitHubRuntimeClient({
         details
       );
     }
-
     return response;
   }
 
-  return {
-    readJson,
-    readJsonOrNull,
-    list,
-    createJson,
-    updateJson
-  };
+  return { readJson, readJsonOrNull, list, createJson, updateJson };
 }
 
 export function assertMemoPath(path, { allowDirectory = false } = {}) {
@@ -197,7 +184,6 @@ export function assertMemoPath(path, { allowDirectory = false } = {}) {
       403
     );
   }
-
   if (path.includes('..') || path.includes('\\') || path.includes('//')) {
     throw new GitHubRuntimeError(
       'GITHUB_RUNTIME_PATH_DENIED',
@@ -220,12 +206,14 @@ export function assertMemoPath(path, { allowDirectory = false } = {}) {
   ];
 
   const directoryPatterns = [
-    /^memo\/runs$/
+    /^memo\/runs$/,
+    new RegExp('^memo/runs/' + segment + '$'),
+    new RegExp('^memo/runs/' + segment + '/(?:evidence|results)$'),
+    new RegExp('^memo/runs/' + segment + '/evidence/' + segment + '$')
   ];
 
-  const allowed = allowDirectory
-    ? directoryPatterns.some(pattern => pattern.test(normalized))
-    : filePatterns.some(pattern => pattern.test(normalized));
+  const allowed = (allowDirectory ? directoryPatterns : filePatterns)
+    .some(pattern => pattern.test(normalized));
 
   if (!allowed) {
     throw new GitHubRuntimeError(
