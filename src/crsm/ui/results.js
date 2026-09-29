@@ -33,7 +33,7 @@ export function renderResultsPage({
       <div>
         <p class="eyebrow">CRSM</p>
         <h1>Results</h1>
-        <p class="muted">Current ticker status, analysis history and immutable CRSM results.</p>
+        <p class="muted">Chọn run, chuyển mã và xem một báo cáo tại một thời điểm.</p>
       </div>
       <div class="results-refresh-block">
         <span class="muted results-updated">${updatedAt ? 'Updated ' + escapeHtml(formatRelative(updatedAt)) : (loading ? 'Updating…' : 'Not updated yet')}</span>
@@ -44,15 +44,9 @@ export function renderResultsPage({
     ${error ? `<div class="results-warning" aria-live="polite"><span>${escapeHtml(error)}</span><button class="btn" id="memoResultsRefreshInline" type="button">Refresh</button></div>` : ''}
     ${needsRepair ? renderRepairWarning(maintenance, repairing) : ''}
 
-    <div class="results-layout">
-      <aside class="results-master">
-        ${renderCurrentRun(currentRun, selectedRun?.run_id, selectedTicker, retryingItemId)}
-        ${renderHistory(history, selectedRun?.run_id)}
-      </aside>
-      <div class="results-detail">
-        ${renderSelectedRunHeader(selectedRun, selectedTicker)}
-        ${renderResultDetail(item, reportTab)}
-      </div>
+    ${renderRunNavigator({ currentRun, history, selectedRun, selectedTicker })}
+    <div class="results-viewer">
+      ${renderResultDetail(item, reportTab, selectedRun, retryingItemId)}
     </div>
   </section>`;
 }
@@ -73,9 +67,10 @@ export function bindResultsPage({
   bindClick('memoDownloadImage', onDownloadImage);
   bindClick('memoDownloadWord', onDownloadWord);
 
-  document.querySelectorAll('[data-results-run]').forEach(node => {
-    node.addEventListener('click', () => onSelectRun?.(node.dataset.resultsRun));
-  });
+  const runSelect = document.getElementById('memoResultsRunSelect');
+  if (runSelect) {
+    runSelect.addEventListener('change', () => onSelectRun?.(runSelect.value));
+  }
 
   document.querySelectorAll('[data-results-ticker]').forEach(node => {
     node.addEventListener('click', () => {
@@ -101,125 +96,82 @@ export function bindResultsPage({
   });
 }
 
-function renderCurrentRun(run, selectedRunId, selectedTicker, retryingItemId) {
-  if (!run) {
-    return `<section class="panel panel-pad results-current">
-      <p class="eyebrow">Current Run</p>
-      <h2>No submitted analysis</h2>
-      <p class="muted">Submit an Analysis List to create a run.</p>
+function renderRunNavigator({ currentRun, history, selectedRun, selectedTicker }) {
+  const runs = dedupeRuns(currentRun, history);
+  if (!runs.length) {
+    return `<section class="panel panel-pad results-navigator results-empty">
+      <div>
+        <p class="eyebrow">Analysis Results</p>
+        <h2>Chưa có analysis run</h2>
+        <p class="muted">Tạo Analysis List và gửi sang Stockmind để bắt đầu.</p>
+      </div>
     </section>`;
   }
 
-  const summary = summarizeMemoRun(run);
-  return `<section class="panel panel-pad results-current">
-    <div class="results-section-head">
-      <div>
-        <p class="eyebrow">Current Run</p>
-        <h2>${escapeHtml(formatDateTime(run.created_at) || run.run_id)}</h2>
+  const summary = summarizeMemoRun(selectedRun);
+  return `<section class="panel panel-pad results-navigator">
+    <div class="results-navigator-top">
+      <label class="results-run-field">
+        <span>Run</span>
+        <select id="memoResultsRunSelect" class="results-run-select" aria-label="Chọn analysis run">
+          ${runs.map(run => `<option value="${escapeHtml(run.run_id)}" ${run.run_id === selectedRun?.run_id ? 'selected' : ''}>${escapeHtml(runLabel(run))}</option>`).join('')}
+        </select>
+      </label>
+      <div class="results-run-meta">
+        <span class="results-status status-${statusClass(selectedRun?.state)}">${escapeHtml(selectedRun?.state || 'UNKNOWN')}</span>
+        <span class="muted">${summary.total ? `${summary.completed}/${summary.total} completed${summary.failed ? ` · ${summary.failed} failed` : ''}` : 'No items'}</span>
       </div>
-      <span class="results-status status-${statusClass(run.state)}">${escapeHtml(run.state)}</span>
     </div>
-    <p class="muted results-progress">${summary.completed}/${summary.total} completed${summary.failed ? ' · ' + summary.failed + ' failed' : ''}</p>
-    <div class="results-ticker-list">
-      ${run.items.map(item => renderTickerRow(run, item, selectedRunId, selectedTicker, retryingItemId)).join('')}
-    </div>
+    ${selectedRun ? `<div class="results-ticker-switcher" role="tablist" aria-label="Chuyển báo cáo theo mã">
+      ${selectedRun.items.map(item => renderTickerSwitch(selectedRun, item, selectedTicker)).join('')}
+    </div>` : ''}
   </section>`;
 }
 
-function renderTickerRow(run, item, selectedRunId, selectedTicker, retryingItemId) {
-  const selected = run.run_id === selectedRunId && item.ticker === selectedTicker;
-  const retrying = retryingItemId === item.item_id;
-  const error = item.error?.message || item.error || null;
-
-  return `<div class="results-ticker-row ${selected ? 'selected' : ''}">
-    <button class="results-ticker-select" type="button"
-      data-results-run="${escapeHtml(run.run_id)}"
-      data-results-ticker="${escapeHtml(item.ticker)}">
-      <span class="results-ticker-main">
-        <strong>${escapeHtml(item.ticker)}</strong>
-        <small>${escapeHtml(sourceLabel(item.analysis_source))}</small>
-      </span>
-      <span class="results-status status-${statusClass(item.state)}">${escapeHtml(item.state)}</span>
-    </button>
-    ${item.state === 'FAILED'
-      ? `<div class="results-retry-wrap">
-          ${error ? `<small class="results-error-short">${escapeHtml(error)}</small>` : ''}
-          <button class="btn results-retry-button" type="button"
-            data-results-retry-run="${escapeHtml(run.run_id)}"
-            data-results-retry="${escapeHtml(item.item_id)}"
-            aria-label="Retry ${escapeHtml(item.ticker)}" ${retrying ? 'disabled' : ''}>${retrying ? 'Retrying…' : 'Retry'}</button>
-        </div>`
-      : ''}
-  </div>`;
+function renderTickerSwitch(run, item, selectedTicker) {
+  const active = item.ticker === selectedTicker;
+  return `<button class="results-ticker-chip ${active ? 'active' : ''}" type="button"
+    role="tab" aria-selected="${active ? 'true' : 'false'}"
+    data-results-run="${escapeHtml(run.run_id)}"
+    data-results-ticker="${escapeHtml(item.ticker)}">
+    <strong>${escapeHtml(item.ticker)}</strong>
+    <span class="results-status status-${statusClass(item.state)}">${escapeHtml(item.state)}</span>
+  </button>`;
 }
 
-function renderHistory(history, selectedRunId) {
-  return `<section class="panel panel-pad results-history">
-    <div class="results-section-head">
-      <div>
-        <p class="eyebrow">History</p>
-        <h2>${history.length} run${history.length === 1 ? '' : 's'}</h2>
-      </div>
-    </div>
-    <div class="results-history-list">
-      ${history.length
-        ? history.map(run => {
-            const selected = run.run_id === selectedRunId;
-            return `<button class="results-history-row ${selected ? 'selected' : ''}" type="button" data-results-run="${escapeHtml(run.run_id)}">
-              <span><strong>${escapeHtml(formatDateTime(run.created_at) || run.run_id)}</strong><small>${escapeHtml((run.tickers || []).join(', '))}</small></span>
-              <span><b>${escapeHtml(run.state)}</b><small>${Number(run.completed_count || 0)}/${Number(run.item_count || 0)} completed${run.failed_count ? ' · ' + run.failed_count + ' failed' : ''}</small></span>
-            </button>`;
-          }).join('')
-        : '<p class="muted">No completed history yet.</p>'}
-    </div>
-  </section>`;
-}
-
-function renderSelectedRunHeader(run, selectedTicker) {
-  if (!run) return '';
-  return `<section class="panel panel-pad results-run-picker">
-    <div class="results-section-head">
-      <div>
-        <p class="eyebrow">Selected Run</p>
-        <h2>${escapeHtml(formatDateTime(run.created_at) || run.run_id)}</h2>
-      </div>
-      <span class="results-status status-${statusClass(run.state)}">${escapeHtml(run.state)}</span>
-    </div>
-    <div class="results-run-tickers">
-      ${run.items.map(item => `<button class="results-run-ticker ${item.ticker === selectedTicker ? 'active' : ''}" type="button"
-        data-results-run="${escapeHtml(run.run_id)}"
-        data-results-ticker="${escapeHtml(item.ticker)}">${escapeHtml(item.ticker)} · ${escapeHtml(item.state)}</button>`).join('')}
-    </div>
-  </section>`;
-}
-
-function renderResultDetail(item, reportTab) {
+function renderResultDetail(item, reportTab, selectedRun, retryingItemId) {
   if (!item) {
     return `<section class="panel panel-pad results-empty">
-      <p class="eyebrow">Result Detail</p>
-      <h2>Select a run or ticker</h2>
-      <p class="muted">Choose a ticker from Current Run or History.</p>
+      <p class="eyebrow">Result Viewer</p>
+      <h2>Chọn một mã để xem báo cáo</h2>
     </section>`;
   }
 
   if (item.result_error) {
     return `<section class="panel panel-pad results-warning">
-      <p class="eyebrow">Invalid Result</p>
-      <h2>${escapeHtml(item.ticker)}</h2>
-      <p>${escapeHtml(item.result_error)}</p>
+      <div><p class="eyebrow">Invalid Result</p><h2>${escapeHtml(item.ticker)}</h2><p>${escapeHtml(item.result_error)}</p></div>
     </section>`;
   }
 
   if (item.state !== 'COMPLETED' || !item.result) {
     const error = item.error?.message || item.error || null;
+    const retrying = retryingItemId === item.item_id;
     return `<section class="panel panel-pad results-status-detail">
-      <p class="eyebrow">Result Detail</p>
+      <p class="eyebrow">Result Viewer</p>
       <div class="results-section-head">
-        <h2>${escapeHtml(item.ticker)}</h2>
+        <div>
+          <h2>${escapeHtml(item.ticker)}</h2>
+          <p class="muted">${escapeHtml(sourceLabel(item.analysis_source))}</p>
+        </div>
         <span class="results-status status-${statusClass(item.state)}">${escapeHtml(item.state)}</span>
       </div>
-      <p class="muted">${escapeHtml(sourceLabel(item.analysis_source))}</p>
       ${error ? `<p class="results-error-detail">${escapeHtml(error)}</p>` : '<p class="muted">Result is not available yet.</p>'}
+      ${item.state === 'FAILED' && selectedRun
+        ? `<div class="results-status-actions"><button class="btn" type="button"
+            data-results-retry-run="${escapeHtml(selectedRun.run_id)}"
+            data-results-retry="${escapeHtml(item.item_id)}"
+            ${retrying ? 'disabled' : ''}>${retrying ? 'Retrying…' : 'Retry ' + escapeHtml(item.ticker)}</button></div>`
+        : ''}
     </section>`;
   }
 
@@ -263,6 +215,33 @@ function renderResultDetail(item, reportTab) {
       ? renderDecisionLog(decisionLogRows(item))
       : `<div class="report-paper"><iframe class="crsm-report-frame" srcdoc="${escapeAttr(srcdoc)}" sandbox></iframe></div>`}
   </section>`;
+}
+
+function dedupeRuns(currentRun, history) {
+  const byId = new Map();
+  if (currentRun?.run_id) {
+    byId.set(currentRun.run_id, {
+      run_id: currentRun.run_id,
+      created_at: currentRun.created_at,
+      state: currentRun.state,
+      item_count: currentRun.items?.length || 0,
+      completed_count: summarizeMemoRun(currentRun).completed,
+      failed_count: summarizeMemoRun(currentRun).failed,
+      tickers: (currentRun.items || []).map(item => item.ticker)
+    });
+  }
+  for (const run of history || []) {
+    if (run?.run_id && !byId.has(run.run_id)) byId.set(run.run_id, run);
+  }
+  return [...byId.values()];
+}
+
+function runLabel(run) {
+  const when = formatDateTime(run.created_at) || run.run_id;
+  const tickers = (run.tickers || []).join(', ');
+  const completed = Number(run.completed_count || 0);
+  const total = Number(run.item_count || 0);
+  return `${when}${tickers ? ' · ' + tickers : ''}${total ? ` · ${completed}/${total}` : ''}`;
 }
 
 function renderDecisionLog(rows) {
