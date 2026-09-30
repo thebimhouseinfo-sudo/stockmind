@@ -4,6 +4,7 @@ import {
   adaptMemoResult,
   decisionLogRows,
   normalizeMemoRun,
+  normalizeRenderSnapshot,
   selectDefaultTicker,
   selectedRunItem,
   summarizeMemoRun
@@ -66,6 +67,28 @@ assert.equal(selectDefaultTicker(run), 'VCB');
 assert.equal(selectedRunItem(run, 'vcb').ticker, 'VCB');
 assert.equal(decisionLogRows(run.items[0]).length, 1);
 assert.equal(decisionLogRows(run.items[0])[0].decision, 'HOLD');
+
+const renderSnapshot = normalizeRenderSnapshot({
+  snapshot: {
+    schema_version: 'stockmind-render.v1',
+    date: '2026-09-30',
+    run_id: screened.request.run_id,
+    created_at: '2026-09-30T02:00:00.000Z',
+    completed_at: '2026-09-30T02:10:00.000Z',
+    state: 'COMPLETED',
+    items: [{
+      item_id: screened.request.items[0].item_id,
+      ticker: screened.result.ticker,
+      analysis_source: screened.result.analysis_source,
+      completed_at: '2026-09-30T02:10:00.000Z',
+      result: screened.result
+    }]
+  }
+});
+assert.equal(renderSnapshot.run_id, screened.request.run_id);
+assert.equal(renderSnapshot.items[0].state, 'COMPLETED');
+assert.equal(renderSnapshot.items[0].result.ticker, screened.result.ticker);
+
 
 const rendered = renderResultsPage({
   currentRun: run,
