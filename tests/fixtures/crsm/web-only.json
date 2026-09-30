@@ -1,0 +1,46 @@
+{
+  "request": {
+    "request_version": "crsm-request.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-web-001",
+    "items": [
+      {
+        "item_id": "item-fpt-web",
+        "ticker": "FPT",
+        "analysis_source": "WEB_ONLY",
+        "screening_context": null,
+        "evidence_refs": []
+      }
+    ]
+  },
+  "result": {
+    "result_version": "crsm-result.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-web-001",
+    "item_id": "item-fpt-web",
+    "ticker": "FPT",
+    "analysis_source": "WEB_ONLY",
+    "outputs": {
+      "node1": {"company_name": "FPT Corporation", "market_data": {"price": {"value": 120}}},
+      "node2": {"trend_status": "UPTREND"},
+      "node3": {"moat": "Technology services scale"},
+      "node4": {"macro_view": "Export technology demand constructive"},
+      "node5": {"decision": "BUY ON DIP", "ai_score": {"value": 81}, "confidence": {"value": 79}, "strategy": {"entry_zone": "114-118", "tp1": 132, "tp2": 142}, "trading_stop": {"price": 108}, "thesis_invalidation": "Export growth slows sharply"},
+      "node6a": "<html><body>FPT visual report fixture</body></html>",
+      "node6b": "# Báo cáo FPT\nFixture"
+    },
+    "decision_record": {
+      "date": "29/09/2026",
+      "ticker": "FPT",
+      "price_at_analysis": 120,
+      "decision": "BUY ON DIP",
+      "ai_score": 81,
+      "confidence": 79,
+      "entry_zone": "114-118",
+      "trading_stop": 108,
+      "tp1": 132,
+      "tp2": 142,
+      "thesis_invalidation": "Export growth slows sharply"
+    }
+  }
+}

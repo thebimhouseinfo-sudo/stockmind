@@ -16,7 +16,7 @@ export function clearPendingUserEvidence() {
   pendingEvidence = null;
 }
 
-export async function ingestUserEvidence(files) {
+export async function extractUserEvidence(files) {
   const list = Array.from(files || []);
   if (!list.length) throw new Error('Chưa chọn file dữ liệu.');
 
@@ -27,6 +27,7 @@ export async function ingestUserEvidence(files) {
   for (const file of list) {
     try {
       const extracted = await extractFile(file);
+      const checksum = await hashFile(file);
       const remaining = Math.max(0, MAX_TOTAL_CHARS - totalChars);
       if (!remaining) break;
       const finalText = String(extracted.text || '').slice(0, Math.min(MAX_FILE_CHARS, remaining));
@@ -37,6 +38,7 @@ export async function ingestUserEvidence(files) {
         name: file.name,
         type: file.type || guessType(file.name),
         bytes: file.size,
+        checksum,
         source: 'USER_UPLOAD',
         kind: extracted.kind || classifyDocument(file.name, finalText),
         extractedChars: finalText.length,
@@ -53,7 +55,7 @@ export async function ingestUserEvidence(files) {
 
   if (!documents.length) throw new Error(errors.join('\n') || 'Không đọc được file.');
 
-  pendingEvidence = {
+  return {
     source: 'USER_UPLOAD',
     uploadedAt: new Date().toISOString(),
     documents,
@@ -62,7 +64,12 @@ export async function ingestUserEvidence(files) {
     intendedUse: 'supplementary_evidence',
     routing: summarizeRouting(documents)
   };
-  return pendingEvidence;
+}
+
+export async function ingestUserEvidence(files) {
+  const evidence = await extractUserEvidence(files);
+  pendingEvidence = evidence;
+  return evidence;
 }
 
 async function extractFile(file) {
@@ -164,6 +171,25 @@ function columnName(index) {
     n = Math.floor((n - 1) / 26);
   }
   return result;
+}
+
+async function hashFile(file) {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+
+  if (globalThis.crypto?.subtle) {
+    const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest))
+      .map(value => value.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  let hash = 0x811c9dc5;
+  for (const byte of bytes) {
+    hash ^= byte;
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return 'fnv1a-' + (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 function normalizeText(text) {

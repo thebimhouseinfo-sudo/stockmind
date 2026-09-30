@@ -1,0 +1,25 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "stockmind-web",
+  "version": "0.2.1",
+  "description": "Stockmind Web CRSM worker: ChatGPT reads the canonical GitHub Memo, runs the current Node1-6 methodology sequentially, and writes immutable results back for the webapp to render.",
+  "author": {
+    "name": "The BIM House"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Stockmind",
+        "shortDescription": "Run CRSM from the GitHub Memo",
+        "longDescription": "Stockmind keeps ChatGPT Web as the reasoning engine. Invoking Stockmind makes ChatGPT read the canonical Analysis List from GitHub, process the list sequentially, write CRSM results/status back to the repository, and leave the Stockmind webapp to render those durable results.",
+        "developerName": "The BIM House",
+        "category": "Productivity",
+        "capabilities": ["Interactive"],
+        "defaultPrompt": [
+          "Run Stockmind",
+          "Process the current Analysis List"
+        ]
+      }
+    }
+  }
+}

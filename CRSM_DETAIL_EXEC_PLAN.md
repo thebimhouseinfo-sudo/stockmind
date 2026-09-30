@@ -52,7 +52,8 @@ Expected new source modules:
 - `api/crsm-history.js`
 - `api/crsm-retry.js`
 - `api/crsm-maintenance.js`
-- `plugin/stockmind/` durable admission/methodology/contracts
+- `plugin/stockmind-web/` skill-only admission/GitHub-runtime/worker/methodology/contracts
+- `plugin/stockmind/` legacy MCP experiment retained only until cleanup
 - `tests/fixtures/crsm/`
 - CRSM contract/Memo/API/UI integration test files
 
@@ -246,15 +247,16 @@ Owner: **Coder**
 Requires: PACK 1 + PACK 3 + PACK 4.
 
 Page 2:
-- current run summary;
-- ticker READY/PROCESSING/COMPLETED/FAILED;
-- historical runs;
-- selected result;
+- one selected ticker report viewer at a time;
+- compact ticker switcher for all tickers in the selected run;
+- compact Run selector for history instead of a long sidebar/list;
+- ticker READY/PROCESSING/COMPLETED/FAILED state on the switcher;
 - Visual Report;
 - Detail Report;
 - Decision Log;
-- retry failed ticker;
+- retry failed ticker inside that ticker's viewer;
 - repairable index-error state.
+- Settings is removed from normal webapp navigation because provider/model configuration is obsolete in the target architecture.
 
 Polling:
 - start only when Results visible;
@@ -266,47 +268,59 @@ Create result adapter so existing report/export renderers can consume immutable 
 
 Exit gate:
 - fixture results render without `runCRSM()`;
+- multi-ticker run renders only the currently selected ticker report body;
+- ticker switching does not append multiple reports vertically;
 - canonical decision_record drives Decision Log;
 - completed sibling result is unchanged by retry;
+- Settings is absent from normal webapp navigation;
 - exactly two normal CRSM pages remain.
 
-## PACK 6 — Private Stockmind plugin + zero-step admission
+## PACK 6 — Web-compatible Stockmind skill plugin + GitHub Memo admission
 
 Owner: **Coder / plugin deployment task**
 
-Durable plugin source lives in repo under a dedicated plugin contract folder.
+Durable web-compatible plugin source lives in `plugin/stockmind-web/`.
+
+Hard architectural rule:
+- the Stockmind plugin is **skill/harness only**;
+- it contains **no MCP server** and no desktop dependency;
+- all durable Memo I/O uses the already connected **GitHub plugin** directly;
+- the old MCP-based `plugin/stockmind/` package is legacy only.
 
 Admission:
 
 ```text
-Stockmind invoked
--> read runtime:memo/current.json
+@Stockmind
+-> GitHub plugin reads runtime:memo/current.json
 -> no actionable run: concise status
--> actionable run: load request/status and start processing
+-> actionable run: read request/status/evidence
+-> enter sequential worker loop automatically
 ```
 
-Internal tool boundary:
-- fixed repository;
-- fixed `runtime` branch;
-- fixed `memo/` path;
-- read current/request/status/evidence;
-- exact-SHA status writes;
-- create immutable result;
-- update current/index.
+GitHub boundary:
+- repository fixed to `thebimhouseinfo-sudo/stockmind`;
+- branch fixed to `runtime`;
+- path namespace fixed to `memo/`;
+- exact current blob SHA required before every mutation;
+- completed result files are create-only/immutable.
 
 No user-facing:
 - job selection;
 - ticker selection;
 - mode selection;
 - run/start;
-- confirm.
+- confirm;
+- repository/branch/path selection;
+- copy/paste of results back to the webapp.
 
-Before porting CRSM methodology, verify plugin can read a fixture run and perform a bounded non-analytical status round trip.
+Before porting CRSM methodology, verify the skill-only plugin loads in ChatGPT Web/mobile and can use the GitHub connector to read the canonical Memo without any custom MCP integration.
 
 Exit gate:
-- private plugin installed/connected;
+- web-compatible private `stockmind-web` plugin exists;
+- no `mcp.json` in that plugin package;
+- GitHub connector is the only plugin I/O dependency;
 - bare invocation needs zero extra commands;
-- boundary test proves no write outside runtime Memo path.
+- fixed repo/branch/path contract is explicit in the harness.
 
 ## PACK 7 — Sequential CRSM methodology port
 
@@ -358,10 +372,12 @@ Verify:
 - Dashboard;
 - Ranking;
 - Analysis List;
-- Results;
-- api bridge;
+- Results single-report ticker switcher + Run selector;
+- Settings is absent from top navigation;
+- webapp api bridge;
 - assets/modules;
-- runtime Memo commits do not trigger preview/deploy churn.
+- runtime Memo commits do not trigger preview/deploy churn;
+- plugin flow remains independent of Vercel/MCP and uses GitHub connector directly.
 
 Record:
 - source commit;
@@ -456,7 +472,7 @@ Owner: **Tester**
 - smoke Screen/Dashboard/Ranking;
 - smoke Analysis List/Results;
 - bounded real Memo submit/read cycle;
-- verify plugin reads/writes production-compatible Memo contract;
+- verify Stockmind Web skill reads/writes production-compatible Memo directly through the GitHub connector;
 - inspect deployment/function logs;
 - record final verification and rollback target.
 
@@ -472,7 +488,7 @@ Job can complete only after this evidence exists.
 | Bridge | mocked GitHub API tests and client-secret boundary |
 | Page 1 | draft/reload/failure + Screener regression |
 | Page 2 | polling/history/adapter/retry |
-| Plugin | connection + path-boundary + zero-step admission |
+| Plugin | skill-only web/mobile load + GitHub connector boundary + zero-step admission |
 | Pipeline | 3 source modes + mixed sequential + resume |
 | Preview | exact source + exact Vercel preview |
 | Cutover | independent Reviewer PASS + Tester PASS |

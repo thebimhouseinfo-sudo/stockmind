@@ -1,0 +1,69 @@
+{
+  "request": {
+    "request_version": "crsm-request.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-evidence-001",
+    "items": [
+      {
+        "item_id": "item-hpg-evidence",
+        "ticker": "HPG",
+        "analysis_source": "EVIDENCE_WEB",
+        "screening_context": null,
+        "evidence_refs": [
+          {
+            "document_id": "doc-hpg-annual-report",
+            "item_id": "item-hpg-evidence",
+            "ticker": "HPG",
+            "filename": "HPG-annual-report.txt",
+            "type": "text/plain",
+            "checksum": "fixture-sha256-hpg",
+            "size": 1024,
+            "repository_path": "memo/runs/run-evidence-001/evidence/HPG/doc-hpg-annual-report.json"
+          }
+        ]
+      }
+    ]
+  },
+  "evidence_payload": {
+    "document_id": "doc-hpg-annual-report",
+    "item_id": "item-hpg-evidence",
+    "ticker": "HPG",
+    "filename": "HPG-annual-report.txt",
+    "type": "text/plain",
+    "checksum": "fixture-sha256-hpg",
+    "size": 1024,
+    "repository_path": "memo/runs/run-evidence-001/evidence/HPG/doc-hpg-annual-report.json",
+    "routing_metadata": {"source": "user_upload"},
+    "extracted_content": "Fixture evidence for HPG."
+  },
+  "result": {
+    "result_version": "crsm-result.v1",
+    "pipeline_version": "crsm-pipeline.v1",
+    "run_id": "run-evidence-001",
+    "item_id": "item-hpg-evidence",
+    "ticker": "HPG",
+    "analysis_source": "EVIDENCE_WEB",
+    "outputs": {
+      "node1": {"company_name": "Hoa Phat Group", "market_data": {"price": {"value": 25}}},
+      "node2": {"trend_status": "RANGE"},
+      "node3": {"moat": "Integrated steel producer"},
+      "node4": {"macro_view": "Construction cycle sensitive"},
+      "node5": {"decision": "WATCH", "ai_score": {"value": 63}, "confidence": {"value": 68}, "strategy": {"entry_zone": "23-24", "tp1": 28, "tp2": 31}, "trading_stop": {"price": 21.5}, "thesis_invalidation": "Steel spread compresses materially"},
+      "node6a": "<html><body>HPG visual report fixture</body></html>",
+      "node6b": "# Báo cáo HPG\nFixture"
+    },
+    "decision_record": {
+      "date": "29/09/2026",
+      "ticker": "HPG",
+      "price_at_analysis": 25,
+      "decision": "WATCH",
+      "ai_score": 63,
+      "confidence": 68,
+      "entry_zone": "23-24",
+      "trading_stop": 21.5,
+      "tp1": 28,
+      "tp2": 31,
+      "thesis_invalidation": "Steel spread compresses materially"
+    }
+  }
+}
