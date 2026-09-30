@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20260930T180927147Z-4bpkbr95",
-  "state": "READY",
+  "state": "PROCESSING",
   "created_at": "2026-09-30T18:09:27.974Z",
-  "updated_at": "2026-09-30T18:16:28.124Z",
+  "updated_at": "2026-09-30T18:16:40.955Z",
   "items": [
     {
       "item_id": "item-087c0399-609c-424a-960f-df5a957e9eb2",
@@ -31,12 +31,12 @@
       "item_id": "item-20f5f86e-c0c6-429d-85c8-2ceb6c073a5c",
       "ticker": "FPT",
       "analysis_source": "WEB_ONLY",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-09-30T18:16:40.955Z",
       "completed_at": null,
-      "updated_at": "2026-09-30T18:09:27.974Z"
+      "updated_at": "2026-09-30T18:16:40.955Z"
     }
   ]
 }
