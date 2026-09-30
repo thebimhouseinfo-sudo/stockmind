@@ -18,6 +18,18 @@ export async function fetchMemoHistory(fetchImpl = globalThis.fetch) {
   return requestJson(fetchImpl, '/api/crsm-history', { method: 'GET' });
 }
 
+export async function fetchDailyRenderIndex(fetchImpl = globalThis.fetch) {
+  return requestJson(fetchImpl, '/api/crsm-render', { method: 'GET' });
+}
+
+export async function fetchDailyRenderRun(runId, fetchImpl = globalThis.fetch) {
+  return requestJson(
+    fetchImpl,
+    '/api/crsm-render-run?run_id=' + encodeURIComponent(runId),
+    { method: 'GET' }
+  );
+}
+
 export async function fetchMemoRun(runId, fetchImpl = globalThis.fetch) {
   return requestJson(
     fetchImpl,
