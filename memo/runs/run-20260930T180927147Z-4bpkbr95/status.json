@@ -1,20 +1,20 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20260930T180927147Z-4bpkbr95",
-  "state": "PROCESSING",
+  "state": "READY",
   "created_at": "2026-09-30T18:09:27.974Z",
-  "updated_at": "2026-09-30T18:10:34.294Z",
+  "updated_at": "2026-09-30T18:14:03.854Z",
   "items": [
     {
       "item_id": "item-087c0399-609c-424a-960f-df5a957e9eb2",
       "ticker": "NT2",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20260930T180927147Z-4bpkbr95/results/NT2.json",
       "started_at": "2026-09-30T18:10:34.294Z",
-      "completed_at": null,
-      "updated_at": "2026-09-30T18:10:34.294Z"
+      "completed_at": "2026-09-30T18:14:03.854Z",
+      "updated_at": "2026-09-30T18:14:03.854Z"
     },
     {
       "item_id": "item-7a8211d6-ff9e-4a82-8025-6e2f079763b0",
