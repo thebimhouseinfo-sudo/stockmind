@@ -109,7 +109,7 @@ const rendered = renderResultsPage({
 assert.match(rendered, /Results/);
 assert.match(rendered, /VCB/);
 assert.match(rendered, /Visual Report/);
-assert.match(rendered, /VCB visual report fixture/);
+assert.match(rendered, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
 
 const secondItem = {
   ...run.items[0],
@@ -134,7 +134,7 @@ const multiRendered = renderResultsPage({
 });
 assert.match(multiRendered, /data-results-ticker="VCB"/);
 assert.match(multiRendered, /data-results-ticker="HPG"/);
-assert.match(multiRendered, /VCB visual report fixture/);
+assert.match(multiRendered, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
 assert.doesNotMatch(multiRendered, /HPG visual report fixture/);
 assert.doesNotMatch(multiRendered, /results-ticker-list/);
 assert.match(multiRendered, /memoResultsRunSelect/);
