@@ -1,0 +1,20 @@
+{
+  "schema_version": "stockmind-memo.v1",
+  "run_id": "run-20260930T232510822Z-0m22rrsb",
+  "state": "READY",
+  "created_at": "2026-09-30T23:25:11.779Z",
+  "updated_at": "2026-09-30T23:25:11.779Z",
+  "items": [
+    {
+      "item_id": "item-88ea2d0f-326f-424c-ae89-7544654aab74",
+      "ticker": "FPT",
+      "analysis_source": "WEB_ONLY",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-09-30T23:25:11.779Z"
+    }
+  ]
+}
