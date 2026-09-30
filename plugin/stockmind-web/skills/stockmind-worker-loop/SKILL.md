@@ -22,12 +22,16 @@ Repeat until no actionable item remains:
 1. Read current/request/status using `stockmind-github-runtime`.
 2. If item is READY, atomically update it to PROCESSING.
 3. Re-read status after the write and retain the new SHA.
-4. Load the item's canonical source inputs.
-5. Load and execute `stockmind-crsm-methodology` for exactly that ticker.
-6. Build a contract-valid immutable result using the methodology outputs and `stockmind-result-contract`.
-7. Commit result/status/current/history through GitHub.
-8. Re-read current/request/status.
-9. Continue automatically to the next actionable item.
+4. For every PROCESSING item, run the **existing-result recovery check** from `stockmind-github-runtime` before any analysis:
+   - if a valid canonical immutable result already exists, do not rerun CRSM; finish the missing COMPLETED/current/index transitions from that result;
+   - if no result exists, continue normally;
+   - if a conflicting/invalid result exists, never overwrite it and apply the recovery-conflict failure/blocker rule.
+5. Load the item's canonical source inputs only when analysis is still required.
+6. Load and execute `stockmind-crsm-methodology` for exactly that ticker.
+7. Build a contract-valid immutable result using the methodology outputs and `stockmind-result-contract`.
+8. Commit result/status/current/history through GitHub.
+9. Re-read current/request/status.
+10. Continue automatically to the next actionable item.
 
 Do not ask for permission between items.
 
