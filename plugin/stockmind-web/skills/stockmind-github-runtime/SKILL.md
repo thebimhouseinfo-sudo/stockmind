@@ -58,6 +58,28 @@ On admission:
 3. identify the first PROCESSING item, otherwise the first READY item;
 4. load evidence only from that item's canonical evidence refs.
 
+## PROCESSING recovery before analysis
+
+A PROCESSING item may already have an immutable result file if a previous invocation stopped after creating the result but before updating status.
+
+Before rerunning CRSM for any PROCESSING item:
+
+1. Resolve its canonical path `memo/runs/<run_id>/results/<TICKER>.json`.
+2. Check whether that result file already exists.
+3. If it does not exist, resume normal analysis.
+4. If it exists, validate it against `crsm-result.v1` and the canonical request item:
+   - same `run_id`;
+   - same `item_id`;
+   - same `ticker`;
+   - same `analysis_source`;
+   - expected pipeline/result versions;
+   - required node outputs and decision_record present.
+5. If valid, treat the existing immutable result as authoritative. **Do not rerun CRSM and do not regenerate the result.** Complete only the missing status/current/index transitions using the latest exact SHAs.
+6. If the existing result is invalid or belongs to a different item/source, never overwrite it. Record a bounded `RESULT_RECOVERY_CONFLICT` failure/blocker for that item and require manual repair before retrying it.
+
+This recovery rule closes the intentional write-order crash window:
+`PROCESSING -> immutable result file -> status COMPLETED`.
+
 ## Write behavior
 
 READY -> PROCESSING:
@@ -76,4 +98,4 @@ Failure:
 - update current state;
 - if the run becomes terminal, update history.
 
-Completed result files are immutable. A pre-existing result may be accepted only if byte/JSON-equivalent to the result being committed.
+Completed result files are immutable. A valid pre-existing canonical result for a PROCESSING item is recovered as described above; it must never be replaced by a newly generated analysis.
