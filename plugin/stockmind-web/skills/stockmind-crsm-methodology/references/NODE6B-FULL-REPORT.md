@@ -39,7 +39,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 |---|---|---|---|---|---|---|---|
 | [SCREEN_SCORE] | [SCREEN_RANK] | [SCREEN_GRADE] | [SCREEN_QUALITY] | [SCREEN_GROWTH] | [SCREEN_VALUATION] | [SCREEN_MOMENTUM] | [SCREEN_MISPRICING] |
 
-- **CRSM Score:** [AI_SCORE]/100 — **So với Screening:** [SCREEN_CRSM_STATUS] ([SCREEN_CRSM_INTERPRETATION])
+- **CRSM Score:** [AI_SCORE]/100 — trình bày độc lập theo methodology CRSM; không so sánh/chấm trạng thái với Screening Score.
 
 ## 3. Tín hiệu tổng hợp (Conflict Detector)
 | Cơ bản | Kỹ thuật | Vĩ mô | Thanh khoản | Đồng thuận |
@@ -118,6 +118,6 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 * Fill every bracket with real values — no unresolved `[PLACEHOLDER]` in the final output; use `Chưa có dữ liệu` for genuinely missing (null) fields.
 * Section 1's Thesis Invalidation and Trading Stop are two different concepts (fundamental vs technical) — never collapse them into one "stop loss" line.
 * Section 2 (Screening Snapshot) is conditional — include and number it only when `analysis_mode` = "SCREENED"; for DIRECT mode, remove it entirely and renumber the remaining sections 2–11, don't leave a "N/A" placeholder section.
-* This node renders and formats — it does not compute [SCREEN_CRSM_STATUS] from scratch. That label is read verbatim from Node 5's `screen_vs_crsm.status` (one of `"CONFIRMED"` / `"PARTIAL"` / `"DIVERGENT"`, derived by Node 5 from `screen_vs_crsm.score_difference` = crsm_score − screen_score with thresholds |diff|≤5 / 5<|diff|≤15 / |diff|>15). Node 6B only displays the string and the `interpretation` text — it MUST NOT re-derive the status from `score_difference` itself. The same rule applies to Node 6A.
+* Screening Snapshot is contextual input only. Do not compute, display, or imply `screen_vs_crsm`, score differences, CONFIRMED/PARTIAL/DIVERGENT, or any comparison verdict between Screening Score and CRSM AI Score.
 * Peer table, sensitivity table, and sources list must be real Markdown tables built from the JSON arrays — not summarized away.
 * Keep section order identical to the structure above so this document and Node 6A's HTML stay easy to cross-check.
