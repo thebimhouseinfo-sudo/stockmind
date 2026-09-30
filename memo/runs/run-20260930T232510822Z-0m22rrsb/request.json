@@ -1,0 +1,15 @@
+{
+  "request_version": "crsm-request.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20260930T232510822Z-0m22rrsb",
+  "created_at": "2026-09-30T23:25:10.825Z",
+  "items": [
+    {
+      "item_id": "item-88ea2d0f-326f-424c-ae89-7544654aab74",
+      "ticker": "FPT",
+      "analysis_source": "WEB_ONLY",
+      "screening_context": null,
+      "evidence_refs": []
+    }
+  ]
+}
