@@ -7,10 +7,12 @@ description: Mandatory CRSM analytical methodology for each actionable Stockmind
 
 This skill is mandatory after `stockmind-worker-loop` selects/claims one canonical item and before `stockmind-result-contract` writes its result.
 
-Before analyzing a ticker, read all three mandatory references:
-- `references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
-- `references/NODE6A-LOCKED-TEMPLATE.md` — locked Visual Report DOM/CSS/template. Node 6A must populate this template; it must not invent a replacement layout.
-- `references/NODE6B-FULL-REPORT.md` — full Word-ready detailed report contract. Node 6B must satisfy its detailed section/table requirements; an executive-summary substitute is invalid.
+Before analyzing a ticker, read all three canonical references from the Stockmind repository `thebimhouseinfo-sudo/stockmind` on `master` via the connected GitHub app:
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md` — locked Visual Report DOM/CSS/template. Node 6A must populate this template; it must not invent a replacement layout.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — full Word-ready detailed report contract. Node 6B must satisfy its detailed section/table requirements; an executive-summary substitute is invalid.
+
+The repository copy is canonical. Do not rely on an older packaged reference if it differs from `master`.
 
 When a legacy report reference conflicts with `CRSM-METHODOLOGY.md` (for example legacy `screen_vs_crsm` comparison text), the current methodology wins semantically, but the locked visual layout remains the rendering baseline.
 
@@ -92,6 +94,12 @@ The current source architecture explicitly requires:
 - six-factor CRSM score only;
 - Screener score/rank/grade never changes weights or decision;
 - no `screen_vs_crsm` object.
+
+## Strict output shape reminder
+
+Node 2 must include `technical_coverage` with `status: FULL|DEGRADED`, `required_sessions: 300`, `sessions_used`, and `missing_capabilities[]`. If ~300 daily sessions/SMA200 or quantified sector-vs-VNINDEX comparison is unavailable, use `DEGRADED` and disclose the gap.
+
+Node 5 must use only decisions `BUY | HOLD | SELL | BUY ON DIP | WATCH`. Its six factor scores are scalar 0–20 fields named exactly `fundamental, valuation, technical, flow, sector_macro, risk`. `catalyst_horizon` is an object, `thesis_invalidation` is one non-empty string, and `strategy` must contain `entry_zone, allocation_plan, tp1, tp2, risk_per_trade_pct_nav, position_size_note, max_portfolio_weight_pct, position_type`.
 
 ## Result construction
 
