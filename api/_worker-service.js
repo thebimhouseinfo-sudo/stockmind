@@ -1,17 +1,14 @@
 import {
   ITEM_STATES,
-  TERMINAL_RUN_STATES,
   assertEvidenceOwnedByItem,
   assertResult,
   assertStatus,
-  buildRunSummary,
+  createEmptyCurrent,
   memoPaths,
   transitionItem,
-  upsertRunSummary,
-  validateCurrent,
-  validateIndex
+  validateCurrent
 } from '../src/memo/protocol.js';
-import { getCurrentRun, getHistory, serviceError } from './_memo-service.js';
+import { getCurrentRun, serviceError } from './_memo-service.js';
 
 export async function inspectWorkerState(runtime) {
   const current = await getCurrentRun(runtime);
@@ -240,11 +237,6 @@ export async function failItem(runtime, {
     'Stockmind worker fail ' + run_id
   );
 
-  let history = null;
-  if (TERMINAL_RUN_STATES.includes(nextStatus.state)) {
-    history = await persistTerminalSummary(runtime, requestFile.value, nextStatus, now);
-  }
-
   return {
     already_failed: false,
     current: currentWrite.value,
@@ -252,7 +244,7 @@ export async function failItem(runtime, {
     status: nextStatus,
     status_sha: statusWrite.sha,
     item: findStatusItem(nextStatus, item_id),
-    history
+    render: null
   };
 }
 
@@ -343,25 +335,32 @@ export async function completeItem(runtime, {
     'Stockmind worker complete ' + runId
   );
 
-  let history = null;
-  if (TERMINAL_RUN_STATES.includes(nextStatus.state)) {
-    history = await persistTerminalSummary(runtime, requestFile.value, nextStatus, now);
+  let render = null;
+  let finalCurrent = currentWrite;
+  if (nextStatus.state === 'COMPLETED') {
+    render = await publishCompletedRun(runtime, requestFile.value, nextStatus, now);
+    finalCurrent = await resetCurrentAfterCompletion(runtime, currentWrite, now);
+    await deleteWorkingRun(runtime, runId);
   }
 
   return {
     already_completed: false,
     result_ref: resultPath,
     result_sha: resultWrite.sha,
-    current: currentWrite.value,
-    current_sha: currentWrite.sha,
+    current: finalCurrent.value,
+    current_sha: finalCurrent.sha,
     status: nextStatus,
     status_sha: statusWrite.sha,
-    history
+    render
   };
 }
 
 export async function getWorkerHistory(runtime) {
-  return getHistory(runtime);
+  const indexFile = await runtime.readJsonOrNull('memo/render/index.json');
+  return {
+    index: indexFile?.value || createEmptyRenderIndex(),
+    index_sha: indexFile?.sha || null
+  };
 }
 
 async function assertCurrentRun(runtime, runId) {
@@ -389,20 +388,168 @@ async function syncCurrent(runtime, currentFile, status, now, message) {
   return { value: nextCurrent, sha: write.sha };
 }
 
-async function persistTerminalSummary(runtime, request, status, now) {
-  const indexFile = await runtime.readJson('memo/index.json');
-  const check = validateIndex(indexFile.value);
-  if (!check.valid) throw serviceError('INDEX_INVALID', check.errors.join('; '), 500);
+async function publishCompletedRun(runtime, request, status, now) {
+  const date = vietnamDate(now);
+  const renderPath = 'memo/render/runs/' + request.run_id + '.json';
+  const items = [];
 
-  const summary = buildRunSummary(request, status);
-  const nextIndex = upsertRunSummary(indexFile.value, summary, now);
+  for (const statusItem of status.items || []) {
+    if (statusItem.state !== ITEM_STATES.COMPLETED || !statusItem.result_ref) {
+      throw serviceError('RENDER_RUN_INCOMPLETE', 'Completed run contains a non-completed item', 500);
+    }
+    const resultFile = await runtime.readJson(statusItem.result_ref);
+    try {
+      assertResult(resultFile.value);
+    } catch (error) {
+      throw serviceError(error.code || 'RESULT_INVALID', error.message, 500, error.details);
+    }
+    items.push({
+      item_id: statusItem.item_id,
+      ticker: statusItem.ticker,
+      analysis_source: statusItem.analysis_source,
+      completed_at: statusItem.completed_at || now,
+      result: resultFile.value
+    });
+  }
+
+  const snapshot = {
+    schema_version: 'stockmind-render.v1',
+    date,
+    run_id: request.run_id,
+    created_at: request.created_at || status.created_at || now,
+    completed_at: status.updated_at || now,
+    state: 'COMPLETED',
+    items
+  };
+
+  let indexFile = await runtime.readJsonOrNull('memo/render/index.json');
+  let index = indexFile?.value || createEmptyRenderIndex();
+
+  if (index.date && index.date !== date) {
+    for (const oldRun of index.runs || []) {
+      const oldPath = oldRun.result_ref || ('memo/render/runs/' + oldRun.run_id + '.json');
+      const oldFile = await runtime.readJsonOrNull(oldPath);
+      if (oldFile) {
+        await runtime.deleteJson(oldPath, oldFile.sha, 'Expire Stockmind render ' + index.date);
+      }
+    }
+    index = createEmptyRenderIndex();
+  }
+
+  const existingSnapshot = await runtime.readJsonOrNull(renderPath);
+  if (existingSnapshot) {
+    if (stableJson(existingSnapshot.value) !== stableJson(snapshot)) {
+      throw serviceError('RENDER_SNAPSHOT_CONFLICT', 'Daily render snapshot already exists with different content', 409);
+    }
+  } else {
+    await runtime.createJson(renderPath, snapshot, 'Publish Stockmind render ' + request.run_id);
+  }
+
+  const summary = {
+    run_id: request.run_id,
+    created_at: snapshot.created_at,
+    completed_at: snapshot.completed_at,
+    tickers: items.map(item => item.ticker),
+    item_count: items.length,
+    result_ref: renderPath
+  };
+  const runs = (index.runs || []).filter(run => run.run_id !== request.run_id);
+  runs.push(summary);
+  runs.sort((a, b) => String(b.completed_at || '').localeCompare(String(a.completed_at || '')));
+  const nextIndex = {
+    schema_version: 'stockmind-render-index.v1',
+    date,
+    updated_at: now,
+    runs
+  };
+
+  let indexWrite;
+  if (indexFile) {
+    indexWrite = await runtime.updateJson(
+      'memo/render/index.json',
+      nextIndex,
+      indexFile.sha,
+      'Update Stockmind daily render index ' + date
+    );
+  } else {
+    indexWrite = await runtime.createJson(
+      'memo/render/index.json',
+      nextIndex,
+      'Create Stockmind daily render index ' + date
+    );
+  }
+
+  return {
+    index: nextIndex,
+    index_sha: indexWrite.sha,
+    snapshot,
+    snapshot_ref: renderPath
+  };
+}
+
+async function resetCurrentAfterCompletion(runtime, currentFile, now) {
+  const empty = {
+    ...createEmptyCurrent(),
+    updated_at: now
+  };
   const write = await runtime.updateJson(
-    'memo/index.json',
-    nextIndex,
-    indexFile.sha,
-    'Stockmind worker finalize ' + request.run_id
+    'memo/current.json',
+    empty,
+    currentFile.sha,
+    'Clear completed Stockmind work'
   );
-  return { index: nextIndex, index_sha: write.sha, summary };
+  return { value: empty, sha: write.sha };
+}
+
+async function deleteWorkingRun(runtime, runId) {
+  const root = memoPaths(runId).run_dir;
+  const files = await collectFiles(runtime, root);
+  for (const path of files.sort((a, b) => b.length - a.length)) {
+    const file = await runtime.readJsonOrNull(path);
+    if (file) {
+      await runtime.deleteJson(path, file.sha, 'Clean completed Stockmind work ' + runId);
+    }
+  }
+}
+
+async function collectFiles(runtime, directory) {
+  let entries = [];
+  try {
+    entries = await runtime.list(directory);
+  } catch (error) {
+    if (error?.status === 404) return [];
+    throw error;
+  }
+  const files = [];
+  for (const entry of entries) {
+    if (entry.type === 'dir') files.push(...await collectFiles(runtime, entry.path));
+    else files.push(entry.path);
+  }
+  return files;
+}
+
+function createEmptyRenderIndex() {
+  return {
+    schema_version: 'stockmind-render-index.v1',
+    date: null,
+    updated_at: null,
+    runs: []
+  };
+}
+
+function vietnamDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw serviceError('RENDER_DATE_INVALID', 'Invalid completion timestamp', 500);
+  }
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  const pick = type => parts.find(part => part.type === type)?.value;
+  return pick('year') + '-' + pick('month') + '-' + pick('day');
 }
 
 function assertResultMatchesItem(result, item) {
