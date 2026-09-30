@@ -17,7 +17,8 @@ import {
 } from './crsm/draft-list.js';
 import {
   fetchMemoCurrent,
-  fetchMemoHistory,
+  fetchDailyRenderIndex,
+  fetchDailyRenderRun,
   fetchMemoMaintenance,
   fetchMemoRun,
   isActiveMemoRun,
@@ -29,6 +30,7 @@ import { bindAnalysisListPage, renderAnalysisListPage } from './crsm/ui/analysis
 import { bindResultsPage, renderResultsPage } from './crsm/ui/results.js';
 import {
   normalizeMemoRun,
+  normalizeRenderSnapshot,
   selectDefaultTicker,
   selectedRunItem
 } from './crsm/result-adapter.js';
@@ -346,17 +348,10 @@ async function refreshResults({background=false}={}){
   if(!background&&isResultsVisible())render();
 
   try{
-    const tasks=[
+    const [currentData,renderData]=await Promise.all([
       fetchMemoCurrent(),
-      fetchMemoHistory(),
-      background&&state.resultsMaintenance
-        ? Promise.resolve(state.resultsMaintenance)
-        : fetchMemoMaintenance()
-    ];
-    const [currentResult,historyResult,maintenanceResult]=await Promise.allSettled(tasks);
-
-    if(currentResult.status!=='fulfilled')throw currentResult.reason;
-    const currentData=currentResult.value;
+      fetchDailyRenderIndex()
+    ]);
     state.memoCurrent=currentData.current;
 
     let currentRun=null;
@@ -364,19 +359,8 @@ async function refreshResults({background=false}={}){
       currentRun=normalizeMemoRun(await fetchMemoRun(currentData.current.run_id));
     }
     state.resultsCurrentRun=currentRun;
-
-    const warnings=[];
-    if(historyResult.status==='fulfilled'){
-      state.resultsHistory=historyResult.value.index?.runs||[];
-    }else{
-      warnings.push(historyResult.reason?.message||String(historyResult.reason));
-    }
-
-    if(maintenanceResult.status==='fulfilled'){
-      state.resultsMaintenance=maintenanceResult.value;
-    }else{
-      warnings.push(maintenanceResult.reason?.message||String(maintenanceResult.reason));
-    }
+    state.resultsHistory=renderData.index?.runs||[];
+    state.resultsMaintenance=null;
 
     const available=new Set([
       ...(currentRun?.run_id?[currentRun.run_id]:[]),
@@ -391,7 +375,9 @@ async function refreshResults({background=false}={}){
       if(currentRun?.run_id===state.resultsSelectedRunId){
         state.resultsSelectedRun=currentRun;
       }else if(state.resultsSelectedRun?.run_id!==state.resultsSelectedRunId){
-        state.resultsSelectedRun=normalizeMemoRun(await fetchMemoRun(state.resultsSelectedRunId));
+        state.resultsSelectedRun=normalizeRenderSnapshot(
+          await fetchDailyRenderRun(state.resultsSelectedRunId)
+        );
       }
       state.resultsSelectedTicker=selectDefaultTicker(
         state.resultsSelectedRun,
@@ -403,8 +389,7 @@ async function refreshResults({background=false}={}){
     }
 
     state.resultsUpdatedAt=new Date().toISOString();
-    state.resultsError=warnings[0]||null;
-    if(state.resultsError)resultsPoller.stop();
+    state.resultsError=null;
   }catch(error){
     state.resultsError=error?.message||String(error);
     resultsPoller.stop();
@@ -436,7 +421,7 @@ async function selectResultsRun(runId){
   state.resultsLoading=true;
   render();
   try{
-    state.resultsSelectedRun=normalizeMemoRun(await fetchMemoRun(runId));
+    state.resultsSelectedRun=normalizeRenderSnapshot(await fetchDailyRenderRun(runId));
     state.resultsSelectedTicker=selectDefaultTicker(state.resultsSelectedRun);
     state.resultsError=null;
   }catch(error){
