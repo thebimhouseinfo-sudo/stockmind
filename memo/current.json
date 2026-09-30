@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
-  "run_id": "run-tester-e2e-20260930-01",
-  "state": "COMPLETED",
-  "created_at": "2026-09-30T13:58:00.000Z",
-  "updated_at": "2026-09-30T13:59:00.000Z",
-  "request_ref": "memo/runs/run-tester-e2e-20260930-01/request.json",
-  "status_ref": "memo/runs/run-tester-e2e-20260930-01/status.json"
+  "run_id": null,
+  "state": "EMPTY",
+  "created_at": null,
+  "updated_at": null,
+  "request_ref": null,
+  "status_ref": null
 }
