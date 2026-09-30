@@ -185,9 +185,7 @@
 }
 
 .analysis-submit-bar {
-  position: sticky;
-  bottom: 16px;
-  z-index: 2;
+  position: static;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -294,10 +292,6 @@
   .analysis-document-chip {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .analysis-submit-bar {
-    bottom: 8px;
   }
 
   .analysis-submit-actions {

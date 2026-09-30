@@ -90,6 +90,49 @@ export function normalizeMemoRun(run) {
   };
 }
 
+
+export function normalizeRenderSnapshot(input) {
+  const snapshot = input?.snapshot ?? input;
+  if (!snapshot || snapshot.schema_version !== 'stockmind-render.v1' || !Array.isArray(snapshot.items)) {
+    return null;
+  }
+
+  const items = snapshot.items.map(item => {
+    let result = null;
+    let resultError = null;
+    try {
+      result = adaptMemoResult(item.result);
+    } catch (error) {
+      resultError = error?.message || String(error);
+    }
+    return {
+      item_id: item.item_id,
+      ticker: normalizeTicker(item.ticker),
+      analysis_source: item.analysis_source,
+      analysis_source_label: sourceLabel(item.analysis_source),
+      state: 'COMPLETED',
+      error: null,
+      result_ref: null,
+      started_at: null,
+      completed_at: item.completed_at ?? snapshot.completed_at ?? null,
+      updated_at: item.completed_at ?? snapshot.completed_at ?? null,
+      result,
+      result_error: resultError
+    };
+  });
+
+  return {
+    run_id: snapshot.run_id,
+    state: 'COMPLETED',
+    created_at: snapshot.created_at ?? null,
+    updated_at: snapshot.completed_at ?? null,
+    status_sha: null,
+    request_sha: null,
+    items,
+    raw: snapshot
+  };
+}
+
 export function summarizeMemoRun(run) {
   const items = run?.items || [];
   const completed = items.filter(item => item.state === 'COMPLETED').length;

@@ -119,6 +119,42 @@ export function createGitHubRuntimeClient({
     return write(safe, value, message, existing.sha);
   }
 
+  async function deleteJson(path, expectedSha, message) {
+    const safe = assertMemoPath(path);
+    const existing = await readJson(safe);
+    try {
+      assertExactSha(expectedSha, existing.sha);
+    } catch (error) {
+      throw new GitHubRuntimeError(
+        error.code || 'MEMO_SHA_CONFLICT',
+        error.message,
+        409,
+        error.details || null
+      );
+    }
+    if (!token) {
+      throw new GitHubRuntimeError(
+        'GITHUB_TOKEN_MISSING',
+        'STOCKMIND_GITHUB_TOKEN is not configured',
+        500
+      );
+    }
+    const response = await request(
+      'DELETE',
+      base + '/' + encodeGitHubPath(safe),
+      {
+        message: message || 'Delete Stockmind Memo file',
+        branch,
+        sha: existing.sha
+      }
+    );
+    const data = await response.json();
+    return {
+      path: safe,
+      commit_sha: data.commit && data.commit.sha ? data.commit.sha : null
+    };
+  }
+
   async function write(path, value, message, sha) {
     if (!token) {
       throw new GitHubRuntimeError(
@@ -173,7 +209,7 @@ export function createGitHubRuntimeClient({
     return response;
   }
 
-  return { readJson, readJsonOrNull, list, createJson, updateJson };
+  return { readJson, readJsonOrNull, list, createJson, updateJson, deleteJson };
 }
 
 export function assertMemoPath(path, { allowDirectory = false } = {}) {
@@ -198,6 +234,8 @@ export function assertMemoPath(path, { allowDirectory = false } = {}) {
   const filePatterns = [
     /^memo\/current\.json$/,
     /^memo\/index\.json$/,
+    /^memo\/render\/index\.json$/,
+    new RegExp('^memo/render/runs/' + segment + '\\.json$'),
     new RegExp('^memo/runs/' + segment + '/(?:request|status)\\.json$'),
     new RegExp('^memo/runs/' + segment + '/results/' + segment + '\\.json$'),
     new RegExp(
@@ -207,6 +245,8 @@ export function assertMemoPath(path, { allowDirectory = false } = {}) {
 
   const directoryPatterns = [
     /^memo\/runs$/,
+    /^memo\/render$/,
+    /^memo\/render\/runs$/,
     new RegExp('^memo/runs/' + segment + '$'),
     new RegExp('^memo/runs/' + segment + '/(?:evidence|results)$'),
     new RegExp('^memo/runs/' + segment + '/evidence/' + segment + '$')

@@ -353,7 +353,10 @@ assert.throws(
     && error.code === 'GITHUB_RUNTIME_PATH_DENIED'
 );
 assert.equal(assertMemoPath('memo/current.json'), 'memo/current.json');
+assert.equal(assertMemoPath('memo/render/index.json'), 'memo/render/index.json');
+assert.equal(assertMemoPath('memo/render/runs/run-001.json'), 'memo/render/runs/run-001.json');
 assert.equal(assertMemoPath('memo/runs', { allowDirectory: true }), 'memo/runs');
+assert.equal(assertMemoPath('memo/render/runs', { allowDirectory: true }), 'memo/render/runs');
 
 assert.throws(
   () => createGitHubRuntimeClient({
@@ -375,7 +378,9 @@ for (const route of [
   'crsm-run',
   'crsm-retry',
   'crsm-evidence',
-  'crsm-maintenance'
+  'crsm-maintenance',
+  'crsm-render',
+  'crsm-render-run'
 ]) {
   const mod = await import('../api/' + route + '.js');
   assert.equal(typeof mod.default, 'function', route + ' must export a Vercel handler');
