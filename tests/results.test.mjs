@@ -117,9 +117,13 @@ assert.doesNotMatch(multiRendered, /results-ticker-list/);
 assert.match(multiRendered, /memoResultsRunSelect/);
 
 const appSource = readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
+const crsmNavSource = readFileSync(new URL('../src/crsm-navigation-mobile.js', import.meta.url), 'utf8');
 assert.doesNotMatch(appSource, /openSettings/);
 assert.doesNotMatch(appSource, /renderSettings/);
 assert.doesNotMatch(appSource, /settingsOpen/);
+assert.doesNotMatch(crsmNavSource, /renderSettings|bindSettingsEvents|openInlineSettings/);
+assert.doesNotMatch(crsmNavSource, /menuButton\(['"]Settings['"]/);
+assert.match(crsmNavSource, /\.results-page/);
 
 const failedRun = {
   ...run,
