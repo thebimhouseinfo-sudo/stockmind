@@ -53,6 +53,11 @@ assert.match(methodology, /node1\.\.node6b/);
 
 assert.match(admission, /stockmind-crsm-methodology/);
 assert.match(worker, /stockmind-crsm-methodology/);
+assert.match(worker, /existing-result recovery check/);
+assert.match(worker, /do not rerun CRSM/);
+assert.match(githubRuntime, /PROCESSING recovery before analysis/);
+assert.match(githubRuntime, /RESULT_RECOVERY_CONFLICT/);
+assert.match(githubRuntime, /valid pre-existing canonical result/);
 assert.match(githubRuntime, /thebimhouseinfo-sudo\/stockmind/);
 assert.match(githubRuntime, /Branch:\s*\n`runtime`/);
 assert.match(githubRuntime, /`memo\/`/);
