@@ -1,0 +1,549 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20260930T180927147Z-4bpkbr95",
+  "item_id": "item-20f5f86e-c0c6-429d-85c8-2ceb6c073a5c",
+  "ticker": "FPT",
+  "analysis_source": "WEB_ONLY",
+  "outputs": {
+    "node1": {
+      "ticker": "FPT",
+      "sector_type": "Technology / IT services",
+      "timestamp": "2026-10-01T01:09:00+07:00",
+      "data_period": "1H2026 / market through 2026-09-30",
+      "analysis_mode": "WEB_ONLY",
+      "screening_metrics": null,
+      "screening_summary": null,
+      "trusted_screener_snapshot": null,
+      "screening_as_of": null,
+      "data_integrity": {
+        "status": "partial_but_multi_source",
+        "notes": [
+          "Official company 1H2026 operating results verified.",
+          "Market/valuation data cross-checked across FPT IR, Stockbiz, Investing, StockAnalysis and BSI.",
+          "Full Q2 consolidated cash-flow line items were not extracted; missing values remain null."
+        ]
+      },
+      "market_data": {
+        "price": {
+          "value": 63200,
+          "currency": "VND",
+          "as_of": "2026-09-29",
+          "source": "Investing/StockAnalysis"
+        },
+        "price_2026_09_30_intraday_approx": 63100,
+        "range_52w": {
+          "low": 55909,
+          "high": 97476
+        },
+        "market_cap": {
+          "value": 118430000000000,
+          "currency": "VND"
+        },
+        "shares_outstanding": 1870000000,
+        "avg_volume_10d": 5797140,
+        "foreign_flow": null,
+        "foreign_room": null
+      },
+      "valuation_multiples": {
+        "pe_ttm": 12.48,
+        "forward_pe": 10.51,
+        "pb": 2.89,
+        "ps": 1.86,
+        "p_fcf": 28.63,
+        "dividend_yield_pct": 2.88
+      },
+      "financial_core_raw": {
+        "revenue_1h_2026": 26269000000000,
+        "pbt_1h_2026": 5714000000000,
+        "npat_parent_1h_2026": 5055000000000,
+        "eps_1h_2026": 2967,
+        "technology_revenue_1h_2026": 23138000000000,
+        "technology_pbt_1h_2026": 3314000000000,
+        "foreign_it_new_signings_growth_yoy_pct": 32.3,
+        "q2_revenue": 13789000000000,
+        "q2_npat_parent": 2568000000000,
+        "cfo_1h_2026": null,
+        "capex_1h_2026": null,
+        "receivables": null,
+        "inventory": null,
+        "total_debt": null,
+        "cash": null
+      },
+      "cost_of_capital_raw_inputs": {
+        "risk_free_rate_pct": 4.5786,
+        "beta": 0.42,
+        "vietnam_erp": null,
+        "average_cost_of_debt_pct": null,
+        "tax_rate_pct": null
+      },
+      "ownership_insider": {
+        "insider_ownership_pct": 11.87,
+        "institutional_ownership_pct": 19.7,
+        "details": "Third-party ownership statistics; no anomaly inferred."
+      },
+      "upcoming_events": [
+        {
+          "event": "Estimated Q3 earnings",
+          "date": "2026-10-28"
+        },
+        {
+          "event": "Execution of overseas IT and AI/automotive pipeline",
+          "window": "Q4 2026"
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "Price de-rating despite earnings growth",
+          "fact": "1H PBT +18.1% YoY while stock fell roughly one-third over 1Y in market-source comparison.",
+          "status": "verified_directionally"
+        },
+        {
+          "issue": "Accounting scope change",
+          "fact": "FPT Telecom moved to associate accounting from 1/1/2026, affecting reported comparisons.",
+          "status": "reported_by_TCX_summary"
+        }
+      ],
+      "data_completion": {
+        "complete": false,
+        "missing": [
+          "full Q2 cash flow",
+          "capex",
+          "receivables/inventory detail",
+          "Vietnam ERP",
+          "cost of debt",
+          "foreign flow/room",
+          "direct 300-session OHLCV extraction"
+        ]
+      },
+      "sources": [
+        {
+          "name": "FPT official 1H2026 results",
+          "url": "https://fpt.com/vi/tin-tuc/6-thang-dau-nam-2026-loi-nhuan-truoc-thue-cua-fpt-tang-truong-18-1",
+          "date": "2026-07-16",
+          "type": "company"
+        },
+        {
+          "name": "FPT Investor Relations",
+          "url": "https://fpt.com/en/ir",
+          "date": "2026-09-29",
+          "type": "company_market"
+        },
+        {
+          "name": "FPT public disclosures 2026",
+          "url": "https://fpt.com/en/ir/information-disclosures",
+          "date": "2026-09-09",
+          "type": "filing"
+        },
+        {
+          "name": "Stockbiz FPT quote/history",
+          "url": "https://web.stockbiz.vn/Stocks/FPT/LookupQuote.aspx?Date=29%2F09%2F2026",
+          "date": "2026-09-29",
+          "type": "market"
+        },
+        {
+          "name": "Investing FPT historical",
+          "url": "https://vn.investing.com/equities/fpt-corp-historical-data",
+          "date": "2026-09-29",
+          "type": "market"
+        },
+        {
+          "name": "Taichinh.com FPT market history",
+          "url": "https://taichinh.com/chung-khoan/fpt",
+          "date": "2026-09-29",
+          "type": "market"
+        },
+        {
+          "name": "StockAnalysis FPT ratios",
+          "url": "https://stockanalysis.com/quote/hose/FPT/financials/ratios/",
+          "date": "2026-09-28",
+          "type": "valuation"
+        },
+        {
+          "name": "BSI FPT financial analysis",
+          "url": "https://resource1.bsi.com.vn/phan-tich-tai-chinh/FPT",
+          "date": "2026-09-26",
+          "type": "valuation_peers"
+        },
+        {
+          "name": "Reuters Asia AI capital markets",
+          "url": "https://www.reuters.com/world/asia-pacific/asia-share-sales-poised-test-2021-record-ai-boom-fuels-deal-pipeline-2026-09-30/",
+          "date": "2026-09-30",
+          "type": "macro_sector"
+        },
+        {
+          "name": "TradingEconomics Vietnam 10Y",
+          "url": "https://tradingeconomics.com/vietnam/government-bond-yield",
+          "date": "2026-09-29",
+          "type": "macro"
+        }
+      ]
+    },
+    "node2": {
+      "ohlcv_source": {
+        "name": "Taichinh.com / Stockbiz / Investing",
+        "coverage": "Taichinh.com reports 1001-session end-of-day history; recent daily OHLCV separately verified. Full raw ~300-row series not extracted into this run.",
+        "sessions_available": 1001
+      },
+      "trend_status": {
+        "short_term": "downtrend_with_attempted_base",
+        "medium_term": "weak",
+        "long_term": "weak_relative_to_market"
+      },
+      "sma_200_rel": {
+        "value": null,
+        "status": "not_computed_from_raw_series"
+      },
+      "volume_analysis": {
+        "avg_10d": 5797140,
+        "recent_high_volume_selloff": {
+          "date": "2026-09-18",
+          "volume": 19422700,
+          "price_change_pct": -3.5
+        },
+        "interpretation": "High participation on downside; rebound confirmation remains insufficient."
+      },
+      "smart_money_phase": {
+        "wyckoff_vsa_candidate": "possible_markdown_to_base_transition",
+        "confidence": "low",
+        "evidence": [
+          "Large Sep 18 selloff volume",
+          "Price approaching 52-week lower range"
+        ],
+        "caution": "No institutional inference from volume alone."
+      },
+      "zones": {
+        "demand": [
+          61000,
+          63500
+        ],
+        "supply": [
+          66000,
+          68000
+        ],
+        "higher_supply": [
+          72000,
+          75000
+        ],
+        "method": "recent observed daily structure"
+      },
+      "sector_benchmark": {
+        "type": "peer_basket",
+        "peers": [
+          "CMG",
+          "SBD"
+        ],
+        "status": "partial",
+        "relative_note": "FPT PE ~12.2–12.5x vs CMG ~13.3x in BSI snapshot; business quality/growth profiles differ."
+      },
+      "sector_vs_market": {
+        "periods": {
+          "1m": {
+            "fpt_pct": -13.3,
+            "vnindex_pct": -2.9
+          },
+          "3m": {
+            "fpt_pct": -10.3,
+            "vnindex_pct": -4.1
+          },
+          "6m": {
+            "fpt_pct": -16.6,
+            "vnindex_pct": 6.4
+          },
+          "1y": {
+            "fpt_pct": -34.9,
+            "vnindex_pct": 6.8
+          }
+        },
+        "conclusion": "material_underperformance"
+      },
+      "screening_signal_analysis": {
+        "screening_context": null,
+        "note": "WEB_ONLY; no screener snapshot."
+      },
+      "signal_strength": {
+        "value": 6,
+        "max": 20,
+        "reason": "Valuation compression and proximity to support are constructive, but persistent relative underperformance and high-volume selloff dominate."
+      },
+      "conclusion": "Technical chưa xác nhận đảo chiều. Vùng 61–63.5k là hỗ trợ gần; cần reclaim 66–68k trước khi nâng conviction."
+    },
+    "node3": {
+      "data_period": "1H2026 / TTM Sep 2026",
+      "screening_flags": [],
+      "screening_metrics_used": null,
+      "capital_efficiency": {
+        "cost_of_equity_pct": null,
+        "wacc_pct": null,
+        "roic_pct": null,
+        "economic_spread_pct": null,
+        "reason": "ERP/cost-of-debt and invested-capital detail incomplete."
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "receivables_vs_revenue": null,
+        "inventory_vs_revenue": null,
+        "debt_vs_npat": null,
+        "note": "Operating earnings growth verified, but current-period cash-flow quality metrics were not extracted."
+      },
+      "earnings_sustainability": {
+        "classification": "Structural growth with execution/cycle overlay",
+        "drivers": [
+          "Overseas IT new signings +32.3% YoY",
+          "14 large projects >USD10m each",
+          "Technology segment growth and margin expansion"
+        ],
+        "caution": "AI/IT spending cycle and FX/global demand can alter growth cadence."
+      },
+      "f_score": {
+        "value": null,
+        "reason": "Full comparative balance-sheet/cash-flow inputs not available."
+      },
+      "m_score": null,
+      "m_score_note": "Not calculated without complete inputs.",
+      "health_status": {
+        "overall": "high_quality_growth_business_but_market_de_rating_and_cashflow_detail_incomplete"
+      },
+      "valuation": {
+        "dcf": {
+          "fair_value": null,
+          "wacc": null,
+          "reason": "No defensible WACC/FCF set."
+        },
+        "reverse_dcf": {
+          "implied_fcf_cagr": null,
+          "reason": "Current normalized FCF not verified."
+        },
+        "relative": {
+          "pe_ttm": 12.48,
+          "forward_pe": 10.51,
+          "pb": 2.89,
+          "p_fcf": 28.63,
+          "history": "PE and PB around one-third below 5-year averages per BSI snapshot.",
+          "peers": [
+            {
+              "ticker": "CMG",
+              "pe": 13.27,
+              "pb": 1.57
+            },
+            {
+              "ticker": "SBD",
+              "pe": 3.89,
+              "pb": 0.61
+            }
+          ],
+          "comment": "FPT trades near/under CMG on PE but at premium PB reflecting higher ROE/quality."
+        }
+      },
+      "moat": {
+        "score": null,
+        "drivers": [
+          "Scale in global IT services",
+          "Long-standing Japan and international client base",
+          "AI/automotive/digital transformation capabilities",
+          "Education/telecom ecosystem"
+        ],
+        "risks": [
+          "Talent costs",
+          "Global tech spending cycle",
+          "Execution in AI/data-center capital intensity",
+          "FX and international competition"
+        ]
+      },
+      "conclusion": "Fundamental tăng trưởng vẫn tốt và multiple đã co mạnh; tuy nhiên valuation rẻ hơn lịch sử chưa đủ để xác nhận đáy khi price action còn yếu."
+    },
+    "node4": {
+      "risk_regime": "ai_capex_boom_with_high_global_yields",
+      "macro_indicators": {
+        "vietnam_10y_yield_pct": 4.5786,
+        "global_ai_capex": "Very strong 2026 AI infrastructure fundraising and spending",
+        "global_rates": "Elevated global bond yields in Q3 2026",
+        "usd_backdrop": "firm/high-rate environment"
+      },
+      "company_specific_drivers": [
+        {
+          "driver": "Overseas IT demand",
+          "impact": "positive; new signings +32.3% YoY",
+          "confidence": "high"
+        },
+        {
+          "driver": "AI transformation spending",
+          "impact": "positive opportunity with competition/capex risk",
+          "confidence": "medium"
+        },
+        {
+          "driver": "Automotive/Europe expansion",
+          "impact": "diversifies client and geography",
+          "confidence": "medium"
+        }
+      ],
+      "sensitivity_table": [
+        {
+          "factor": "Global IT budgets",
+          "direction_up": "revenue/new bookings accelerate",
+          "direction_down": "slower growth"
+        },
+        {
+          "factor": "JPY/USD/VND",
+          "direction_up": "mixed translation and wage competitiveness effects",
+          "direction_down": "mixed"
+        },
+        {
+          "factor": "Rates",
+          "direction_up": "growth-stock multiple pressure",
+          "direction_down": "valuation support"
+        }
+      ],
+      "geopolitical_events": [
+        {
+          "event": "AI infrastructure race and policy scrutiny",
+          "impact": "Demand tailwind for AI services, but regulatory and capex discipline matter."
+        }
+      ],
+      "causal_chains": [
+        {
+          "fact": "Foreign IT new signings +32.3% YoY",
+          "inference": "Revenue backlog supports forward growth",
+          "assumption": "Conversion timing remains normal",
+          "confidence": "high"
+        },
+        {
+          "fact": "Global AI investment remains elevated",
+          "inference": "FPT addressable demand expands",
+          "assumption": "FPT captures profitable projects rather than low-margin capacity spending",
+          "confidence": "medium"
+        },
+        {
+          "fact": "Global yields are high",
+          "inference": "Long-duration growth multiples face pressure",
+          "assumption": "Rates stay elevated into Q4",
+          "confidence": "medium"
+        }
+      ],
+      "risk_scenarios": {
+        "bull": "Bookings convert strongly + AI/automotive wins + multiple stabilizes",
+        "base": "Mid-teens earnings growth but stock bases before rerating",
+        "bear": "Global IT demand slows and technical downtrend persists"
+      },
+      "macro_view": "Sector demand is structurally favorable, but high yields restrain valuation multiples.",
+      "industry_impact": "AI and digital transformation support IT services, while customer scrutiny on ROI may increase.",
+      "company_impact": "FPT's bookings and international expansion are positives; market de-rating suggests investors demand clearer growth acceleration/technical stabilization.",
+      "conclusion": "Macro-sector setup is better than current stock momentum."
+    },
+    "node5": {
+      "scores": {
+        "fundamental": {
+          "value": 17,
+          "max": 20
+        },
+        "valuation": {
+          "value": 16,
+          "max": 20
+        },
+        "technical": {
+          "value": 6,
+          "max": 20
+        },
+        "money_flow": {
+          "value": 8,
+          "max": 20
+        },
+        "sector_macro": {
+          "value": 14,
+          "max": 20
+        },
+        "risk": {
+          "value": 13,
+          "max": 20
+        }
+      },
+      "ai_score": {
+        "value": 65.5,
+        "max": 100
+      },
+      "confidence": {
+        "value": 70,
+        "components": {
+          "data_completeness": 16,
+          "source_quality": 18,
+          "cross_source_agreement": 15,
+          "fundamental_consistency": 13,
+          "technical_confirmation": 3,
+          "macro_clarity": 5
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "green",
+        "technical": "red",
+        "macro": "green",
+        "liquidity": "green"
+      },
+      "catalyst_horizon": "30–90d",
+      "decision": "WAIT_FOR_ENTRY",
+      "drivers": [
+        "Mid-teens earnings growth and strong overseas bookings",
+        "Valuation well below recent historical averages",
+        "AI/automotive/international expansion"
+      ],
+      "thesis_invalidation": [
+        "Sustained break below 60,000 VND with no earnings reacceleration",
+        "Overseas new-signing growth reverses materially",
+        "Technology segment margin deteriorates materially"
+      ],
+      "trading_stop": {
+        "price": 59800,
+        "reason": "Below near-term demand and round-number support; model-derived."
+      },
+      "liquidity_note": "High liquidity; however, large-volume down sessions show active supply and warrant staged sizing.",
+      "strategy": {
+        "entry_zone": [
+          61000,
+          63500
+        ],
+        "tp1": {
+          "price": 68000
+        },
+        "tp2": {
+          "price": 75000
+        },
+        "position_sizing": {
+          "risk_per_trade_pct": 1,
+          "max_portfolio_weight_pct": 8,
+          "initial_pct": 50,
+          "add_on_pct": 50
+        },
+        "style": "wait_for_base_and_reclaim"
+      },
+      "localized_upstream": {
+        "technical": "Đang underperform VN-Index rõ rệt, chưa xác nhận đáy.",
+        "fundamental": "1H2026 tăng trưởng doanh thu/LNTT hai chữ số; overseas bookings mạnh.",
+        "macro": "AI demand là tailwind nhưng high-rate regime ép multiple."
+      },
+      "full_reasoning": "Fundamental và valuation đều hấp dẫn hơn đầu năm nhưng technical đỏ. Theo conflict rule, CRSM chọn chờ điểm vào thay vì BUY ngay."
+    },
+    "node6a": "<article><h1>FPT — CRSM 01/10/2026</h1><p><strong>Decision:</strong> WAIT_FOR_ENTRY | <strong>AI Score:</strong> 65.50/100 | <strong>Confidence:</strong> 70/100</p><h2>Tóm tắt</h2><p>1H2026 doanh thu 26.269 nghìn tỷ VND, LNTT 5.714 nghìn tỷ (+18.1% YoY), overseas IT new signings +32.3%. P/E ~12.5x, thấp hơn đáng kể lịch sử gần đây; nhưng cổ phiếu underperform VN-Index mạnh ở 1–12 tháng.</p><h2>Kỹ thuật</h2><p>Demand 61–63.5k; cần reclaim 66–68k. SMA200: Data not available.</p><h2>Macro/Sector</h2><p>AI capex toàn cầu mạnh là tailwind, trong khi lợi suất cao gây áp lực multiple.</p><h2>Trade setup</h2><p>Entry 61–63.5k; stop 59.8k; TP1 68k; TP2 75k.</p><p><em>Phân tích phục vụ tham khảo cá nhân.</em></p></article>",
+    "node6b": "# FPT — CRSM 01/10/2026\n\n## 1. Quyết định đầu tư\n**WAIT_FOR_ENTRY** — AI Score **65.50/100**, Confidence **70/100**.\n\n## 2. Tín hiệu tổng hợp\nFundamental xanh, Technical đỏ, Macro xanh. Conflict rule ưu tiên chờ điểm vào.\n\n## 3. Vĩ mô & Ngành\nAI/digital transformation là tailwind cấu trúc; high-rate regime gây áp lực multiple.\n\n## 4. Doanh nghiệp & Chất lượng lợi nhuận\n1H2026 revenue **26.269 nghìn tỷ**, PBT **5.714 nghìn tỷ**, NPAT cổ đông mẹ **5.055 nghìn tỷ**. Overseas IT new signings **+32.3% YoY**. CFO/FCF hiện kỳ: **Chưa có dữ liệu** đủ để tính.\n\n## 5. Định giá & So sánh peer\nP/E ~12.48x, forward P/E ~10.51x, P/B ~2.89x. BSI cho thấy P/E/PB thấp hơn khoảng một phần ba so với trung bình 5 năm. DCF/reverse DCF: **Chưa có dữ liệu** đủ.\n\n| Mã | P/E | P/B |\n|---|---:|---:|\n| FPT | 12.48 | 2.89 |\n| CMG | 13.27 | 1.57 |\n| SBD | 3.89 | 0.61 |\n\n## 6. Kỹ thuật & Dòng tiền\nFPT underperform VN-Index: 1m -13.3% vs -2.9%; 6m -16.6% vs +6.4%; 1y -34.9% vs +6.8%. Phiên 18/09 giảm 3.5% với volume ~19.4m cp là tín hiệu cung đáng chú ý. SMA200: **Chưa có dữ liệu**.\n\n## 7. Rủi ro\nGlobal IT budgets, margin pressure, high-rate valuation, execution AI/automotive, FX.\n\n## 8. FACT / INFERENCE / ASSUMPTION\n| Loại | Nội dung |\n|---|---|\n| FACT | 1H PBT +18.1%; overseas IT new signings +32.3%; valuation multiple co mạnh. |\n| INFERENCE | Fundamental tốt hơn price action; thị trường đang đòi premium rủi ro cao hơn. |\n| ASSUMPTION | Booking chuyển thành revenue đúng tiến độ và margin không xấu đi. |\n\n## 9. Kịch bản\n- Bull: booking convert mạnh + AI wins + multiple ổn định.\n- Base: earnings tăng mid-teens, giá tạo nền.\n- Bear: global IT spending chậm và downtrend kéo dài.\n\n## 10. Chiến lược giao dịch & Quản trị vị thế\nEntry **61–63.5k**, stop **59.8k**, TP1 **68k**, TP2 **75k**. Risk/trade 1%, max weight 8%, Initial/Add-on 50/50.\n\n## 11. Nguồn dữ liệu\n- FPT official 1H2026 results (2026-07-16) — https://fpt.com/vi/tin-tuc/6-thang-dau-nam-2026-loi-nhuan-truoc-thue-cua-fpt-tang-truong-18-1\n- FPT Investor Relations (2026-09-29) — https://fpt.com/en/ir\n- FPT public disclosures 2026 (2026-09-09) — https://fpt.com/en/ir/information-disclosures\n- Stockbiz FPT quote/history (2026-09-29) — https://web.stockbiz.vn/Stocks/FPT/LookupQuote.aspx?Date=29%2F09%2F2026\n- Investing FPT historical (2026-09-29) — https://vn.investing.com/equities/fpt-corp-historical-data\n- Taichinh.com FPT market history (2026-09-29) — https://taichinh.com/chung-khoan/fpt\n- StockAnalysis FPT ratios (2026-09-28) — https://stockanalysis.com/quote/hose/FPT/financials/ratios/\n- BSI FPT financial analysis (2026-09-26) — https://resource1.bsi.com.vn/phan-tich-tai-chinh/FPT\n- Reuters Asia AI capital markets (2026-09-30) — https://www.reuters.com/world/asia-pacific/asia-share-sales-poised-test-2021-record-ai-boom-fuels-deal-pipeline-2026-09-30/\n- TradingEconomics Vietnam 10Y (2026-09-29) — https://tradingeconomics.com/vietnam/government-bond-yield\n\n*Phân tích phục vụ tham khảo cá nhân.*"
+  },
+  "decision_record": {
+    "date": "01/10/2026",
+    "ticker": "FPT",
+    "price_at_analysis": 63200,
+    "decision": "WAIT_FOR_ENTRY",
+    "ai_score": 65.5,
+    "confidence": 70,
+    "entry_zone": [
+      61000,
+      63500
+    ],
+    "trading_stop": 59800,
+    "tp1": 68000,
+    "tp2": 75000,
+    "thesis_invalidation": [
+      "Sustained break below 60,000 VND with no earnings reacceleration",
+      "Overseas new-signing growth reverses materially",
+      "Technology segment margin deteriorates materially"
+    ]
+  }
+}
