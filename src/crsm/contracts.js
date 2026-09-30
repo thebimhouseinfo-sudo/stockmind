@@ -467,7 +467,7 @@ function validateNode6AReport(html) {
   for (const marker of requiredMarkers) {
     if (!html.includes(marker)) errors.push('locked template marker missing: ' + marker);
   }
-  if (/\[(?:TICKER|AI_SCORE|CONFIDENCE|PLACEHOLDER|DECISION)\]/.test(html)) {
+  if (/\[[A-Z][A-Z0-9_]*\]/.test(html)) {
     errors.push('unresolved locked-template placeholder remains');
   }
   if (/^\s*<article[\s>]/i.test(html)) {
@@ -497,6 +497,9 @@ function validateNode6BReport(markdown) {
   const tableSeparators = (markdown.match(/\|\s*---/g) || []).length;
   if (tableSeparators < 3) {
     errors.push('full report must contain at least 3 Markdown tables (peer, sensitivity/scenario, sources)');
+  }
+  if (/\[[A-Z][A-Z0-9_]*\]/.test(markdown)) {
+    errors.push('unresolved detail-report placeholder remains');
   }
   return errors;
 }
