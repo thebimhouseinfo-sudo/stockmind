@@ -12,7 +12,7 @@
     ]
   },
   "name": "stockmind-web",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Stockmind Web CRSM worker: ChatGPT reads the canonical GitHub Memo, runs the current Node1-6 methodology sequentially, and writes immutable results back for the webapp to render.",
   "author": {
     "name": "The BIM House"
