@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20260930T180927147Z-4bpkbr95",
-  "state": "PROCESSING",
+  "state": "READY",
   "created_at": "2026-09-30T18:09:27.974Z",
-  "updated_at": "2026-09-30T18:14:31.007Z",
+  "updated_at": "2026-09-30T18:16:30.398Z",
   "request_ref": "memo/runs/run-20260930T180927147Z-4bpkbr95/request.json",
   "status_ref": "memo/runs/run-20260930T180927147Z-4bpkbr95/status.json"
 }
