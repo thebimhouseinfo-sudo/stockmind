@@ -1,5 +1,5 @@
 import { createGitHubRuntimeClient } from './_github-runtime.js';
-import { methodNotAllowed, ok, sendError } from './_http.js';
+import { methodNotAllowed, sendError, sendJson } from './_http.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return methodNotAllowed(res, ['GET']);
@@ -8,17 +8,23 @@ export default async function handler(req, res) {
     const file = await runtime.readJsonOrNull('memo/render/index.json');
     const today = vietnamDate(new Date());
     if (!file || file.value?.date !== today) {
-      return ok(res, {
-        index: {
-          schema_version: 'stockmind-render-index.v1',
-          date: today,
-          updated_at: null,
-          runs: []
-        },
-        index_sha: file?.sha || null
+      return sendJson(res, 200, {
+        ok: true,
+        data: {
+          index: {
+            schema_version: 'stockmind-render-index.v1',
+            date: today,
+            updated_at: null,
+            runs: []
+          },
+          index_sha: file?.sha || null
+        }
       });
     }
-    return ok(res, { index: file.value, index_sha: file.sha });
+    return sendJson(res, 200, {
+      ok: true,
+      data: { index: file.value, index_sha: file.sha }
+    });
   } catch (error) {
     return sendError(res, error);
   }
