@@ -60,6 +60,10 @@ assert.match(node6aTemplate, /HTML TEMPLATE \(LOCKED/);
 assert.match(node6aTemplate, /id="report"/);
 assert.match(node6bReport, /DOCUMENT STRUCTURE/);
 assert.match(node6bReport, /BÁO CÁO PHÂN TÍCH/);
+assert.doesNotMatch(node6aTemplate, /\[SCREEN_CRSM_STATUS\]/);
+assert.doesNotMatch(node6aTemplate, /\[SCREEN_CRSM_INTERPRETATION\]/);
+assert.doesNotMatch(node6bReport, /\[SCREEN_CRSM_STATUS\]/);
+assert.doesNotMatch(node6bReport, /\[SCREEN_CRSM_INTERPRETATION\]/);
 
 assert.match(admission, /stockmind-crsm-methodology/);
 assert.match(worker, /stockmind-crsm-methodology/);
