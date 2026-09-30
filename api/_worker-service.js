@@ -451,6 +451,8 @@ async function publishCompletedRun(runtime, request, status, now) {
     completed_at: snapshot.completed_at,
     tickers: items.map(item => item.ticker),
     item_count: items.length,
+    completed_count: items.length,
+    failed_count: 0,
     result_ref: renderPath
   };
   const runs = (index.runs || []).filter(run => run.run_id !== request.run_id);
