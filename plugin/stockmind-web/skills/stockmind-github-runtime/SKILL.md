@@ -29,13 +29,18 @@ Branch:
 Allowed namespace:
 `memo/`
 
-Canonical files:
+Canonical working files:
 - `memo/current.json`
-- `memo/index.json`
 - `memo/runs/<run_id>/request.json`
 - `memo/runs/<run_id>/status.json`
 - `memo/runs/<run_id>/evidence/<TICKER>/<document_id>.json`
 - `memo/runs/<run_id>/results/<TICKER>.json`
+
+Canonical rendered files:
+- `memo/render/index.json`
+- `memo/render/runs/<run_id>.json`
+
+Rendered retention is daily in `Asia/Ho_Chi_Minh`: append all completed runs from the same Vietnam calendar date; when the first completed run of a new date is published, expire the previous date's rendered run files and replace the render index with the new date.
 
 Never read/write Stockmind runtime state from another branch or namespace.
 
@@ -88,14 +93,19 @@ READY -> PROCESSING:
 - update `memo/current.json` to the same run state.
 
 Completion:
-- create `results/<TICKER>.json` only if absent;
+- create the working `results/<TICKER>.json` only if absent;
 - then update the target status item to COMPLETED with its result_ref;
 - update current state;
-- if the run is terminal, upsert one terminal summary into `memo/index.json`.
+- when every item is COMPLETED, publish one immutable daily render snapshot at `memo/render/runs/<run_id>.json`;
+- append that run to today's `memo/render/index.json`;
+- reset `memo/current.json` to EMPTY;
+- delete the completed run's request/status/evidence/working-result files.
+- if the Vietnam calendar date changed, expire the previous date's rendered snapshots before adding the new day's first snapshot.
 
 Failure:
 - update only the target PROCESSING item to FAILED with structured error data;
 - update current state;
-- if the run becomes terminal, update history.
+- keep the working payload so a later invocation can retry/resume;
+- do not publish a render snapshot until the run is fully COMPLETED.
 
 Completed result files are immutable. A valid pre-existing canonical result for a PROCESSING item is recovered as described above; it must never be replaced by a newly generated analysis.
