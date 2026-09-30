@@ -221,12 +221,292 @@ export function validateAnalysisResult(result) {
     if ('node6b' in result.outputs && typeof result.outputs.node6b !== 'string') {
       errors.push('outputs.node6b must be a string');
     }
+
+    if (isPlainObject(result.outputs.node1)) {
+      errors.push(...validateNode1Output(result.outputs.node1).map(error => 'outputs.node1: ' + error));
+    }
+    if (isPlainObject(result.outputs.node2)) {
+      errors.push(...validateNode2Output(result.outputs.node2).map(error => 'outputs.node2: ' + error));
+    }
+    if (isPlainObject(result.outputs.node3)) {
+      errors.push(...validateRequiredKeys(
+        result.outputs.node3,
+        ['data_period','screening_flags','screening_metrics_used','capital_efficiency','earnings_quality','earnings_sustainability','f_score','m_score','m_score_note','health_status','valuation','moat','conclusion']
+      ).map(error => 'outputs.node3: ' + error));
+    }
+    if (isPlainObject(result.outputs.node4)) {
+      errors.push(...validateRequiredKeys(
+        result.outputs.node4,
+        ['risk_regime','macro_indicators','company_specific_drivers','sensitivity_table','geopolitical_events','causal_chains','risk_scenarios','macro_view','industry_impact','company_impact','conclusion']
+      ).map(error => 'outputs.node4: ' + error));
+    }
+    if (isPlainObject(result.outputs.node5)) {
+      errors.push(...validateNode5Output(result.outputs.node5).map(error => 'outputs.node5: ' + error));
+    }
+    if (typeof result.outputs.node6a === 'string') {
+      errors.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
+    }
+    if (typeof result.outputs.node6b === 'string') {
+      errors.push(...validateNode6BReport(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
+    }
   }
 
   const decision = validateDecisionRecord(result.decision_record, result.ticker);
   errors.push(...decision.errors);
 
   return { valid: errors.length === 0, errors };
+}
+
+export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP', 'WATCH']);
+export const NODE2_COVERAGE_STATES = Object.freeze(['FULL', 'DEGRADED']);
+
+function validateNode1Output(node) {
+  return validateRequiredKeys(node, [
+    'ticker','sector_type','timestamp','data_period','analysis_mode','screening_metrics',
+    'screening_summary','trusted_screener_snapshot','screening_as_of','data_integrity',
+    'market_data','valuation_multiples','financial_core_raw','cost_of_capital_raw_inputs',
+    'ownership_insider','upcoming_events','anomaly_investigation','data_completion','sources'
+  ]);
+}
+
+function validateNode2Output(node) {
+  const errors = validateRequiredKeys(node, [
+    'technical_coverage','ohlcv_source','trend_status','sma_200_rel','volume_analysis',
+    'smart_money_phase','zones','sector_benchmark','sector_vs_market',
+    'screening_signal_analysis','signal_strength','conclusion'
+  ]);
+
+  const coverage = node.technical_coverage;
+  if (!isPlainObject(coverage)) {
+    errors.push('technical_coverage must be an object');
+  } else {
+    if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
+      errors.push('technical_coverage.status must be FULL or DEGRADED');
+    }
+    if (coverage.required_sessions !== 300) {
+      errors.push('technical_coverage.required_sessions must equal 300');
+    }
+    if (!(coverage.sessions_used == null || Number.isFinite(coverage.sessions_used))) {
+      errors.push('technical_coverage.sessions_used must be a finite number or null');
+    }
+    if (!Array.isArray(coverage.missing_capabilities)) {
+      errors.push('technical_coverage.missing_capabilities must be an array');
+    }
+    if (coverage.status === 'FULL' && coverage.missing_capabilities?.length) {
+      errors.push('FULL technical coverage cannot declare missing capabilities');
+    }
+    if (coverage.status === 'DEGRADED' && !coverage.missing_capabilities?.length) {
+      errors.push('DEGRADED technical coverage must name missing capabilities');
+    }
+  }
+
+  const ohlcv = node.ohlcv_source;
+  if (!isPlainObject(ohlcv)) {
+    errors.push('ohlcv_source must be an object');
+  } else {
+    requireString(ohlcv.source, 'ohlcv_source.source', errors);
+    if (!(ohlcv.sessions_used == null || Number.isFinite(ohlcv.sessions_used))) {
+      errors.push('ohlcv_source.sessions_used must be a finite number or null');
+    }
+    if (!('date_range' in ohlcv)) errors.push('ohlcv_source.date_range is required');
+  }
+
+  if (!isPlainObject(node.volume_analysis)) {
+    errors.push('volume_analysis must be an object');
+  } else {
+    for (const key of ['ratio','classification','vsa_signal_candidate','supporting_evidence']) {
+      if (!(key in node.volume_analysis)) errors.push('volume_analysis missing field: ' + key);
+    }
+  }
+
+  if (!isPlainObject(node.zones)) {
+    errors.push('zones must be an object');
+  } else {
+    for (const key of ['demand','supply','is_fresh']) {
+      if (!(key in node.zones)) errors.push('zones missing field: ' + key);
+    }
+  }
+
+  if (!isPlainObject(node.sector_benchmark)) {
+    errors.push('sector_benchmark must be an object');
+  } else {
+    for (const key of ['method','name','constituents_if_peer_basket','source','date']) {
+      if (!(key in node.sector_benchmark)) errors.push('sector_benchmark missing field: ' + key);
+    }
+  }
+
+  if (!isPlainObject(node.sector_vs_market)) {
+    errors.push('sector_vs_market must be an object');
+  } else {
+    for (const key of ['period','sector_perf_pct','vnindex_perf_pct','sector_strength_label']) {
+      if (!(key in node.sector_vs_market)) errors.push('sector_vs_market missing field: ' + key);
+    }
+  }
+
+  return errors;
+}
+
+function validateNode5Output(node) {
+  const errors = validateRequiredKeys(node, [
+    'ticker','data_period','scores','ai_score','confidence','conflict_detector',
+    'catalyst_horizon','decision','drivers','thesis_invalidation','trading_stop',
+    'liquidity_note','strategy','localized_upstream','full_reasoning'
+  ]);
+
+  if (!NODE5_DECISIONS.includes(node.decision)) {
+    errors.push('decision must be BUY, HOLD, SELL, BUY ON DIP, or WATCH');
+  }
+
+  if (!isPlainObject(node.scores)) {
+    errors.push('scores must be an object');
+  } else {
+    const keys = ['fundamental','valuation','technical','flow','sector_macro','risk'];
+    for (const key of keys) {
+      if (!Number.isFinite(node.scores[key]) || node.scores[key] < 0 || node.scores[key] > 20) {
+        errors.push('scores.' + key + ' must be a scalar number from 0 to 20');
+      }
+    }
+    if ('money_flow' in node.scores) errors.push('scores.money_flow is invalid; use scores.flow');
+  }
+
+  if (!isPlainObject(node.ai_score) || !Number.isFinite(node.ai_score.value)) {
+    errors.push('ai_score.value must be numeric');
+  } else if (node.ai_score.value < 0 || node.ai_score.value > 100) {
+    errors.push('ai_score.value must be from 0 to 100');
+  }
+  if (!isPlainObject(node.ai_score) || typeof node.ai_score.formula_shown !== 'string') {
+    errors.push('ai_score.formula_shown must be a string');
+  }
+
+  if (!isPlainObject(node.confidence) || !Number.isFinite(node.confidence.value)) {
+    errors.push('confidence.value must be numeric');
+  }
+  const confidenceKeys = [
+    'data_completeness','source_quality','cross_source_agreement',
+    'fundamental_consistency','technical_confirmation','macro_clarity'
+  ];
+  if (!isPlainObject(node.confidence?.components)) {
+    errors.push('confidence.components must be an object');
+  } else {
+    for (const key of confidenceKeys) {
+      if (!Number.isFinite(node.confidence.components[key])) {
+        errors.push('confidence.components.' + key + ' must be numeric');
+      }
+    }
+  }
+
+  if (!isPlainObject(node.conflict_detector)) {
+    errors.push('conflict_detector must be an object');
+  } else {
+    for (const key of ['fundamental','technical','macro','liquidity','signal_alignment','alignment','override_applied']) {
+      if (!(key in node.conflict_detector)) errors.push('conflict_detector missing field: ' + key);
+    }
+  }
+
+  if (!isPlainObject(node.catalyst_horizon)) {
+    errors.push('catalyst_horizon must be an object');
+  } else {
+    requireString(node.catalyst_horizon.nearest_catalyst, 'catalyst_horizon.nearest_catalyst', errors);
+    if (!['0-30d','30-90d','90-180d','>180d'].includes(node.catalyst_horizon.bucket)) {
+      errors.push('catalyst_horizon.bucket is invalid');
+    }
+  }
+
+  if (!Array.isArray(node.drivers) || node.drivers.length < 3) {
+    errors.push('drivers must contain at least 3 evidence-linked drivers');
+  }
+  if (typeof node.thesis_invalidation !== 'string' || !node.thesis_invalidation.trim()) {
+    errors.push('thesis_invalidation must be a non-empty string');
+  }
+
+  if (!isPlainObject(node.trading_stop)) {
+    errors.push('trading_stop must be an object');
+  } else {
+    if (!('price' in node.trading_stop)) errors.push('trading_stop.price is required');
+    requireString(node.trading_stop.basis, 'trading_stop.basis', errors);
+  }
+
+  if (!isPlainObject(node.strategy)) {
+    errors.push('strategy must be an object');
+  } else {
+    for (const key of [
+      'entry_zone','allocation_plan','tp1','tp2','risk_per_trade_pct_nav',
+      'position_size_note','max_portfolio_weight_pct','position_type'
+    ]) {
+      if (!(key in node.strategy)) errors.push('strategy missing field: ' + key);
+    }
+    if (!isPlainObject(node.strategy.allocation_plan) || !Array.isArray(node.strategy.allocation_plan?.steps)) {
+      errors.push('strategy.allocation_plan must contain steps[]');
+    }
+    for (const key of ['tp1','tp2']) {
+      if (!isPlainObject(node.strategy[key]) || !('price' in node.strategy[key])) {
+        errors.push('strategy.' + key + ' must be an object with price');
+      }
+      if (!isPlainObject(node.strategy[key]) || typeof node.strategy[key].rationale !== 'string') {
+        errors.push('strategy.' + key + '.rationale must be a string');
+      }
+    }
+    if (!['Initial','Add-on'].includes(node.strategy.position_type)) {
+      errors.push('strategy.position_type must be Initial or Add-on');
+    }
+  }
+
+  return errors;
+}
+
+function validateNode6AReport(html) {
+  const errors = [];
+  const requiredMarkers = [
+    '<div id="report"',
+    'hero-card',
+    'metric-card',
+    'sub-card',
+    'tailwind.config',
+    'BÁO CÁO PHÂN TÍCH CHUYÊN SÂU'
+  ];
+  for (const marker of requiredMarkers) {
+    if (!html.includes(marker)) errors.push('locked template marker missing: ' + marker);
+  }
+  if (/\[(?:TICKER|AI_SCORE|CONFIDENCE|PLACEHOLDER|DECISION)\]/.test(html)) {
+    errors.push('unresolved locked-template placeholder remains');
+  }
+  if (/^\s*<article[\s>]/i.test(html)) {
+    errors.push('free-form article layout is invalid; locked Node6A template is required');
+  }
+  return errors;
+}
+
+function validateNode6BReport(markdown) {
+  const errors = [];
+  const requiredSections = [
+    '## 1. Quyết định đầu tư',
+    'Tín hiệu tổng hợp',
+    'Vĩ mô',
+    'Doanh nghiệp',
+    'Định giá',
+    'Kỹ thuật',
+    'Rủi ro',
+    'Phân tích nhân quả',
+    'Kịch bản',
+    'Chiến lược giao dịch',
+    'Nguồn dữ liệu'
+  ];
+  for (const section of requiredSections) {
+    if (!markdown.includes(section)) errors.push('full-report section missing: ' + section);
+  }
+  const tableSeparators = (markdown.match(/\|\s*---/g) || []).length;
+  if (tableSeparators < 3) {
+    errors.push('full report must contain at least 3 Markdown tables (peer, sensitivity/scenario, sources)');
+  }
+  return errors;
+}
+
+function validateRequiredKeys(value, keys) {
+  const errors = [];
+  for (const key of keys) {
+    if (!(key in value)) errors.push('missing field: ' + key);
+  }
+  return errors;
 }
 
 export function assertValidAnalysisRequest(request) {

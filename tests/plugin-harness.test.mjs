@@ -15,6 +15,8 @@ const githubRuntime = read('skills/stockmind-github-runtime/SKILL.md');
 const worker = read('skills/stockmind-worker-loop/SKILL.md');
 const methodology = read('skills/stockmind-crsm-methodology/SKILL.md');
 const methodologyRef = read('skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md');
+const node6aTemplate = read('skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md');
+const node6bReport = read('skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md');
 const resultContract = read('skills/stockmind-result-contract/SKILL.md');
 
 assert.equal(
@@ -50,6 +52,14 @@ assert.match(methodologyRef, /do not output `screen_vs_crsm`/);
 assert.match(methodologyRef, /legacy Node 7 side effect/);
 assert.match(methodologyRef, /decision_record/);
 assert.match(methodology, /node1\.\.node6b/);
+assert.match(methodology, /NODE6A-LOCKED-TEMPLATE\.md/);
+assert.match(methodology, /NODE6B-FULL-REPORT\.md/);
+assert.match(methodologyRef, /technical_coverage/);
+assert.match(methodologyRef, /DEGRADED/);
+assert.match(node6aTemplate, /HTML TEMPLATE \(LOCKED/);
+assert.match(node6aTemplate, /id="report"/);
+assert.match(node6bReport, /DOCUMENT STRUCTURE/);
+assert.match(node6bReport, /BÁO CÁO PHÂN TÍCH/);
 
 assert.match(admission, /stockmind-crsm-methodology/);
 assert.match(worker, /stockmind-crsm-methodology/);
@@ -66,6 +76,8 @@ assert.match(methodology, /runLLM\(\).*Do \*\*not\*\* reproduce that layer/s);
 assert.match(methodology, /Do not use browser model-provider API keys/);
 assert.doesNotMatch(admission, /custom MCP/i);
 assert.match(resultContract, /repository result is the durable output|analysis destination is GitHub/i);
+assert.match(resultContract, /NODE6A-LOCKED-TEMPLATE\.md/);
+assert.match(resultContract, /NODE6B-FULL-REPORT\.md/);
 
 const prohibited = [
   'choose the next ticker',

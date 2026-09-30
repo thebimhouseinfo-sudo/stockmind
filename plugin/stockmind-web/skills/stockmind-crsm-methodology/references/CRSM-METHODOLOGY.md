@@ -157,6 +157,7 @@ Compute/analyze:
 Never claim institutional activity from volume alone. Use "candidate" language unless direct evidence exists.
 
 Node 2 output must include:
+- `technical_coverage {status,required_sessions,sessions_used,missing_capabilities,note}` where `status` is `FULL` or `DEGRADED`; `required_sessions` is 300; if fewer than ~300 daily sessions are verified or a quantified sector-vs-VNINDEX comparison is unavailable, status must be `DEGRADED` and the missing capability must be named explicitly.
 - `ohlcv_source {source,sessions_used,date_range}`
 - `trend_status`
 - `sma_200_rel`
@@ -379,6 +380,8 @@ Top 3 drivers should tie to actual upstream evidence/numbers.
 
 ### Node 5 output contract
 
+The following shape is strict. Do not rename `flow` to `money_flow`, do not wrap score scalars in `{value,max}`, do not emit an out-of-enum decision such as `WAIT_FOR_ENTRY`, and do not collapse structured objects into strings.
+
 ```json
 {
   "ticker": "",
@@ -447,6 +450,8 @@ Top 3 drivers should tie to actual upstream evidence/numbers.
 
 Role: report renderer, not an analyst.
 
+Mandatory renderer source: `references/NODE6A-LOCKED-TEMPLATE.md`. Preserve its report DOM hierarchy and visual class/CSS system as the baseline. Populate it from Node 1–5 instead of generating a new short-form layout. Current architecture overrides still apply: remove/omit any legacy screen-vs-CRSM score-comparison semantics while preserving the surrounding visual structure.
+
 Input: completed Node1–5 outputs.
 
 Requirements:
@@ -471,6 +476,8 @@ No unresolved placeholder token such as `[TICKER]`, `[AI_SCORE]`, or `[PLACEHOLD
 ## Stage 5B — Node 6B: Detail Markdown
 
 Role: Word-ready detailed report writer, not a new analytical node.
+
+Mandatory report source: `references/NODE6B-FULL-REPORT.md`. Follow its detailed Word-ready structure and tables. A condensed executive summary is not a valid Node 6B output.
 
 Input: same completed Node1–5 outputs.
 

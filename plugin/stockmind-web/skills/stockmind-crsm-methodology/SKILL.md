@@ -7,7 +7,12 @@ description: Mandatory CRSM analytical methodology for each actionable Stockmind
 
 This skill is mandatory after `stockmind-worker-loop` selects/claims one canonical item and before `stockmind-result-contract` writes its result.
 
-Read `references/CRSM-METHODOLOGY.md` for the exact current methodology and output contracts before analyzing a ticker.
+Before analyzing a ticker, read all three mandatory references:
+- `references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
+- `references/NODE6A-LOCKED-TEMPLATE.md` — locked Visual Report DOM/CSS/template. Node 6A must populate this template; it must not invent a replacement layout.
+- `references/NODE6B-FULL-REPORT.md` — full Word-ready detailed report contract. Node 6B must satisfy its detailed section/table requirements; an executive-summary substitute is invalid.
+
+When a legacy report reference conflicts with `CRSM-METHODOLOGY.md` (for example legacy `screen_vs_crsm` comparison text), the current methodology wins semantically, but the locked visual layout remains the rendering baseline.
 
 ## Core architecture
 
@@ -134,6 +139,10 @@ Do not run or emulate legacy Node7 localStorage append behavior.
 
 Before calling the GitHub write flow:
 - all `node1..node6b` outputs exist and are non-null;
+- Node 2 explicitly declares technical coverage (`FULL` or `DEGRADED`) and, when degraded, names each missing mandatory capability (for example ~300-session OHLCV/SMA200 or quantified sector-vs-VNINDEX benchmark) and lowers technical confirmation/confidence rather than silently treating it as complete;
+- Node 5 follows the exact current schema: fixed decision enum, scalar six-factor scores with key `flow`, structured `catalyst_horizon`, complete `conflict_detector`, complete `strategy` including allocation/position sizing fields;
+- Node 6A preserves the locked template structure/visual classes and contains the required visual sections; a short free-form `<article>` is invalid;
+- Node 6B contains the full detailed report sections and real peer/sensitivity/source tables; a short summary is invalid;
 - node6a is raw HTML string;
 - node6b is Markdown string;
 - decision_record contains all 11 canonical fields;

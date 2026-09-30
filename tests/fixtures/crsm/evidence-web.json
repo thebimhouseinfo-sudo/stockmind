@@ -33,7 +33,9 @@
     "checksum": "fixture-sha256-hpg",
     "size": 1024,
     "repository_path": "memo/runs/run-evidence-001/evidence/HPG/doc-hpg-annual-report.json",
-    "routing_metadata": {"source": "user_upload"},
+    "routing_metadata": {
+      "source": "user_upload"
+    },
     "extracted_content": "Fixture evidence for HPG."
   },
   "result": {
@@ -44,13 +46,190 @@
     "ticker": "HPG",
     "analysis_source": "EVIDENCE_WEB",
     "outputs": {
-      "node1": {"company_name": "Hoa Phat Group", "market_data": {"price": {"value": 25}}},
-      "node2": {"trend_status": "RANGE"},
-      "node3": {"moat": "Integrated steel producer"},
-      "node4": {"macro_view": "Construction cycle sensitive"},
-      "node5": {"decision": "WATCH", "ai_score": {"value": 63}, "confidence": {"value": 68}, "strategy": {"entry_zone": "23-24", "tp1": 28, "tp2": 31}, "trading_stop": {"price": 21.5}, "thesis_invalidation": "Steel spread compresses materially"},
-      "node6a": "<html><body>HPG visual report fixture</body></html>",
-      "node6b": "# Báo cáo HPG\nFixture"
+      "node1": {
+        "ticker": "HPG",
+        "sector_type": "TEST",
+        "timestamp": "2026-09-30T00:00:00Z",
+        "data_period": "fixture",
+        "analysis_mode": "DIRECT",
+        "screening_metrics": null,
+        "screening_summary": null,
+        "trusted_screener_snapshot": null,
+        "screening_as_of": null,
+        "data_integrity": null,
+        "market_data": {
+          "price": {
+            "value": 25
+          }
+        },
+        "valuation_multiples": {},
+        "financial_core_raw": {},
+        "cost_of_capital_raw_inputs": {},
+        "ownership_insider": {},
+        "upcoming_events": [],
+        "anomaly_investigation": [],
+        "data_completion": {
+          "provided_by_screening": [],
+          "new_data_collected": [],
+          "still_missing": []
+        },
+        "sources": []
+      },
+      "node2": {
+        "technical_coverage": {
+          "status": "FULL",
+          "required_sessions": 300,
+          "sessions_used": 300,
+          "missing_capabilities": [],
+          "note": "fixture"
+        },
+        "ohlcv_source": {
+          "source": "fixture",
+          "sessions_used": 300,
+          "date_range": "fixture"
+        },
+        "trend_status": "RANGE",
+        "sma_200_rel": "ABOVE",
+        "volume_analysis": {
+          "ratio": 1.2,
+          "classification": "Normal",
+          "vsa_signal_candidate": "none",
+          "supporting_evidence": []
+        },
+        "smart_money_phase": "neutral",
+        "zones": {
+          "demand": "fixture",
+          "supply": "fixture",
+          "is_fresh": true
+        },
+        "sector_benchmark": {
+          "method": "peer_basket",
+          "name": "fixture peers",
+          "constituents_if_peer_basket": [
+            "AAA",
+            "BBB",
+            "CCC"
+          ],
+          "source": "fixture",
+          "date": "2026-09-30"
+        },
+        "sector_vs_market": {
+          "period": "3m",
+          "sector_perf_pct": 1,
+          "vnindex_perf_pct": 0,
+          "sector_strength_label": "neutral"
+        },
+        "screening_signal_analysis": null,
+        "signal_strength": 10,
+        "conclusion": "fixture"
+      },
+      "node3": {
+        "data_period": "fixture",
+        "screening_flags": [],
+        "screening_metrics_used": {},
+        "capital_efficiency": {},
+        "earnings_quality": {},
+        "earnings_sustainability": {},
+        "f_score": null,
+        "m_score": null,
+        "m_score_note": "",
+        "health_status": {},
+        "valuation": {},
+        "moat": "Integrated steel producer",
+        "conclusion": "fixture"
+      },
+      "node4": {
+        "risk_regime": "neutral",
+        "macro_indicators": {},
+        "company_specific_drivers": [],
+        "sensitivity_table": [],
+        "geopolitical_events": [],
+        "causal_chains": [],
+        "risk_scenarios": {},
+        "macro_view": "Construction cycle sensitive",
+        "industry_impact": "fixture",
+        "company_impact": "fixture",
+        "conclusion": "fixture"
+      },
+      "node5": {
+        "ticker": "HPG",
+        "data_period": "fixture",
+        "scores": {
+          "fundamental": 14,
+          "valuation": 14,
+          "technical": 14,
+          "flow": 14,
+          "sector_macro": 14,
+          "risk": 14
+        },
+        "ai_score": {
+          "value": 63,
+          "formula_shown": "Fundamental/20×30 + Valuation/20×20 + Technical/20×15 + Flow/20×15 + Sector_Macro/20×10 + Risk/20×10"
+        },
+        "confidence": {
+          "value": 68,
+          "components": {
+            "data_completeness": 80,
+            "source_quality": 80,
+            "cross_source_agreement": 80,
+            "fundamental_consistency": 80,
+            "technical_confirmation": 80,
+            "macro_clarity": 80
+          }
+        },
+        "conflict_detector": {
+          "fundamental": "🟢",
+          "technical": "🟢",
+          "macro": "🟡",
+          "liquidity": "🟢",
+          "signal_alignment": "3/4",
+          "alignment": "3/4",
+          "override_applied": ""
+        },
+        "catalyst_horizon": {
+          "nearest_catalyst": "fixture catalyst",
+          "bucket": "30-90d"
+        },
+        "decision": "WATCH",
+        "drivers": [
+          "driver 1: 1",
+          "driver 2: 2",
+          "driver 3: 3"
+        ],
+        "thesis_invalidation": "Steel spread compresses materially",
+        "trading_stop": {
+          "price": 21.5,
+          "basis": "fixture technical basis"
+        },
+        "liquidity_note": "fixture liquidity",
+        "strategy": {
+          "entry_zone": "23-24",
+          "allocation_plan": {
+            "note": "fixture",
+            "steps": [
+              "step 1",
+              "step 2",
+              "step 3"
+            ]
+          },
+          "tp1": {
+            "price": 28,
+            "rationale": "fixture"
+          },
+          "tp2": {
+            "price": 31,
+            "rationale": "fixture"
+          },
+          "risk_per_trade_pct_nav": 1,
+          "position_size_note": "fixture",
+          "max_portfolio_weight_pct": 10,
+          "position_type": "Initial"
+        },
+        "localized_upstream": {},
+        "full_reasoning": "fixture reasoning"
+      },
+      "node6a": "<!DOCTYPE html><html lang=\"vi\"><head><script>tailwind.config={}</script><style>.hero-card{}.metric-card{}.sub-card{}</style></head><body><div id=\"report\"><h1>BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><div class=\"hero-card\">Decision</div><div class=\"metric-card\">Metric</div><div class=\"sub-card\">Detail</div></div></body></html>",
+      "node6b": "# BÁO CÁO PHÂN TÍCH HPG\n## 1. Quyết định đầu tư\nFixture.\n## 2. Tín hiệu tổng hợp\nFixture.\n## 3. Vĩ mô & Ngành\nFixture.\n## 4. Doanh nghiệp & Chất lượng lợi nhuận\nFixture.\n## 5. Định giá & So sánh peer\n| Peer | P/E |\n| --- | --- |\n| AAA | 10 |\n## 6. Kỹ thuật & Dòng tiền\nFixture.\n## 7. Rủi ro\nFixture.\n## 8. Phân tích nhân quả FACT / INFERENCE / ASSUMPTION\n| FACT | INFERENCE | ASSUMPTION |\n| --- | --- | --- |\n| A | B | C |\n## 9. Kịch bản\nFixture.\n## 10. Chiến lược giao dịch & Quản trị vị thế\nFixture.\n## 11. Nguồn dữ liệu\n| Nguồn | Ngày |\n| --- | --- |\n| Fixture | 2026-09-30 |\n"
     },
     "decision_record": {
       "date": "29/09/2026",

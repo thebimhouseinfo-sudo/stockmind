@@ -90,4 +90,37 @@ const mismatchedDecisionTicker = structuredClone(webOnly.result);
 mismatchedDecisionTicker.decision_record.ticker = 'VCB';
 assert.equal(validateAnalysisResult(mismatchedDecisionTicker).valid, false);
 
+const driftedNode5 = structuredClone(screened.result);
+driftedNode5.outputs.node5.scores.money_flow = driftedNode5.outputs.node5.scores.flow;
+delete driftedNode5.outputs.node5.scores.flow;
+driftedNode5.outputs.node5.decision = 'WAIT_FOR_ENTRY';
+driftedNode5.outputs.node5.catalyst_horizon = '30-90d';
+driftedNode5.outputs.node5.thesis_invalidation = ['array is not canonical'];
+const driftedNode5Check = validateAnalysisResult(driftedNode5);
+assert.equal(driftedNode5Check.valid, false);
+assert.ok(driftedNode5Check.errors.some(error => error.includes('scores.flow')));
+assert.ok(driftedNode5Check.errors.some(error => error.includes('decision must be')));
+assert.ok(driftedNode5Check.errors.some(error => error.includes('catalyst_horizon must be an object')));
+assert.ok(driftedNode5Check.errors.some(error => error.includes('thesis_invalidation must be')));
+
+const degradedWithoutDisclosure = structuredClone(screened.result);
+degradedWithoutDisclosure.outputs.node2.technical_coverage = {
+  status: 'DEGRADED',
+  required_sessions: 300,
+  sessions_used: 42,
+  missing_capabilities: [],
+  note: 'missing OHLCV'
+};
+const degradedCheck = validateAnalysisResult(degradedWithoutDisclosure);
+assert.equal(degradedCheck.valid, false);
+assert.ok(degradedCheck.errors.some(error => error.includes('must name missing capabilities')));
+
+const freeformVisual = structuredClone(screened.result);
+freeformVisual.outputs.node6a = '<article><h1>Short report</h1></article>';
+assert.equal(validateAnalysisResult(freeformVisual).valid, false);
+
+const shortDetail = structuredClone(screened.result);
+shortDetail.outputs.node6b = '# NT2\nShort summary';
+assert.equal(validateAnalysisResult(shortDetail).valid, false);
+
 console.log('CRSM migration contract tests passed.');
