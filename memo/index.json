@@ -1,5 +1,22 @@
 {
   "schema_version": "stockmind-memo.v1",
-  "updated_at": null,
-  "runs": []
+  "updated_at": "2026-09-30T18:19:48.993Z",
+  "runs": [
+    {
+      "run_id": "run-20260930T180927147Z-4bpkbr95",
+      "state": "COMPLETED",
+      "created_at": "2026-09-30T18:09:27.974Z",
+      "completed_at": "2026-09-30T18:19:48.993Z",
+      "item_count": 3,
+      "completed_count": 3,
+      "failed_count": 0,
+      "tickers": [
+        "NT2",
+        "VHM",
+        "FPT"
+      ],
+      "status_ref": "memo/runs/run-20260930T180927147Z-4bpkbr95/status.json",
+      "request_ref": "memo/runs/run-20260930T180927147Z-4bpkbr95/request.json"
+    }
+  ]
 }
