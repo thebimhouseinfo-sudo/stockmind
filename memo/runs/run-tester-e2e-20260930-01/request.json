@@ -1,0 +1,31 @@
+{
+  "request_version": "crsm-request.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-tester-e2e-20260930-01",
+  "created_at": "2026-09-30T13:58:00.000Z",
+  "items": [
+    {
+      "item_id": "item-vcb-tester",
+      "ticker": "VCB",
+      "analysis_source": "SCREENED_WEB",
+      "screening_context": {
+        "source": "StockScreenerV2",
+        "ticker": "VCB",
+        "screening_as_of": "2026-09-29",
+        "screening_summary": {
+          "screen_score": 78,
+          "screen_rank": 1,
+          "screen_grade": "A"
+        }
+      },
+      "evidence_refs": []
+    },
+    {
+      "item_id": "item-fpt-tester",
+      "ticker": "FPT",
+      "analysis_source": "WEB_ONLY",
+      "screening_context": null,
+      "evidence_refs": []
+    }
+  ]
+}
