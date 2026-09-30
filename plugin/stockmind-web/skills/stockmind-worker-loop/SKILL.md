@@ -29,7 +29,7 @@ Repeat until no actionable item remains:
 5. Load the item's canonical source inputs only when analysis is still required.
 6. Load and execute `stockmind-crsm-methodology` for exactly that ticker.
 7. Build a contract-valid immutable result using the methodology outputs and `stockmind-result-contract`.
-8. Commit result/status/current/history through GitHub.
+8. Commit the working result/status/current through GitHub. When the full run completes, publish the current-day render snapshot/index and clean the completed working payload.
 9. Re-read current/request/status.
 10. Continue automatically to the next actionable item.
 
