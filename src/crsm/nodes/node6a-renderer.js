@@ -33,7 +33,7 @@ export function renderNode6A(ctx) {
 <html lang="vi">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Báo Cáo Phân Tích ${escapeHtml(ctx.ticker)} | Senior Equity Analyst</title>
+<title>Báo Cáo Phân Tích ${escapeHtml(ctx.ticker)} | Phân tích cổ phiếu chuyên sâu</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
