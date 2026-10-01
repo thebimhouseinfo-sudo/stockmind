@@ -42,7 +42,21 @@ A strong model is expected to add judgment, prioritization and causal synthesis 
 
 ### Reader-language rule
 
-All reader-facing prose must be natural Vietnamese. English is allowed only for unavoidable proper nouns, source titles, tickers and standard finance abbreviations such as EBITDA, DCF, WACC, ROIC, FCF, VSA, SMA200. Do not alternate English/Vietnamese headings or repeat the same point in both languages.
+All reader-facing prose must be natural Vietnamese. English is allowed only for unavoidable proper nouns, source titles, tickers, fixed machine enums, formulas and standard finance abbreviations such as EBITDA, DCF, WACC, ROIC, FCF, VSA, SMA200. Do not alternate English/Vietnamese headings or repeat the same point in both languages.
+
+### Mandatory Vietnamese normalization pass
+
+After Node 5 is complete and **before** Node 6B/result construction, scan every reader-facing string leaf in `node1..node5`. Rewrite any English sentence or mixed English-Vietnamese prose into natural Vietnamese while preserving:
+- all numeric values, percentages, dates, prices and units;
+- tickers, company/product names and source titles;
+- machine enums such as `FULL`, `DEGRADED`, `BUY`, `HOLD`, `SELL`, `BUY ON DIP`, `WATCH`;
+- standard finance/technical abbreviations and formulas.
+
+This is a semantic rewrite, not a literal word-replacement pass. A field such as `macro_view`, `industry_impact`, `company_impact`, `risk_regime`, `catalyst_horizon.nearest_catalyst`, `trading_stop.basis`, TP rationales, scenario conditions, technical notes, VSA notes, risk notes or causal-chain text must not remain as a full English sentence merely because the renderer can display it.
+
+Do not rely on `localized_upstream` as an escape hatch. Prefer storing Vietnamese directly in the canonical Node fields. Use `localized_upstream` only for compatibility when an upstream machine/source value cannot be rewritten safely.
+
+Before write, re-read Node 2–5 prose once specifically for language consistency. If a reader-facing sentence is still English or awkwardly code-switched, repair it in memory before creating the immutable result.
 
 ## Per-ticker dependency graph
 
@@ -57,6 +71,7 @@ canonical request/evidence
   -> Node 3 Deep Fundamentals & Valuation
   -> Node 4 Macro & Causal
   -> Node 5 CIO Decision
+  -> Vietnamese normalization pass across Node 1–5
   -> Node 6B Detail Markdown
   -> immutable crsm-result.v1 + decision_record
   -> deterministic web Visual Report from Node 1–5
@@ -169,6 +184,7 @@ Before calling the GitHub write flow:
 - `node1..node5` outputs exist and are non-null;
 - Node 2 explicitly declares technical coverage (`FULL` or `DEGRADED`) and, when degraded, names each missing mandatory capability instead of silently treating it as complete;
 - Node 5 preserves its canonical machine identity and decision enum. Missing analytical inputs may remain null and must lower confidence or route to WATCH rather than being fabricated;
+- Node 1–5 reader-facing prose has completed the mandatory Vietnamese normalization pass; remaining English is limited to allowed proper nouns, source titles, enums, formulas and standard abbreviations;
 - Node 6B should be a substantive Vietnamese Markdown report, but presentation defects are soft and recoverable;
 - decision_record contains all 11 canonical fields and is derived from Node 1 + Node 5;
 - ticker/item/run/source identity matches request;

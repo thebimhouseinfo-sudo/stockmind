@@ -40,6 +40,8 @@ The Visual Report HTML is not model-owned result content. The webapp determinist
 
 Do not write a result that merely has the right top-level keys. Before completion, re-check the exact nested contract and renderer markers. If the result would be rejected by the repository validator, repair the in-memory result before attempting the canonical write; never weaken the hard identity/source/schema validator or omit report sections to make it pass.
 
+Before the immutable write, also run the CRSM methodology's **mandatory Vietnamese normalization pass**. Reader-facing prose in Node 1–5 must already be natural Vietnamese; the renderer is not a translation engine. Full English sentences in report-facing fields must be rewritten before write while preserving numbers, sources, proper nouns, machine enums, formulas and standard finance abbreviations.
+
 ## Hard vs soft consistency
 
 CRSM is an evidence-driven analytical workflow, not a deterministic math proof.
@@ -55,12 +57,15 @@ CRSM is an evidence-driven analytical workflow, not a deterministic math proof.
 
 Missing analytical inputs are not hard failures by themselves. They may remain null when honestly unavailable and must reduce confidence, be disclosed, and if material may justify WATCH rather than fabricated precision.
 
-**Soft analytical/presentation consistency** must not fail an otherwise valid ticker:
+**Soft analytical/presentation consistency** must not fail an otherwise valid ticker, but should be repaired in memory before a new immutable write when possible:
 - prose wording or qualitative interpretation differs slightly between nodes;
 - Node 6B repeats a score/decision/confidence differently from Node 5;
 - optional display data is unavailable;
 - Node 6B misses a heading/table or has imperfect formatting;
-- a legacy Node 6A HTML payload is malformed or absent.
+- a legacy Node 6A HTML payload is malformed or absent;
+- isolated language drift remains in non-identity prose.
+
+Language drift is soft for recovery of an already immutable result, but for a **new** result the worker should normalize it before write instead of knowingly publishing mixed-language prose.
 
 Node 5 + decision_record are canonical for final decision fields. Node 6B is narrative only. The deterministic web renderer owns the Visual Report and normalizes presentation from Node 1–5. Presentation defects should surface as warnings/fallback, not analytical failure.
 
