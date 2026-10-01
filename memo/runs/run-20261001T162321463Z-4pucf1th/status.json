@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261001T162321463Z-4pucf1th",
-  "state": "PROCESSING",
+  "state": "COMPLETED",
   "created_at": "2026-10-01T16:23:23.178Z",
-  "updated_at": "2026-10-01T16:32:00.000Z",
+  "updated_at": "2026-10-01T16:38:00.000Z",
   "items": [
     {
       "item_id": "item-8294535e-d955-4d48-bfa0-547a3e0f7ef2",
@@ -20,12 +20,12 @@
       "item_id": "item-119bb638-38fe-46b3-acc3-63c8707768cb",
       "ticker": "CTR",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261001T162321463Z-4pucf1th/results/CTR.json",
       "started_at": "2026-10-01T16:32:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-01T16:32:00.000Z"
+      "completed_at": "2026-10-01T16:38:00.000Z",
+      "updated_at": "2026-10-01T16:38:00.000Z"
     }
   ]
 }
