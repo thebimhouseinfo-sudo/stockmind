@@ -9,12 +9,9 @@
       "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
       "ticker": "NT2",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result was created with Node5 AI score 72.8 but Node6A rendered a different AI score. Manual repair is required; result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/NT2.json",
       "started_at": "2026-10-01T15:00:00.000Z",
       "completed_at": "2026-10-01T15:08:00.000Z",
       "updated_at": "2026-10-01T15:08:00.000Z"
@@ -23,12 +20,9 @@
       "item_id": "item-6882e794-9737-4670-a781-6c443f902a28",
       "ticker": "HAG",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/HAG.json",
       "started_at": "2026-10-01T15:08:00.000Z",
       "completed_at": "2026-10-01T16:05:00.000Z",
       "updated_at": "2026-10-01T16:05:00.000Z"
@@ -37,12 +31,9 @@
       "item_id": "item-88d6325d-42c5-47e0-909c-4806d3c4bb08",
       "ticker": "VHM",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/VHM.json",
       "started_at": "2026-10-01T15:16:00.000Z",
       "completed_at": "2026-10-01T16:05:00.000Z",
       "updated_at": "2026-10-01T16:05:00.000Z"
@@ -51,12 +42,9 @@
       "item_id": "item-bfe390c0-bb9e-4552-91a8-34d86bca9f5f",
       "ticker": "GMD",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/GMD.json",
       "started_at": "2026-10-01T15:24:00.000Z",
       "completed_at": "2026-10-01T16:05:00.000Z",
       "updated_at": "2026-10-01T16:05:00.000Z"
@@ -65,12 +53,9 @@
       "item_id": "item-068c7771-7ec6-4542-a6aa-2bb4bf950bad",
       "ticker": "DXP",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/DXP.json",
       "started_at": "2026-10-01T15:35:00.000Z",
       "completed_at": "2026-10-01T16:05:00.000Z",
       "updated_at": "2026-10-01T16:05:00.000Z"
@@ -79,12 +64,9 @@
       "item_id": "item-6d93c119-9c62-4d8c-b198-04eee7b4b6a2",
       "ticker": "KSF",
       "analysis_source": "SCREENED_WEB",
-      "state": "FAILED",
-      "error": {
-        "code": "RESULT_RECOVERY_CONFLICT",
-        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
-      },
-      "result_ref": null,
+      "state": "COMPLETED",
+      "error": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/KSF.json",
       "started_at": "2026-10-01T15:46:00.000Z",
       "completed_at": "2026-10-01T16:05:00.000Z",
       "updated_at": "2026-10-01T16:05:00.000Z"
