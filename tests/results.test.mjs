@@ -23,6 +23,7 @@ for (const fixture of [screened, evidence, webOnly]) {
   assert.match(adapted.visualReport, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
   assert.match(adapted.visualReport, new RegExp(fixture.result.ticker));
   assert.match(adapted.visualReport, new RegExp(String(fixture.result.outputs.node5.ai_score.value)));
+  assert.doesNotMatch(adapted.visualReport, /Senior Equity Analyst|Key Insight|Volume Ratio|BULL CASE|BASE CASE|BEAR CASE|Target Price|Position Sizing/);
   assert.equal(adapted.detailReport, fixture.result.outputs.node6b);
   assert.equal(adapted.decisionRecord.ticker, fixture.result.ticker);
 }
@@ -91,6 +92,13 @@ const renderSnapshot = normalizeRenderSnapshot({
 assert.equal(renderSnapshot.run_id, screened.request.run_id);
 assert.equal(renderSnapshot.items[0].state, 'COMPLETED');
 assert.equal(renderSnapshot.items[0].result.ticker, screened.result.ticker);
+
+const missingDetail = structuredClone(screened.result);
+delete missingDetail.outputs.node6b;
+const adaptedMissingDetail = adaptMemoResult(missingDetail);
+assert.match(adaptedMissingDetail.detailReport, /BÁO CÁO PHÂN TÍCH VCB/);
+assert.match(adaptedMissingDetail.detailReport, /bản phục hồi deterministic/);
+assert.ok(adaptedMissingDetail.validationWarnings.some(warning => warning.includes('node6b')));
 
 
 const rendered = renderResultsPage({
