@@ -34,7 +34,10 @@ const webOnly = JSON.parse(readFileSync(new URL('./fixtures/crsm/web-only.json',
 for (const fixture of [screened, evidence, webOnly]) {
   const adapted = adaptMemoResult(fixture.result);
   assert.equal(adapted.ticker, fixture.result.ticker);
-  assert.equal(adapted.visualReport, fixture.result.outputs.node6a);
+  assert.match(adapted.visualReport, /^<!DOCTYPE html>/);
+  assert.match(adapted.visualReport, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
+  assert.match(adapted.visualReport, new RegExp(fixture.result.ticker));
+  assert.match(adapted.visualReport, new RegExp(String(fixture.result.outputs.node5.ai_score.value)));
   assert.equal(adapted.detailReport, fixture.result.outputs.node6b);
   assert.equal(adapted.decisionRecord.ticker, fixture.result.ticker);
 }
