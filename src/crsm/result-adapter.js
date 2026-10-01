@@ -1,5 +1,6 @@
 import { validateAnalysisResult } from './contracts.js';
 import { decisionLabel } from './nodes/render-common.js';
+import { renderNode6A } from './nodes/node6a-renderer.js';
 
 export const RESULT_SOURCE_LABELS = Object.freeze({
   SCREENED_WEB: 'Screener + Web',
@@ -34,7 +35,15 @@ export function adaptMemoResult(input) {
     tp1: decision.tp1,
     tp2: decision.tp2,
     thesisInvalidation: decision.thesis_invalidation,
-    visualReport: normalizeVisualReportHtml(result.outputs.node6a, result),
+    visualReport: renderNode6A({
+      ticker: result.ticker,
+      mode: result.analysis_source === 'SCREENED_WEB' ? 'SCREENED' : 'DIRECT',
+      screeningContext: result.outputs?.node1?.trusted_screener_snapshot
+        ?? result.outputs?.node1?.screening_context
+        ?? null,
+      sectorType: result.outputs?.node1?.sector_type ?? null,
+      outputs: result.outputs
+    }),
     detailReport: result.outputs.node6b,
     decisionRecord: { ...decision },
     outputs: result.outputs,
