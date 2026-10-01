@@ -1,5 +1,3 @@
-import { renderSettings, bindSettingsEvents } from './crsm/ui/settings.js';
-
 const DATA_KEY = 'stock-mind.dataset.v1';
 let observerScheduled = false;
 let activeDashboardGroup = 'CORE';
@@ -189,35 +187,6 @@ function enhanceRankingPage() {
 function requestAnalyze(tickers) {
   document.dispatchEvent(new CustomEvent('stockmind:analyze-tickers', { detail: { tickers } }));
 }
-
-function openSettingsOverlay() {
-  if (document.getElementById('settingsOverlay')) return;
-  const overlay = document.createElement('div');
-  overlay.id = 'settingsOverlay';
-  overlay.className = 'settings-overlay';
-  overlay.innerHTML = `<div class="settings-modal" role="dialog" aria-modal="true" aria-label="Stock Mind Settings">${renderSettings()}</div>`;
-  document.body.appendChild(overlay);
-  bindSettingsEvents();
-  document.body.classList.add('settings-open');
-}
-
-function closeSettingsOverlay() {
-  document.getElementById('settingsOverlay')?.remove();
-  document.body.classList.remove('settings-open');
-}
-
-document.addEventListener('click', event => {
-  const closeButton = event.target.closest?.('#crsmSettingsClose');
-  if (closeButton && document.getElementById('settingsOverlay')) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    closeSettingsOverlay();
-  }
-}, true);
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeSettingsOverlay();
-});
 
 document.addEventListener('click', event => {
   const dashboardTab = event.target.closest?.('[data-dashboard-group]');
