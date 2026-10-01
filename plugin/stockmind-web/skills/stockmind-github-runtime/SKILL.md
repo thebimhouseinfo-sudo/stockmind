@@ -72,15 +72,18 @@ Before rerunning CRSM for any PROCESSING item:
 1. Resolve its canonical path `memo/runs/<run_id>/results/<TICKER>.json`.
 2. Check whether that result file already exists.
 3. If it does not exist, resume normal analysis.
-4. If it exists, validate it against `crsm-result.v1` and the canonical request item:
+4. If it exists, validate only **hard recovery invariants** against `crsm-result.v1` and the canonical request item:
    - same `run_id`;
    - same `item_id`;
    - same `ticker`;
    - same `analysis_source`;
    - expected pipeline/result versions;
-   - required node outputs and decision_record present.
-5. If valid, treat the existing immutable result as authoritative. **Do not rerun CRSM and do not regenerate the result.** Complete only the missing status/current/index transitions using the latest exact SHAs.
-6. If the existing result is invalid or belongs to a different item/source, never overwrite it. Record a bounded `RESULT_RECOVERY_CONFLICT` failure/blocker for that item and require manual repair before retrying it.
+   - required node outputs and decision_record present;
+   - Node 5 and decision_record satisfy their machine contracts;
+   - no evidence/source ownership violation.
+5. Presentation drift is **not** a recovery conflict. A duplicated AI score/decision/confidence rendered differently inside Node 6A/6B, prose variation, missing optional display value, or extra renderer wrapper text must not turn an otherwise valid analysis into FAILED. Node 5 + decision_record are canonical for decision fields; the web renderer may normalize the presentation deterministically.
+6. If hard invariants are valid, treat the existing immutable result as authoritative. **Do not rerun CRSM and do not regenerate the result.** Complete only the missing status/current/index transitions using the latest exact SHAs.
+7. Use `RESULT_RECOVERY_CONFLICT` only when a hard invariant is broken (identity/source/version/schema corruption, missing required analytical node, invalid canonical decision record, or unsafe evidence ownership). Never use it for ordinary analytical disagreement or presentation-only drift.
 
 This recovery rule closes the intentional write-order crash window:
 `PROCESSING -> immutable result file -> status COMPLETED`.

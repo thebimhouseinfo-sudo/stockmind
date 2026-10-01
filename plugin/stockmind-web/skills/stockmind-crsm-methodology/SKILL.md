@@ -145,18 +145,31 @@ Do not run or emulate legacy Node7 localStorage append behavior.
 
 ## Validation gate before GitHub write
 
+Use two validation levels.
+
+### HARD — may fail the item
+
 Before calling the GitHub write flow:
 - all `node1..node6b` outputs exist and are non-null;
-- Node 2 explicitly declares technical coverage (`FULL` or `DEGRADED`) and, when degraded, names each missing mandatory capability (for example ~300-session OHLCV/SMA200 or quantified sector-vs-VNINDEX benchmark) and lowers technical confirmation/confidence rather than silently treating it as complete;
-- Node 5 follows the exact current schema: fixed decision enum, scalar six-factor scores with key `flow`, structured `catalyst_horizon`, complete `conflict_detector`, complete `strategy` including allocation/position sizing fields;
-- Node 6A preserves the locked template structure/visual classes and contains the required visual sections; a short free-form `<article>` is invalid;
-- Node 6B contains the full detailed report sections and real peer/sensitivity/source tables; a short summary is invalid;
-- node6a is raw HTML string;
-- node6b is Markdown string;
-- decision_record contains all 11 canonical fields;
+- Node 2 explicitly declares technical coverage (`FULL` or `DEGRADED`) and, when degraded, names each missing mandatory capability instead of silently treating it as complete;
+- Node 5 follows the exact machine schema: fixed decision enum, scalar six-factor scores with key `flow`, structured `catalyst_horizon`, complete `conflict_detector`, complete `strategy`;
+- node6a is a non-empty string containing the locked report markers;
+- node6b is a non-empty Markdown string containing the required detailed sections;
+- decision_record contains all 11 canonical fields and is derived from Node 1 + Node 5;
 - ticker/item/run/source identity matches request;
-- no unresolved report placeholder tokens remain;
-- no source-mode violation occurred;
-- completed result path does not already contain different content.
+- no source-mode/evidence ownership violation occurred;
+- completed result path does not already contain content for another hard identity.
 
-If validation fails, do not fabricate/fill silently. Mark the item FAILED through the worker-loop failure policy.
+A hard failure must not be fabricated away. Mark that exact item FAILED and continue safely.
+
+### SOFT — repair/normalize, do not fail the item
+
+Analytical work is not expected to have one mathematically unique answer. Do **not** fail merely because:
+- prose or qualitative interpretation differs slightly across nodes;
+- Node 6A/6B accidentally repeats an AI score, decision, confidence, target, or other headline differently from Node 5;
+- optional display data is missing;
+- Node 6A contains harmless wrapper/preamble/trailing instruction text around the actual locked HTML document.
+
+Node 5 is the canonical final decision stage. `decision_record` is its deterministic machine projection. Node 6A and Node 6B are renderers only: copy canonical decision fields from Node 5 rather than recomputing them. Before a new write, normalize presentation drift in memory. For an existing immutable result, preserve the analytical result and allow the deterministic web renderer to normalize presentation.
+
+The goal of validation is to prevent broken identity, unsafe evidence mixing, malformed machine contracts, or unusable reports — not to force subjective analytical prose to have a single exact answer.
