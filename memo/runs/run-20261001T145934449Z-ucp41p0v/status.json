@@ -3,7 +3,7 @@
   "run_id": "run-20261001T145934449Z-ucp41p0v",
   "state": "PROCESSING",
   "created_at": "2026-10-01T14:59:36.275Z",
-  "updated_at": "2026-10-01T15:24:00.000Z",
+  "updated_at": "2026-10-01T15:35:00.000Z",
   "items": [
     {
       "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
@@ -45,23 +45,23 @@
       "item_id": "item-bfe390c0-bb9e-4552-91a8-34d86bca9f5f",
       "ticker": "GMD",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/GMD.json",
       "started_at": "2026-10-01T15:24:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-01T15:24:00.000Z"
+      "completed_at": "2026-10-01T15:35:00.000Z",
+      "updated_at": "2026-10-01T15:35:00.000Z"
     },
     {
       "item_id": "item-068c7771-7ec6-4542-a6aa-2bb4bf950bad",
       "ticker": "DXP",
       "analysis_source": "SCREENED_WEB",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-10-01T15:35:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-01T14:59:36.275Z"
+      "updated_at": "2026-10-01T15:35:00.000Z"
     },
     {
       "item_id": "item-6d93c119-9c62-4d8c-b198-04eee7b4b6a2",
