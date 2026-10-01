@@ -12,8 +12,8 @@ Turn the combined analysis JSON (Node 1–5) into a clean, Word-ready Markdown d
 * Output ONLY the Markdown document — no explanation before/after, no wrapping code fence around the whole thing.
 * Every figure carries its `data_period` and source.
 * **NULL HANDLING:** any field that is `null` upstream renders as exactly `Chưa có dữ liệu` — never leave blank, never invent, never use "—" (standardized: JSON=null, HTML="Data not available", Markdown="Chưa có dữ liệu" — three different renderings of the same missing-data state, never mixed).
-* No vague language — every claim needs a number.
-* Vietnamese throughout.
+* Evidence-anchored, not number-forced: quantitative claims need numbers/sources when available; qualitative judgments are allowed when clearly identified as inference and supported by evidence. Never invent a number just to make prose look precise.
+* Vietnamese throughout. Do not use English headings or duplicate an English label after a Vietnamese label, except standard finance abbreviations and proper nouns.
 * Personal use — one short disclaimer line at the end, not a legal block.
 
 ---
@@ -28,7 +28,10 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - **Khuyến nghị:** [DECISION] (lưu ý nếu conflict_detector.override_applied có giá trị, ví dụ "MUA KHI ĐIỀU CHỈNH" thay vì MUA thẳng)
 - **AI Score:** [AI_SCORE]/100 — công thức: Cơ bản/20×30 + Định giá/20×20 + Kỹ thuật/20×15 + Dòng tiền/20×15 + Ngành-Vĩ mô/20×10 + Rủi ro/20×10
 - **Độ tin cậy:** [CONFIDENCE]% (thành phần: data completeness [X]%, source quality [X]%, cross-source agreement [X]%, fundamental consistency [X]%, technical confirmation [X]%, macro clarity [X]%)
+- **Luận điểm đầu tư:** 1 đoạn 4–7 câu giải thích vì sao cổ phiếu đáng chú ý lúc này, liên kết trực tiếp thay đổi kinh doanh → lợi nhuận/dòng tiền → định giá → catalyst.
 - **Động lực chính:** [DRIVER_1]; [DRIVER_2]; [DRIVER_3]
+- **Phản biện mạnh nhất:** nêu bằng chứng hoặc kịch bản mạnh nhất chống lại luận điểm chính, không dựng strawman.
+- **Thị trường đã phản ánh gì / chưa phản ánh gì:** phân biệt kỳ vọng đang nằm trong giá và phần thesis còn có khả năng tạo bất ngờ.
 - **Điều kiện vô hiệu hóa luận điểm (fundamental):** [THESIS_INVALIDATION]
 - **Ngưỡng cắt lỗ kỹ thuật (technical, KHÁC với trên):** [TRADING_STOP_PRICE] — [TRADING_STOP_BASIS]
 
@@ -54,6 +57,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - Biến số nhạy cảm riêng của doanh nghiệp: [bảng từ Node 4 sensitivity_table — Biến số | Độ nhạy | Chiều tác động | Độ tin cậy]
 - Ngành vs benchmark ([SECTOR_BENCHMARK_METHOD]): [SECTOR_PERF] vs [VNINDEX_PERF] — [SECTOR_STRENGTH]
 - Nhận định: [MACRO_CONCLUSION]
+- **Cơ chế truyền dẫn:** giải thích 1–3 chuỗi cụ thể từ biến vĩ mô/ngành → doanh thu/biên lợi nhuận/vốn lưu động/chi phí vốn của chính doanh nghiệp. Không viết macro chung chung nếu không có cơ chế tác động.
 
 ## 5. Doanh nghiệp & Chất lượng lợi nhuận
 - Doanh thu: [REVENUE_VALUE] ([REVENUE_PERIOD], [REVENUE_YOY])
@@ -65,6 +69,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - Lợi thế cạnh tranh: [MOAT]
 - F-Score: [F_SCORE] | M-Score: [M_SCORE] ([M_SCORE_NOTE])
 - WACC: [WACC_VALUE] (công thức: [WACC_FORMULA_NOTE]) | ROIC: [ROIC_VALUE] | Kinh tế biên: [ECONOMIC_SPREAD]
+- **Điểm then chốt:** giải thích chất lượng tăng trưởng và khả năng chuyển lợi nhuận kế toán thành tiền; nếu có mâu thuẫn giữa tăng trưởng, CFO, công nợ, tồn kho hoặc đòn bẩy thì ưu tiên phân tích mâu thuẫn đó.
 
 ## 6. Định giá & So sánh ngành
 - P/E (TTM): [PE_VALUE] | P/E trung bình peer: [PE_PEER_AVG]
@@ -72,6 +77,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - DCF Fair Value: [DCF_FAIR_VALUE]
 - **Reverse DCF:** giá hiện tại ngầm định FCF CAGR ~[REVERSE_DCF_CAGR] — [REVERSE_DCF_COMMENTARY]
 - Danh sách peer (lý do chọn từng mã): [bảng từ Node 3 peer_list — Mã | P/E | P/B | ROE | Ngày | Lý do chọn peer]
+- **Định giá hàm ý:** nêu rõ giá hiện tại đang đòi hỏi điều gì về tăng trưởng/biên lợi nhuận/FCF; đối chiếu với lịch sử hoặc peer khi dữ liệu cho phép. Kết luận phải nói rõ upside/downside đến từ thay đổi giả định nào, không chỉ nêu một fair value.
 
 ## 7. Kỹ thuật & Dòng tiền
 - Nguồn dữ liệu giá: [OHLCV_SOURCE] ([OHLCV_SESSIONS] phiên, [OHLCV_DATE_RANGE])
@@ -79,6 +85,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - Khối lượng: [VOLUME_RATIO] — phân loại: [VOLUME_CLASSIFICATION] (chỉ là "candidate", không khẳng định dòng tiền lớn nếu chưa có bằng chứng)
 - Giai đoạn: [SMART_MONEY_PHASE] tại vùng [SMART_MONEY_ZONE] — [SMART_MONEY_INSIGHT]
 - Nếu [ANALYSIS_MODE] = SCREENED: đối chiếu momentum screening — trạng thái [SCREENING_MOMENTUM_STATUS], bằng chứng: [SCREENING_MOMENTUM_EVIDENCE]
+- **Hàm ý giao dịch:** kỹ thuật chỉ trả lời timing/risk control; không được lấn át thesis cơ bản nếu dữ liệu kỹ thuật DEGRADED. Nếu technical coverage thiếu, nói rõ điều gì chưa thể kết luận.
 
 ## 8. Rủi ro
 - Doanh nghiệp: [RISK_COMPANY]
@@ -90,6 +97,7 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 - **Suy luận (Inference):** [CAUSAL_INFERENCES] — độ tin cậy: [INFERENCE_CONFIDENCE]
 - **Giả định (Assumption):** [CAUSAL_ASSUMPTIONS]
 - Tóm tắt chuỗi: [CAUSAL_CHAIN_SUMMARY]
+- **Điểm bất đối xứng:** nếu có, nêu biến số có thể khiến kết quả thực tế lệch đáng kể so với kỳ vọng đồng thuận và dấu hiệu cần theo dõi để xác nhận.
 
 ## 10. Kịch bản
 | Kịch bản | Xác suất | Điều kiện | Giá mục tiêu |
@@ -113,6 +121,14 @@ Cập nhật: [DATE] · Kỳ dữ liệu: [DATA_PERIOD] · Chế độ: [ANALYSI
 ```
 
 ---
+
+# 🧠 QUALITY BAR
+* Viết như một senior buy-side analyst đang trình bày cho CIO: có luận điểm, phản biện, mức độ chắc chắn và điều kiện thay đổi quan điểm.
+* Mỗi phần quan trọng phải trả lời "so what?" — dữ liệu này thay đổi quyết định đầu tư như thế nào.
+* Không lặp lại cùng một fact ở nhiều mục nếu không có thêm implication mới.
+* Không dùng các câu chung chung như "cần theo dõi diễn biến vĩ mô", "doanh nghiệp có tiềm năng", "rủi ro vẫn hiện hữu" nếu không chỉ ra biến cụ thể và cơ chế tác động.
+* Khi dữ liệu mâu thuẫn, trình bày xung đột và trọng số lý luận thay vì ép về một narrative sạch.
+* Nếu dữ liệu chưa đủ để có conviction cao, nói rõ giới hạn và chuyển mức độ tự tin/decision phù hợp; không bù bằng prose dài.
 
 # ⚠️ FINAL EXECUTION RULE
 * Fill every bracket with real values — no unresolved `[PLACEHOLDER]` in the final output; use `Chưa có dữ liệu` for genuinely missing (null) fields.

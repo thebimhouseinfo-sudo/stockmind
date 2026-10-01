@@ -45,7 +45,8 @@ export function adaptMemoResult(input) {
       sectorType: result.outputs?.node1?.sector_type ?? null,
       outputs: prepareNode6AOutputs(result.outputs)
     })),
-    detailReport: result.outputs.node6b,
+    detailReport: normalizeDetailReport(result.outputs.node6b, result),
+    validationWarnings: [...(check.warnings || [])],
     decisionRecord: { ...decision },
     outputs: result.outputs,
     raw: result
@@ -194,4 +195,36 @@ export function sourceLabel(value) {
 
 function normalizeTicker(value) {
   return typeof value === 'string' ? value.trim().toUpperCase() : '';
+}
+
+
+function normalizeDetailReport(markdown, result) {
+  if (typeof markdown === 'string' && markdown.trim()) return markdown;
+
+  const n1 = result?.outputs?.node1 || {};
+  const n5 = result?.outputs?.node5 || {};
+  const d = result?.decision_record || {};
+  const lines = [
+    `# BÁO CÁO PHÂN TÍCH ${result?.ticker || ''}`,
+    '',
+    '## 1. Quyết định đầu tư',
+    `- **Khuyến nghị:** ${d.decision ?? 'Chưa có dữ liệu'}`,
+    `- **Điểm AI:** ${d.ai_score ?? 'Chưa có dữ liệu'}/100`,
+    `- **Độ tin cậy:** ${d.confidence ?? 'Chưa có dữ liệu'}%`,
+    `- **Luận điểm chính:** ${n5.full_reasoning || 'Chưa có dữ liệu'}`,
+    `- **Điều kiện vô hiệu luận điểm:** ${d.thesis_invalidation ?? 'Chưa có dữ liệu'}`,
+    '',
+    '## 2. Chiến lược giao dịch',
+    `- **Vùng mua:** ${d.entry_zone ?? 'Chưa có dữ liệu'}`,
+    `- **Cắt lỗ kỹ thuật:** ${d.trading_stop ?? 'Chưa có dữ liệu'}`,
+    `- **Mục tiêu 1:** ${d.tp1 ?? 'Chưa có dữ liệu'}`,
+    `- **Mục tiêu 2:** ${d.tp2 ?? 'Chưa có dữ liệu'}`,
+    '',
+    '## 3. Dữ liệu nền',
+    `- **Kỳ dữ liệu:** ${n1.data_period ?? 'Chưa có dữ liệu'}`,
+    `- **Giá tại thời điểm phân tích:** ${d.price_at_analysis ?? 'Chưa có dữ liệu'}`,
+    '',
+    '> Báo cáo chi tiết do mô hình tạo chưa khả dụng; đây là bản phục hồi deterministic từ dữ liệu CRSM đã được lưu.'
+  ];
+  return lines.join('\\n');
 }

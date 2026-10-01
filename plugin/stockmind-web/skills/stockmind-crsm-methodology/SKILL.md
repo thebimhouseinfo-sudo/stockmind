@@ -7,14 +7,15 @@ description: Mandatory CRSM analytical methodology for each actionable Stockmind
 
 This skill is mandatory after `stockmind-worker-loop` selects/claims one canonical item and before `stockmind-result-contract` writes its result.
 
-Before analyzing a ticker, read all three canonical references from the Stockmind repository `thebimhouseinfo-sudo/stockmind` on `master` via the connected GitHub app:
+Before analyzing a ticker, read the canonical references from the Stockmind repository `thebimhouseinfo-sudo/stockmind` on `master` via the connected GitHub app:
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
-- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md` — locked Visual Report DOM/CSS/template. Node 6A must populate this template; it must not invent a replacement layout.
-- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — full Word-ready detailed report contract. Node 6B must satisfy its detailed section/table requirements; an executive-summary substitute is invalid.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — Word-ready detailed report contract and depth standard.
+
+The webapp owns the visual Node 6A HTML through its deterministic renderer. The model must not spend reasoning budget reproducing template HTML. Legacy `outputs.node6a` may exist in old results, but new analysis does not need to generate it.
 
 The repository copy is canonical. Do not rely on an older packaged reference if it differs from `master`.
 
-When a legacy report reference conflicts with `CRSM-METHODOLOGY.md` (for example legacy `screen_vs_crsm` comparison text), the current methodology wins semantically, but the locked visual layout remains the rendering baseline.
+When a legacy report reference conflicts with `CRSM-METHODOLOGY.md`, the current methodology wins. Visual layout is a web-renderer concern, not an analytical-model task.
 
 ## Core architecture
 
@@ -26,6 +27,22 @@ In Stockmind Web:
 - Use the GitHub connector only for canonical request/evidence/result state.
 - Do not call a custom Stockmind MCP server.
 - Do not use browser model-provider API keys.
+
+## Frontier analyst mode — reason first, serialize second
+
+The schema is a storage contract, not the reasoning process. For every ticker:
+1. Build an evidence ledger first: what is known, what is uncertain, what conflicts, and which facts materially move the thesis.
+2. Form a provisional investment thesis and an explicit anti-thesis. Actively search for evidence that could invalidate the provisional view.
+3. Trace the business mechanism: driver → revenue/margin/cash flow/balance sheet → valuation → price implication. Do not stop at generic macro commentary.
+4. Distinguish what is company-specific from what is merely sector/market beta.
+5. Quantify whenever the evidence supports it, but never invent a number to satisfy a field.
+6. Only after the analytical synthesis is complete, serialize the result into Node contracts.
+
+A strong model is expected to add judgment, prioritization and causal synthesis — not merely restate source facts. Prefer a smaller number of material insights with evidence and implications over a long checklist of generic observations.
+
+### Reader-language rule
+
+All reader-facing prose must be natural Vietnamese. English is allowed only for unavoidable proper nouns, source titles, tickers and standard finance abbreviations such as EBITDA, DCF, WACC, ROIC, FCF, VSA, SMA200. Do not alternate English/Vietnamese headings or repeat the same point in both languages.
 
 ## Per-ticker dependency graph
 
@@ -40,12 +57,12 @@ canonical request/evidence
   -> Node 3 Deep Fundamentals & Valuation
   -> Node 4 Macro & Causal
   -> Node 5 CIO Decision
-  -> Node 6A Visual HTML
   -> Node 6B Detail Markdown
   -> immutable crsm-result.v1 + decision_record
+  -> deterministic web Visual Report from Node 1–5
 ```
 
-Node 2 and Node 3 are dependency-safe siblings after Node 1. Node 6A and Node 6B are dependency-safe siblings after Node 5. They may be reasoned in parallel only when the execution surface safely supports it; sequential execution is always acceptable. Never parallelize different tickers.
+Node 2 and Node 3 are dependency-safe siblings after Node 1. Node 6B is written only after Node 5 is complete. The webapp deterministically renders the visual report from Node 1–5. Never parallelize different tickers.
 
 ## Source isolation
 
@@ -103,7 +120,7 @@ Node 5 must use only decisions `BUY | HOLD | SELL | BUY ON DIP | WATCH`. Its six
 
 ## Result construction
 
-After Node 6A and Node 6B are complete, build exactly one result:
+After Node 5 and the detailed Node 6B report are complete, build exactly one result:
 
 ```json
 {
@@ -119,7 +136,6 @@ After Node 6A and Node 6B are complete, build exactly one result:
     "node3": {},
     "node4": {},
     "node5": {},
-    "node6a": "<raw HTML>",
     "node6b": "<Markdown>"
   },
   "decision_record": {}
@@ -150,11 +166,10 @@ Use two validation levels.
 ### HARD — may fail the item
 
 Before calling the GitHub write flow:
-- all `node1..node6b` outputs exist and are non-null;
+- `node1..node5` outputs exist and are non-null;
 - Node 2 explicitly declares technical coverage (`FULL` or `DEGRADED`) and, when degraded, names each missing mandatory capability instead of silently treating it as complete;
-- Node 5 follows the exact machine schema: fixed decision enum, scalar six-factor scores with key `flow`, structured `catalyst_horizon`, complete `conflict_detector`, complete `strategy`;
-- node6a is a non-empty string containing the locked report markers;
-- node6b is a non-empty Markdown string containing the required detailed sections;
+- Node 5 preserves its canonical machine identity and decision enum. Missing analytical inputs may remain null and must lower confidence or route to WATCH rather than being fabricated;
+- Node 6B should be a substantive Vietnamese Markdown report, but presentation defects are soft and recoverable;
 - decision_record contains all 11 canonical fields and is derived from Node 1 + Node 5;
 - ticker/item/run/source identity matches request;
 - no source-mode/evidence ownership violation occurred;
@@ -166,10 +181,10 @@ A hard failure must not be fabricated away. Mark that exact item FAILED and cont
 
 Analytical work is not expected to have one mathematically unique answer. Do **not** fail merely because:
 - prose or qualitative interpretation differs slightly across nodes;
-- Node 6A/6B accidentally repeats an AI score, decision, confidence, target, or other headline differently from Node 5;
+- Node 6B accidentally repeats an AI score, decision, confidence, target, or other headline differently from Node 5;
 - optional display data is missing;
-- Node 6A contains harmless wrapper/preamble/trailing instruction text around the actual locked HTML document.
+- a report heading/table is missing or imperfect.
 
-Node 5 is the canonical final decision stage. `decision_record` is its deterministic machine projection. Node 6A and Node 6B are renderers only: copy canonical decision fields from Node 5 rather than recomputing them. Before a new write, normalize presentation drift in memory. For an existing immutable result, preserve the analytical result and allow the deterministic web renderer to normalize presentation.
+Node 5 is the canonical final decision stage. `decision_record` is its deterministic machine projection. Node 6B is a narrative report only and must copy canonical decision fields from Node 5 rather than recomputing them. The webapp owns Node 6A presentation deterministically from Node 1–5.
 
 The goal of validation is to prevent broken identity, unsafe evidence mixing, malformed machine contracts, or unusable reports — not to force subjective analytical prose to have a single exact answer.

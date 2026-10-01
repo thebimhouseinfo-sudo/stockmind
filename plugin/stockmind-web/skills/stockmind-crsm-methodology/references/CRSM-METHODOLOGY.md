@@ -3,6 +3,20 @@
 This document is the provider-independent analytical contract for Stockmind Web.
 It is derived from the live Node 1–6 source contracts. Where legacy generated prompts conflict with current source behavior, the current source behavior in this document wins.
 
+## Analytical operating principle
+
+CRSM is a structured research process, not a form-filling exercise. The model must reason before it serializes.
+
+For every ticker, first create an internal evidence map: strongest positive evidence, strongest negative evidence, unresolved conflicts, missing material facts, and the variables most capable of changing the investment thesis. Then construct both a thesis and an anti-thesis and actively test each against current evidence. Only after this synthesis should the model populate Node JSON.
+
+The final analysis should answer four questions clearly:
+1. **What is actually changing in this business now?**
+2. **Why should that change affect earnings/cash flow/valuation?**
+3. **What is the market likely already pricing in, and what could still surprise it?**
+4. **What evidence would prove the thesis wrong?**
+
+Reader-facing prose is Vietnamese-first. Use English only for proper nouns, source titles, tickers and standard finance abbreviations. Avoid bilingual duplicate headings and generic textbook commentary.
+
 ---
 
 ## Stage 1 — Node 1: Financial Data Verification
@@ -380,7 +394,9 @@ Top 3 drivers should tie to actual upstream evidence/numbers.
 
 ### Node 5 output contract
 
-The following shape is strict. Do not rename `flow` to `money_flow`, do not wrap score scalars in `{value,max}`, do not emit an out-of-enum decision such as `WAIT_FOR_ENTRY`, and do not collapse structured objects into strings.
+The following shape is the canonical machine serialization. It must not force fabricated precision. Keep the decision enum and field identities exact, but a genuinely unavailable analytical subscore may be `null`; explain the gap in `full_reasoning` and reduce confidence. When evidence is materially insufficient, prefer `WATCH` over manufacturing a precise score.
+
+Do not rename `flow` to `money_flow`, do not wrap score scalars in `{value,max}`, do not emit an out-of-enum decision such as `WAIT_FOR_ENTRY`, and do not collapse structured objects into strings.
 
 ```json
 {
@@ -446,38 +462,29 @@ The following shape is strict. Do not rename `flow` to `money_flow`, do not wrap
 
 ---
 
-## Stage 5A — Node 6A: Visual HTML
+## Stage 5A — Visual Report: deterministic web renderer
 
-Role: report renderer, not an analyst.
+Role: presentation owned by the webapp, not by the analytical model.
 
-Mandatory renderer source: `references/NODE6A-LOCKED-TEMPLATE.md`. Preserve its report DOM hierarchy and visual class/CSS system as the baseline. Populate it from Node 1–5 instead of generating a new short-form layout. Current architecture overrides still apply: remove/omit any legacy screen-vs-CRSM score-comparison semantics while preserving the surrounding visual structure.
+The model does **not** generate Visual HTML. The webapp renders the canonical visual report deterministically from Node 1–5 using `src/crsm/nodes/node6a-renderer.js` and its normalization layer. This removes duplicate HTML generation, prevents template drift, and preserves reasoning budget for analysis.
 
-Input: completed Node1–5 outputs.
+The renderer must treat Node 5 / `decision_record` as canonical for decision, AI score, confidence and trade levels; show SCREENED_WEB snapshots only as context; preserve source provenance; and render missing data explicitly without inventing values.
 
-Requirements:
-- raw HTML string only;
-- Vietnamese reader-facing text;
-- Node 6A is a deterministic presentation step, not a second analytical judgment;
-- copy final decision, AI score, confidence, trade levels and position-sizing fields from Node 5/decision_record exactly; never recompute them from prose or factor scores;
-- render decision, AI score, confidence, drivers, invalidation;
-- render screening snapshot for SCREENED_WEB as context only;
-- **do not render a screen-vs-CRSM score comparison/status**;
-- render macro, company, technical/VSA, valuation, six-factor score grid, risk, causal analysis, scenarios, trade setup and position sizing;
-- preserve real Node 1 sources;
-- use `Data not available` for upstream nulls;
-- do not invent numbers;
-- trading stop and thesis invalidation remain separate;
-- any VSA/smart-money inference keeps candidate/uncertainty wording.
-
-The HTML must be self-contained enough for the existing Results iframe and export path. Do not add interactive analysis actions.
-
-No unresolved placeholder token such as `[TICKER]`, `[AI_SCORE]`, or `[PLACEHOLDER]` may remain.
+Legacy immutable results may still contain `outputs.node6a`; it is compatibility data only and is not the rendering source of truth.
 
 ---
 
 ## Stage 5B — Node 6B: Detail Markdown
 
-Role: Word-ready detailed report writer, not a new analytical node.
+Role: senior equity research writer who communicates the Node 1–5 synthesis, not a new scoring node.
+
+### Depth and writing standard
+
+The report must read like a serious buy-side research note, not a schema dump. Each major section should connect **evidence → interpretation → investment implication**. Prioritize materiality: explain which 3–5 variables actually matter to the stock and why. Surface contradictions rather than smoothing them away. Distinguish company alpha from market/sector beta. State what appears priced in, what is not obviously priced in, and what catalyst could close that gap.
+
+Do not pad the report with generic macro definitions, boilerplate risk language, or duplicated bullet points. A strong report should contain differentiated reasoning that would still be useful to a knowledgeable investor who already knows the headline financial figures.
+
+Language: natural Vietnamese throughout, except unavoidable proper nouns and standard finance abbreviations. Never emit alternating English/Vietnamese headings or untranslated template labels.
 
 Mandatory report source: `references/NODE6B-FULL-REPORT.md`. Follow its detailed Word-ready structure and tables. A condensed executive summary is not a valid Node 6B output.
 
@@ -544,14 +551,16 @@ A ticker is COMPLETED when the hard contract is safe and the report is renderabl
 
 1. result schema/version identity matches canonical request.
 2. `node1..node5` are JSON objects.
-3. `node6a` is a non-empty HTML string containing the locked report markers.
-4. `node6b` is a non-empty Markdown string with the required detailed sections.
+3. Node 2 explicitly declares FULL or DEGRADED technical coverage; DEGRADED names the missing capabilities instead of fabricating them.
+4. Node 5 preserves the canonical decision/machine identity and contains a substantive `full_reasoning` synthesis.
 5. decision_record has all 11 fields and is derived from Node 1 + Node 5.
 6. result ticker/item/run/source match the request.
 7. no evidence from another ticker was used.
 8. SCREENED_WEB snapshot remains unchanged.
 9. no Screener score was blended into CRSM score.
 10. result file is create-only; an existing hard-identity conflict is never overwritten.
+
+Node 6A HTML and Node 6B formatting/section completeness are presentation-quality concerns. They may produce warnings or deterministic fallback, but must not turn a sound analytical result into FAILED.
 
 ### Soft consistency checks
 
