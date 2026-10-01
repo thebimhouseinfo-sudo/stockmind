@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "stockmind-web",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Stockmind Web CRSM worker: ChatGPT reads the canonical GitHub Memo, runs the current Node1-6 methodology sequentially, and writes immutable results back for the webapp to render.",
   "author": {
     "name": "The BIM House"
