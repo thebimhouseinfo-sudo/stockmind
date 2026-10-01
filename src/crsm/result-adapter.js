@@ -1,5 +1,7 @@
 import { validateAnalysisResult } from './contracts.js';
 import { decisionLabel } from './nodes/render-common.js';
+import { renderNode6A } from './nodes/node6a-renderer.js';
+import { prepareNode6AOutputs, localizeReportText } from './report-data-normalizer.js';
 
 export const RESULT_SOURCE_LABELS = Object.freeze({
   SCREENED_WEB: 'Screener + Web',
@@ -34,7 +36,15 @@ export function adaptMemoResult(input) {
     tp1: decision.tp1,
     tp2: decision.tp2,
     thesisInvalidation: decision.thesis_invalidation,
-    visualReport: normalizeVisualReportHtml(result.outputs.node6a, result),
+    visualReport: localizeReportText(renderNode6A({
+      ticker: result.ticker,
+      mode: result.analysis_source === 'SCREENED_WEB' ? 'SCREENED' : 'DIRECT',
+      screeningContext: result.outputs?.node1?.trusted_screener_snapshot
+        ?? result.outputs?.node1?.screening_context
+        ?? null,
+      sectorType: result.outputs?.node1?.sector_type ?? null,
+      outputs: prepareNode6AOutputs(result.outputs)
+    })),
     detailReport: result.outputs.node6b,
     decisionRecord: { ...decision },
     outputs: result.outputs,
@@ -43,79 +53,6 @@ export function adaptMemoResult(input) {
 }
 
 
-export function normalizeVisualReportHtml(input, result = null) {
-  let html = String(input ?? '');
-  if (!html.trim()) return html;
-
-  const doctypeStart = html.search(/<!doctype\s+html/i);
-  const htmlStart = html.search(/<html(?:\s|>)/i);
-  const start = doctypeStart >= 0 ? doctypeStart : htmlStart;
-  const end = html.toLowerCase().lastIndexOf('</html>');
-  if (start >= 0 && end >= start) {
-    html = html.slice(start, end + '</html>'.length);
-  }
-
-  html = html.replace(/class=(["'])([\s\S]*?)\1/g, (match, quote, value) => {
-    const cleaned = value
-      .replace(/\bData\s+not\s+available\b/gi, '')
-      .replace(/\bChưa\s+có\s+dữ\s+liệu\b/gi, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-    return `class=${quote}${cleaned}${quote}`;
-  });
-
-  html = html.replace(/style=(["'])([\s\S]*?)\1/g, (match, quote, value) => {
-    const cleaned = value
-      .replace(/width\s*:\s*(?:Data\s+not\s+available|Chưa\s+có\s+dữ\s+liệu)/gi, 'width:0%');
-    return `style=${quote}${cleaned}${quote}`;
-  });
-
-  const decisionRecord = result?.decision_record ?? result?.decisionRecord ?? null;
-  const node5 = result?.outputs?.node5 ?? result?.node5 ?? null;
-  const aiScore = firstFinite(decisionRecord?.ai_score, node5?.ai_score?.value);
-  const confidence = firstFinite(decisionRecord?.confidence, node5?.confidence?.value);
-  const decision = decisionRecord?.decision ?? node5?.decision ?? null;
-
-  if (Number.isFinite(aiScore)) {
-    html = html.replace(
-      /(<p[^>]*>\s*AI Score\s*<\/p>\s*<p[^>]*>)[^<]*(<span[^>]*>\s*\/100\s*<\/span>)/i,
-      (_, before, after) => `${before}${formatCanonicalNumber(aiScore)}${after}`
-    );
-    html = html.replace(
-      /(<span[^>]*>\s*CRSM Score\s*<\/span>\s*<strong[^>]*>)[^<]*(<\/strong>)/i,
-      (_, before, after) => `${before}${formatCanonicalNumber(aiScore)}/100${after}`
-    );
-  }
-
-  if (Number.isFinite(confidence)) {
-    html = html.replace(
-      /(<p[^>]*>\s*(?:Tin tưởng|Confidence)\s*<\/p>\s*<p[^>]*>)[^<]*(<\/p>)/i,
-      (_, before, after) => `${before}${formatCanonicalNumber(confidence)}%${after}`
-    );
-  }
-
-  if (decision) {
-    html = html.replace(
-      /(<h2[^>]*>\s*Quyết định đầu tư\s*<\/h2>\s*<div[^>]*>)[^<]*(<\/div>)/i,
-      (_, before, after) => `${before}${decisionLabel(decision)}${after}`
-    );
-  }
-
-  return html;
-}
-
-function firstFinite(...values) {
-  for (const value of values) {
-    if (value == null || value === '') continue;
-    const number = Number(value);
-    if (Number.isFinite(number)) return number;
-  }
-  return null;
-}
-
-function formatCanonicalNumber(value) {
-  return Number(value).toLocaleString('en-US', { maximumFractionDigits: 2, useGrouping: false });
-}
 
 export function normalizeMemoRun(run) {
   if (!run?.request || !run?.status) return null;
