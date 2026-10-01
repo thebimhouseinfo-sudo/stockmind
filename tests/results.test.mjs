@@ -114,6 +114,17 @@ assert.match(rendered, /VCB/);
 assert.match(rendered, /Visual Report/);
 assert.match(rendered, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
 
+const detailRendered = renderResultsPage({
+  currentRun: run,
+  history: [],
+  selectedRun: run,
+  selectedTicker: 'VCB',
+  reportTab: 'word'
+});
+assert.match(detailRendered, /crsm-word-preview/);
+assert.match(detailRendered, /BÁO CÁO PHÂN TÍCH/);
+assert.doesNotMatch(detailRendered, /crsm-report-frame/);
+
 const secondItem = {
   ...run.items[0],
   item_id: 'item-hpg-001',
