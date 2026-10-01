@@ -457,6 +457,8 @@ Input: completed Node1–5 outputs.
 Requirements:
 - raw HTML string only;
 - Vietnamese reader-facing text;
+- Node 6A is a deterministic presentation step, not a second analytical judgment;
+- copy final decision, AI score, confidence, trade levels and position-sizing fields from Node 5/decision_record exactly; never recompute them from prose or factor scores;
 - render decision, AI score, confidence, drivers, invalidation;
 - render screening snapshot for SCREENED_WEB as context only;
 - **do not render a screen-vs-CRSM score comparison/status**;
@@ -536,16 +538,23 @@ Use `strategy.tp1.price` and `strategy.tp2.price` when targets are objects.
 
 ## Final result validation
 
-A ticker is not COMPLETED until all checks pass:
+A ticker is COMPLETED when the hard contract is safe and the report is renderable.
+
+### Hard completion checks
 
 1. result schema/version identity matches canonical request.
 2. `node1..node5` are JSON objects.
-3. `node6a` is a non-empty HTML string.
-4. `node6b` is a non-empty Markdown string.
-5. decision_record has all 11 fields.
+3. `node6a` is a non-empty HTML string containing the locked report markers.
+4. `node6b` is a non-empty Markdown string with the required detailed sections.
+5. decision_record has all 11 fields and is derived from Node 1 + Node 5.
 6. result ticker/item/run/source match the request.
 7. no evidence from another ticker was used.
 8. SCREENED_WEB snapshot remains unchanged.
 9. no Screener score was blended into CRSM score.
-10. no unresolved report placeholders remain.
-11. result file is create-only; an existing different result is a conflict, not an overwrite.
+10. result file is create-only; an existing hard-identity conflict is never overwritten.
+
+### Soft consistency checks
+
+Presentation must prefer Node 5/decision_record whenever the same value appears in several places. A duplicated score, decision, confidence, target or narrative mismatch in Node 6A/6B is a renderer drift to normalize, not proof that the analysis itself is invalid. Missing optional facts lower confidence and are shown as unavailable; they do not create a fake precise answer.
+
+If a locked-template placeholder remains before a **new** write, repair the presentation in memory. If an immutable existing result contains wrapper text or presentation drift but passes hard identity/schema/evidence checks, recover it and normalize only at the rendering boundary rather than failing the ticker.
