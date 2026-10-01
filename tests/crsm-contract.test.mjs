@@ -106,7 +106,7 @@ const driftedNode5Check = validateAnalysisResult(driftedNode5);
 assert.equal(driftedNode5Check.valid, false);
 assert.ok(driftedNode5Check.errors.some(error => error.includes('scores.flow')));
 assert.ok(driftedNode5Check.errors.some(error => error.includes('decision must be')));
-assert.ok(!driftedNode5Check.errors.some(error => error.includes('catalyst_horizon must be an object')));
+assert.ok(driftedNode5Check.errors.some(error => error.includes('catalyst_horizon must be an object')));
 assert.ok(driftedNode5Check.errors.some(error => error.includes('thesis_invalidation must be')));
 
 const degradedWithoutDisclosure = structuredClone(screened.result);
@@ -143,5 +143,14 @@ degradedButHonest.outputs.node2.technical_coverage = {
 };
 degradedButHonest.outputs.node2.ohlcv_source = { source: null, sessions_used: 42, date_range: null };
 assert.equal(validateAnalysisResult(degradedButHonest).valid, true);
+
+const uncertainButHonest = structuredClone(screened.result);
+uncertainButHonest.outputs.node5.scores.technical = null;
+uncertainButHonest.outputs.node5.confidence.components.technical_confirmation = null;
+uncertainButHonest.outputs.node5.catalyst_horizon = { nearest_catalyst: null, bucket: null };
+uncertainButHonest.outputs.node5.ai_score.value = null;
+uncertainButHonest.outputs.node5.confidence.value = 48;
+uncertainButHonest.outputs.node5.decision = 'WATCH';
+assert.equal(validateAnalysisResult(uncertainButHonest).valid, true);
 
 console.log('CRSM migration contract tests passed.');
