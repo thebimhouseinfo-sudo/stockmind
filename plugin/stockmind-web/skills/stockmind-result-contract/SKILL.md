@@ -32,10 +32,11 @@ Never transplant a result between items or runs.
 Use the repository's canonical `crsm-result.v1` contract.
 
 It must contain:
-- Node outputs required by the current CRSM pipeline, including strict Node 2 technical coverage and exact Node 5 schema
-- Visual Report output populated from the canonical `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md` on `master`
-- Detail Report output satisfying the canonical `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` on `master`
+- Node 1–5 outputs required by the current CRSM pipeline, including explicit Node 2 technical coverage and canonical Node 5 machine identity
+- Detail Report output following the canonical `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` quality standard when available
 - exactly one canonical immutable `decision_record`
+
+The Visual Report HTML is not model-owned result content. The webapp deterministically renders it from Node 1–5. Legacy results may still contain `outputs.node6a`, but it is compatibility data only.
 
 Do not write a result that merely has the right top-level keys. Before completion, re-check the exact nested contract and renderer markers. If the result would be rejected by the repository validator, repair the in-memory result before attempting the canonical write; never weaken the hard identity/source/schema validator or omit report sections to make it pass.
 
@@ -46,18 +47,22 @@ CRSM is an evidence-driven analytical workflow, not a deterministic math proof.
 **Hard invariants** must be exact:
 - result/request identity and source ownership;
 - schema/version shape;
-- required Node outputs;
-- Node 5 machine contract and fixed decision enum;
+- Node 1–5 existence;
+- Node 2 FULL/DEGRADED disclosure semantics;
+- Node 5 canonical field identity and fixed decision enum;
 - decision_record as the canonical machine projection of Node 1 + Node 5;
 - evidence isolation and immutable-result rules.
 
+Missing analytical inputs are not hard failures by themselves. They may remain null when honestly unavailable and must reduce confidence, be disclosed, and if material may justify WATCH rather than fabricated precision.
+
 **Soft analytical/presentation consistency** must not fail an otherwise valid ticker:
 - prose wording or qualitative interpretation differs slightly between nodes;
-- a duplicated score/decision/confidence displayed in Node 6A/6B drifts from Node 5;
+- Node 6B repeats a score/decision/confidence differently from Node 5;
 - optional display data is unavailable;
-- renderer output contains harmless wrapper/preamble/trailing text.
+- Node 6B misses a heading/table or has imperfect formatting;
+- a legacy Node 6A HTML payload is malformed or absent.
 
-Node 5 + decision_record are canonical for the final decision fields. Node 6A/6B are presentation layers and must copy those canonical values rather than independently recomputing them. If presentation drift is detected before the write, normalize it in memory. If it is discovered in an already-created immutable result, recover the result and let the deterministic renderer normalize presentation; do not classify it as analytical corruption.
+Node 5 + decision_record are canonical for final decision fields. Node 6B is narrative only. The deterministic web renderer owns the Visual Report and normalizes presentation from Node 1–5. Presentation defects should surface as warnings/fallback, not analytical failure.
 
 Do not append a second browser-local decision log row.
 
