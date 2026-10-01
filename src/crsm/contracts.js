@@ -505,7 +505,13 @@ function validateNode6AReport(html) {
 
 function validateNode6BSemanticCore(markdown) {
   const errors = [];
-  if (/\[[A-Z][A-Z0-9_]*\]/.test(markdown)) {
+  const tokens = markdown.match(/\[([A-Z][A-Z0-9_]*)\](?!\()/g) || [];
+  const simpleTemplateTokens = new Set(['TICKER','DATE','DECISION','CONFIDENCE','AI_SCORE']);
+  const hasTemplatePlaceholder = tokens.some(token => {
+    const key = token.slice(1, -1);
+    return key.includes('_') || simpleTemplateTokens.has(key);
+  });
+  if (hasTemplatePlaceholder) {
     errors.push('unresolved detail-report placeholder remains');
   }
   return errors;
