@@ -106,6 +106,7 @@ export function normalizeVisualReportHtml(input, result = null) {
 
 function firstFinite(...values) {
   for (const value of values) {
+    if (value == null || value === '') continue;
     const number = Number(value);
     if (Number.isFinite(number)) return number;
   }
