@@ -39,6 +39,21 @@ for (const fixture of [screened, evidence, webOnly]) {
   assert.equal(adapted.decisionRecord.ticker, fixture.result.ticker);
 }
 
+const wrappedVisualResult = JSON.parse(JSON.stringify(screened.result));
+wrappedVisualResult.outputs.node6a = [
+  'PROMPT INSTRUCTIONS THAT MUST NOT BE RENDERED',
+  wrappedVisualResult.outputs.node6a.replace(
+    '<div class="hero-card">',
+    '<div class="hero-card"><p>AI Score</p><p>99<span>/100</span></p><p>Confidence</p><p>12</p>'
+  ),
+  'TRAILING EXECUTION RULES THAT MUST NOT BE RENDERED'
+].join('\n');
+const wrappedAdapted = adaptMemoResult(wrappedVisualResult);
+assert.match(wrappedAdapted.visualReport, /^<!DOCTYPE html>/i);
+assert.doesNotMatch(wrappedAdapted.visualReport, /PROMPT INSTRUCTIONS|TRAILING EXECUTION RULES/);
+assert.match(wrappedAdapted.visualReport, new RegExp('AI Score</p><p>' + wrappedVisualResult.decision_record.ai_score + '<span>/100</span>'));
+assert.match(wrappedAdapted.visualReport, new RegExp('Confidence</p><p>' + wrappedVisualResult.decision_record.confidence + '</p>'));
+
 const run = normalizeMemoRun({
   request: {
     ...screened.request,
@@ -125,6 +140,17 @@ assert.match(rendered, /Results/);
 assert.match(rendered, /VCB/);
 assert.match(rendered, /Visual Report/);
 assert.match(rendered, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
+
+const wordRendered = renderResultsPage({
+  currentRun: run,
+  history: [],
+  selectedRun: run,
+  selectedTicker: 'VCB',
+  reportTab: 'word'
+});
+assert.match(wordRendered, /crsm-word-preview/);
+assert.match(wordRendered, /BÁO CÁO PHÂN TÍCH/);
+assert.doesNotMatch(wordRendered, /crsm-report-frame/);
 
 const secondItem = {
   ...run.items[0],
