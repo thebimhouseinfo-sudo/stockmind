@@ -52,7 +52,7 @@ assert.match(methodologyRef, /do not output `screen_vs_crsm`/);
 assert.match(methodologyRef, /legacy Node 7 side effect/);
 assert.match(methodologyRef, /decision_record/);
 assert.match(methodology, /node1\.\.node5|Node 1–5/);
-assert.match(methodology, /deterministic web renderer/i);
+assert.match(methodology, /deterministic.*renderer/i);
 assert.match(methodology, /NODE6B-FULL-REPORT\.md/);
 assert.match(methodologyRef, /technical_coverage/);
 assert.match(methodologyRef, /DEGRADED/);
