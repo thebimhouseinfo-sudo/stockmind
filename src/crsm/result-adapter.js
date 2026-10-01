@@ -117,6 +117,59 @@ function formatCanonicalNumber(value) {
   return Number(value).toLocaleString('en-US', { maximumFractionDigits: 2, useGrouping: false });
 }
 
+export function normalizeVisualReportHtml(input, decisionRecord = {}) {
+  let html = String(input ?? '').trim();
+  if (!html) return html;
+
+  const lower = html.toLowerCase();
+  const doctypeIndex = lower.indexOf('<!doctype html');
+  const htmlIndex = lower.indexOf('<html');
+  const starts = [doctypeIndex, htmlIndex].filter(index => index >= 0);
+  const start = starts.length ? Math.min(...starts) : -1;
+  const end = lower.lastIndexOf('</html>');
+
+  if (start >= 0 && end > start) {
+    html = html.slice(start, end + '</html>'.length);
+  }
+
+  // Node6A is presentation only. Missing data must not become invalid CSS tokens.
+  html = html.replace(/class=(["'])([^"']*)\1/gi, (match, quote, classValue) => {
+    const cleaned = String(classValue)
+      .replace(/\bData\s+not\s+available\b/gi, 'text-gray-500')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return 'class=' + quote + cleaned + quote;
+  });
+  html = html.replace(/style=(["'])([^"']*)\1/gi, (match, quote, styleValue) => {
+    const cleaned = String(styleValue)
+      .replace(/width\s*:\s*Data\s+not\s+available/gi, 'width:0%');
+    return 'style=' + quote + cleaned + quote;
+  });
+
+  const score = Number(decisionRecord?.ai_score);
+  if (Number.isFinite(score)) {
+    html = html.replace(
+      /(<p[^>]*>\s*AI Score\s*<\/p>\s*<p[^>]*>)[^<]*(<span[^>]*>\s*\/100\s*<\/span>)/i,
+      (_, before, after) => before + formatCanonicalNumber(score) + after
+    );
+  }
+
+  const confidence = Number(decisionRecord?.confidence);
+  if (Number.isFinite(confidence)) {
+    html = html.replace(
+      /(<p[^>]*>\s*(?:Tin tưởng|Confidence)\s*<\/p>\s*<p[^>]*>)[^<]*(<\/p>)/i,
+      (_, before, after) => before + formatCanonicalNumber(confidence) + after
+    );
+  }
+
+  return html;
+}
+
+function formatCanonicalNumber(value) {
+  if (!Number.isFinite(value)) return '';
+  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
+}
+
 export function normalizeMemoRun(run) {
   if (!run?.request || !run?.status) return null;
   const requestItems = new Map(
