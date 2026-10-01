@@ -1,4 +1,4 @@
-import { buildWordHtmlDocument } from '../report-export.js';
+import { markdownToHtml } from '../report-export.js';
 import {
   decisionLogRows,
   selectedRunItem,
@@ -177,9 +177,7 @@ function renderResultDetail(item, reportTab, selectedRun, retryingItemId) {
 
   const result = item.result;
   const activeTab = ['html', 'word', 'log'].includes(reportTab) ? reportTab : 'html';
-  const srcdoc = activeTab === 'word'
-    ? buildWordHtmlDocument(result.detailReport, result.ticker)
-    : result.visualReport;
+  const srcdoc = result.visualReport;
 
   return `<section class="results-completed">
     <div class="panel panel-pad results-summary-card">
@@ -213,7 +211,9 @@ function renderResultDetail(item, reportTab, selectedRun, retryingItemId) {
 
     ${activeTab === 'log'
       ? renderDecisionLog(decisionLogRows(item))
-      : `<div class="report-paper"><iframe class="crsm-report-frame" srcdoc="${escapeAttr(srcdoc)}" sandbox></iframe></div>`}
+      : activeTab === 'word'
+        ? `<div class="report-paper"><article class="crsm-word-preview">${markdownToHtml(result.detailReport)}</article></div>`
+        : `<div class="report-paper"><iframe class="crsm-report-frame" srcdoc="${escapeAttr(srcdoc)}" sandbox></iframe></div>`}
   </section>`;
 }
 
