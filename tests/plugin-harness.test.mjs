@@ -71,6 +71,8 @@ assert.match(worker, /existing-result recovery check/);
 assert.match(worker, /do not rerun CRSM/);
 assert.match(githubRuntime, /PROCESSING recovery before analysis/);
 assert.match(githubRuntime, /RESULT_RECOVERY_CONFLICT/);
+assert.match(githubRuntime, /hard recovery invariants/i);
+assert.match(githubRuntime, /Presentation drift is \*\*not\*\* a recovery conflict/i);
 assert.match(githubRuntime, /valid pre-existing canonical result/);
 assert.match(githubRuntime, /thebimhouseinfo-sudo\/stockmind/);
 assert.match(githubRuntime, /Branch:\s*\n`runtime`/);
@@ -82,6 +84,11 @@ assert.doesNotMatch(admission, /custom MCP/i);
 assert.match(resultContract, /repository result is the durable output|analysis destination is GitHub/i);
 assert.match(resultContract, /NODE6A-LOCKED-TEMPLATE\.md/);
 assert.match(resultContract, /NODE6B-FULL-REPORT\.md/);
+assert.match(resultContract, /Hard vs soft consistency/);
+assert.match(resultContract, /Node 5 \+ decision_record are canonical/);
+assert.match(methodology, /SOFT — repair\/normalize, do not fail the item/);
+assert.match(node6aTemplate, /OUTPUT BOUNDARY/);
+assert.doesNotMatch(node6aTemplate, /FINAL EXECUTION RULE/);
 
 const prohibited = [
   'choose the next ticker',
