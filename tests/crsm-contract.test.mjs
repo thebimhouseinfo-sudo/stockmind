@@ -214,9 +214,13 @@ assert.equal(emptyMethodologyRevisionCheck.valid, false);
 assert.ok(emptyMethodologyRevisionCheck.errors.some(error => error.includes('methodology_revision')));
 
 const unresolvedDetailPlaceholder = structuredClone(screened.result);
-unresolvedDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nLuận điểm: [THESIS]';
+unresolvedDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nAI Score: [AI_SCORE]';
 const unresolvedDetailCheck = validateAnalysisResult(unresolvedDetailPlaceholder);
 assert.equal(unresolvedDetailCheck.valid, false);
 assert.ok(unresolvedDetailCheck.errors.some(error => error.includes('unresolved detail-report placeholder')));
+
+const legitimateBracketLabel = structuredClone(screened.result);
+legitimateBracketLabel.outputs.node6b = '# BÁO CÁO NT2\nNguồn tham chiếu [HOSE] và [VNDIRECT].';
+assert.equal(validateAnalysisResult(legitimateBracketLabel).valid, true);
 
 console.log('CRSM migration contract tests passed.');
