@@ -1,0 +1,800 @@
+{
+  "request_version": "crsm-request.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261001T164043123Z-me4omawq",
+  "created_at": "2026-10-01T16:40:43.123Z",
+  "items": [
+    {
+      "item_id": "item-80b3d812-e72f-4c2b-b4bd-82fbb6de6a9d",
+      "ticker": "VIX",
+      "analysis_source": "SCREENED_WEB",
+      "screening_context": {
+        "source": "StockScreenerV2",
+        "ticker": "VIX",
+        "industry": "Investment banks/Brokers",
+        "screening_as_of": "2026-10-01",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 61.78,
+          "screen_rank": 48,
+          "screen_grade": "C",
+          "quality_score": 90.67,
+          "growth_score": 76.91,
+          "valuation_score": 79,
+          "micro_score": 45.3,
+          "momentum_score": 6.67,
+          "opportunity_score": 54.19,
+          "classification": "WATCH_NEUTRAL"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 12150,
+              "value": 12150,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 32550,
+              "value": 32550,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 11000,
+              "value": 11000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": -5.81,
+              "value": -5.81,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": -14.13,
+              "value": -14.13,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": -24.96,
+              "value": -24.96,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": -23.15,
+              "value": -23.15,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": -58.95,
+              "value": -58.95,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": -33.31,
+              "value": -33.31,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 26710000,
+              "value": 26710000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 0.76,
+              "value": 0.76,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 33830000,
+              "value": 33830000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 43090000,
+              "value": 43090000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 47010000,
+              "value": 47010000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 31650000000000,
+              "value": 31650000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 15.67,
+              "value": 15.67,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 12.55,
+              "value": 12.55,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 269.65,
+              "value": 269.65,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": -6.94,
+              "value": -6.94,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 102.08,
+              "value": 102.08,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": 181.29,
+              "value": 181.29,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 95.4,
+              "value": 95.4,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 149.17,
+              "value": 149.17,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 108.85,
+              "value": 108.85,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": 2790000000000,
+              "value": 2790000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.14,
+              "value": 0.14,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.53,
+              "value": 0.53,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 4.72,
+              "value": 4.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 4.72,
+              "value": 4.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 5.85,
+              "value": 5.85,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0.06,
+              "value": 0.06,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 0.96,
+              "value": 0.96,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 8.72,
+              "value": 8.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 2.22,
+              "value": 2.22,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 3.32,
+              "value": 3.32,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 12150,
+          "high_52w": 32550,
+          "low_52w": 11000
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 90.67,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 76.91,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 4
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 79,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 5
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 45.3,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 6.67,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 67.99,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 54.19,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "TRUE",
+            "signals": [
+              "SEVERE_DRAWDOWN",
+              "WEAK_MEDIUM_MOMENTUM"
+            ]
+          },
+          "lineage": [
+            "SEVERE_DRAWDOWN",
+            "WEAK_MEDIUM_MOMENTUM"
+          ]
+        },
+        "classification": {
+          "classification": "WATCH_NEUTRAL",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Mixed or unresolved sandbox evidence",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 67.99,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 54.19,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.626728,
+          "upside_to_52w_high": 1.679012,
+          "position_52w_range": 0.053364,
+          "signals": [
+            "SEVERE_DRAWDOWN"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "TRUE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": -5.81,
+          "perf_1m": -14.13,
+          "perf_3m": -24.96,
+          "perf_6m": -23.15,
+          "perf_1y": -58.95,
+          "perf_ytd": -33.31,
+          "volume": 26710000,
+          "relative_volume": 0.76,
+          "avg_volume_30d": 43090000,
+          "medium_momentum": -21.9795,
+          "momentum_stack": 0,
+          "volume_confirmation": "FALSE",
+          "signals": [
+            "WEAK_MEDIUM_MOMENTUM"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "FALSE",
+            "weak_medium_momentum": "TRUE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "VIX",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 61.78,
+          "percentile": 27.69,
+          "rank_position": 48,
+          "rank_total": 66,
+          "rankable_denominator": 66,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "SEVERE_DRAWDOWN",
+            "WEAK_MEDIUM_MOMENTUM",
+            "STRONG_BUSINESS_QUALITY",
+            "ATTRACTIVE_VALUATION"
+          ]
+        }
+      },
+      "evidence_refs": []
+    }
+  ]
+}
