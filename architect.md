@@ -1,204 +1,208 @@
 # Stock Mind Architecture
 
-This is the current architecture reference. It is the orientation document for future work. Old current-phase specs, TODOs, and implementation plans were removed because the implemented system is now the source of truth. `IMPLEMENTATION_PHASE2.md` is intentionally kept as future-scope planning because Phase 2 has not been implemented yet.
+This file describes the current implemented architecture.
 
-## 1. Product Shape
+## 1. Product shape
 
-Stock Mind has two layers:
+Stock Mind has two independent layers:
 
-1. **Screener**: deterministic TradingView import, normalization, scoring, ranking, dashboard grouping, and candidate selection.
-2. **CRSM**: deeper AI-assisted analysis for selected tickers, using the screener snapshot when the ticker came from the screener.
+1. **Screener V2** — deterministic TradingView import, normalization, scoring, ranking and candidate selection.
+2. **CRSM** — ChatGPT-driven deep research executed outside the browser against a durable GitHub Memo contract.
 
-The core rule is simple: the screener is cheap, deterministic, and transparent; CRSM is expensive, research-heavy, and only runs after the user chooses candidates.
+The browser is the job producer and result renderer. It is not an LLM runtime.
 
-## 2. Main Flow
+## 2. Main flow
 
 ```text
-TradingView table
+TradingView
   -> parser
-  -> Screener V2 scoring
+  -> Screener V2
   -> Dashboard / Ranking
-  -> selected ticker(s)
-  -> CRSM SCREENED mode
-  -> report / decision log
+  -> Analysis List
+  -> Vercel Memo bridge
+  -> GitHub runtime:memo/
 
-Manual ticker
-  -> CRSM DIRECT mode
-  -> report / decision log
+Stockmind Web plugin
+  -> admission
+  -> connected GitHub app
+  -> claim current item
+  -> CRSM methodology
+  -> immutable result + decision_record
+  -> next ticker
+  -> daily render
+
+Results
+  -> one selected run
+  -> one selected ticker
+  -> Visual Report / Detail Report / Decision Log
 ```
 
-SCREENED and DIRECT share the same CRSM engine. DIRECT must remain available even when no screener data exists.
+Manual tickers enter Analysis List as `WEB_ONLY`. Screener-origin tickers enter as `SCREENED_WEB`. A ticker with user evidence uses `EVIDENCE_WEB`.
 
-## 3. Current Runtime Files
+## 3. Core runtime files
 
-Core app:
+### Browser
 
-- `index.html`: app shell and script/style loading.
-- `src/app.js`: top-level UI state, tabs, import/share flow, dashboard/ranking/detail/CRSM handoff.
-- `src/parser.js`: TradingView paste parser and field normalization.
-- `src/scoring.js`: deterministic Screener V2 entrypoint and app-facing score/stat helpers.
-- `src/share-code.js`: local, file-based screener export/import codec.
-- `tests/core.test.mjs`: parser, Screener V2, and share round-trip tests.
+- `src/app.js` — top-level UI, Screener handoff, Analysis List and Results orchestration.
+- `src/parser.js` — TradingView paste parser and normalization.
+- `src/scoring.js` — deterministic Screener V2 entrypoint.
+- `src/share-code.js` — screener-only local export/import.
+- `src/crsm/context.js` — trusted SCREENED_WEB snapshot builder.
+- `src/crsm/contracts.js` — CRSM request/result/source contracts.
+- `src/crsm/draft-list.js` — versioned Analysis List draft.
+- `src/crsm/memo-client.js` — browser client for Vercel Memo APIs.
+- `src/crsm/result-adapter.js` — immutable result -> renderer adapter.
+- `src/crsm/results-poller.js` — Results-visible polling lifecycle.
+- `src/crsm/report-export.js` — client-side export transforms for returned reports.
+- `src/crsm/user-evidence.js` — local document extraction for ticker-bound evidence.
+- `src/crsm/ui/analysis-list.js` — Analysis List UI.
+- `src/crsm/ui/results.js` — Results UI.
 
-Screener V2 modules:
+### Memo / server bridge
 
-- `src/screener-v2/registry.js`: thresholds, metadata, calibration status.
-- `src/screener-v2/contract-validator.js`: input contract and data-quality state.
-- `src/screener-v2/price-dislocation.js`: 52-week price/dislocation profile.
-- `src/screener-v2/momentum-volume.js`: momentum and volume profile.
-- `src/screener-v2/full-evaluation.js`: full row evaluation.
-- `src/screener-v2/diagnostic-runner.js`: diagnostics.
-- `src/screener-v2/state.js`: shared Screener V2 constants/state helpers.
+- `src/memo/protocol.js` — Memo paths, states, transition rules and validators.
+- `api/_github-runtime.js` — server-only GitHub runtime client and allowlist.
+- `api/_memo-service.js` — submit/read/retry/repair operations.
+- `api/_worker-service.js` — protocol-level worker operations and deterministic tests.
+- `api/crsm-*.js` — bounded Vercel endpoints consumed by the webapp.
 
-CRSM:
+`STOCKMIND_GITHUB_TOKEN` is server-only. No browser module may import or expose it.
 
-- `src/crsm/context.js`: builds the trusted screening snapshot for CRSM.
-- `src/crsm/engine.js`: public CRSM run entrypoint.
-- `src/crsm/pipeline.js`: node orchestration.
-- `src/crsm/router.js`: provider/model resolution and capability checks.
-- `src/crsm/llm.js`: shared LLM call abstraction.
-- `src/crsm/providers/`: provider adapters.
-- `src/crsm/model-discovery.js`: model discovery for configured API keys.
-- `src/crsm/settings.js`: model/provider/node settings.
-- `src/crsm/usage.js`: token and cost telemetry; Node 6A and 6B usage is grouped under Node 6 for node-level totals.
-- `src/crsm/nodes/`: CRSM node implementations.
-- `src/crsm/ui/`: CRSM UI, settings UI, reports, progress, error states.
+### Stockmind Web plugin
 
-Removed historical/test UI and docs:
+Active plugin source is `plugin/stockmind-web/`.
 
-- Mapping preview tab and export scripts were removed from runtime.
-- Current-phase spec, TODO, and implementation-plan documents were removed. Use this file plus source code instead.
-- `IMPLEMENTATION_PHASE2.md` remains as future-scope planning only.
+It is **skill-only**:
+- no `mcp.json`;
+- no Stockmind MCP server;
+- no desktop dependency;
+- GitHub is accessed through the connected GitHub app;
+- repository/branch/Memo boundaries are fixed by the harness.
 
-## 4. Screener Rules
-
-The screener is deterministic. It must not call LLMs or depend on CRSM.
-
-Responsibilities:
-
-- Parse TradingView data.
-- Normalize fields into the app schema.
-- Validate critical inputs.
-- Produce Screener V2 scores, rank, grade, group, flags, and notes.
-- Show full ranking for inspection.
-- Show dashboard candidate groups for action.
-- Build a trusted snapshot for CRSM.
-
-Dashboard is the primary action surface. Ranking is for full-universe inspection. User actions:
-
-- Click a ticker: run single SCREENED CRSM.
-- Select multiple tickers on Dashboard: batch SCREENED CRSM.
-- Use Ranking to inspect all rows.
-
-## 5. Share / Import
-
-Stock Mind supports local, no-cloud screener sharing.
-
-Screen tab layout:
+The canonical CRSM methodology and report contracts live under:
 
 ```text
-[Open TradingView] [Import & Screen]
-TradingView -> Ctrl+A -> Ctrl+C -> Import & Screen
-[Share Screen] [Import Screen]
+plugin/stockmind-web/skills/stockmind-crsm-methodology/
+```
+
+The repository copy on `master` is canonical for each new analysis.
+
+## 4. Screener rules
+
+Screener V2 is deterministic and must never depend on CRSM.
+
+Responsibilities:
+- parse TradingView data;
+- validate critical inputs;
+- calculate deterministic factors/axes/risk/classification/ranking;
+- expose complete ranking and Dashboard groups;
+- build a trusted CRSM snapshot.
+
+User actions no longer run CRSM in-browser:
+- single ticker action -> add to Analysis List;
+- Dashboard multi-select -> add selected tickers to Analysis List.
+
+CRSM must not overwrite Screener V2 score, rank, grade or classification.
+
+## 5. CRSM source contracts
+
+Exactly three source modes exist:
+
+| Source | Inputs |
+|---|---|
+| `SCREENED_WEB` | trusted Screener snapshot + web |
+| `EVIDENCE_WEB` | evidence for exactly that ticker/item + web |
+| `WEB_ONLY` | web only |
+
+Evidence ownership is `document_id + item_id + ticker`. A mismatch is invalid.
+
+## 6. Memo contract
+
+Canonical runtime location:
+
+```text
+branch: runtime
+memo/
+  current.json
+  index.json
+  runs/<run_id>/
+    request.json
+    status.json
+    evidence/<ticker>/<document_id>.json
+    results/<ticker>.json
+  render/
+    index.json
+    runs/<run_id>.json
+```
+
+Item lifecycle:
+
+```text
+READY -> PROCESSING -> COMPLETED
+                    -> FAILED
+FAILED -> READY
 ```
 
 Rules:
+- one active submitted run;
+- exact-SHA state transitions;
+- result files are create-only/immutable;
+- completed siblings are never rerun;
+- interruption resumes the first unfinished item;
+- failed work remains resumable;
+- completed working payload is cleaned after render publication.
 
-- `Share Screen` exports a `.stockmind` file.
-- `Import Screen` opens a file picker and imports a `.stockmind` file.
-- The file contains screener rows/scores only.
-- The file must not contain API keys, CRSM settings, provider settings, or private CRSM reports.
-- Imported files replace the current screener dataset and rerun deterministic scoring.
+## 7. CRSM methodology
 
-## 6. CRSM Screening Snapshot Contract
+For each ticker the Stockmind Web plugin executes the current Node 1–6 methodology in dependency order and produces:
+- canonical Node outputs;
+- Node 6A locked Visual HTML report;
+- Node 6B full detailed Word-ready Markdown report;
+- exactly one canonical `decision_record`.
 
-When CRSM runs in SCREENED mode, it receives a snapshot generated from the selected screener row. CRSM must treat this snapshot as trusted user-provided screening context.
+Node 2 must expose explicit `technical_coverage`; unavailable required market-history capability is reported as `DEGRADED`, not silently treated as complete.
 
-Node 1 uses the snapshot as verified internal evidence and should only search for:
+Node 5 uses the canonical six-factor contract and approved decision enum defined by `src/crsm/contracts.js` and the plugin methodology.
 
-- missing critical stock facts;
-- current facts that may have changed;
-- direct/manual ticker data when the user did not come through the screener;
-- verification or explanation of important discrepancies.
+The old browser `runLLM/router/provider` runtime is not part of the active architecture.
 
-CRSM must not silently recalculate or overwrite screener scores, rank, grade, or deterministic classifications.
+## 8. Result retention
 
-## 7. CRSM Pipeline
+Daily render is keyed to `Asia/Ho_Chi_Minh`:
+- completed runs on the same day append to the current render set;
+- the first completed run on a new day replaces the prior-day rendered set;
+- Results suppresses stale prior-day render data.
 
-```text
-Node 1: company/data/current fact grounding
-Node 2: technical and smart money
-Node 3: fundamentals and valuation
-Node 4: macro/causal context
-Node 5: synthesis and decision
-Node 6A: LLM-assisted HTML report
-Node 6B: LLM-assisted Word/Markdown report
-Node 7: local decision log
-```
+Historical immutable result artifacts are not rewritten retroactively.
 
-Node 6A and Node 6B are report-generation nodes that use the shared LLM routing layer and can be assigned provider/model independently in Settings. Their raw request telemetry remains identifiable as `node6a` and `node6b`, while node-level usage/cost summaries aggregate both under **Node 6**.
+## 9. Share / import boundary
 
-Both report nodes retain deterministic local renderers as fallbacks if the selected model fails or returns unusable output. Node 7 remains local-only and is not a provider-model assignment target.
+`.stockmind` share files contain screener rows/scores only.
 
-## 8. Provider And Model Settings
+They must never contain:
+- GitHub credentials;
+- private CRSM reports;
+- Memo runtime state;
+- uploaded evidence.
 
-Settings separates availability from assignment:
+## 10. Development rules
 
-- Providers: API key and model inventory.
-- Model inventory: models available per provider.
-- CRSM Engine: provider/model assignment per AI node, including Node 6A and Node 6B.
-- Usage: current-run telemetry; Node 6 totals combine 6A + 6B.
-- Cost: historical cost and budget monitoring.
+1. Keep Screener V2 deterministic.
+2. Keep browser code free of provider API keys and model-provider routing.
+3. Keep privileged GitHub access server-side for webapp Memo APIs.
+4. Keep the Stockmind Web plugin skill-only and GitHub-connector based.
+5. Preserve exactly two CRSM browser pages: Analysis List and Results.
+6. Preserve `SCREENED_WEB`, `EVIDENCE_WEB`, and `WEB_ONLY`.
+7. Preserve ticker-bound evidence ownership.
+8. Preserve exact-SHA Memo transitions and immutable completed results.
+9. Preserve sequential ticker execution and resume semantics.
+10. Treat the repository plugin methodology/report references as canonical.
+11. Do not revive local Decision Log ownership; render the canonical `decision_record`.
+12. Run `npm run check` before promotion.
 
-Auto model discovery:
+## 11. Quick orientation
 
-- Gemini and OpenAI can auto-scan available models after the user enters an API key.
-- Ollama Cloud is excluded from auto-scan.
-- Auto-scan updates provider model inventory.
-- If a node's selected model is no longer available after scanning, the app moves that node to the first available model for that provider.
-
-Provider calls must stay behind:
-
-```text
-node -> runLLM() -> router -> provider adapter -> model API
-```
-
-Nodes must never call provider APIs directly.
-
-## 9. Data Ownership
-
-| Data | Owner | Rule |
-|---|---|---|
-| TradingView pasted data | Screener | Raw user import source |
-| Parsed rows | Parser | Normalized app input |
-| Scores/rank/grade/group | Screener V2 | Deterministic, trusted snapshot |
-| External current facts | CRSM Node 1+ | Search and verify |
-| Analysis/decision | CRSM Node 5 | Interpret evidence |
-| Reports | CRSM Node 6A/6B | LLM-assisted render with deterministic local fallback |
-| Provider/API settings | Settings | Never include in share files |
-| Usage/cost telemetry | CRSM usage | Observability only; 6A + 6B aggregate as Node 6 at node-summary level |
-
-## 10. Development Rules
-
-1. Keep screener logic deterministic.
-2. Do not move deterministic scoring into CRSM.
-3. Preserve both SCREENED and DIRECT CRSM modes.
-4. Treat the screener snapshot as trusted context, not as a prompt suggestion.
-5. When changing screener output, review `src/crsm/context.js`, Node 1, and Node 1 prompt.
-6. Do not let missing non-critical TradingView data create noisy warnings.
-7. Only flag missing data strongly when it affects critical scoring or CRSM reliability.
-8. Keep Dashboard as the candidate action surface.
-9. Keep Ranking as full-universe inspection.
-10. Keep provider calls behind router/provider adapters, including report-generation calls from Node 6A/6B.
-11. Keep deterministic local report renderers as fallback paths for Node 6A/6B.
-12. Aggregate Node 6A + Node 6B usage/cost under Node 6 for node-level monitoring while retaining raw request provenance.
-13. Never store or export API keys in share/import artifacts.
-14. Avoid reviving removed Mapping preview code unless explicitly requested for parser debugging.
-15. Before pushing, run `npm test`.
-
-## 11. Quick Orientation
-
-For most future tasks, start with:
+For future work start with:
 
 ```text
 architect.md
@@ -206,10 +210,14 @@ src/app.js
 src/parser.js
 src/scoring.js
 src/screener-v2/
-src/crsm/context.js
-src/crsm/settings.js
-src/crsm/router.js
-src/crsm/usage.js
+src/crsm/contracts.js
+src/crsm/draft-list.js
+src/crsm/memo-client.js
+src/crsm/result-adapter.js
+src/memo/protocol.js
+api/_github-runtime.js
+api/_memo-service.js
+plugin/stockmind-web/
 ```
 
-Then inspect only the specific UI, node, provider, or scoring module needed for the requested change.
+Only expand into the exact module required by the task.

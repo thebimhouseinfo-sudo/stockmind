@@ -1,5 +1,8 @@
 # Stockmind CRSM — Detail Execution Plan
 
+> **Implementation status (2026-10-01):** The target skill-only `stockmind-web` + GitHub Memo architecture is implemented and human-tested. PACK 11 retires the legacy browser model-provider runtime and custom Stockmind MCP experiment. Current architecture is documented in `architect.md`; release/verification evidence is tracked in GSA Project Memory.
+
+
 Status: REVIEWED / READY  
 Parent architecture Job: J-2AC0 rev2  
 Execution Job: J-1C2B rev2  

@@ -1,5 +1,8 @@
 # Stockmind CRSM — Single-user GitHub Memo + Vercel + ChatGPT Plugin Plan
 
+> **Implementation status (2026-10-01):** The target skill-only `stockmind-web` + GitHub Memo architecture is implemented and human-tested. PACK 11 retires the legacy browser model-provider runtime and custom Stockmind MCP experiment. Current architecture is documented in `architect.md`; release/verification evidence is tracked in GSA Project Memory.
+
+
 Status: PLANNING REVIEW PASS / READY  
 GSA Job: J-2AC0  
 Planning revision: 2  

@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import { submitRun, retryFailedItem } from '../api/_memo-service.js';
-import { stockmindMcpBoundary } from '../api/_mcp-config.js';
 import {
   claimItem,
   completeItem,
@@ -143,14 +142,6 @@ async function runToCompletion(runtime, fixtureValue, nowBase) {
     now: new Date(new Date(nowBase).getTime() + 120_000).toISOString()
   });
 }
-
-const boundary = stockmindMcpBoundary();
-assert.equal(boundary.owner, 'thebimhouseinfo-sudo');
-assert.equal(boundary.repo, 'stockmind');
-assert.equal(boundary.branch, 'runtime');
-assert.equal(boundary.path_prefix, 'memo/');
-assert.equal(boundary.writes_enabled_by_default, true);
-assert.equal(boundary.write_kill_switch, 'STOCKMIND_MCP_WRITES_ENABLED=false');
 
 const screened = fixture('screened-web');
 const runtime = makeRuntime({
