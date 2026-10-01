@@ -29,7 +29,17 @@ Never transplant a result between items or runs.
 
 ## Required result shape
 
-Use the repository's canonical `crsm-result.v1` contract.
+Use the repository's canonical `crsm-result.v1` contract. The compatibility rules for analytical-quality upgrades are defined in repository-root `CRSM_SCHEMA_MIGRATION.md`; do not invent a version bump outside that gate.
+
+### v1 compatibility profiles
+
+`crsm-result.v1` remains one durable identity while specific nested fields may use dual-compatible profiles:
+- Node 2 legacy technical coverage keeps `required_sessions: 300`; new analysis may use `coverage_model: CAPABILITY_BASED_V1` with explicit `indicator_requirements`.
+- Node 5 legacy confidence remains readable; new analysis may use `confidence.method: EVIDENCE_QUALITY_V1` with evidence-quality components.
+- `methodology_revision` and later CR-reviewed analytical fields are additive/optional for legacy results until their owning checkpoint defines validation.
+- Node 6B exact headings/table counts are presentation guidance, not result-fatal structure. Unresolved machine placeholders remain invalid content.
+
+Never rewrite immutable legacy results merely to adopt a newer compatibility profile.
 
 It must contain:
 - Node 1–5 outputs required by the current CRSM pipeline, including explicit Node 2 technical coverage and canonical Node 5 machine identity
