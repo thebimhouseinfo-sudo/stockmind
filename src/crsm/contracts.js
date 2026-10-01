@@ -226,6 +226,10 @@ export function validateAnalysisResult(result) {
     }
     if (isPlainObject(result.outputs.node2)) {
       errors.push(...validateNode2Output(result.outputs.node2).map(error => 'outputs.node2: ' + error));
+      warnings.push(...validateRequiredKeys(
+        result.outputs.node2,
+        ['ohlcv_source','trend_status','sma_200_rel','volume_analysis','smart_money_phase','zones','sector_benchmark','sector_vs_market','screening_signal_analysis','signal_strength','conclusion']
+      ).map(error => 'outputs.node2: ' + error));
     }
     if (isPlainObject(result.outputs.node3)) {
       warnings.push(...validateRequiredKeys(
@@ -316,8 +320,9 @@ function validateNode2Output(node) {
 
 function validateNode5Output(node) {
   const errors = validateRequiredKeys(node, [
-    'ticker','scores','ai_score','confidence','conflict_detector','decision',
-    'drivers','thesis_invalidation','trading_stop','strategy','full_reasoning'
+    'ticker','data_period','scores','ai_score','confidence','conflict_detector',
+    'catalyst_horizon','decision','drivers','thesis_invalidation','trading_stop',
+    'liquidity_note','strategy','localized_upstream','full_reasoning'
   ]);
 
   if (!NODE5_DECISIONS.includes(node.decision)) {
@@ -348,12 +353,41 @@ function validateNode5Output(node) {
 
   if (!isPlainObject(node.confidence) || !('value' in node.confidence)) {
     errors.push('confidence must be an object with value');
-  } else if (node.confidence.value != null && (!Number.isFinite(node.confidence.value) || node.confidence.value < 0 || node.confidence.value > 100)) {
-    errors.push('confidence.value must be null or numeric from 0 to 100');
+  } else {
+    if (node.confidence.value != null && (!Number.isFinite(node.confidence.value) || node.confidence.value < 0 || node.confidence.value > 100)) {
+      errors.push('confidence.value must be null or numeric from 0 to 100');
+    }
+    const components = node.confidence.components;
+    if (!isPlainObject(components)) {
+      errors.push('confidence.components must be an object');
+    } else {
+      for (const key of ['data_completeness','source_quality','cross_source_agreement','fundamental_consistency','technical_confirmation','macro_clarity']) {
+        if (!(key in components)) errors.push('confidence.components missing field: ' + key);
+        const value = components[key];
+        if (value != null && (!Number.isFinite(value) || value < 0 || value > 100)) {
+          errors.push('confidence.components.' + key + ' must be null or numeric from 0 to 100');
+        }
+      }
+    }
   }
 
   if (!isPlainObject(node.conflict_detector)) {
     errors.push('conflict_detector must be an object');
+  } else {
+    for (const key of ['fundamental','technical','macro','liquidity','signal_alignment','alignment','override_applied']) {
+      if (!(key in node.conflict_detector)) errors.push('conflict_detector missing field: ' + key);
+    }
+  }
+
+  if (!isPlainObject(node.catalyst_horizon)) {
+    errors.push('catalyst_horizon must be an object');
+  } else {
+    if (!('nearest_catalyst' in node.catalyst_horizon)) errors.push('catalyst_horizon.nearest_catalyst is required');
+    if (!('bucket' in node.catalyst_horizon)) errors.push('catalyst_horizon.bucket is required');
+    const bucket = node.catalyst_horizon.bucket;
+    if (bucket != null && !['0-30d','30-90d','90-180d','>180d'].includes(bucket)) {
+      errors.push('catalyst_horizon.bucket must be null or a canonical bucket');
+    }
   }
 
   if (!Array.isArray(node.drivers)) {
@@ -369,6 +403,10 @@ function validateNode5Output(node) {
 
   if (!isPlainObject(node.strategy)) {
     errors.push('strategy must be an object');
+  } else {
+    for (const key of ['entry_zone','allocation_plan','tp1','tp2','risk_per_trade_pct_nav','position_size_note','max_portfolio_weight_pct','position_type']) {
+      if (!(key in node.strategy)) errors.push('strategy missing field: ' + key);
+    }
   }
 
   if (typeof node.full_reasoning !== 'string' || !node.full_reasoning.trim()) {
