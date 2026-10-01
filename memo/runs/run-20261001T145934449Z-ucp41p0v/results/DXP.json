@@ -1,0 +1,1885 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261001T145934449Z-ucp41p0v",
+  "item_id": "item-068c7771-7ec6-4542-a6aa-2bb4bf950bad",
+  "ticker": "DXP",
+  "analysis_source": "SCREENED_WEB",
+  "outputs": {
+    "node1": {
+      "ticker": "DXP",
+      "sector_type": "Port operations",
+      "timestamp": "2026-10-01T15:35:00Z",
+      "data_period": "6T2026 + market 01/10/2026",
+      "analysis_mode": "SCREENED",
+      "screening_metrics": {
+        "price": {
+          "field": "price",
+          "raw_value": 13400,
+          "value": 13400,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "high_52w": {
+          "field": "high_52w",
+          "raw_value": 16000,
+          "value": 16000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "low_52w": {
+          "field": "low_52w",
+          "raw_value": 9800,
+          "value": 9800,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1w": {
+          "field": "perf_1w",
+          "raw_value": -0.74,
+          "value": -0.74,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1m": {
+          "field": "perf_1m",
+          "raw_value": -6.94,
+          "value": -6.94,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_3m": {
+          "field": "perf_3m",
+          "raw_value": -0.74,
+          "value": -0.74,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_6m": {
+          "field": "perf_6m",
+          "raw_value": 3.08,
+          "value": 3.08,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1y": {
+          "field": "perf_1y",
+          "raw_value": 19.64,
+          "value": 19.64,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_ytd": {
+          "field": "perf_ytd",
+          "raw_value": 21.82,
+          "value": 21.82,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "volume": {
+          "field": "volume",
+          "raw_value": 237980,
+          "value": 237980,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "relative_volume": {
+          "field": "relative_volume",
+          "raw_value": 1.58,
+          "value": 1.58,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_10d": {
+          "field": "avg_volume_10d",
+          "raw_value": 166800,
+          "value": 166800,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_30d": {
+          "field": "avg_volume_30d",
+          "raw_value": 220730,
+          "value": 220730,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_60d": {
+          "field": "avg_volume_60d",
+          "raw_value": 215310,
+          "value": 215310,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "market_cap": {
+          "field": "market_cap",
+          "raw_value": 814780000000,
+          "value": 814780000000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "roe_ttm": {
+          "field": "roe_ttm",
+          "raw_value": 19.01,
+          "value": 19.01,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "roa_ttm": {
+          "field": "roa_ttm",
+          "raw_value": 12.7,
+          "value": 12.7,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "revenue_growth_annual_yoy": {
+          "field": "revenue_growth_annual_yoy",
+          "raw_value": 3.01,
+          "value": 3.01,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "revenue_growth_quarterly_yoy": {
+          "field": "revenue_growth_quarterly_yoy",
+          "raw_value": 95.63,
+          "value": 95.63,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "eps_dil_growth_ttm_yoy": {
+          "field": "eps_dil_growth_ttm_yoy",
+          "raw_value": 131.46,
+          "value": 131.46,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "fcf_growth_ttm_yoy": {
+          "field": "fcf_growth_ttm_yoy",
+          "raw_value": -299.27,
+          "value": -299.27,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "gross_margin_ttm": {
+          "field": "gross_margin_ttm",
+          "raw_value": 28.39,
+          "value": 28.39,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "operating_margin_ttm": {
+          "field": "operating_margin_ttm",
+          "raw_value": 21.15,
+          "value": 21.15,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "net_margin_ttm": {
+          "field": "net_margin_ttm",
+          "raw_value": 17.93,
+          "value": 17.93,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "fcf_ttm": {
+          "field": "fcf_ttm",
+          "raw_value": -481540000000,
+          "value": -481540000000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "debt_equity_fq": {
+          "field": "debt_equity_fq",
+          "raw_value": 0.53,
+          "value": 0.53,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "debt_equity_fy": {
+          "field": "debt_equity_fy",
+          "raw_value": 0.35,
+          "value": 0.35,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "current_ratio_fq": {
+          "field": "current_ratio_fq",
+          "raw_value": 2.7,
+          "value": 2.7,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "quick_ratio_fq": {
+          "field": "quick_ratio_fq",
+          "raw_value": 2.5,
+          "value": 2.5,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "pe": {
+          "field": "pe",
+          "raw_value": 4.36,
+          "value": 4.36,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "peg": {
+          "field": "peg",
+          "raw_value": 0.03,
+          "value": 0.03,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "pb": {
+          "field": "pb",
+          "raw_value": 0.76,
+          "value": 0.76,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ps": {
+          "field": "ps",
+          "raw_value": 0.79,
+          "value": 0.79,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ev_ebitda": {
+          "field": "ev_ebitda",
+          "raw_value": 3.61,
+          "value": 3.61,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ev_revenue": {
+          "field": "ev_revenue",
+          "raw_value": 0.87,
+          "value": 0.87,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        }
+      },
+      "screening_summary": {
+        "screen_score": 76.67,
+        "screen_rank": 10,
+        "screen_grade": "A",
+        "quality_score": 90.06,
+        "growth_score": 59.29,
+        "valuation_score": 98.71,
+        "micro_score": 70.39,
+        "momentum_score": 58.98,
+        "opportunity_score": 72.33,
+        "classification": "CORE"
+      },
+      "trusted_screener_snapshot": {
+        "source": "StockScreenerV2",
+        "ticker": "DXP",
+        "industry": "Other transportation",
+        "screening_as_of": "2026-10-01",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 76.67,
+          "screen_rank": 10,
+          "screen_grade": "A",
+          "quality_score": 90.06,
+          "growth_score": 59.29,
+          "valuation_score": 98.71,
+          "micro_score": 70.39,
+          "momentum_score": 58.98,
+          "opportunity_score": 72.33,
+          "classification": "CORE"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [
+            "NEGATIVE_FCF"
+          ],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 13400,
+              "value": 13400,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 16000,
+              "value": 16000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 9800,
+              "value": 9800,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": -0.74,
+              "value": -0.74,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": -6.94,
+              "value": -6.94,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": -0.74,
+              "value": -0.74,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": 3.08,
+              "value": 3.08,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": 19.64,
+              "value": 19.64,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": 21.82,
+              "value": 21.82,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 237980,
+              "value": 237980,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 1.58,
+              "value": 1.58,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 166800,
+              "value": 166800,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 220730,
+              "value": 220730,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 215310,
+              "value": 215310,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 814780000000,
+              "value": 814780000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 19.01,
+              "value": 19.01,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 12.7,
+              "value": 12.7,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 3.01,
+              "value": 3.01,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": 95.63,
+              "value": 95.63,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 131.46,
+              "value": 131.46,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": -299.27,
+              "value": -299.27,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 28.39,
+              "value": 28.39,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 21.15,
+              "value": 21.15,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 17.93,
+              "value": 17.93,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": -481540000000,
+              "value": -481540000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.53,
+              "value": 0.53,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.35,
+              "value": 0.35,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 2.7,
+              "value": 2.7,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 2.5,
+              "value": 2.5,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 4.36,
+              "value": 4.36,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0.03,
+              "value": 0.03,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 0.76,
+              "value": 0.76,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 0.79,
+              "value": 0.79,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 3.61,
+              "value": 3.61,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 0.87,
+              "value": 0.87,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 13400,
+          "high_52w": 16000,
+          "low_52w": 9800
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 90.06,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 59.29,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 4
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 98.71,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 5
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 70.39,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 58.98,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 80.22,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 72.33,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "FALSE",
+            "signals": []
+          },
+          "lineage": []
+        },
+        "classification": {
+          "classification": "CORE",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Strong quality and opportunity, no material soft risk",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 80.22,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 72.33,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.1625,
+          "upside_to_52w_high": 0.19403,
+          "position_52w_range": 0.580645,
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "FALSE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": -0.74,
+          "perf_1m": -6.94,
+          "perf_3m": -0.74,
+          "perf_6m": 3.08,
+          "perf_1y": 19.64,
+          "perf_ytd": 21.82,
+          "volume": 237980,
+          "relative_volume": 1.58,
+          "avg_volume_30d": 220730,
+          "medium_momentum": -0.261,
+          "momentum_stack": 0.5,
+          "volume_confirmation": "FALSE",
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "FALSE",
+            "weak_medium_momentum": "FALSE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "DXP",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 76.67,
+          "percentile": 86.15,
+          "rank_position": 10,
+          "rank_total": 66,
+          "rankable_denominator": 66,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "STRONG_BUSINESS_QUALITY",
+            "ATTRACTIVE_VALUATION",
+            "NEGATIVE_FCF"
+          ]
+        }
+      },
+      "screening_as_of": "2026-10-01",
+      "data_integrity": {
+        "coverage": 100,
+        "status": "DATA_OK",
+        "flags": [
+          "NEGATIVE_FCF"
+        ],
+        "missing_fields": [],
+        "observations": {
+          "price": {
+            "field": "price",
+            "raw_value": 13400,
+            "value": 13400,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "high_52w": {
+            "field": "high_52w",
+            "raw_value": 16000,
+            "value": 16000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "low_52w": {
+            "field": "low_52w",
+            "raw_value": 9800,
+            "value": 9800,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1w": {
+            "field": "perf_1w",
+            "raw_value": -0.74,
+            "value": -0.74,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1m": {
+            "field": "perf_1m",
+            "raw_value": -6.94,
+            "value": -6.94,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_3m": {
+            "field": "perf_3m",
+            "raw_value": -0.74,
+            "value": -0.74,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_6m": {
+            "field": "perf_6m",
+            "raw_value": 3.08,
+            "value": 3.08,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1y": {
+            "field": "perf_1y",
+            "raw_value": 19.64,
+            "value": 19.64,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_ytd": {
+            "field": "perf_ytd",
+            "raw_value": 21.82,
+            "value": 21.82,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "volume": {
+            "field": "volume",
+            "raw_value": 237980,
+            "value": 237980,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "relative_volume": {
+            "field": "relative_volume",
+            "raw_value": 1.58,
+            "value": 1.58,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_10d": {
+            "field": "avg_volume_10d",
+            "raw_value": 166800,
+            "value": 166800,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_30d": {
+            "field": "avg_volume_30d",
+            "raw_value": 220730,
+            "value": 220730,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_60d": {
+            "field": "avg_volume_60d",
+            "raw_value": 215310,
+            "value": 215310,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "market_cap": {
+            "field": "market_cap",
+            "raw_value": 814780000000,
+            "value": 814780000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roe_ttm": {
+            "field": "roe_ttm",
+            "raw_value": 19.01,
+            "value": 19.01,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roa_ttm": {
+            "field": "roa_ttm",
+            "raw_value": 12.7,
+            "value": 12.7,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_annual_yoy": {
+            "field": "revenue_growth_annual_yoy",
+            "raw_value": 3.01,
+            "value": 3.01,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_quarterly_yoy": {
+            "field": "revenue_growth_quarterly_yoy",
+            "raw_value": 95.63,
+            "value": 95.63,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "eps_dil_growth_ttm_yoy": {
+            "field": "eps_dil_growth_ttm_yoy",
+            "raw_value": 131.46,
+            "value": 131.46,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_growth_ttm_yoy": {
+            "field": "fcf_growth_ttm_yoy",
+            "raw_value": -299.27,
+            "value": -299.27,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "gross_margin_ttm": {
+            "field": "gross_margin_ttm",
+            "raw_value": 28.39,
+            "value": 28.39,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "operating_margin_ttm": {
+            "field": "operating_margin_ttm",
+            "raw_value": 21.15,
+            "value": 21.15,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "net_margin_ttm": {
+            "field": "net_margin_ttm",
+            "raw_value": 17.93,
+            "value": 17.93,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_ttm": {
+            "field": "fcf_ttm",
+            "raw_value": -481540000000,
+            "value": -481540000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fq": {
+            "field": "debt_equity_fq",
+            "raw_value": 0.53,
+            "value": 0.53,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fy": {
+            "field": "debt_equity_fy",
+            "raw_value": 0.35,
+            "value": 0.35,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "current_ratio_fq": {
+            "field": "current_ratio_fq",
+            "raw_value": 2.7,
+            "value": 2.7,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "quick_ratio_fq": {
+            "field": "quick_ratio_fq",
+            "raw_value": 2.5,
+            "value": 2.5,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pe": {
+            "field": "pe",
+            "raw_value": 4.36,
+            "value": 4.36,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "peg": {
+            "field": "peg",
+            "raw_value": 0.03,
+            "value": 0.03,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pb": {
+            "field": "pb",
+            "raw_value": 0.76,
+            "value": 0.76,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ps": {
+            "field": "ps",
+            "raw_value": 0.79,
+            "value": 0.79,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_ebitda": {
+            "field": "ev_ebitda",
+            "raw_value": 3.61,
+            "value": 3.61,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_revenue": {
+            "field": "ev_revenue",
+            "raw_value": 0.87,
+            "value": 0.87,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          }
+        },
+        "issues": []
+      },
+      "market_data": {
+        "price": {
+          "value": 13400,
+          "date": "2026-10-01",
+          "source": "StockScreenerV2; external quote showed intraday/close variation"
+        },
+        "volume_20d_avg": {
+          "value": 220730,
+          "date": "2026-10-01",
+          "source": "StockScreenerV2 30d proxy"
+        },
+        "avg_trading_value_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "liquidity_flag": "LOW_TO_MODERATE",
+        "foreign_net_flow_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "foreign_room_remaining": {
+          "value": null,
+          "unit": "%",
+          "date": null,
+          "source": null
+        },
+        "market_cap": {
+          "value": 814.78,
+          "unit": "Bn VND",
+          "date": "2026-10-01",
+          "source": "StockScreenerV2"
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": 4.36,
+        "pb_current": 0.76,
+        "dividend_yield": null
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 572,
+          "period": "6T2026",
+          "yoy": null,
+          "source": "Q1+Q2 public results"
+        },
+        "npat": {
+          "value": 116.1,
+          "period": "6T2026",
+          "yoy": null,
+          "source": "Q1+Q2 public results"
+        },
+        "ebit": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "gross_margin": 28.39,
+        "debt_equity": 0.53,
+        "total_debt": null,
+        "total_equity": null,
+        "cash_and_equivalents": null,
+        "effective_tax_rate": null,
+        "cfo": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "capex": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "receivables": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "inventory": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "financial_income": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "financial_expense": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "other_income": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "other_expense": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "raw inputs only; WACC is calculated downstream",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": null,
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": null
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": null
+      },
+      "upcoming_events": [
+        {
+          "event": "Q3/2026 results",
+          "expected_window": "Oct 2026"
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "Strong EPS growth but negative FCF",
+          "observation": "EPS growth 131.46% while FCF TTM -481.54bn and FCF growth -299.27% in screening snapshot",
+          "explanation": "Cash conversion is materially weaker than accounting earnings and requires monitoring."
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [
+          "price",
+          "high_52w",
+          "low_52w",
+          "perf_1w",
+          "perf_1m",
+          "perf_3m",
+          "perf_6m",
+          "perf_1y",
+          "perf_ytd",
+          "volume",
+          "relative_volume",
+          "avg_volume_10d",
+          "avg_volume_30d",
+          "avg_volume_60d",
+          "market_cap",
+          "roe_ttm",
+          "roa_ttm",
+          "revenue_growth_annual_yoy",
+          "revenue_growth_quarterly_yoy",
+          "eps_dil_growth_ttm_yoy",
+          "fcf_growth_ttm_yoy",
+          "gross_margin_ttm",
+          "operating_margin_ttm",
+          "net_margin_ttm",
+          "fcf_ttm",
+          "debt_equity_fq",
+          "debt_equity_fy",
+          "current_ratio_fq",
+          "quick_ratio_fq",
+          "pe",
+          "peg",
+          "pb",
+          "ps",
+          "ev_ebitda",
+          "ev_revenue"
+        ],
+        "new_data_collected": [
+          "Q1/Q2 revenue and NPAT"
+        ],
+        "still_missing": [
+          "CFO/capex breakdown",
+          "cost-of-capital inputs",
+          "full OHLCV",
+          "sector benchmark"
+        ]
+      },
+      "sources": [
+        {
+          "name": "HNX/DXP filings",
+          "date": "2026",
+          "url": "https://www.hnx.vn/",
+          "note": "Issuer filings/AGM documents"
+        },
+        {
+          "name": "24HMoney DXP financial summary",
+          "date": "2026",
+          "url": "https://24hmoney.vn/stock/DXP",
+          "note": "Q1/Q2 financial data"
+        },
+        {
+          "name": "StockScreenerV2",
+          "date": "2026-10-01",
+          "url": null,
+          "note": "Trusted screening snapshot"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "required_sessions": 300,
+        "sessions_used": 20,
+        "missing_capabilities": [
+          "~300 daily OHLCV/SMA200",
+          "quantified port sector vs VNINDEX"
+        ],
+        "note": "Recent momentum available; long technical history incomplete."
+      },
+      "ohlcv_source": {
+        "source": "Public market history / screening snapshot",
+        "sessions_used": 20,
+        "date_range": "Sep-Oct 2026"
+      },
+      "trend_status": "Near-term weak, medium-term mildly positive",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": 1.58,
+        "classification": "above recent average",
+        "vsa_signal_candidate": "candidate support but not confirmed",
+        "supporting_evidence": "1M -6.94%, 3M -0.74%, 6M +3.08%, YTD +21.82%"
+      },
+      "smart_money_phase": "unclear / pullback",
+      "zones": {
+        "demand": "12,500–13,200",
+        "supply": "14,500–16,000",
+        "is_fresh": true
+      },
+      "sector_benchmark": {
+        "method": null,
+        "name": null,
+        "constituents_if_peer_basket": [],
+        "source": null,
+        "date": null
+      },
+      "sector_vs_market": {
+        "period": null,
+        "sector_perf_pct": null,
+        "vnindex_perf_pct": null,
+        "sector_strength_label": null
+      },
+      "screening_signal_analysis": "Recent weakness offsets positive 6M/YTD performance.",
+      "signal_strength": 11,
+      "conclusion": "Technical confirmation is incomplete and short-term momentum is weak."
+    },
+    "node3": {
+      "data_period": "6T2026",
+      "screening_flags": [
+        {
+          "flag": "Negative FCF",
+          "severity": "HIGH",
+          "observation": "FCF TTM -481.54bn despite strong EPS growth",
+          "question": "Are earnings converting to cash?",
+          "answer": "Not currently according to snapshot; this is the principal quality risk."
+        }
+      ],
+      "screening_metrics_used": {
+        "pe": 4.36,
+        "pb": 0.76,
+        "roe_ttm": 19.01,
+        "debt_equity_fq": 0.53
+      },
+      "capital_efficiency": {
+        "cost_of_equity": null,
+        "wacc": null,
+        "nopat": null,
+        "roic": null,
+        "economic_spread": null,
+        "formula_note": "Insufficient cost-of-capital inputs."
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "receivables_vs_revenue_growth": null,
+        "inventory_vs_revenue_growth": null,
+        "debt_vs_npat_growth": null,
+        "red_flags": [
+          "Negative TTM FCF despite strong accounting profit growth."
+        ]
+      },
+      "earnings_sustainability": {
+        "classification": "Cyclical/operational growth with cash-conversion concern",
+        "reasoning": "Port earnings improved but negative FCF reduces confidence in quality."
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Insufficient detailed line items.",
+      "health_status": "Cheap valuation and good ROE, but negative FCF and moderate leverage warrant caution.",
+      "valuation": {
+        "dcf_fair_value": null,
+        "reverse_dcf": {
+          "implied_fcf_cagr": null,
+          "commentary": "Not meaningful with negative current FCF."
+        },
+        "relative": {
+          "pe": 4.36,
+          "pb": 0.76
+        },
+        "peer_list": [
+          {
+            "ticker": "GMD",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Listed port/logistics peer"
+          },
+          {
+            "ticker": "VSC",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Listed port peer"
+          },
+          {
+            "ticker": "PHP",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Listed port peer"
+          }
+        ]
+      },
+      "moat": "Established Hải Phòng port position and local operating network.",
+      "conclusion": "Valuation is optically very cheap, but cash conversion is the gating issue."
+    },
+    "node4": {
+      "risk_regime": "Neutral",
+      "macro_indicators": {
+        "fed_rate": "3.75–4.00%",
+        "us_pce_yoy": "3.4% Aug-2026",
+        "dxy": "~101.47",
+        "brent_usd_bbl": "~103.5",
+        "usd_vnd": null
+      },
+      "company_specific_drivers": [
+        {
+          "driver": "Northern Vietnam trade/container volume",
+          "latest": null,
+          "direction": "Higher positive",
+          "source": "Port activity"
+        },
+        {
+          "driver": "Port competition/capacity",
+          "latest": null,
+          "direction": "More competition can pressure utilization/tariffs",
+          "source": "Industry"
+        },
+        {
+          "driver": "Working-capital/capex cash needs",
+          "latest": "FCF snapshot negative",
+          "direction": "Higher cash needs negative",
+          "source": "Screening snapshot"
+        }
+      ],
+      "sensitivity_table": [
+        {
+          "variable": "Container volume",
+          "sensitivity": "High",
+          "direction": "Positive",
+          "confidence": "High"
+        },
+        {
+          "variable": "Tariff/utilization",
+          "sensitivity": "High",
+          "direction": "Positive",
+          "confidence": "Medium"
+        },
+        {
+          "variable": "Capex/working capital",
+          "sensitivity": "High",
+          "direction": "Higher cash use negative",
+          "confidence": "High"
+        }
+      ],
+      "geopolitical_events": [],
+      "causal_chains": [
+        {
+          "fact": "Accounting profit grew strongly while TTM FCF is negative.",
+          "inference": "Growth may be consuming cash or affected by working-capital/capex timing.",
+          "assumption": "Snapshot FCF is correctly measured.",
+          "confidence": "Medium-High"
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Bull",
+          "description": "Volume grows and cash conversion normalizes."
+        },
+        {
+          "scenario": "Base",
+          "description": "Profit holds but FCF remains volatile."
+        },
+        {
+          "scenario": "Bear",
+          "description": "Cash burn persists alongside weaker throughput."
+        }
+      ],
+      "macro_view": "Trade volume is supportive but company cash conversion dominates risk.",
+      "industry_impact": "Neutral-positive",
+      "company_impact": "Mixed",
+      "conclusion": "Macro does not offset the need for cash-flow confirmation."
+    },
+    "node5": {
+      "ticker": "DXP",
+      "data_period": "6T2026 + 01/10/2026",
+      "scores": {
+        "fundamental": 14,
+        "valuation": 19,
+        "technical": 11,
+        "flow": 10,
+        "sector_macro": 13,
+        "risk": 11
+      },
+      "ai_score": {
+        "value": 67.8,
+        "formula_shown": "14/20×30 + 19/20×20 + 11/20×15 + 10/20×15 + 13/20×10 + 11/20×10"
+      },
+      "confidence": {
+        "value": 66,
+        "components": {
+          "data_completeness": 65,
+          "source_quality": 72,
+          "cross_source_agreement": 70,
+          "fundamental_consistency": 58,
+          "technical_confirmation": 45,
+          "macro_clarity": 68
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🟡",
+        "technical": "🟡",
+        "macro": "🟢",
+        "liquidity": "🟡",
+        "signal_alignment": "1/4",
+        "alignment": "1/4",
+        "override_applied": "Negative FCF and weak near-term technicals keep decision at WATCH despite cheap valuation."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "Q3/2026 results and cash-flow update",
+        "bucket": "0-30d"
+      },
+      "decision": "WATCH",
+      "drivers": [
+        "P/E 4.36x and P/B 0.76x are low.",
+        "Q2 revenue and NPAT improved strongly.",
+        "FCF TTM is -481.54bn VND and short-term momentum is weak."
+      ],
+      "thesis_invalidation": "Free cash flow remains materially negative while operating profit weakens, indicating that cheap valuation is not supported by sustainable cash generation.",
+      "trading_stop": {
+        "price": 12500,
+        "basis": "Lower boundary of near-term demand zone"
+      },
+      "liquidity_note": "Small-cap liquidity is moderate; use small tranches and allow for slippage.",
+      "strategy": {
+        "entry_zone": "12,500–13,000 only after cash-flow/technical confirmation",
+        "allocation_plan": {
+          "note": "WATCH; no default entry until FCF improves.",
+          "steps": [
+            "Wait for Q3 cash-flow data",
+            "If FCF improves, initiate a small tranche near support",
+            "Add only after trend confirmation"
+          ]
+        },
+        "tp1": {
+          "price": 14500,
+          "rationale": "Near supply zone."
+        },
+        "tp2": {
+          "price": 16000,
+          "rationale": "52-week high reference."
+        },
+        "risk_per_trade_pct_nav": 0.5,
+        "position_size_note": "Cap at 4% NAV due liquidity and cash-conversion risk.",
+        "max_portfolio_weight_pct": 4,
+        "position_type": "Initial"
+      },
+      "localized_upstream": {
+        "fundamental": "Định giá rẻ nhưng dòng tiền tự do âm.",
+        "technical": "Ngắn hạn yếu, coverage DEGRADED."
+      },
+      "full_reasoning": "DXP looks inexpensive and profitable, but negative FCF is a material quality conflict. WATCH until cash conversion improves."
+    },
+    "node6a": "You are a **Senior Frontend Engineer + Institutional Equity Research Report Designer (Top-tier Hedge Fund Level)**.\n\n---\n\n# ⚠️ HARD RULES (ABSOLUTE)\n\n* Using HTML TEMPLATE\n* Output ONLY raw HTML — no markdown, no explanation, no code fences\n* Do NOT change the HTML structure, DOM hierarchy, or CSS class **definitions** (the `<style>` block and `tailwind.config`).\n* You MAY replace: text inside text nodes, and inline Tailwind class TOKENS that are explicitly marked as replaceable below (e.g. `Data not available`, `Data not available`, `Data not available` — these sit inside an existing `class=\"...\"` attribute and you swap only that one token, e.g. `text-red-500` ↔ `text-green-600`). This is the one exception to \"text only\" — it exists because color IS the data (over/undervalued), so treat these specific placeholders as data fields, not layout.\n* EVERY placeholder MUST be replaced with real data.\n* **NULL HANDLING (standardized across the whole pipeline):** internal JSON from Node 1-5 uses `null`. In THIS HTML output, any field that was `null` upstream renders as exactly: `Data not available`. Never render a raw `null`, never invent a plausible-looking number to fill the gap.\n* If output breaks layout → FAIL\n* This node is a RENDERER only — it never computes a score, a comparison verdict, or an interpretation from raw numbers itself beyond simple formatting (e.g. picking a CONFIRMED/PARTIAL/DIVERGENT label from a difference Node 5 already gave you). If a value looks like it needs judgment (is this good or bad?), that judgment already happened upstream — find it in the JSON rather than deciding here.\n\n---\n\n# 🎯 INPUT\n\n{ALL_ANALYSIS_JSON} — combined JSON from Node 1 (financial/liquidity/ownership/events), Node 2 (technical + OHLCV-based signals + sector_benchmark), Node 3 (fundamentals + earnings quality + peer_list + reverse DCF), Node 4 (macro + sensitivity table + causal chains), Node 5 (decision + 6-factor scores + conflict detector + catalyst horizon + position sizing).\n\nUse each node's own `data_period` field to confirm all figures refer to the same fiscal period — if they don't match, keep the mismatch visible (footnote which period each block uses) rather than silently picking one.\n\n---\n\n# 🧠 DATA MAPPING (STRICT)\n\n## HEADER\n* DXP → stock ticker\n* 01/10/2026 → today's date (DD/MM/YYYY)\n* CTCP Cảng Đoạn Xá → full company name\n\n## HERO CARD\n* WATCH → Node 5 `decision` (Vietnamese: MUA / GIỮ / BÁN). If `conflict_detector.override_applied` is non-empty, the decision text must reflect it (e.g. \"MUA KHI ĐIỀU CHỈNH\" for a fundamental-green/technical-red override) rather than a plain MUA.\n* 67.8 → Node 5 `ai_score.value` (0–100)\n* 66 → Node 5 `confidence.value` (%)\n* P/E 4,36x; P/B 0,76x, 6T doanh thu ~572 tỷ; LNST ~116 tỷ, FCF TTM -481,5 tỷ → Node 5 `drivers` (MUST include numbers/signals)\n* Data not available → Node 5 `thesis_invalidation` (the FUNDAMENTAL condition — e.g. \"Q3 gross margin < X% AND CFO/NPAT < Y\"). This is NOT the same as the trade's technical stop-loss below — keep them conceptually separate even though both are red/warning-styled in the template.\n\n## MACRO\n* Trung tính → Node 4 `risk_regime` (Vietnamese)\n* 3,75–4,00%, Data not available, ~103,5 USD/thùng Brent, PCE 3,4% YoY → Node 4 `macro_indicators`\n* Cash conversion quan trọng hơn macro. → Node 4 `macro_view`, grounded in the sensitivity_table — don't apply a generic macro headline if Node 4's own sensitivity table rated it Low for this ticker\n\n## SECTOR\n* Data not available → Node 2 `sector_vs_market.sector_strength_label`\n* Data not available → Node 2 `sector_vs_market.sector_perf_pct`. Prefix with method: if `sector_benchmark.method` = \"peer_basket\", the value must be labeled as peer-basket performance, not \"ngành\" performance — e.g. \"+8% (rổ peer, không có chỉ số ngành chính thức)\" — never present a peer-basket number as if it were an official sector index.\n* Data not available → Node 2 `sector_vs_market.vnindex_perf_pct` (same period)\n* Data not available → CSS width% derived from sector_perf_pct vs vnindex_perf_pct\n* Data not available → 1 sentence, grounded in the two numbers above\n\n## INDUSTRY (qualitative section — no upstream node computes an exact \"industry stage\" number; treat as lower-confidence and say so, don't present it with false precision)\n* Data not available → derived qualitatively from Node 4 `industry_impact` + `sensitivity_table` — state it as a read of current conditions, not a hard data point\n* Data not available → average gross/net margin from Node 3 `peer_list` if margin data was captured there; otherwise \"Data not available\" — do not invent an industry margin number\n* Data not available → from Node 4 `company_specific_drivers` or `domestic_drivers` if a public-investment/capex figure relevant to the sector was found; otherwise \"Data not available\"\n* Data not available → short description tied to whichever of the above was actually available\n\n## COMPANY\n* ~572 tỷ đồng, 6T2026, Data not available, ~116,1 tỷ đồng, Data not available → Node 1 `financial_core_raw`\n* Vị thế cảng Hải Phòng và mạng vận hành địa phương. → Node 3 `moat`\n\n## SMART MONEY & VALUATION\n* unclear/pullback → Node 2 `smart_money_phase` — always phrase as a read with evidence, never assert \"institutional buying\" as settled fact (see Node 2 rules)\n* 12.500–13.200 → Node 2 `zones.demand` or `zones.supply` (whichever is currently relevant)\n* Chưa đủ xác nhận. → Node 2 `volume_analysis.vsa_signal_candidate` + `supporting_evidence` — keep the word \"candidate\" in the phrasing\n* 1,58x → Node 2 `volume_analysis.ratio`\n* 4,36x → Node 1 `valuation_multiples.pe_ttm`\n* Data not available → Node 3 `valuation.peer_avg_pe`, computed from the explicit `peer_list` — never a vague unsourced \"industry average\"; label it \"TB Peer\" not \"Ngành\" in the copy since it's a peer average, not an official index\n* Data not available → data-driven class token (see HARD RULES): `text-red-500` if `pe_ttm` > `peer_avg_pe`, `text-green-600` if lower\n* 0,76x → Node 1 `valuation_multiples.pb_current`\n* Snapshot → \"Dưới giá trị sổ sách\" / \"Trên giá trị sổ sách\" based on PB vs 1\n* Data not available → data-driven class token: `text-green-600` if PB < 1, `text-red-500` if PB > 2\n\n## TECHNICAL\n* Ngắn hạn yếu, trung hạn nhẹ dương → Node 2 `trend_status`\n* Data not available → data-driven class token: `text-green-700` or `text-red-700`\n* Data not available → Node 2 `sma_200_rel`\n* Data not available → Node 2 `volume_analysis.classification` (e.g. \"Unusual Volume\" / \"Normal\") — do not upgrade this to \"institutional\" wording\n\n## AI SCORE GRID (6 factors, 0–20 each — labels already updated in the template: \"Cơ bản\" = Fundamental 30%, \"Ngành/Vĩ mô\" = Sector/Macro 10%; the other four keep their existing labels)\n* 11/20 / 55% ← Node 5 `scores.technical` (weight 15%)\n* 10/20 / 50% ← Node 5 `scores.flow` (weight 15%)\n* 14/20 / 70% ← Node 5 `scores.fundamental` (weight 30% — this box is now labeled \"Cơ bản\" in the template, but keeps the original `SCORE_MACRO` placeholder name; don't be misled by the old token name)\n* 13/20 / 65% ← Node 5 `scores.sector_macro` (weight 10% — labeled \"Ngành/Vĩ mô\")\n* 19/20 / 95% ← Node 5 `scores.valuation` (weight 20%)\n* 11/20 / 55% ← Node 5 `scores.risk` (0–20 scale, 20=safest — NOT negative anymore)\n* PCT for each = value/20 × 100\n\n## RISK\n* FCF âm, quy mô nhỏ, capex/working capital. → company-level risk with ratio, grounded in Node 3 `earnings_quality.red_flags` / debt figures\n* Trade/port competition. → Node 4 `risk_regime` + relevant `sensitivity_table` entry\n* Thanh khoản vừa-thấp; chia lệnh nhỏ. → Node 5 `liquidity_note`; if empty, write \"Thanh khoản bình thường\" (a normal state, not missing data — never \"Data not available\" here)\n\n## CAUSAL ANALYSIS (fact vs inference — do not blur them)\n* Data not available → Node 4 `causal_chainsData not available.facts`, joined — the verified starting point, not a guess\n* Data not available → Node 4 `causal_chainsData not available.chain_summary` (industry/company impact)\n* Data not available → Node 4 `causal_chainsData not available.inferences` — prefix with \"Suy luận:\" since this is inference, not fact; also show `inference_confidence` in parentheses\n\n## SCENARIOS\n* 25%/Cash conversion cải thiện/16.000, [BASE_...], [BEAR_...] → Node 4 `risk_scenarios`, cross-checked against Node 5 `strategy.tp1`/`tp2`/`trading_stop`\n\n## TRADE SETUP\n* 12.500–13.000 sau xác nhận → Node 5 `strategy.entry_zone`\n* WATCH → Node 5 `strategy.allocation_plan`\n* 12.500 → Node 5 `trading_stop.price` — the TECHNICAL stop. Hitting this triggers reassessment; it does NOT by itself mean the thesis was wrong — that's Data not available in the Hero card, a different concept, never merge them.\n* Trading stop → Node 5 `trading_stop.basis`\n* 14.500/Supply zone/16.000/52w high → Node 5 `strategy.tp1`/`.tp2` + rationale\n* Chờ Q3 cash flow, Khởi tạo nhỏ nếu FCF tốt hơn, Add khi trend xác nhận → derived from Node 5 `strategy.allocation_plan`\n\n## NEW ADDITIONS TO THE HTML (see template changes below — these are genuinely new sections with no old equivalent, added as small blocks rather than a redesign)\n* **Screening Snapshot card** (inserted after Hero, before Institutional Signals — **only include this whole card if `analysis_mode` = \"SCREENED\"; omit the entire block for DIRECT mode**, don't render it empty): 76,67/10/66/A → Node 1 `screening_summary.screen_score / .screen_rank / .screen_grade`; 90,06/59,29/98,71/58,98/72,33 → corresponding `_score` fields. 67.8 may be shown in its own CRSM context, but never calculate/display a Screening-vs-CRSM score difference, status, verdict, or `screen_vs_crsm` field.\n* **Institutional Signals card**: 🟡 / 🟡 / 🟢 / 🟡 from Node 5 `conflict_detector`; 1/4; Q3/2026 cash-flow update / 0-30d; Data not available; Data not available / Không phù hợp khi FCF hiện âm..\n  * Do NOT render emoji icons such as 🟢 🟡 🔴 because they can appear as dead square glyphs in exported HTML/image. Use text-safe colored dot HTML instead: positive = `<span class=\"inline-block w-3 h-3 rounded-full bg-green-600\" title=\"Tích cực\"></span>`, neutral = `<span class=\"inline-block w-3 h-3 rounded-full bg-yellow-500\" title=\"Trung lập\"></span>`, negative = `<span class=\"inline-block w-3 h-3 rounded-full bg-red-600\" title=\"Tiêu cực\"></span>`, missing = `<span class=\"inline-block w-3 h-3 rounded-full bg-gray-300\" title=\"Chưa có dữ liệu\"></span>`.\n* **Position sizing line**: 0,5% NAV / 4% NAV / Initial.\n* **Source bar**: DXP/HNX filings; public Q1/Q2 financial data; StockScreener 01/10/2026 from Node 1 `sources[]`.\n\n---\n\n# 🔥 CONTENT QUALITY RULES\n\n## 1. MUST USE NUMBERS\n❌ BAD: \"tăng trưởng tốt\"\n✅ GOOD: \"Doanh thu +34% YoY\"\n\n## 2. MUST HAVE CAUSAL LOGIC\nMacro → Sector → Company → Price\n\n## 3. SHORT BUT POWERFUL\n* Card content: 1–2 lines max\n* No filler words\n\n## 4. PROFESSIONAL TONE\n* Institutional style\n* No emoji in report content\n* No vague language\n\n---\n\n# ⚠️ FALLBACK RULE\nIf any data is missing → write exactly: `Data not available`\n\n---\n\n# 🎨 HTML TEMPLATE (LOCKED – REPLACE CONTENT ONLY)\n\n<!DOCTYPE html>\n<html lang=\"vi\">\n<head>\n<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Báo Cáo Phân Tích DXP | Senior Equity Analyst</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js\"></script>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif'],display:['Outfit','sans-serif']},colors:{brand:{deep:'#1e3a8a',accent:'#3b82f6',bg:'#f5f7fb'},status:{buy:'#16a34a',sell:'#dc2626',hold:'#f59e0b'}},boxShadow:{premium:'0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)'}}}}</script>\n<style>body{background-color:#f5f7fb;color:#1a1a1a;line-height:1.6}.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 4px 6px -1px rgb(0 0 0/0.05),0 2px 4px -2px rgb(0 0 0/0.05);transition:transform .2s ease,box-shadow .2s ease}.card:hover{box-shadow:0 20px 25px -5px rgb(0 0 0/0.05)}.hero-card{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);color:#fff}.metric-card{background:#f8fafc;border:1px solid #e2e8f0;padding:16px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:16px;margin:16px 0;border-radius:0 8px 8px 0;font-style:italic}.sub-card{background:#fff;border:1px solid #f1f5f9;padding:16px;border-radius:10px;margin-bottom:12px}.badge{padding:4px 12px;border-radius:9999px;font-size:.75rem;font-weight:600;text-transform:uppercase}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:768px){.grid-3{grid-template-columns:1fr}.card{padding:20px}}</style>\n</head>\n<body class=\"font-sans antialiased\">\n<div id=\"report\" class=\"container mx-auto px-4 py-8 max-w-[1100px]\">\n<header class=\"mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4\"><div><div class=\"flex items-center gap-3 mb-2\"><span class=\"bg-brand-deep text-white px-3 py-1 rounded text-sm font-bold tracking-widest\">HOSE: DXP</span><span class=\"text-gray-500 font-medium text-sm\">Cập nhật: 01/10/2026</span></div><h1 class=\"text-3xl md:text-4xl font-display font-extrabold text-brand-deep\">BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><p class=\"text-gray-600 mt-1 font-medium\">CTCP Cảng Đoạn Xá</p></div><div class=\"text-right\"><p class=\"text-xs uppercase tracking-wider text-gray-400 font-bold\">Chuyên gia phân tích</p><p class=\"text-sm font-semibold text-gray-800\">Senior Equity Analyst & Geopolitical Strategist</p></div></header>\n<main>\n<div class=\"card hero-card shadow-2xl relative overflow-hidden mb-6\"><div class=\"relative z-10\"><div class=\"flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-white/20 pb-6\"><div><h2 class=\"text-sm uppercase tracking-widest text-blue-200 font-bold mb-1\">Quyết định đầu tư</h2><div class=\"text-5xl font-display font-black text-white tracking-tight\">WATCH</div></div><div class=\"mt-4 md:mt-0 flex gap-8\"><div class=\"text-center\"><p class=\"text-blue-200 text-xs font-bold uppercase mb-1\">AI Score</p><p class=\"text-3xl font-black\">67.8<span class=\"text-sm\">/100</span></p></div><div class=\"text-center\"><p class=\"text-blue-200 text-xs font-bold uppercase mb-1\">Tin tưởng</p><p class=\"text-3xl font-black\">66</p></div></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-8\"><div><h3 class=\"text-blue-100 font-bold text-sm uppercase mb-3\">Động lực tăng trưởng chính</h3><ul class=\"space-y-2\"><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>P/E 4,36x; P/B 0,76x</span></li><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>6T doanh thu ~572 tỷ; LNST ~116 tỷ</span></li><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>FCF TTM -481,5 tỷ</span></li></ul></div><div class=\"bg-white/10 p-4 rounded-lg border border-white/10\"><h3 class=\"text-red-300 font-bold text-sm uppercase mb-2\">Điều kiện vô hiệu (Invalidation)</h3><p class=\"text-sm leading-relaxed\">Data not available</p></div></div></div></div>\n<div class=\"card border-2 border-purple-200 mb-6\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-1\">Screening Snapshot</h2><p class=\"text-xs text-gray-400 mb-4\">Nguồn: StockScreener — đây là bối cảnh sàng lọc ban đầu, KHÔNG phải điểm số của CRSM</p><div class=\"grid grid-cols-3 md:grid-cols-4 gap-3 mb-4\"><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Score</span><strong class=\"text-lg\">76,67</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Rank</span><strong class=\"text-lg\">10/66</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Grade</span><strong class=\"text-lg\">A</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Quality</span><strong class=\"text-lg\">90,06</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Growth</span><strong class=\"text-lg\">59,29</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Valuation</span><strong class=\"text-lg\">98,71</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Momentum</span><strong class=\"text-lg\">58,98</strong></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] text-gray-400 uppercase block\">Mispricing</span><strong class=\"text-lg\">72,33</strong></div></div><div class=\"flex flex-col md:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-brand-accent/10\"><div class=\"text-center md:text-left\"><span class=\"text-xs text-gray-400 uppercase block\">CRSM Score</span><strong class=\"text-2xl text-brand-deep\">67.8/100</strong></div><div class=\"text-center\"><span class=\"badge bg-purple-100 text-purple-700\">Sàng lọc: bối cảnh đầu vào</span><p class=\"text-[10px] text-gray-500 mt-1\">Screening Score không được so sánh hoặc trộn với CRSM AI Score.</p></div></div></div>\n<div class=\"card border-2 border-brand-accent/20 mb-6\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Tín hiệu Tổng hợp</h2><div class=\"grid grid-cols-2 md:grid-cols-4 gap-3 mb-4\"><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Cơ bản</span><span class=\"text-2xl leading-none\">🟡</span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Kỹ thuật</span><span class=\"text-2xl leading-none\">🟡</span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Vĩ mô</span><span class=\"text-2xl leading-none\">🟢</span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Thanh khoản</span><span class=\"text-2xl leading-none\">🟡</span></div></div><div class=\"text-center mb-4\"><span class=\"badge bg-blue-100 text-blue-700\">Đồng thuận tín hiệu: 1/4</span></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-3\"><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Catalyst gần nhất</span><p class=\"text-sm font-medium\">Q3/2026 cash-flow update (0-30d)</p></div><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Chất lượng lợi nhuận</span><p class=\"text-sm font-medium\">Data not available</p></div><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Reverse DCF</span><p class=\"text-sm font-medium\">CAGR ngầm định: Data not available — Không phù hợp khi FCF hiện âm.</p></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Vĩ mô & Địa chính trị</h2><div class=\"space-y-4\"><div class=\"flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100\"><span class=\"text-sm font-semibold text-gray-600 uppercase\">Chế độ rủi ro</span><span class=\"badge bg-yellow-100 text-yellow-700\">Trung tính</span></div><div class=\"grid grid-cols-2 gap-3\"><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Lãi suất FED</h3><p class=\"text-lg font-bold\">3,75–4,00%</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Tỷ giá USD/VND</h3><p class=\"text-lg font-bold\">Data not available</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Dầu Brent</h3><p class=\"text-lg font-bold\">~103,5 USD/thùng Brent</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Lạm phát Mỹ</h3><p class=\"text-lg font-bold\">PCE 3,4% YoY</p></div></div><p class=\"text-sm text-gray-600\">Cash conversion quan trọng hơn macro.</p></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Nhóm Ngành</h2><div class=\"space-y-4\"><div class=\"flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100\"><span class=\"text-sm font-semibold text-gray-600 uppercase\">Sức mạnh ngành</span><span class=\"badge bg-gray-200 text-gray-700\">Data not available</span></div><div class=\"bg-blue-50 border border-blue-100 p-4 rounded-xl\"><div class=\"flex justify-between mb-2\"><span class=\"text-sm font-medium\">Ngành (cùng kỳ)</span><span class=\"text-sm font-bold\">Data not available</span></div><div class=\"flex justify-between\"><span class=\"text-sm font-medium\">VN-Index</span><span class=\"text-sm font-bold\">Data not available</span></div><div class=\"w-full bg-gray-200 h-2 rounded-full mt-3 overflow-hidden\"><div class=\"bg-brand-accent h-full\" style=\"width:Data not available\"></div></div></div><p class=\"text-sm text-gray-600 italic\">Data not available</p></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Chu kỳ & Chính sách</h2><div class=\"sub-card\"><p class=\"text-xs font-bold text-blue-500 uppercase mb-1\">Giai đoạn</p><p class=\"font-bold text-gray-800\">Data not available</p></div><div class=\"space-y-3\"><div class=\"flex items-center gap-3\"><div class=\"w-14 h-10 bg-red-50 text-red-600 rounded flex items-center justify-center font-bold text-sm\">Data not available</div><p class=\"text-xs text-gray-500 uppercase font-semibold leading-tight\">Data not available</p></div><div class=\"flex items-center gap-3\"><div class=\"w-14 h-10 bg-green-50 text-green-600 rounded flex items-center justify-center font-bold text-sm\">Data not available</div><p class=\"text-xs text-gray-500 uppercase font-semibold leading-tight\">Ngân sách đầu tư công (Tỷ USD)</p></div></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Doanh nghiệp</h2><div class=\"space-y-3\"><div class=\"flex justify-between items-end border-b border-gray-100 pb-2\"><div><p class=\"text-xs text-gray-400 font-bold uppercase\">Doanh thu (6T2026)</p><p class=\"text-lg font-bold\">~572 tỷ đồng</p></div><span class=\"text-green-600 font-bold text-sm\">Data not available</span></div><div class=\"flex justify-between items-end border-b border-gray-100 pb-2\"><div><p class=\"text-xs text-gray-400 font-bold uppercase\">Lợi nhuận sau thuế</p><p class=\"text-lg font-bold\">~116,1 tỷ đồng</p></div><span class=\"text-green-600 font-bold text-sm\">Data not available</span></div><div class=\"highlight text-xs m-0 mt-2 py-2\"><strong>Lợi thế (Moat):</strong> Vị thế cảng Hải Phòng và mạng vận hành địa phương.</div></div></div></div>\n<div class=\"card mb-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 items-start\"><div><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Dòng tiền thông minh & Định giá</h2><div class=\"highlight\"><strong>Key Insight:</strong> Đang trong giai đoạn <strong>unclear/pullback</strong> tại vùng 12.500–13.200. Chưa đủ xác nhận.</div><div class=\"grid grid-cols-2 gap-4 mt-4\"><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">Volume Ratio</span><strong class=\"text-2xl text-brand-deep\">1,58x</strong><span class=\"text-[10px] text-gray-400\">vs avg 20 phiên</span></div><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">Tín hiệu</span><strong class=\"text-sm text-center text-brand-accent mt-1\">Chưa đủ xác nhận.</strong></div></div></div><div><h3 class=\"text-sm font-bold uppercase text-gray-500 mb-4\">Định giá (Valuation)</h3><div class=\"grid grid-cols-2 gap-4 mb-6\"><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">P/E (TTM)</span><strong class=\"text-2xl Data not available\">4,36x</strong><span class=\"text-[10px] text-gray-400\">Ngành: Data not available</span></div><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">P/B Ratio</span><strong class=\"text-2xl Data not available\">0,76x</strong><span class=\"text-[10px] text-gray-400\">Snapshot</span></div></div><div class=\"bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300\"><h3 class=\"text-sm font-bold uppercase text-gray-500 mb-4\">Cấu trúc Kỹ thuật</h3><ul class=\"space-y-4\"><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">Xu hướng</span><span class=\"badge bg-green-100 Data not available\">Ngắn hạn yếu, trung hạn nhẹ dương</span></li><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">So với SMA 200</span><span class=\"text-sm font-bold\">Data not available</span></li><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">Thanh khoản (Volume)</span><span class=\"text-sm font-bold\">Data not available</span></li></ul></div></div></div></div>\n<div class=\"mb-6\"><h2 class=\"text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1\">Hệ thống chấm điểm AI</h2><div class=\"grid grid-cols-2 md:grid-cols-6 gap-3\"><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Kỹ thuật</span><strong class=\"text-xl\">11/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-green-500 h-full rounded\" style=\"width:55%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Dòng tiền</span><strong class=\"text-xl\">10/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-blue-500 h-full rounded\" style=\"width:50%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Cơ bản</span><strong class=\"text-xl\">14/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-yellow-500 h-full rounded\" style=\"width:70%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Ngành/Vĩ mô</span><strong class=\"text-xl\">13/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-purple-500 h-full rounded\" style=\"width:65%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Định giá</span><strong class=\"text-xl\">19/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-green-400 h-full rounded\" style=\"width:95%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Rủi ro</span><strong class=\"text-xl\">11/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-red-500 h-full rounded\" style=\"width:55%\"></div></div></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-red-700 mb-4\">Quản trị Rủi ro</h2><div class=\"space-y-3\"><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Doanh nghiệp</span><p class=\"text-sm font-medium\">FCF âm, quy mô nhỏ, capex/working capital.</p></div><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Vĩ mô</span><p class=\"text-sm font-medium\">Trade/port competition.</p></div><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Thanh khoản</span><p class=\"text-sm font-medium\">Thanh khoản vừa-thấp; chia lệnh nhỏ.</p></div></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Nhân quả</h2><ul class=\"space-y-2\"><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Gốc:</span><span>Data not available</span></li><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Quả:</span><span>Data not available</span></li><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Kỹ thuật:</span><span>Data not available</span></li></ul></div></div>\n<div class=\"mb-6\"><h2 class=\"text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1\">Kịch bản Phân tích</h2><div class=\"grid-3\"><div class=\"card m-0 border-t-4 border-green-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-green-700\">BULL CASE</h3><span class=\"text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded\">25%</span></div><p class=\"text-xs text-gray-600 mb-4\">Cash conversion cải thiện</p><p class=\"text-2xl font-black text-green-700\">16.000</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Target Price</p></div><div class=\"card m-0 border-t-4 border-blue-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-brand-deep\">BASE CASE</h3><span class=\"text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded\">50%</span></div><p class=\"text-xs text-gray-600 mb-4\">Profit giữ, FCF biến động</p><p class=\"text-2xl font-black text-brand-deep\">14.500</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Target Price</p></div><div class=\"card m-0 border-t-4 border-red-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-red-700\">BEAR CASE</h3><span class=\"text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded\">25%</span></div><p class=\"text-xs text-gray-600 mb-4\">Cash burn kéo dài</p><p class=\"text-2xl font-black text-red-700\">12.500</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Stop Loss</p></div></div></div>\n<div class=\"card border-2 border-brand-accent/20 bg-blue-50/30\"><h2 class=\"text-2xl font-display font-bold text-brand-deep mb-6 text-center\">Chiến lược Giao dịch (Trade Setup)</h2><div class=\"grid grid-cols-1 md:grid-cols-4 gap-4\"><div class=\"sub-card m-0 text-center\"><p class=\"text-xs font-bold text-gray-400 uppercase mb-2\">Vùng Mua</p><p class=\"text-xl font-bold text-brand-deep\">12.500–13.000 sau xác nhận</p><p class=\"text-[10px] text-gray-500 mt-1\">WATCH</p></div><div class=\"sub-card m-0 text-center border-red-100\"><p class=\"text-xs font-bold text-red-400 uppercase mb-2\">Cắt Lỗ (SL)</p><p class=\"text-xl font-bold text-red-600\">12.500</p><p class=\"text-[10px] text-gray-500 mt-1\">Trading stop</p></div><div class=\"sub-card m-0 text-center border-green-100\"><p class=\"text-xs font-bold text-green-400 uppercase mb-2\">Mục tiêu 1</p><p class=\"text-xl font-bold text-green-700\">14.500</p><p class=\"text-[10px] text-gray-500 mt-1\">Supply zone</p></div><div class=\"sub-card m-0 text-center border-green-100\"><p class=\"text-xs font-bold text-green-400 uppercase mb-2\">Mục tiêu 2</p><p class=\"text-xl font-bold text-green-700\">16.000</p><p class=\"text-[10px] text-gray-500 mt-1\">52w high</p></div></div><div class=\"mt-6 bg-white p-4 rounded-xl border border-brand-accent/10\"><h3 class=\"text-sm font-bold uppercase text-brand-deep mb-3\">Lộ trình giải ngân</h3><div class=\"flex flex-col md:flex-row justify-between gap-4\"><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 1:</span> Chờ Q3 cash flow</div><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 2:</span> Khởi tạo nhỏ nếu FCF tốt hơn</div><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 3:</span> Add khi trend xác nhận</div></div></div><div class=\"mt-4 bg-white p-4 rounded-xl border border-brand-accent/10\"><h3 class=\"text-sm font-bold uppercase text-brand-deep mb-3\">Quản trị vị thế (Position Sizing)</h3><div class=\"flex flex-col md:flex-row justify-between gap-4 text-sm\"><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Rủi ro/lệnh:</span> 0,5% NAV</div><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Tỷ trọng tối đa:</span> 4% NAV</div><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Loại vị thế:</span> Initial</div></div></div></div>\n</main><footer class=\"mt-10 pt-6 border-t border-gray-200 text-center text-xs text-gray-400\"><p class=\"mb-1\">DXP/HNX filings; public Q1/Q2 financial data; StockScreener 01/10/2026</p><p>Báo cáo được tạo tự động bởi AI Equity Research Engine · 01/10/2026 · Chỉ dành cho mục đích tham khảo, không phải khuyến nghị đầu tư chính thức.</p></footer></div>\n</body></html>\n\n---\n\n# ⚠️ FINAL EXECUTION RULE\n* Replace EVERY placeholder with real data from the JSON inputs\n* Keep DOM structure and CSS class definitions IDENTICAL to the reference template\n* Data not available, Data not available, Data not available are data-driven class tokens\n* Any upstream null → `Data not available`\n* Numbers MUST be present\n* DXP/HNX filings; public Q1/Q2 financial data; StockScreener 01/10/2026 must list real sources from Node 1\n* If output resembles SSI / VNDirect institutional report → SUCCESS\n",
+    "node6b": "# BÁO CÁO PHÂN TÍCH DXP — CTCP Cảng Đoạn Xá\nCập nhật: 01/10/2026 · Kỳ dữ liệu: 6T2026 + 01/10/2026 · Chế độ: SCREENED\n\n## 1. Quyết định đầu tư\n- **Khuyến nghị:** WATCH\n- **AI Score:** 67.8/100 — 14/20×30 + 19/20×20 + 11/20×15 + 10/20×15 + 13/20×10 + 11/20×10\n- **Độ tin cậy:** 66%.\n- **Động lực:** P/E 4,36x; P/B 0,76x; Q2 tăng trưởng tốt nhưng FCF TTM -481,5 tỷ.\n- **Thesis invalidation:** Free cash flow remains materially negative while operating profit weakens, indicating that cheap valuation is not supported by sustainable cash generation.\n- **Trading Stop:** 12.500 đồng.\n\n## 2. Screening Snapshot\n| Score | Rank | Grade | Quality | Growth | Valuation | Momentum | Mispricing |\n|---|---:|---|---:|---:|---:|---:|---:|\n| 76,67 | 10/66 | A | 90,06 | 59,29 | 98,71 | 58,98 | 72,33 |\n- CRSM Score: 67.8/100, độc lập.\n\n## 3. Tín hiệu tổng hợp\n| Cơ bản | Kỹ thuật | Vĩ mô | Thanh khoản | Đồng thuận |\n|---|---|---|---|---|\n| 🟡 | 🟡 | 🟢 | 🟡 | 1/4 |\n- Catalyst: Q3/2026 cash-flow update (0–30d).\n\n## 4. Vĩ mô & Ngành\n| Biến số | Độ nhạy | Chiều tác động | Độ tin cậy |\n|---|---|---|---|\n| Container volume | Cao | Tăng → tích cực | Cao |\n| Tariff/utilization | Cao | Tăng → tích cực | Trung bình |\n| Capex/working capital | Cao | Tăng cash use → tiêu cực | Cao |\n- Sector vs VNINDEX: Chưa có dữ liệu định lượng.\n\n## 5. Doanh nghiệp & Chất lượng lợi nhuận\n- 6T doanh thu ~572 tỷ; LNST ~116,1 tỷ.\n- CFO/NPAT và accrual: Chưa có dữ liệu.\n- FCF TTM snapshot -481,54 tỷ; đây là cờ đỏ chính.\n| Cờ | Mức độ | Quan sát | Câu hỏi | Kết luận |\n|---|---|---|---|---|\n| Negative FCF | Cao | FCF âm dù EPS tăng | Earnings convert to cash? | Chưa; cần Q3 xác nhận |\n- Sustainability: cyclical/operational growth with cash-conversion concern.\n- F/M-Score, WACC/ROIC: Chưa có dữ liệu.\n\n## 6. Định giá & So sánh ngành\n- P/E 4,36x; P/B 0,76x; DCF/Reverse DCF: Chưa có dữ liệu.\n| Mã | P/E | P/B | ROE | Ngày | Lý do |\n|---|---|---|---|---|---|\n| GMD | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | Port/logistics peer |\n| VSC | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | Port peer |\n| PHP | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | Port peer |\n\n## 7. Kỹ thuật & Dòng tiền\n- Technical coverage DEGRADED: ~20 phiên; thiếu SMA200 và sector benchmark.\n- 1M -6,94%; 3M -0,74%; 6M +3,08%; YTD +21,82%; rel.volume 1,58x.\n- Demand 12,5–13,2k; supply 14,5–16k.\n\n## 8. Rủi ro\n- FCF âm, liquidity nhỏ, capex/working capital.\n- Chia lệnh nhỏ nếu sau này đủ điều kiện.\n\n## 9. Phân tích nhân quả\n- Fact: accounting profit tăng nhưng FCF âm.\n- Inference: growth may consume cash / timing mismatch — confidence trung-cao.\n- Assumption: FCF snapshot is accurate.\n- Chain: growth → working capital/capex → FCF pressure.\n\n## 10. Kịch bản\n| Kịch bản | Xác suất | Điều kiện | Giá mục tiêu |\n|---|---:|---|---:|\n| Bull | 25% | FCF cải thiện | 16.000 |\n| Base | 50% | Profit giữ, FCF volatile | 14.500 |\n| Bear | 25% | Cash burn kéo dài | 12.500 |\n\n## 11. Chiến lược giao dịch & Quản trị vị thế\n- WATCH; vùng xem xét 12.500–13.000 sau xác nhận.\n- Stop 12.500; TP1 14.500; TP2 16.000.\n- Risk/trade 0,5% NAV; max 4%.\n\n## 12. Nguồn dữ liệu\n| Nguồn | Ngày | Ghi chú |\n|---|---|---|\n| StockScreener/TradingView | 01/10/2026 | Screening context |\n| HNX/DXP filings | 2026 | Issuer filings |\n| Public Q1/Q2 financial data | 2026 | Revenue/profit |\n\n*Báo cáo tự động, chỉ dùng tham khảo cá nhân — 01/10/2026.*"
+  },
+  "decision_record": {
+    "date": "01/10/2026",
+    "ticker": "DXP",
+    "price_at_analysis": 13400,
+    "decision": "WATCH",
+    "ai_score": 67.8,
+    "confidence": 66,
+    "entry_zone": "12,500–13,000 only after cash-flow/technical confirmation",
+    "trading_stop": 12500,
+    "tp1": 14500,
+    "tp2": 16000,
+    "thesis_invalidation": "Free cash flow remains materially negative while operating profit weakens, indicating that cheap valuation is not supported by sustainable cash generation."
+  }
+}
