@@ -3,7 +3,7 @@
   "run_id": "run-20261001T145934449Z-ucp41p0v",
   "state": "PROCESSING",
   "created_at": "2026-10-01T14:59:36.275Z",
-  "updated_at": "2026-10-01T15:57:00.000Z",
+  "updated_at": "2026-10-01T16:05:00.000Z",
   "items": [
     {
       "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
@@ -23,56 +23,71 @@
       "item_id": "item-6882e794-9737-4670-a781-6c443f902a28",
       "ticker": "HAG",
       "analysis_source": "SCREENED_WEB",
-      "state": "COMPLETED",
-      "error": null,
-      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/HAG.json",
+      "state": "FAILED",
+      "error": {
+        "code": "RESULT_RECOVERY_CONFLICT",
+        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
+      },
+      "result_ref": null,
       "started_at": "2026-10-01T15:08:00.000Z",
-      "completed_at": "2026-10-01T15:16:00.000Z",
-      "updated_at": "2026-10-01T15:16:00.000Z"
+      "completed_at": "2026-10-01T16:05:00.000Z",
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-88d6325d-42c5-47e0-909c-4806d3c4bb08",
       "ticker": "VHM",
       "analysis_source": "SCREENED_WEB",
-      "state": "COMPLETED",
-      "error": null,
-      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/VHM.json",
+      "state": "FAILED",
+      "error": {
+        "code": "RESULT_RECOVERY_CONFLICT",
+        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
+      },
+      "result_ref": null,
       "started_at": "2026-10-01T15:16:00.000Z",
-      "completed_at": "2026-10-01T15:24:00.000Z",
-      "updated_at": "2026-10-01T15:24:00.000Z"
+      "completed_at": "2026-10-01T16:05:00.000Z",
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-bfe390c0-bb9e-4552-91a8-34d86bca9f5f",
       "ticker": "GMD",
       "analysis_source": "SCREENED_WEB",
-      "state": "COMPLETED",
-      "error": null,
-      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/GMD.json",
+      "state": "FAILED",
+      "error": {
+        "code": "RESULT_RECOVERY_CONFLICT",
+        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
+      },
+      "result_ref": null,
       "started_at": "2026-10-01T15:24:00.000Z",
-      "completed_at": "2026-10-01T15:35:00.000Z",
-      "updated_at": "2026-10-01T15:35:00.000Z"
+      "completed_at": "2026-10-01T16:05:00.000Z",
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-068c7771-7ec6-4542-a6aa-2bb4bf950bad",
       "ticker": "DXP",
       "analysis_source": "SCREENED_WEB",
-      "state": "COMPLETED",
-      "error": null,
-      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/DXP.json",
+      "state": "FAILED",
+      "error": {
+        "code": "RESULT_RECOVERY_CONFLICT",
+        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
+      },
+      "result_ref": null,
       "started_at": "2026-10-01T15:35:00.000Z",
-      "completed_at": "2026-10-01T15:46:00.000Z",
-      "updated_at": "2026-10-01T15:46:00.000Z"
+      "completed_at": "2026-10-01T16:05:00.000Z",
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-6d93c119-9c62-4d8c-b198-04eee7b4b6a2",
       "ticker": "KSF",
       "analysis_source": "SCREENED_WEB",
-      "state": "COMPLETED",
-      "error": null,
-      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/KSF.json",
+      "state": "FAILED",
+      "error": {
+        "code": "RESULT_RECOVERY_CONFLICT",
+        "message": "Immutable result exists but node6a contains template reference instructions before <!DOCTYPE html>; Node6A contract requires a raw HTML string. Result was not overwritten."
+      },
+      "result_ref": null,
       "started_at": "2026-10-01T15:46:00.000Z",
-      "completed_at": "2026-10-01T15:57:00.000Z",
-      "updated_at": "2026-10-01T15:57:00.000Z"
+      "completed_at": "2026-10-01T16:05:00.000Z",
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-4921704c-5222-463c-8ed8-33300867c1dc",
@@ -83,7 +98,7 @@
       "result_ref": null,
       "started_at": "2026-10-01T15:57:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-01T15:57:00.000Z"
+      "updated_at": "2026-10-01T16:05:00.000Z"
     },
     {
       "item_id": "item-760d1a86-fb0b-49bc-8bc6-7f42187b5895",
