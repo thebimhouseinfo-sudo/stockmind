@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261001T145934449Z-ucp41p0v",
-  "state": "PROCESSING",
+  "state": "COMPLETED",
   "created_at": "2026-10-01T14:59:36.275Z",
-  "updated_at": "2026-10-01T16:40:00.000Z",
+  "updated_at": "2026-10-01T16:51:00.000Z",
   "items": [
     {
       "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
@@ -126,12 +126,13 @@
       "item_id": "item-b78e17cb-2584-4a59-8ac8-f37127d2028b",
       "ticker": "HTI",
       "analysis_source": "WEB_ONLY",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/HTI.json",
       "started_at": "2026-10-01T16:40:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-01T16:40:00.000Z"
+      "completed_at": "2026-10-01T16:51:00.000Z",
+      "updated_at": "2026-10-01T16:51:00.000Z"
     }
-  ]
+  ],
+  "completed_at": "2026-10-01T16:51:00.000Z"
 }
