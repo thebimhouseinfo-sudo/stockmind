@@ -199,7 +199,7 @@ function normalizeTicker(value) {
 
 
 function normalizeDetailReport(markdown, result) {
-  if (typeof markdown === 'string' && markdown.trim()) return markdown.trim();
+  if (typeof markdown === 'string' && markdown.trim()) return markdown;
 
   const n1 = result?.outputs?.node1 || {};
   const n5 = result?.outputs?.node5 || {};
