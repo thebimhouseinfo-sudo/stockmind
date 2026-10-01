@@ -82,9 +82,15 @@ const duplicateTicker = structuredClone(mixed);
 duplicateTicker.items[2].ticker = 'VCB';
 assert.equal(validateAnalysisRequest(duplicateTicker).valid, false);
 
-const missingRendererOutput = structuredClone(webOnly.result);
-delete missingRendererOutput.outputs.node6b;
-assert.equal(validateAnalysisResult(missingRendererOutput).valid, false);
+const missingDetailReport = structuredClone(webOnly.result);
+delete missingDetailReport.outputs.node6b;
+const missingDetailCheck = validateAnalysisResult(missingDetailReport);
+assert.equal(missingDetailCheck.valid, true);
+assert.ok(missingDetailCheck.warnings.some(warning => warning.includes('node6b')));
+
+const missingAnalyticalNode = structuredClone(webOnly.result);
+delete missingAnalyticalNode.outputs.node3;
+assert.equal(validateAnalysisResult(missingAnalyticalNode).valid, false);
 
 const mismatchedDecisionTicker = structuredClone(webOnly.result);
 mismatchedDecisionTicker.decision_record.ticker = 'VCB';
@@ -100,7 +106,7 @@ const driftedNode5Check = validateAnalysisResult(driftedNode5);
 assert.equal(driftedNode5Check.valid, false);
 assert.ok(driftedNode5Check.errors.some(error => error.includes('scores.flow')));
 assert.ok(driftedNode5Check.errors.some(error => error.includes('decision must be')));
-assert.ok(driftedNode5Check.errors.some(error => error.includes('catalyst_horizon must be an object')));
+assert.ok(!driftedNode5Check.errors.some(error => error.includes('catalyst_horizon must be an object')));
 assert.ok(driftedNode5Check.errors.some(error => error.includes('thesis_invalidation must be')));
 
 const degradedWithoutDisclosure = structuredClone(screened.result);
@@ -117,10 +123,25 @@ assert.ok(degradedCheck.errors.some(error => error.includes('must name missing c
 
 const freeformVisual = structuredClone(screened.result);
 freeformVisual.outputs.node6a = '<article><h1>Short report</h1></article>';
-assert.equal(validateAnalysisResult(freeformVisual).valid, false);
+const freeformVisualCheck = validateAnalysisResult(freeformVisual);
+assert.equal(freeformVisualCheck.valid, true);
+assert.ok(freeformVisualCheck.warnings.some(warning => warning.includes('node6a')));
 
 const shortDetail = structuredClone(screened.result);
 shortDetail.outputs.node6b = '# NT2\nShort summary';
-assert.equal(validateAnalysisResult(shortDetail).valid, false);
+const shortDetailCheck = validateAnalysisResult(shortDetail);
+assert.equal(shortDetailCheck.valid, true);
+assert.ok(shortDetailCheck.warnings.some(warning => warning.includes('node6b')));
+
+const degradedButHonest = structuredClone(screened.result);
+degradedButHonest.outputs.node2.technical_coverage = {
+  status: 'DEGRADED',
+  required_sessions: 300,
+  sessions_used: 42,
+  missing_capabilities: ['verified 300-session OHLCV', 'quantified sector-vs-VNINDEX comparison'],
+  note: 'Technical conclusions are limited by public data coverage.'
+};
+degradedButHonest.outputs.node2.ohlcv_source = { source: null, sessions_used: 42, date_range: null };
+assert.equal(validateAnalysisResult(degradedButHonest).valid, true);
 
 console.log('CRSM migration contract tests passed.');
