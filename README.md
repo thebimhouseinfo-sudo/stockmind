@@ -1,89 +1,70 @@
 # Stock Mind
 
-Stock Mind is a browser-first Vietnamese stock analysis system with two layers:
+Stock Mind is a browser-first Vietnamese stock research workflow with two layers:
 
-1. **Deterministic Screening** — parse TradingView data, calculate scores, rank stocks.
-2. **CRSM (Capital Research & Strategy Machine)** — deep research and investment decision analysis for a selected ticker.
+1. **Deterministic Screener V2** — parse TradingView data, score and rank stocks without an LLM.
+2. **CRSM** — deeper ChatGPT-driven research for tickers submitted from the webapp.
 
-## Core flow
+## Current flow
 
 ```text
 TradingView paste
-      ↓
-Parser
-      ↓
-Deterministic Scoring
-      ↓
-Ranking / candidate selection
-      ↓
-┌───────────────────────────────┐
-│ SCREENED → CRSM               │
-│ automatic handoff from ranking│
-└───────────────┬───────────────┘
-                ↓
-        Node 1 → Node 5
-                ↓
-       Local Node 6A/6B/7
+  -> Parser
+  -> Screener V2
+  -> Dashboard / Ranking
+  -> Analysis List
+  -> Vercel Memo bridge
+  -> GitHub runtime:memo/
+
+@Stockmind
+  -> stockmind-web skill harness
+  -> connected GitHub app
+  -> current Memo run
+  -> sequential CRSM analysis per ticker
+  -> immutable result + decision_record
+  -> daily render snapshot
+
+Results page
+  -> Visual Report
+  -> Detail Report
+  -> Decision Log
 ```
 
-CRSM also has a separate **DIRECT** entry point for a ticker that is not in the current screener dataset.
+The browser does **not** execute model-provider APIs. There is no browser provider/model Settings surface and no custom Stockmind MCP server in the active architecture.
 
-## SCREENED vs DIRECT
+## Analysis sources
 
-### SCREENED
-Clicking a ranked stock automatically opens CRSM with:
+Each Analysis List item has exactly one source mode:
 
-- ticker
-- screening score/rank/grade
-- quality, growth, valuation, micro, momentum and mispricing scores
-- source/industry metrics used by the screening layer
+- **SCREENED_WEB** — trusted Screener V2 snapshot + current web research.
+- **EVIDENCE_WEB** — ticker-bound uploaded evidence + current web research.
+- **WEB_ONLY** — current web research only.
 
-This lets CRSM compare its deep-research conclusion against the deterministic screening result.
+Uploaded evidence is bound to one `item_id/ticker`; cross-ticker evidence reuse is rejected.
 
-### DIRECT
-From the CRSM tab, enter any HOSE/HNX/UPCOM ticker manually. DIRECT analysis does not require a screening context.
+## Memo runtime
 
-Both modes use the **same CRSM engine and nodes**.
+Runtime state lives on the dedicated GitHub `runtime` branch under `memo/`.
 
-## CRSM model routing
+The webapp uses Vercel server functions to submit/read Memo state. Privileged GitHub credentials stay server-side through `STOCKMIND_GITHUB_TOKEN`; browser code never receives that token.
 
-Settings are organized into four control-center tabs:
+The Stockmind Web plugin is different: it is a **skill-only ChatGPT plugin**. On invocation it uses the connected GitHub app directly, reads the fixed Memo location, and processes actionable tickers sequentially without a second user command.
 
-- **Models** — providers, API keys, model list, capabilities and token pricing.
-- **Nodes** — provider/model assignment for Node 1–5.
-- **Usage** — input/output/total tokens for the current run.
-- **Cost** — current run, historical periods, average cost, cost by model, budget and warning threshold.
+Completed result files are immutable. Failed items remain resumable. Completed working request/status/evidence payloads are cleaned after render publication.
 
-Node requirements are capability-aware. Web-grounded nodes are blocked if the assigned model does not declare the required capability.
+## Result retention
 
-## Cost accounting
+Rendered reports are day-scoped using `Asia/Ho_Chi_Minh`:
 
-Each LLM response records:
+- analyses completed on the same day are appended;
+- the first completed run on a new day replaces the previous day's rendered set;
+- the Results page only exposes the current-day render set.
 
-- provider
-- model
-- node
-- ticker/mode
-- input tokens
-- output tokens
-- duration
-- estimated input/output token cost
+## Screener boundary
 
-Usage history is retained in browser storage for monitoring. The cost monitor supports Today, 7 days, 30 days and All-time views.
+Screener V2 remains deterministic and separate from CRSM. CRSM may consume a trusted screener snapshot but must not recalculate or overwrite screener score, rank, grade, or classification.
 
-**Important:** token-based cost does not yet include provider-specific grounding/search charges. Those are tracked as a future accounting item and should not be assumed to be zero.
-
-## Cache
-
-Completed CRSM runs are cached by:
-
-- SCREENED vs DIRECT mode
-- ticker
-- analysis date
-- model assignment/capability/pricing configuration fingerprint
-- cache version
-
-Changing the relevant CRSM configuration therefore moves the run into a new cache namespace.
+Dashboard/Ranking actions add tickers to **Analysis List**; they do not launch browser-side CRSM execution.
 
 ## Run locally
 
@@ -98,47 +79,55 @@ Then open:
 http://localhost:4321
 ```
 
-`npm run check` rebuilds generated prompts and runs the core parser/scoring regression tests.
+`npm run check` runs the Screener, CRSM contract, Memo protocol/bridge, Analysis List, Results, worker-service and plugin-harness regression suites plus syntax checks.
 
 ## Project structure
 
 ```text
 index.html
 styles.css
-settings.css
 src/
   app.js
   parser.js
   scoring.js
-  sample.js
+  screener-v2/
   crsm/
-    engine.js
-    pipeline.js
-    state.js
     context.js
-    cache.js
-    llm.js
-    router.js
-    usage.js
-    settings.js
-    nodes/
-    providers/
-    prompts/
+    contracts.js
+    draft-list.js
+    memo-client.js
+    result-adapter.js
+    results-poller.js
+    report-export.js
+    user-evidence.js
     ui/
+      analysis-list.js
+      results.js
+  memo/
+api/
+  _github-runtime.js
+  _memo-service.js
+  _worker-service.js
+  crsm-*.js
+plugin/
+  stockmind-web/
+    HARNESS-REGISTRY.md
+    skills/
 legacy/
-  Appscript/       historical reference
-  CRSM/            prompt source/history
- tests/
-  core.test.mjs
+  Appscript/
+  CRSM/
+tests/
 .github/workflows/
-  check.yml
 ```
+
+`legacy/` is historical/reference material only. It is not part of the active browser CRSM runtime.
 
 ## Development principles
 
-- Keep parser and scoring deterministic.
-- Keep CRSM isolated from the screener core.
-- Nodes call the shared `runLLM()` layer instead of provider SDKs directly.
-- Do not let CRSM silently replace an invalid model assignment with another model.
-- Keep DIRECT analysis available even when no screening dataset is loaded.
-- Treat `legacy/` as historical/reference material, not runtime dependencies.
+- Keep parser and Screener V2 deterministic.
+- Keep privileged GitHub credentials out of browser code.
+- Keep the active CRSM UX to exactly **Analysis List** and **Results**.
+- Preserve the three source-mode contracts and ticker-bound evidence ownership.
+- Keep plugin execution sequential across tickers and resumable after failure/interruption.
+- Treat repository CRSM methodology/report references as canonical for the Stockmind Web plugin.
+- Do not reintroduce browser provider API keys, provider routing, model discovery, custom Stockmind MCP, or local Decision Log ownership.
