@@ -1,0 +1,495 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261001T145934449Z-ucp41p0v",
+  "item_id": "item-760d1a86-fb0b-49bc-8bc6-7f42187b5895",
+  "ticker": "FPT",
+  "analysis_source": "WEB_ONLY",
+  "outputs": {
+    "node1": {
+      "ticker": "FPT",
+      "sector_type": "Technology services",
+      "timestamp": "2026-10-01T16:16:00Z",
+      "data_period": "7T2026 + market 01/10/2026",
+      "analysis_mode": "DIRECT",
+      "screening_metrics": null,
+      "screening_summary": null,
+      "trusted_screener_snapshot": null,
+      "screening_as_of": null,
+      "data_integrity": null,
+      "market_data": {
+        "price": {
+          "value": 62700,
+          "date": "2026-10-01",
+          "source": "Simplize/Stockbiz close"
+        },
+        "volume_20d_avg": {
+          "value": 5498070,
+          "date": "2026-10-01",
+          "source": "Stockbiz 10d average proxy"
+        },
+        "avg_trading_value_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "liquidity_flag": "HIGH",
+        "foreign_net_flow_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "foreign_room_remaining": {
+          "value": null,
+          "unit": "%",
+          "date": null,
+          "source": null
+        },
+        "market_cap": {
+          "value": 121309,
+          "unit": "Bn VND",
+          "date": "2026-09-25",
+          "source": "VNDirect/taichinh.com"
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": 12.13,
+        "pb_current": 3.04,
+        "dividend_yield": 2.8
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 30784,
+          "period": "7T2026",
+          "yoy": 13.6,
+          "source": "FPT official"
+        },
+        "npat": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "ebit": {
+          "value": null,
+          "period": "7T2026",
+          "source": null
+        },
+        "gross_margin": null,
+        "debt_equity": null,
+        "total_debt": null,
+        "total_equity": null,
+        "cash_and_equivalents": null,
+        "effective_tax_rate": null,
+        "cfo": {
+          "value": null,
+          "period": "7T2026",
+          "source": null
+        },
+        "capex": {
+          "value": null,
+          "period": "7T2026",
+          "source": null
+        },
+        "receivables": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "inventory": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "financial_income": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "financial_expense": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "other_income": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        },
+        "other_expense": {
+          "value": null,
+          "period": "7T2026",
+          "yoy": null,
+          "source": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "raw inputs only; WACC is calculated downstream",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": null,
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": null
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": null
+      },
+      "upcoming_events": [
+        {
+          "event": "9M/Q3 2026 business update",
+          "expected_window": "Oct 2026"
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "Strong earnings growth vs severe price underperformance",
+          "observation": "7T revenue +13.6%, PBT +18.3%; price performance about -13.9% 1M, -10.3% 3M, -15.7% 6M and -32.3% 1Y vs market",
+          "explanation": "Valuation compression / growth expectation reset despite resilient operating results."
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [],
+        "new_data_collected": [
+          "7T revenue/PBT",
+          "6T NPAT-MI",
+          "current valuation",
+          "price-vs-VNINDEX performance"
+        ],
+        "still_missing": [
+          "CFO/capex current period",
+          "cost-of-capital inputs",
+          "SMA200 exact value"
+        ]
+      },
+      "sources": [
+        {
+          "name": "FPT",
+          "date": "2026-09",
+          "url": "https://fpt.com/vi/tin-tuc/nhan-su-cong-nghe-fpt-tang-gan-4-giua-lan-song-tai-co-cau-vi-ai-tren-toan-cau",
+          "note": "7T2026 revenue/PBT and AI business update"
+        },
+        {
+          "name": "FPT",
+          "date": "2026-07-16",
+          "url": "https://fpt.com/vi/tin-tuc/6-thang-dau-nam-2026-loi-nhuan-truoc-thue-cua-fpt-tang-truong-18-1",
+          "note": "6T official results"
+        },
+        {
+          "name": "VNDirect/taichinh.com",
+          "date": "2026-09-25",
+          "url": "https://taichinh.com/chung-khoan/fpt",
+          "note": "Valuation and relative performance"
+        },
+        {
+          "name": "Simplize",
+          "date": "2026-10-01",
+          "url": "https://simplize.vn/co-phieu/FPT/lich-su-gia",
+          "note": "Current price"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "required_sessions": 300,
+        "sessions_used": 300,
+        "missing_capabilities": [
+          "exact verified SMA200 level"
+        ],
+        "note": "Long price series and market-relative performance are available, but SMA200 was not directly computed in this run."
+      },
+      "ohlcv_source": {
+        "source": "VNDirect/Stockbiz/Simplize",
+        "sessions_used": 300,
+        "date_range": "2025-08 to 2026-10"
+      },
+      "trend_status": "Strong downtrend / severe relative underperformance",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": null,
+        "classification": "liquid",
+        "vsa_signal_candidate": "possible capitulation/base near 52w low, unconfirmed",
+        "supporting_evidence": "Price 62.7k near 52w low 61.5k; 1M -13.9%, 3M -10.3%, 6M -15.7%, 1Y -32.3%."
+      },
+      "smart_money_phase": "markdown / potential base candidate",
+      "zones": {
+        "demand": "61,500–63,000",
+        "supply": "68,000–75,000",
+        "is_fresh": true
+      },
+      "sector_benchmark": {
+        "method": "VNINDEX relative comparison",
+        "name": "VNINDEX",
+        "constituents_if_peer_basket": [],
+        "source": "VNDirect/taichinh.com",
+        "date": "2026-09-30"
+      },
+      "sector_vs_market": {
+        "period": "6M",
+        "sector_perf_pct": -15.7,
+        "vnindex_perf_pct": 2.7,
+        "sector_strength_label": "FPT significantly underperformed VNINDEX"
+      },
+      "screening_signal_analysis": null,
+      "signal_strength": 5,
+      "conclusion": "Technical trend is clearly negative; no confirmed reversal despite price reaching long-term low zone."
+    },
+    "node3": {
+      "data_period": "7T2026",
+      "screening_flags": [],
+      "screening_metrics_used": {},
+      "capital_efficiency": {
+        "cost_of_equity": null,
+        "wacc": null,
+        "nopat": null,
+        "roic": null,
+        "economic_spread": null,
+        "formula_note": "Insufficient verified beta/ERP/debt-cost inputs."
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "receivables_vs_revenue_growth": null,
+        "inventory_vs_revenue_growth": null,
+        "debt_vs_npat_growth": null,
+        "red_flags": [
+          "No current-period cash conversion metrics collected in this run."
+        ]
+      },
+      "earnings_sustainability": {
+        "classification": "Structural",
+        "reasoning": "Technology and overseas IT services growth remains double-digit; AI/Data Analytics revenue reportedly +54% in 7T2026."
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Insufficient line-item set.",
+      "health_status": "Operating growth and project wins remain strong; the primary conflict is valuation/multiple compression rather than earnings deterioration.",
+      "valuation": {
+        "dcf_fair_value": null,
+        "reverse_dcf": {
+          "implied_fcf_cagr": null,
+          "commentary": "Not calculated without normalized FCF/WACC."
+        },
+        "relative": {
+          "pe": 12.13,
+          "pb": 3.04
+        },
+        "peer_list": [
+          {
+            "ticker": "CMG",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Vietnam listed IT services peer"
+          },
+          {
+            "ticker": "ELC",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Vietnam technology peer"
+          },
+          {
+            "ticker": "CTR",
+            "pe": null,
+            "pb": null,
+            "roe": null,
+            "date": "2026-10-01",
+            "reason": "Digital infrastructure/technology services peer"
+          }
+        ]
+      },
+      "moat": "Large engineering talent base, international client relationships, broad digital/AI capabilities and recurring telecom/education ecosystem.",
+      "conclusion": "Fundamentals remain structurally strong and valuation has compressed, but technical weakness is severe."
+    },
+    "node4": {
+      "risk_regime": "Neutral-cautious",
+      "macro_indicators": {
+        "fed_rate": "3.75–4.00%",
+        "us_pce_yoy": "3.4% Aug-2026",
+        "dxy": "~101.47",
+        "brent_usd_bbl": "~103.5",
+        "usd_vnd": null
+      },
+      "company_specific_drivers": [
+        {
+          "driver": "Global IT spending / AI transformation",
+          "latest": "AI/Data Analytics revenue +54% in 7T2026",
+          "direction": "Positive",
+          "source": "FPT"
+        },
+        {
+          "driver": "Large overseas contract wins",
+          "latest": "14 projects >USD10m in 6T; new signing +32.3% YoY",
+          "direction": "Positive",
+          "source": "FPT"
+        },
+        {
+          "driver": "JPY/USD/VND and global client budgets",
+          "latest": null,
+          "direction": "FX/budget volatility can affect margins",
+          "source": "Macro/company exposure"
+        }
+      ],
+      "sensitivity_table": [
+        {
+          "variable": "Global IT budgets",
+          "sensitivity": "High",
+          "direction": "Higher positive",
+          "confidence": "High"
+        },
+        {
+          "variable": "AI adoption",
+          "sensitivity": "High",
+          "direction": "Faster adoption positive",
+          "confidence": "High"
+        },
+        {
+          "variable": "FX",
+          "sensitivity": "Medium",
+          "direction": "Mixed by currency mix",
+          "confidence": "Medium"
+        }
+      ],
+      "geopolitical_events": [
+        {
+          "event": "Global AI-led restructuring and tech spending rotation",
+          "date": "2026",
+          "impact": "Creates both demand opportunity and pricing/productivity pressure."
+        }
+      ],
+      "causal_chains": [
+        {
+          "fact": "7T2026 revenue +13.6%, PBT +18.3%, AI/Data Analytics +54%.",
+          "inference": "Operating momentum remains healthy despite stock de-rating.",
+          "assumption": "Large-client demand and execution remain intact.",
+          "confidence": "High"
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Bull",
+          "description": "AI/global IT bookings accelerate and multiple stabilizes."
+        },
+        {
+          "scenario": "Base",
+          "description": "Mid-teens profit growth continues but valuation stays compressed."
+        },
+        {
+          "scenario": "Bear",
+          "description": "Global IT budgets slow and de-rating persists."
+        }
+      ],
+      "macro_view": "Global technology demand is supportive, but higher rates and risk-off conditions can compress growth-stock multiples.",
+      "industry_impact": "Mixed-positive",
+      "company_impact": "Positive operationally, negative valuation sensitivity",
+      "conclusion": "Fundamentals and price are diverging; macro mainly affects valuation multiple rather than near-term operating trajectory."
+    },
+    "node5": {
+      "ticker": "FPT",
+      "data_period": "7T2026 + 01/10/2026",
+      "scores": {
+        "fundamental": 18,
+        "valuation": 15,
+        "technical": 5,
+        "flow": 8,
+        "sector_macro": 16,
+        "risk": 16
+      },
+      "ai_score": {
+        "value": 67.8,
+        "formula_shown": "18/20×30 + 15/20×20 + 5/20×15 + 8/20×15 + 16/20×10 + 16/20×10"
+      },
+      "confidence": {
+        "value": 79,
+        "components": {
+          "data_completeness": 74,
+          "source_quality": 92,
+          "cross_source_agreement": 86,
+          "fundamental_consistency": 90,
+          "technical_confirmation": 70,
+          "macro_clarity": 66
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🟢",
+        "technical": "🔴",
+        "macro": "🟡",
+        "liquidity": "🟢",
+        "signal_alignment": "2/4",
+        "alignment": "2/4",
+        "override_applied": "Fundamental green + technical red => BUY ON DIP, not immediate BUY."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "9M/Q3 2026 business update",
+        "bucket": "0-30d"
+      },
+      "decision": "BUY ON DIP",
+      "drivers": [
+        "7T2026 revenue 30.784tn VND (+13.6%) and PBT 6.659tn (+18.3%).",
+        "AI/Data Analytics revenue +54%, overseas new-signing momentum strong.",
+        "Price near 52w low and underperformed VNINDEX by ~18.4ppt over 6M."
+      ],
+      "thesis_invalidation": "Overseas IT bookings and profit growth decelerate to low single digits for multiple quarters, indicating structural growth has broken rather than merely valuation de-rating.",
+      "trading_stop": {
+        "price": 61500,
+        "basis": "52-week low / major demand boundary"
+      },
+      "liquidity_note": "High liquidity; technical weakness remains the limiting factor.",
+      "strategy": {
+        "entry_zone": "61,500–63,500",
+        "allocation_plan": {
+          "note": "Staged only; wait for evidence of base formation.",
+          "steps": [
+            "30% near 61.5–63.5k",
+            "30% after reclaiming 66k with stable volume",
+            "40% after Q3 confirms growth and price reclaims 70k"
+          ]
+        },
+        "tp1": {
+          "price": 70000,
+          "rationale": "First recovery/supply zone."
+        },
+        "tp2": {
+          "price": 75000,
+          "rationale": "Higher re-rating zone."
+        },
+        "risk_per_trade_pct_nav": 1,
+        "position_size_note": "Cap at 8% NAV while downtrend remains active.",
+        "max_portfolio_weight_pct": 8,
+        "position_type": "Initial"
+      },
+      "localized_upstream": {
+        "fundamental": "Tăng trưởng công nghệ/AI vẫn mạnh.",
+        "technical": "Giá giảm sâu và underperform VNINDEX."
+      },
+      "full_reasoning": "FPT retains strong structural earnings momentum while valuation compressed to ~12x P/E, but the technical trend remains decisively weak. BUY ON DIP follows the conflict rule."
+    },
+    "node6a": "<!DOCTYPE html>\n<html lang=\"vi\">\n<head>\n<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Báo Cáo Phân Tích FPT | Senior Equity Analyst</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js\"></script>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif'],display:['Outfit','sans-serif']},colors:{brand:{deep:'#1e3a8a',accent:'#3b82f6',bg:'#f5f7fb'},status:{buy:'#16a34a',sell:'#dc2626',hold:'#f59e0b'}},boxShadow:{premium:'0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)'}}}}</script>\n<style>body{background-color:#f5f7fb;color:#1a1a1a;line-height:1.6}.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 4px 6px -1px rgb(0 0 0/0.05),0 2px 4px -2px rgb(0 0 0/0.05);transition:transform .2s ease,box-shadow .2s ease}.card:hover{box-shadow:0 20px 25px -5px rgb(0 0 0/0.05)}.hero-card{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);color:#fff}.metric-card{background:#f8fafc;border:1px solid #e2e8f0;padding:16px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:16px;margin:16px 0;border-radius:0 8px 8px 0;font-style:italic}.sub-card{background:#fff;border:1px solid #f1f5f9;padding:16px;border-radius:10px;margin-bottom:12px}.badge{padding:4px 12px;border-radius:9999px;font-size:.75rem;font-weight:600;text-transform:uppercase}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:768px){.grid-3{grid-template-columns:1fr}.card{padding:20px}}</style>\n</head>\n<body class=\"font-sans antialiased\">\n<div id=\"report\" class=\"container mx-auto px-4 py-8 max-w-[1100px]\">\n<header class=\"mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4\"><div><div class=\"flex items-center gap-3 mb-2\"><span class=\"bg-brand-deep text-white px-3 py-1 rounded text-sm font-bold tracking-widest\">HOSE: FPT</span><span class=\"text-gray-500 font-medium text-sm\">Cập nhật: 01/10/2026</span></div><h1 class=\"text-3xl md:text-4xl font-display font-extrabold text-brand-deep\">BÁO CÁO PHÂN TÍCH CHUYÊN SÂU</h1><p class=\"text-gray-600 mt-1 font-medium\">CTCP FPT</p></div><div class=\"text-right\"><p class=\"text-xs uppercase tracking-wider text-gray-400 font-bold\">Chuyên gia phân tích</p><p class=\"text-sm font-semibold text-gray-800\">Senior Equity Analyst & Geopolitical Strategist</p></div></header>\n<main>\n<div class=\"card hero-card shadow-2xl relative overflow-hidden mb-6\"><div class=\"relative z-10\"><div class=\"flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-white/20 pb-6\"><div><h2 class=\"text-sm uppercase tracking-widest text-blue-200 font-bold mb-1\">Quyết định đầu tư</h2><div class=\"text-5xl font-display font-black text-white tracking-tight\">BUY ON DIP</div></div><div class=\"mt-4 md:mt-0 flex gap-8\"><div class=\"text-center\"><p class=\"text-blue-200 text-xs font-bold uppercase mb-1\">AI Score</p><p class=\"text-3xl font-black\">67.8<span class=\"text-sm\">/100</span></p></div><div class=\"text-center\"><p class=\"text-blue-200 text-xs font-bold uppercase mb-1\">Tin tưởng</p><p class=\"text-3xl font-black\">79</p></div></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-8\"><div><h3 class=\"text-blue-100 font-bold text-sm uppercase mb-3\">Động lực tăng trưởng chính</h3><ul class=\"space-y-2\"><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>7T doanh thu 30.784 tỷ, +13,6%</span></li><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>7T LNTT 6.659 tỷ, +18,3%</span></li><li class=\"flex items-start gap-2 text-sm\"><span class=\"text-green-400 mt-0.5\">●</span><span>AI/Data Analytics +54%</span></li></ul></div><div class=\"bg-white/10 p-4 rounded-lg border border-white/10\"><h3 class=\"text-red-300 font-bold text-sm uppercase mb-2\">Điều kiện vô hiệu (Invalidation)</h3><p class=\"text-sm leading-relaxed\">Data not available</p></div></div></div></div>\n<div class=\"card border-2 border-brand-accent/20 mb-6\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Tín hiệu Tổng hợp</h2><div class=\"grid grid-cols-2 md:grid-cols-4 gap-3 mb-4\"><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Cơ bản</span><span class=\"text-2xl leading-none\"><span class=\"inline-block w-3 h-3 rounded-full bg-green-600\"></span></span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Kỹ thuật</span><span class=\"text-2xl leading-none\"><span class=\"inline-block w-3 h-3 rounded-full bg-red-600\"></span></span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Vĩ mô</span><span class=\"text-2xl leading-none\"><span class=\"inline-block w-3 h-3 rounded-full bg-yellow-500\"></span></span></div><div class=\"sub-card m-0 text-center\"><span class=\"text-[10px] font-bold text-gray-400 uppercase block mb-1\">Thanh khoản</span><span class=\"text-2xl leading-none\"><span class=\"inline-block w-3 h-3 rounded-full bg-green-600\"></span></span></div></div><div class=\"text-center mb-4\"><span class=\"badge bg-blue-100 text-blue-700\">Đồng thuận tín hiệu: 2/4</span></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-3\"><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Catalyst gần nhất</span><p class=\"text-sm font-medium\">9M/Q3 business update (0-30d)</p></div><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Chất lượng lợi nhuận</span><p class=\"text-sm font-medium\">Data not available</p></div><div class=\"sub-card m-0\"><span class=\"text-xs font-bold text-gray-400 uppercase block mb-1\">Reverse DCF</span><p class=\"text-sm font-medium\">CAGR ngầm định: Data not available — Thiếu normalized FCF/WACC</p></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Vĩ mô & Địa chính trị</h2><div class=\"space-y-4\"><div class=\"flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100\"><span class=\"text-sm font-semibold text-gray-600 uppercase\">Chế độ rủi ro</span><span class=\"badge bg-yellow-100 text-yellow-700\">Trung tính-thận trọng</span></div><div class=\"grid grid-cols-2 gap-3\"><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Lãi suất FED</h3><p class=\"text-lg font-bold\">3,75–4,00%</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Tỷ giá USD/VND</h3><p class=\"text-lg font-bold\">Data not available</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Dầu Brent</h3><p class=\"text-lg font-bold\">~103,5 USD/thùng Brent</p></div><div class=\"sub-card m-0\"><h3 class=\"text-xs font-bold text-gray-400 uppercase mb-1\">Lạm phát Mỹ</h3><p class=\"text-lg font-bold\">PCE 3,4% YoY</p></div></div><p class=\"text-sm text-gray-600\">IT demand tốt nhưng high rates ép valuation multiple.</p></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Nhóm Ngành</h2><div class=\"space-y-4\"><div class=\"flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100\"><span class=\"text-sm font-semibold text-gray-600 uppercase\">Sức mạnh ngành</span><span class=\"badge bg-gray-200 text-gray-700\">Underperform ~18,4ppt</span></div><div class=\"bg-blue-50 border border-blue-100 p-4 rounded-xl\"><div class=\"flex justify-between mb-2\"><span class=\"text-sm font-medium\">Ngành (cùng kỳ)</span><span class=\"text-sm font-bold\">-15,7% (FPT 6M)</span></div><div class=\"flex justify-between\"><span class=\"text-sm font-medium\">VN-Index</span><span class=\"text-sm font-bold\">+2,7% (6M)</span></div><div class=\"w-full bg-gray-200 h-2 rounded-full mt-3 overflow-hidden\"><div class=\"bg-brand-accent h-full\" style=\"width:Data not available\"></div></div></div><p class=\"text-sm text-gray-600 italic\">Data not available</p></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Chu kỳ & Chính sách</h2><div class=\"sub-card\"><p class=\"text-xs font-bold text-blue-500 uppercase mb-1\">Giai đoạn</p><p class=\"font-bold text-gray-800\">Data not available</p></div><div class=\"space-y-3\"><div class=\"flex items-center gap-3\"><div class=\"w-14 h-10 bg-red-50 text-red-600 rounded flex items-center justify-center font-bold text-sm\">Data not available</div><p class=\"text-xs text-gray-500 uppercase font-semibold leading-tight\">Data not available</p></div><div class=\"flex items-center gap-3\"><div class=\"w-14 h-10 bg-green-50 text-green-600 rounded flex items-center justify-center font-bold text-sm\">Data not available</div><p class=\"text-xs text-gray-500 uppercase font-semibold leading-tight\">Ngân sách đầu tư công (Tỷ USD)</p></div></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Doanh nghiệp</h2><div class=\"space-y-3\"><div class=\"flex justify-between items-end border-b border-gray-100 pb-2\"><div><p class=\"text-xs text-gray-400 font-bold uppercase\">Doanh thu (7T2026)</p><p class=\"text-lg font-bold\">30.784 tỷ đồng</p></div><span class=\"text-green-600 font-bold text-sm\">+13,6% YoY</span></div><div class=\"flex justify-between items-end border-b border-gray-100 pb-2\"><div><p class=\"text-xs text-gray-400 font-bold uppercase\">Lợi nhuận sau thuế</p><p class=\"text-lg font-bold\">6.659 tỷ đồng LNTT</p></div><span class=\"text-green-600 font-bold text-sm\">+18,3% YoY</span></div><div class=\"highlight text-xs m-0 mt-2 py-2\"><strong>Lợi thế (Moat):</strong> Talent, global clients, AI/digital ecosystem.</div></div></div></div>\n<div class=\"card mb-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 items-start\"><div><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Dòng tiền thông minh & Định giá</h2><div class=\"highlight\"><strong>Key Insight:</strong> Đang trong giai đoạn <strong>markdown / potential base</strong> tại vùng 61.500–63.000. Near 52w low, chưa có reversal.</div><div class=\"grid grid-cols-2 gap-4 mt-4\"><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">Volume Ratio</span><strong class=\"text-2xl text-brand-deep\">Data not available</strong><span class=\"text-[10px] text-gray-400\">vs avg 20 phiên</span></div><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">Tín hiệu</span><strong class=\"text-sm text-center text-brand-accent mt-1\">Near 52w low, chưa có reversal.</strong></div></div></div><div><h3 class=\"text-sm font-bold uppercase text-gray-500 mb-4\">Định giá (Valuation)</h3><div class=\"grid grid-cols-2 gap-4 mb-6\"><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">P/E (TTM)</span><strong class=\"text-2xl Data not available\">12,13x</strong><span class=\"text-[10px] text-gray-400\">Ngành: Data not available</span></div><div class=\"metric-card\"><span class=\"text-xs font-bold text-gray-400 uppercase\">P/B Ratio</span><strong class=\"text-2xl Data not available\">3,04x</strong><span class=\"text-[10px] text-gray-400\">VNDirect 25/09</span></div></div><div class=\"bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300\"><h3 class=\"text-sm font-bold uppercase text-gray-500 mb-4\">Cấu trúc Kỹ thuật</h3><ul class=\"space-y-4\"><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">Xu hướng</span><span class=\"badge bg-green-100 Data not available\">Downtrend mạnh</span></li><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">So với SMA 200</span><span class=\"text-sm font-bold\">Data not available</span></li><li class=\"flex justify-between items-center\"><span class=\"text-sm font-medium\">Thanh khoản (Volume)</span><span class=\"text-sm font-bold\">Data not available</span></li></ul></div></div></div></div>\n<div class=\"mb-6\"><h2 class=\"text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1\">Hệ thống chấm điểm AI</h2><div class=\"grid grid-cols-2 md:grid-cols-6 gap-3\"><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Kỹ thuật</span><strong class=\"text-xl\">5/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-green-500 h-full rounded\" style=\"width:25%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Dòng tiền</span><strong class=\"text-xl\">8/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-blue-500 h-full rounded\" style=\"width:40%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Cơ bản</span><strong class=\"text-xl\">18/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-yellow-500 h-full rounded\" style=\"width:90%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Ngành/Vĩ mô</span><strong class=\"text-xl\">16/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-purple-500 h-full rounded\" style=\"width:80%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Định giá</span><strong class=\"text-xl\">15/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-green-400 h-full rounded\" style=\"width:75%\"></div></div></div><div class=\"metric-card\"><span class=\"text-[10px] font-bold text-gray-400 uppercase\">Rủi ro</span><strong class=\"text-xl\">16/20</strong><div class=\"w-full bg-gray-200 h-1 mt-2 rounded\"><div class=\"bg-red-500 h-full rounded\" style=\"width:80%\"></div></div></div></div></div>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-6\"><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-red-700 mb-4\">Quản trị Rủi ro</h2><div class=\"space-y-3\"><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Doanh nghiệp</span><p class=\"text-sm font-medium\">Growth execution, FX, talent costs.</p></div><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Vĩ mô</span><p class=\"text-sm font-medium\">High rates compress tech multiples.</p></div><div class=\"sub-card m-0 border-red-100\"><span class=\"text-red-600 font-bold text-xs uppercase block mb-1\">Thanh khoản</span><p class=\"text-sm font-medium\">Thanh khoản cao; technical yếu.</p></div></div></div><div class=\"card\"><h2 class=\"text-xl font-display font-bold text-brand-deep mb-4\">Phân tích Nhân quả</h2><ul class=\"space-y-2\"><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Gốc:</span><span>Data not available</span></li><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Quả:</span><span>Data not available</span></li><li class=\"text-sm flex gap-2\"><span class=\"font-bold text-brand-deep shrink-0\">Kỹ thuật:</span><span>Data not available</span></li></ul></div></div>\n<div class=\"mb-6\"><h2 class=\"text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 ml-1\">Kịch bản Phân tích</h2><div class=\"grid-3\"><div class=\"card m-0 border-t-4 border-green-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-green-700\">BULL CASE</h3><span class=\"text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded\">30%</span></div><p class=\"text-xs text-gray-600 mb-4\">AI bookings accelerate + multiple stabilize</p><p class=\"text-2xl font-black text-green-700\">75.000</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Target Price</p></div><div class=\"card m-0 border-t-4 border-blue-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-brand-deep\">BASE CASE</h3><span class=\"text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded\">50%</span></div><p class=\"text-xs text-gray-600 mb-4\">Profit mid-teens, multiple compressed</p><p class=\"text-2xl font-black text-brand-deep\">70.000</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Target Price</p></div><div class=\"card m-0 border-t-4 border-red-500\"><div class=\"flex justify-between items-center mb-2\"><h3 class=\"font-bold text-red-700\">BEAR CASE</h3><span class=\"text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded\">20%</span></div><p class=\"text-xs text-gray-600 mb-4\">IT budgets slow</p><p class=\"text-2xl font-black text-red-700\">61.500</p><p class=\"text-[10px] font-bold text-gray-400 uppercase\">Stop Loss</p></div></div></div>\n<div class=\"card border-2 border-brand-accent/20 bg-blue-50/30\"><h2 class=\"text-2xl font-display font-bold text-brand-deep mb-6 text-center\">Chiến lược Giao dịch (Trade Setup)</h2><div class=\"grid grid-cols-1 md:grid-cols-4 gap-4\"><div class=\"sub-card m-0 text-center\"><p class=\"text-xs font-bold text-gray-400 uppercase mb-2\">Vùng Mua</p><p class=\"text-xl font-bold text-brand-deep\">61.500–63.500</p><p class=\"text-[10px] text-gray-500 mt-1\">Mua theo phần</p></div><div class=\"sub-card m-0 text-center border-red-100\"><p class=\"text-xs font-bold text-red-400 uppercase mb-2\">Cắt Lỗ (SL)</p><p class=\"text-xl font-bold text-red-600\">61.500</p><p class=\"text-[10px] text-gray-500 mt-1\">Trading stop</p></div><div class=\"sub-card m-0 text-center border-green-100\"><p class=\"text-xs font-bold text-green-400 uppercase mb-2\">Mục tiêu 1</p><p class=\"text-xl font-bold text-green-700\">70.000</p><p class=\"text-[10px] text-gray-500 mt-1\">Recovery zone</p></div><div class=\"sub-card m-0 text-center border-green-100\"><p class=\"text-xs font-bold text-green-400 uppercase mb-2\">Mục tiêu 2</p><p class=\"text-xl font-bold text-green-700\">75.000</p><p class=\"text-[10px] text-gray-500 mt-1\">Re-rating zone</p></div></div><div class=\"mt-6 bg-white p-4 rounded-xl border border-brand-accent/10\"><h3 class=\"text-sm font-bold uppercase text-brand-deep mb-3\">Lộ trình giải ngân</h3><div class=\"flex flex-col md:flex-row justify-between gap-4\"><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 1:</span> 30% near support</div><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 2:</span> 30% after reclaim 66k</div><div class=\"flex-1 text-sm\"><span class=\"font-bold text-brand-accent\">Bước 3:</span> 40% after Q3 + >70k</div></div></div><div class=\"mt-4 bg-white p-4 rounded-xl border border-brand-accent/10\"><h3 class=\"text-sm font-bold uppercase text-brand-deep mb-3\">Quản trị vị thế (Position Sizing)</h3><div class=\"flex flex-col md:flex-row justify-between gap-4 text-sm\"><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Rủi ro/lệnh:</span> 1% NAV</div><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Tỷ trọng tối đa:</span> 8% NAV</div><div class=\"flex-1\"><span class=\"font-bold text-brand-accent\">Loại vị thế:</span> Initial</div></div></div></div>\n</main><footer class=\"mt-10 pt-6 border-t border-gray-200 text-center text-xs text-gray-400\"><p class=\"mb-1\">FPT official Jul-Sep 2026; VNDirect 25/09; Simplize/Stockbiz 01/10/2026</p><p>Báo cáo được tạo tự động bởi AI Equity Research Engine · 01/10/2026 · Chỉ dành cho mục đích tham khảo, không phải khuyến nghị đầu tư chính thức.</p></footer></div>\n</body></html>\n\n---\n\n# ⚠️ FINAL EXECUTION RULE\n* Replace EVERY placeholder with real data from the JSON inputs\n* Keep DOM structure and CSS class definitions IDENTICAL to the reference template\n* Data not available, Data not available, Data not available are data-driven class tokens\n* Any upstream null → `Data not available`\n* Numbers MUST be present\n* FPT official Jul-Sep 2026; VNDirect 25/09; Simplize/Stockbiz 01/10/2026 must list real sources from Node 1\n* If output resembles SSI / VNDirect institutional report → SUCCESS\n",
+    "node6b": "# BÁO CÁO PHÂN TÍCH FPT — CTCP FPT\nCập nhật: 01/10/2026 · WEB_ONLY\n\n## 1. Quyết định đầu tư\n- **BUY ON DIP** · AI Score 67.8/100 · Confidence 79%.\n- 7T2026 doanh thu 30.784 tỷ (+13,6%); LNTT 6.659 tỷ (+18,3%); AI/Data Analytics +54%.\n- Thesis invalidation: Overseas IT bookings and profit growth decelerate to low single digits for multiple quarters, indicating structural growth has broken rather than merely valuation de-rating.\n- Trading stop: 61.500 đồng.\n\n## 2. Tín hiệu tổng hợp\n| Cơ bản | Kỹ thuật | Vĩ mô | Thanh khoản | Alignment |\n|---|---|---|---|---|\n| 🟢 | 🔴 | 🟡 | 🟢 | 2/4 |\nCatalyst: 9M/Q3 business update (0–30d).\n\n## 3. Vĩ mô & Ngành\n| Biến | Độ nhạy | Tác động | Confidence |\n|---|---|---|---|\n| Global IT budgets | Cao | Tăng → tích cực | Cao |\n| AI adoption | Cao | Nhanh → tích cực | Cao |\n| FX | Trung bình | Mixed | Trung bình |\nFPT 6M -15,7% vs VNINDEX +2,7%, underperform ~18,4 điểm %.\n\n## 4. Doanh nghiệp & Chất lượng lợi nhuận\n- 6T official revenue 26.269 tỷ, LNTT 5.714 tỷ; 7T tiếp tục tăng 13,6%/18,3%.\n- 6T NPAT CĐTS 5.055 tỷ, +14,1%.\n- Overseas new signing 6T +32,3%; 14 dự án >10 triệu USD.\n- Sustainability: Structural.\n- Cash-conversion metrics, F/M-Score, WACC/ROIC: Chưa có dữ liệu.\n\n## 5. Định giá & So sánh peer\n- P/E ~12,13x; P/B ~3,04x; dividend yield ~2,8%.\n| Peer | P/E | P/B | ROE | Ngày | Lý do |\n|---|---|---|---|---|---|\n| CMG | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | IT services |\n| ELC | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | Technology |\n| CTR | Chưa có dữ liệu | Chưa có dữ liệu | Chưa có dữ liệu | 01/10/2026 | Digital infrastructure |\n\n## 6. Kỹ thuật & Dòng tiền\n- 300 phiên price history available; thiếu exact SMA200 → DEGRADED.\n- 1M -13,9%; 3M -10,3%; 6M -15,7%; 1Y -32,3%.\n- Giá 62,7k sát 52w low 61,5k; demand 61,5–63k; supply 68–75k.\n- Chưa có reversal confirmation.\n\n## 7. Rủi ro\nGlobal IT slowdown, FX, talent costs, valuation compression. Liquidity cao.\n\n## 8. FACT / INFERENCE / ASSUMPTION\n- FACT: 7T revenue +13,6%; PBT +18,3%; AI/Data +54%.\n- INFERENCE: operating momentum vẫn khỏe dù giá de-rate (confidence cao).\n- ASSUMPTION: global client demand remains intact.\n\n## 9. Kịch bản\n| Scenario | Xác suất | Điều kiện | Mốc |\n|---|---:|---|---:|\n| Bull | 30% | AI bookings accelerate | 75.000 |\n| Base | 50% | Profit mid-teens, multiple compressed | 70.000 |\n| Bear | 20% | IT budgets slow | 61.500 |\n\n## 10. Chiến lược & Quản trị vị thế\nEntry 61,5–63,5k theo phần; stop 61,5k; TP1 70k; TP2 75k. Risk 1% NAV; max 8%.\n\n## 11. Nguồn dữ liệu\n| Nguồn | Ngày | Nội dung |\n|---|---|---|\n| FPT | 16/07/2026 | 6T official results |\n| FPT | 09/2026 | 7T and AI update |\n| VNDirect/taichinh.com | 25/09/2026 | Valuation/relative performance |\n| Simplize/Stockbiz | 01/10/2026 | Price/volume |\n\n*Báo cáo tự động, chỉ dùng tham khảo cá nhân — 01/10/2026.*"
+  },
+  "decision_record": {
+    "date": "01/10/2026",
+    "ticker": "FPT",
+    "price_at_analysis": 62700,
+    "decision": "BUY ON DIP",
+    "ai_score": 67.8,
+    "confidence": 79,
+    "entry_zone": "61,500–63,500",
+    "trading_stop": 61500,
+    "tp1": 70000,
+    "tp2": 75000,
+    "thesis_invalidation": "Overseas IT bookings and profit growth decelerate to low single digits for multiple quarters, indicating structural growth has broken rather than merely valuation de-rating."
+  }
+}
