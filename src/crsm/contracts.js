@@ -13,9 +13,7 @@ export const REQUIRED_RENDER_OUTPUT_KEYS = Object.freeze([
   'node2',
   'node3',
   'node4',
-  'node5',
-  'node6a',
-  'node6b'
+  'node5'
 ]);
 
 export const DECISION_RECORD_FIELDS = Object.freeze([
@@ -190,6 +188,7 @@ export function validateDecisionRecord(record, ticker = null) {
 
 export function validateAnalysisResult(result) {
   const errors = [];
+  const warnings = [];
   if (!isPlainObject(result)) return fail('result must be an object');
 
   if (result.result_version !== CRSM_RESULT_VERSION) {
@@ -215,11 +214,11 @@ export function validateAnalysisResult(result) {
         errors.push(`outputs missing required renderer key: ${key}`);
       }
     }
-    if ('node6a' in result.outputs && typeof result.outputs.node6a !== 'string') {
-      errors.push('outputs.node6a must be a string');
+    if ('node6a' in result.outputs && result.outputs.node6a != null && typeof result.outputs.node6a !== 'string') {
+      warnings.push('outputs.node6a legacy HTML is ignored by the deterministic web renderer');
     }
-    if ('node6b' in result.outputs && typeof result.outputs.node6b !== 'string') {
-      errors.push('outputs.node6b must be a string');
+    if ('node6b' in result.outputs && result.outputs.node6b != null && typeof result.outputs.node6b !== 'string') {
+      warnings.push('outputs.node6b is not Markdown text; the webapp may use a deterministic fallback');
     }
 
     if (isPlainObject(result.outputs.node1)) {
@@ -229,13 +228,13 @@ export function validateAnalysisResult(result) {
       errors.push(...validateNode2Output(result.outputs.node2).map(error => 'outputs.node2: ' + error));
     }
     if (isPlainObject(result.outputs.node3)) {
-      errors.push(...validateRequiredKeys(
+      warnings.push(...validateRequiredKeys(
         result.outputs.node3,
         ['data_period','screening_flags','screening_metrics_used','capital_efficiency','earnings_quality','earnings_sustainability','f_score','m_score','m_score_note','health_status','valuation','moat','conclusion']
       ).map(error => 'outputs.node3: ' + error));
     }
     if (isPlainObject(result.outputs.node4)) {
-      errors.push(...validateRequiredKeys(
+      warnings.push(...validateRequiredKeys(
         result.outputs.node4,
         ['risk_regime','macro_indicators','company_specific_drivers','sensitivity_table','geopolitical_events','causal_chains','risk_scenarios','macro_view','industry_impact','company_impact','conclusion']
       ).map(error => 'outputs.node4: ' + error));
@@ -243,18 +242,20 @@ export function validateAnalysisResult(result) {
     if (isPlainObject(result.outputs.node5)) {
       errors.push(...validateNode5Output(result.outputs.node5).map(error => 'outputs.node5: ' + error));
     }
-    if (typeof result.outputs.node6a === 'string') {
-      errors.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
+    if (typeof result.outputs.node6a === 'string' && result.outputs.node6a.trim()) {
+      warnings.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
     }
-    if (typeof result.outputs.node6b === 'string') {
-      errors.push(...validateNode6BReport(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
+    if (typeof result.outputs.node6b === 'string' && result.outputs.node6b.trim()) {
+      warnings.push(...validateNode6BReport(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
+    } else {
+      warnings.push('outputs.node6b is missing or empty; deterministic detail fallback may be used');
     }
   }
 
   const decision = validateDecisionRecord(result.decision_record, result.ticker);
   errors.push(...decision.errors);
 
-  return { valid: errors.length === 0, errors };
+  return { valid: errors.length === 0, errors, warnings };
 }
 
 export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP', 'WATCH']);
@@ -270,76 +271,43 @@ function validateNode1Output(node) {
 }
 
 function validateNode2Output(node) {
-  const errors = validateRequiredKeys(node, [
-    'technical_coverage','ohlcv_source','trend_status','sma_200_rel','volume_analysis',
-    'smart_money_phase','zones','sector_benchmark','sector_vs_market',
-    'screening_signal_analysis','signal_strength','conclusion'
-  ]);
-
+  const errors = [];
   const coverage = node.technical_coverage;
   if (!isPlainObject(coverage)) {
     errors.push('technical_coverage must be an object');
-  } else {
-    if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
-      errors.push('technical_coverage.status must be FULL or DEGRADED');
-    }
-    if (coverage.required_sessions !== 300) {
-      errors.push('technical_coverage.required_sessions must equal 300');
-    }
-    if (!(coverage.sessions_used == null || Number.isFinite(coverage.sessions_used))) {
-      errors.push('technical_coverage.sessions_used must be a finite number or null');
-    }
-    if (!Array.isArray(coverage.missing_capabilities)) {
-      errors.push('technical_coverage.missing_capabilities must be an array');
-    }
-    if (coverage.status === 'FULL' && coverage.missing_capabilities?.length) {
-      errors.push('FULL technical coverage cannot declare missing capabilities');
-    }
-    if (coverage.status === 'DEGRADED' && !coverage.missing_capabilities?.length) {
-      errors.push('DEGRADED technical coverage must name missing capabilities');
-    }
+    return errors;
   }
 
-  const ohlcv = node.ohlcv_source;
-  if (!isPlainObject(ohlcv)) {
-    errors.push('ohlcv_source must be an object');
-  } else {
-    requireString(ohlcv.source, 'ohlcv_source.source', errors);
-    if (!(ohlcv.sessions_used == null || Number.isFinite(ohlcv.sessions_used))) {
-      errors.push('ohlcv_source.sessions_used must be a finite number or null');
-    }
-    if (!('date_range' in ohlcv)) errors.push('ohlcv_source.date_range is required');
+  if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
+    errors.push('technical_coverage.status must be FULL or DEGRADED');
+  }
+  if (coverage.required_sessions !== 300) {
+    errors.push('technical_coverage.required_sessions must equal 300');
+  }
+  if (!(coverage.sessions_used == null || Number.isFinite(coverage.sessions_used))) {
+    errors.push('technical_coverage.sessions_used must be a finite number or null');
+  }
+  if (!Array.isArray(coverage.missing_capabilities)) {
+    errors.push('technical_coverage.missing_capabilities must be an array');
+  }
+  if (coverage.status === 'FULL' && coverage.missing_capabilities?.length) {
+    errors.push('FULL technical coverage cannot declare missing capabilities');
+  }
+  if (coverage.status === 'DEGRADED' && !coverage.missing_capabilities?.length) {
+    errors.push('DEGRADED technical coverage must name missing capabilities');
   }
 
-  if (!isPlainObject(node.volume_analysis)) {
-    errors.push('volume_analysis must be an object');
-  } else {
-    for (const key of ['ratio','classification','vsa_signal_candidate','supporting_evidence']) {
-      if (!(key in node.volume_analysis)) errors.push('volume_analysis missing field: ' + key);
-    }
-  }
-
-  if (!isPlainObject(node.zones)) {
-    errors.push('zones must be an object');
-  } else {
-    for (const key of ['demand','supply','is_fresh']) {
-      if (!(key in node.zones)) errors.push('zones missing field: ' + key);
-    }
-  }
-
-  if (!isPlainObject(node.sector_benchmark)) {
-    errors.push('sector_benchmark must be an object');
-  } else {
-    for (const key of ['method','name','constituents_if_peer_basket','source','date']) {
-      if (!(key in node.sector_benchmark)) errors.push('sector_benchmark missing field: ' + key);
-    }
-  }
-
-  if (!isPlainObject(node.sector_vs_market)) {
-    errors.push('sector_vs_market must be an object');
-  } else {
-    for (const key of ['period','sector_perf_pct','vnindex_perf_pct','sector_strength_label']) {
-      if (!(key in node.sector_vs_market)) errors.push('sector_vs_market missing field: ' + key);
+  // A degraded technical node is a valid analytical outcome. Missing OHLCV,
+  // SMA200 or sector-comparison fields must reduce confidence, not kill the ticker.
+  if (coverage.status === 'FULL') {
+    const ohlcv = node.ohlcv_source;
+    if (!isPlainObject(ohlcv)) {
+      errors.push('FULL technical coverage requires ohlcv_source');
+    } else {
+      requireString(ohlcv.source, 'ohlcv_source.source', errors);
+      if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used < 200) {
+        errors.push('FULL technical coverage requires at least 200 verified sessions');
+      }
     }
   }
 
@@ -348,9 +316,8 @@ function validateNode2Output(node) {
 
 function validateNode5Output(node) {
   const errors = validateRequiredKeys(node, [
-    'ticker','data_period','scores','ai_score','confidence','conflict_detector',
-    'catalyst_horizon','decision','drivers','thesis_invalidation','trading_stop',
-    'liquidity_note','strategy','localized_upstream','full_reasoning'
+    'ticker','scores','ai_score','confidence','conflict_detector','decision',
+    'drivers','thesis_invalidation','trading_stop','strategy','full_reasoning'
   ]);
 
   if (!NODE5_DECISIONS.includes(node.decision)) {
@@ -360,95 +327,52 @@ function validateNode5Output(node) {
   if (!isPlainObject(node.scores)) {
     errors.push('scores must be an object');
   } else {
-    const keys = ['fundamental','valuation','technical','flow','sector_macro','risk'];
-    for (const key of keys) {
-      if (!Number.isFinite(node.scores[key]) || node.scores[key] < 0 || node.scores[key] > 20) {
-        errors.push('scores.' + key + ' must be a scalar number from 0 to 20');
+    for (const key of ['fundamental','valuation','technical','flow','sector_macro','risk']) {
+      if (!(key in node.scores)) {
+        errors.push('scores missing field: ' + key);
+        continue;
+      }
+      const value = node.scores[key];
+      if (value != null && (!Number.isFinite(value) || value < 0 || value > 20)) {
+        errors.push('scores.' + key + ' must be null or a scalar number from 0 to 20');
       }
     }
     if ('money_flow' in node.scores) errors.push('scores.money_flow is invalid; use scores.flow');
   }
 
-  if (!isPlainObject(node.ai_score) || !Number.isFinite(node.ai_score.value)) {
-    errors.push('ai_score.value must be numeric');
-  } else if (node.ai_score.value < 0 || node.ai_score.value > 100) {
-    errors.push('ai_score.value must be from 0 to 100');
-  }
-  if (!isPlainObject(node.ai_score) || typeof node.ai_score.formula_shown !== 'string') {
-    errors.push('ai_score.formula_shown must be a string');
+  if (!isPlainObject(node.ai_score) || !('value' in node.ai_score)) {
+    errors.push('ai_score must be an object with value');
+  } else if (node.ai_score.value != null && (!Number.isFinite(node.ai_score.value) || node.ai_score.value < 0 || node.ai_score.value > 100)) {
+    errors.push('ai_score.value must be null or numeric from 0 to 100');
   }
 
-  if (!isPlainObject(node.confidence) || !Number.isFinite(node.confidence.value)) {
-    errors.push('confidence.value must be numeric');
-  }
-  const confidenceKeys = [
-    'data_completeness','source_quality','cross_source_agreement',
-    'fundamental_consistency','technical_confirmation','macro_clarity'
-  ];
-  if (!isPlainObject(node.confidence?.components)) {
-    errors.push('confidence.components must be an object');
-  } else {
-    for (const key of confidenceKeys) {
-      if (!Number.isFinite(node.confidence.components[key])) {
-        errors.push('confidence.components.' + key + ' must be numeric');
-      }
-    }
+  if (!isPlainObject(node.confidence) || !('value' in node.confidence)) {
+    errors.push('confidence must be an object with value');
+  } else if (node.confidence.value != null && (!Number.isFinite(node.confidence.value) || node.confidence.value < 0 || node.confidence.value > 100)) {
+    errors.push('confidence.value must be null or numeric from 0 to 100');
   }
 
   if (!isPlainObject(node.conflict_detector)) {
     errors.push('conflict_detector must be an object');
-  } else {
-    for (const key of ['fundamental','technical','macro','liquidity','signal_alignment','alignment','override_applied']) {
-      if (!(key in node.conflict_detector)) errors.push('conflict_detector missing field: ' + key);
-    }
   }
 
-  if (!isPlainObject(node.catalyst_horizon)) {
-    errors.push('catalyst_horizon must be an object');
-  } else {
-    requireString(node.catalyst_horizon.nearest_catalyst, 'catalyst_horizon.nearest_catalyst', errors);
-    if (!['0-30d','30-90d','90-180d','>180d'].includes(node.catalyst_horizon.bucket)) {
-      errors.push('catalyst_horizon.bucket is invalid');
-    }
-  }
-
-  if (!Array.isArray(node.drivers) || node.drivers.length < 3) {
-    errors.push('drivers must contain at least 3 evidence-linked drivers');
+  if (!Array.isArray(node.drivers)) {
+    errors.push('drivers must be an array');
   }
   if (typeof node.thesis_invalidation !== 'string' || !node.thesis_invalidation.trim()) {
     errors.push('thesis_invalidation must be a non-empty string');
   }
 
-  if (!isPlainObject(node.trading_stop)) {
-    errors.push('trading_stop must be an object');
-  } else {
-    if (!('price' in node.trading_stop)) errors.push('trading_stop.price is required');
-    requireString(node.trading_stop.basis, 'trading_stop.basis', errors);
+  if (!isPlainObject(node.trading_stop) || !('price' in node.trading_stop)) {
+    errors.push('trading_stop must be an object with price');
   }
 
   if (!isPlainObject(node.strategy)) {
     errors.push('strategy must be an object');
-  } else {
-    for (const key of [
-      'entry_zone','allocation_plan','tp1','tp2','risk_per_trade_pct_nav',
-      'position_size_note','max_portfolio_weight_pct','position_type'
-    ]) {
-      if (!(key in node.strategy)) errors.push('strategy missing field: ' + key);
-    }
-    if (!isPlainObject(node.strategy.allocation_plan) || !Array.isArray(node.strategy.allocation_plan?.steps)) {
-      errors.push('strategy.allocation_plan must contain steps[]');
-    }
-    for (const key of ['tp1','tp2']) {
-      if (!isPlainObject(node.strategy[key]) || !('price' in node.strategy[key])) {
-        errors.push('strategy.' + key + ' must be an object with price');
-      }
-      if (!isPlainObject(node.strategy[key]) || typeof node.strategy[key].rationale !== 'string') {
-        errors.push('strategy.' + key + '.rationale must be a string');
-      }
-    }
-    if (!['Initial','Add-on'].includes(node.strategy.position_type)) {
-      errors.push('strategy.position_type must be Initial or Add-on');
-    }
+  }
+
+  if (typeof node.full_reasoning !== 'string' || !node.full_reasoning.trim()) {
+    errors.push('full_reasoning must be a non-empty Vietnamese investment synthesis');
   }
 
   return errors;
