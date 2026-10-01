@@ -37,7 +37,27 @@ It must contain:
 - Detail Report output satisfying the canonical `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` on `master`
 - exactly one canonical immutable `decision_record`
 
-Do not write a result that merely has the right top-level keys. Before completion, re-check the exact nested contract and renderer markers. If the result would be rejected by the repository validator, repair the in-memory result before attempting the canonical write; never weaken the validator or omit report sections to make it pass.
+Do not write a result that merely has the right top-level keys. Before completion, re-check the exact nested contract and renderer markers. If the result would be rejected by the repository validator, repair the in-memory result before attempting the canonical write; never weaken the hard identity/source/schema validator or omit report sections to make it pass.
+
+## Hard vs soft consistency
+
+CRSM is an evidence-driven analytical workflow, not a deterministic math proof.
+
+**Hard invariants** must be exact:
+- result/request identity and source ownership;
+- schema/version shape;
+- required Node outputs;
+- Node 5 machine contract and fixed decision enum;
+- decision_record as the canonical machine projection of Node 1 + Node 5;
+- evidence isolation and immutable-result rules.
+
+**Soft analytical/presentation consistency** must not fail an otherwise valid ticker:
+- prose wording or qualitative interpretation differs slightly between nodes;
+- a duplicated score/decision/confidence displayed in Node 6A/6B drifts from Node 5;
+- optional display data is unavailable;
+- renderer output contains harmless wrapper/preamble/trailing text.
+
+Node 5 + decision_record are canonical for the final decision fields. Node 6A/6B are presentation layers and must copy those canonical values rather than independently recomputing them. If presentation drift is detected before the write, normalize it in memory. If it is discovered in an already-created immutable result, recover the result and let the deterministic renderer normalize presentation; do not classify it as analytical corruption.
 
 Do not append a second browser-local decision log row.
 
