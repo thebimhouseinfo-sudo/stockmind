@@ -1,0 +1,119 @@
+{
+  "schema_version": "stockmind-memo.v1",
+  "run_id": "run-20261001T145934449Z-ucp41p0v",
+  "state": "READY",
+  "created_at": "2026-10-01T14:59:36.275Z",
+  "updated_at": "2026-10-01T14:59:36.275Z",
+  "items": [
+    {
+      "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
+      "ticker": "NT2",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-6882e794-9737-4670-a781-6c443f902a28",
+      "ticker": "HAG",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-88d6325d-42c5-47e0-909c-4806d3c4bb08",
+      "ticker": "VHM",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-bfe390c0-bb9e-4552-91a8-34d86bca9f5f",
+      "ticker": "GMD",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-068c7771-7ec6-4542-a6aa-2bb4bf950bad",
+      "ticker": "DXP",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-6d93c119-9c62-4d8c-b198-04eee7b4b6a2",
+      "ticker": "KSF",
+      "analysis_source": "SCREENED_WEB",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-4921704c-5222-463c-8ed8-33300867c1dc",
+      "ticker": "VIX",
+      "analysis_source": "WEB_ONLY",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-760d1a86-fb0b-49bc-8bc6-7f42187b5895",
+      "ticker": "FPT",
+      "analysis_source": "WEB_ONLY",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-33c48871-d2c5-4923-bb07-96700e34e81a",
+      "ticker": "HAH",
+      "analysis_source": "WEB_ONLY",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    },
+    {
+      "item_id": "item-b78e17cb-2584-4a59-8ac8-f37127d2028b",
+      "ticker": "HTI",
+      "analysis_source": "WEB_ONLY",
+      "state": "READY",
+      "error": null,
+      "result_ref": null,
+      "started_at": null,
+      "completed_at": null,
+      "updated_at": "2026-10-01T14:59:36.275Z"
+    }
+  ]
+}
