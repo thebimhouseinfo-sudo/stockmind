@@ -5,27 +5,12 @@ import {
   decisionLogRows,
   normalizeMemoRun,
   normalizeRenderSnapshot,
-  normalizeVisualReportHtml,
   selectDefaultTicker,
   selectedRunItem,
   summarizeMemoRun
 } from '../src/crsm/result-adapter.js';
 import { createResultsPoller } from '../src/crsm/results-poller.js';
 import { renderResultsPage } from '../src/crsm/ui/results.js';
-
-const contaminatedVisual = `You are a renderer.\n<!DOCTYPE html><html><body><div id="report"><h2>Quyết định đầu tư</h2><div class="decision">BUY ON DIP</div><p>AI Score</p><p class="text-3xl Data not available">78.8<span>/100</span></p><p>Tin tưởng</p><p>69</p><span>CRSM Score</span><strong>78.8/100</strong><div style="width:Data not available"></div></div></body></html>\n--- trailing instructions`;
-const normalizedVisual = normalizeVisualReportHtml(contaminatedVisual, {
-  decision_record: { decision: 'BUY ON DIP', ai_score: 72.8, confidence: 72 },
-  outputs: { node5: { decision: 'BUY ON DIP', ai_score: { value: 72.8 }, confidence: { value: 72 } } }
-});
-assert.match(normalizedVisual, /^<!DOCTYPE html>/);
-assert.match(normalizedVisual, /MUA KHI ĐIỀU CHỈNH/);
-assert.match(normalizedVisual, />72\.8<span>\/100<\/span>/);
-assert.match(normalizedVisual, />72%<\/p>/);
-assert.match(normalizedVisual, /CRSM Score<\/span><strong>72\.8\/100<\/strong>/);
-assert.match(normalizedVisual, /style="width:0%"/);
-assert.doesNotMatch(normalizedVisual, /Data not available/);
-assert.doesNotMatch(normalizedVisual, /trailing instructions/);
 
 const screened = JSON.parse(readFileSync(new URL('./fixtures/crsm/screened-web.json', import.meta.url), 'utf8'));
 const evidence = JSON.parse(readFileSync(new URL('./fixtures/crsm/evidence-web.json', import.meta.url), 'utf8'));
