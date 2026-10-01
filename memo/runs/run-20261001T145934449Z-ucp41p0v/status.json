@@ -3,7 +3,7 @@
   "run_id": "run-20261001T145934449Z-ucp41p0v",
   "state": "PROCESSING",
   "created_at": "2026-10-01T14:59:36.275Z",
-  "updated_at": "2026-10-01T16:05:00.000Z",
+  "updated_at": "2026-10-01T16:16:00.000Z",
   "items": [
     {
       "item_id": "item-b53d90f2-4617-4bc4-b407-25acc87d938b",
@@ -93,23 +93,23 @@
       "item_id": "item-4921704c-5222-463c-8ed8-33300867c1dc",
       "ticker": "VIX",
       "analysis_source": "WEB_ONLY",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261001T145934449Z-ucp41p0v/results/VIX.json",
       "started_at": "2026-10-01T15:57:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-01T16:05:00.000Z"
+      "completed_at": "2026-10-01T16:16:00.000Z",
+      "updated_at": "2026-10-01T16:16:00.000Z"
     },
     {
       "item_id": "item-760d1a86-fb0b-49bc-8bc6-7f42187b5895",
       "ticker": "FPT",
       "analysis_source": "WEB_ONLY",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-10-01T16:16:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-01T14:59:36.275Z"
+      "updated_at": "2026-10-01T16:16:00.000Z"
     },
     {
       "item_id": "item-33c48871-d2c5-4923-bb07-96700e34e81a",
