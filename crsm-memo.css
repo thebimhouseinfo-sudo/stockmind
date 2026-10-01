@@ -310,6 +310,21 @@
   }
 }
 
+/* Restored pre-cleanup Detail Report preview */
+.crsm-word-preview{background:#fff;max-width:900px;margin:0 auto;padding:38px 44px;box-shadow:0 8px 28px rgba(18,35,65,.08);font-family:Arial,sans-serif;color:#1f2937;line-height:1.6}
+.crsm-word-preview h1{color:#1e3a8a;font-size:28px;border-bottom:1px solid #dbe2ec;padding-bottom:10px}
+.crsm-word-preview h2{color:#1e3a8a;font-size:21px;margin:26px 0 10px}
+.crsm-word-preview h3{color:#334e7a;font-size:16px;margin:22px 0 8px}
+.crsm-word-preview p{margin:7px 0}
+.crsm-word-preview ul{margin:8px 0 12px 22px}
+.crsm-word-preview li{margin:4px 0}
+.crsm-word-preview blockquote{margin:10px 0;padding:9px 12px;border-left:3px solid #3b82f6;background:#eff6ff}
+.crsm-word-preview table{width:100%;border-collapse:collapse;margin:10px 0}
+.crsm-word-preview th,.crsm-word-preview td{border:1px solid #cfd8e3;padding:7px 8px;text-align:left;vertical-align:top}
+.crsm-word-preview th{background:#edf3fb}
+.crsm-word-preview hr{border:0;border-top:1px solid #dbe2ec;margin:20px 0}
+@media(max-width:760px){.crsm-word-preview{padding:22px 18px}.crsm-word-preview table{font-size:12px}}
+
 /* PACK 5 — durable Results page */
 .results-page {
   display: grid;
