@@ -244,4 +244,17 @@ const legitimateBracketLabel = structuredClone(screened.result);
 legitimateBracketLabel.outputs.node6b = '# BÁO CÁO NT2\nNguồn tham chiếu [HOSE] và [VNDIRECT].';
 assert.equal(validateAnalysisResult(legitimateBracketLabel).valid, true);
 
+const simpleCanonicalPlaceholder = structuredClone(screened.result);
+simpleCanonicalPlaceholder.methodology_revision = 'crsm-methodology.quality-v1';
+simpleCanonicalPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nLợi thế cạnh tranh: [MOAT] · thành phần [X]';
+const simpleCanonicalPlaceholderCheck = validateAnalysisResult(simpleCanonicalPlaceholder);
+assert.equal(simpleCanonicalPlaceholderCheck.valid, false);
+assert.ok(simpleCanonicalPlaceholderCheck.errors.some(error => error.includes('unresolved detail-report placeholder')));
+
+const underscoredNonTemplateLabel = structuredClone(screened.result);
+underscoredNonTemplateLabel.methodology_revision = 'crsm-methodology.quality-v1';
+underscoredNonTemplateLabel.outputs.node6b = '# BÁO CÁO NT2\nNhãn nguồn nội bộ [VN_INDEX]';
+assert.equal(validateAnalysisResult(underscoredNonTemplateLabel).valid, true);
+
+
 console.log('CRSM migration contract tests passed.');
