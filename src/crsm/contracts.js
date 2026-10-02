@@ -253,7 +253,12 @@ export function validateAnalysisResult(result) {
       warnings.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
     }
     if (typeof result.outputs.node6b === 'string' && result.outputs.node6b.trim()) {
-      errors.push(...validateNode6BSemanticCore(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
+      const node6bSemantic = validateNode6BSemanticCore(result.outputs.node6b);
+      if (result.methodology_revision) {
+        errors.push(...node6bSemantic.map(error => 'outputs.node6b: ' + error));
+      } else {
+        warnings.push(...node6bSemantic.map(error => 'outputs.node6b: ' + error));
+      }
       warnings.push(...validateNode6BPresentation(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
     } else {
       warnings.push('outputs.node6b is missing or empty; deterministic detail fallback may be used');
@@ -356,6 +361,18 @@ function validateNode2Output(node) {
         }
       } else if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used <= 0) {
         errors.push('FULL capability-based technical coverage requires verified OHLCV sessions_used');
+      } else {
+        if (Number.isFinite(coverage.sessions_used) && coverage.sessions_used !== ohlcv.sessions_used) {
+          errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
+        }
+        for (const [index, requirement] of (coverage.indicator_requirements || []).entries()) {
+          if (isPlainObject(requirement)
+            && requirement.satisfied === true
+            && Number.isFinite(requirement.required_sessions)
+            && requirement.required_sessions > ohlcv.sessions_used) {
+            errors.push('technical_coverage.indicator_requirements[' + index + '] cannot be satisfied with fewer verified sessions than required');
+          }
+        }
       }
     }
   }
