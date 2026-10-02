@@ -153,4 +153,108 @@ uncertainButHonest.outputs.node5.confidence.value = 48;
 uncertainButHonest.outputs.node5.decision = 'WATCH';
 assert.equal(validateAnalysisResult(uncertainButHonest).valid, true);
 
+
+const capabilityBasedCoverage = structuredClone(screened.result);
+capabilityBasedCoverage.methodology_revision = 'crsm-methodology.quality-v1';
+capabilityBasedCoverage.outputs.node2.technical_coverage = {
+  status: 'FULL',
+  coverage_model: 'CAPABILITY_BASED_V1',
+  sessions_used: 80,
+  missing_capabilities: [],
+  indicator_requirements: [
+    { capability: 'sma50', required_sessions: 50, satisfied: true },
+    { capability: 'volume_trend', required_sessions: 20, satisfied: true }
+  ],
+  note: 'Only indicators supported by verified history are used.'
+};
+capabilityBasedCoverage.outputs.node2.ohlcv_source = {
+  source: 'public OHLCV',
+  sessions_used: 80,
+  date_range: 'latest 80 verified sessions'
+};
+assert.equal(validateAnalysisResult(capabilityBasedCoverage).valid, true);
+
+const capabilityCoverageWithoutRequirements = structuredClone(capabilityBasedCoverage);
+delete capabilityCoverageWithoutRequirements.outputs.node2.technical_coverage.indicator_requirements;
+const missingRequirementsCheck = validateAnalysisResult(capabilityCoverageWithoutRequirements);
+assert.equal(missingRequirementsCheck.valid, false);
+assert.ok(missingRequirementsCheck.errors.some(error => error.includes('indicator_requirements')));
+
+const evidenceQualityConfidence = structuredClone(screened.result);
+evidenceQualityConfidence.outputs.node5.confidence = {
+  value: 74,
+  method: 'EVIDENCE_QUALITY_V1',
+  components: {
+    data_completeness: 72,
+    source_quality: 82,
+    freshness: 78,
+    cross_source_consistency: 76,
+    method_suitability: 80,
+    key_uncertainty_coverage: 60
+  }
+};
+assert.equal(validateAnalysisResult(evidenceQualityConfidence).valid, true);
+
+const incompleteEvidenceQualityConfidence = structuredClone(evidenceQualityConfidence);
+delete incompleteEvidenceQualityConfidence.outputs.node5.confidence.components.freshness;
+const incompleteEvidenceQualityCheck = validateAnalysisResult(incompleteEvidenceQualityConfidence);
+assert.equal(incompleteEvidenceQualityCheck.valid, false);
+assert.ok(incompleteEvidenceQualityCheck.errors.some(error => error.includes('confidence.components missing field: freshness')));
+
+const unknownConfidenceMethod = structuredClone(evidenceQualityConfidence);
+unknownConfidenceMethod.outputs.node5.confidence.method = 'MODEL_OPINION';
+const unknownConfidenceCheck = validateAnalysisResult(unknownConfidenceMethod);
+assert.equal(unknownConfidenceCheck.valid, false);
+assert.ok(unknownConfidenceCheck.errors.some(error => error.includes('confidence.method')));
+
+const emptyMethodologyRevision = structuredClone(screened.result);
+emptyMethodologyRevision.methodology_revision = '';
+const emptyMethodologyRevisionCheck = validateAnalysisResult(emptyMethodologyRevision);
+assert.equal(emptyMethodologyRevisionCheck.valid, false);
+assert.ok(emptyMethodologyRevisionCheck.errors.some(error => error.includes('methodology_revision')));
+
+const unresolvedDetailPlaceholder = structuredClone(screened.result);
+unresolvedDetailPlaceholder.methodology_revision = 'crsm-methodology.quality-v1';
+unresolvedDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nAI Score: [AI_SCORE]';
+const unresolvedDetailCheck = validateAnalysisResult(unresolvedDetailPlaceholder);
+assert.equal(unresolvedDetailCheck.valid, false);
+assert.ok(unresolvedDetailCheck.errors.some(error => error.includes('unresolved detail-report placeholder')));
+
+const legacyDetailPlaceholder = structuredClone(screened.result);
+legacyDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nAI Score: [AI_SCORE]';
+const legacyDetailPlaceholderCheck = validateAnalysisResult(legacyDetailPlaceholder);
+assert.equal(legacyDetailPlaceholderCheck.valid, true);
+assert.ok(legacyDetailPlaceholderCheck.warnings.some(warning => warning.includes('unresolved detail-report placeholder')));
+
+const impossibleSatisfiedHistory = structuredClone(capabilityBasedCoverage);
+impossibleSatisfiedHistory.outputs.node2.technical_coverage.indicator_requirements = [
+  { capability: 'sma200', required_sessions: 200, satisfied: true }
+];
+const impossibleHistoryCheck = validateAnalysisResult(impossibleSatisfiedHistory);
+assert.equal(impossibleHistoryCheck.valid, false);
+assert.ok(impossibleHistoryCheck.errors.some(error => error.includes('fewer verified sessions than required')));
+
+const mismatchedSessionCounts = structuredClone(capabilityBasedCoverage);
+mismatchedSessionCounts.outputs.node2.technical_coverage.sessions_used = 79;
+const mismatchedSessionsCheck = validateAnalysisResult(mismatchedSessionCounts);
+assert.equal(mismatchedSessionsCheck.valid, false);
+assert.ok(mismatchedSessionsCheck.errors.some(error => error.includes('sessions_used must match')));
+
+const legitimateBracketLabel = structuredClone(screened.result);
+legitimateBracketLabel.outputs.node6b = '# BÁO CÁO NT2\nNguồn tham chiếu [HOSE] và [VNDIRECT].';
+assert.equal(validateAnalysisResult(legitimateBracketLabel).valid, true);
+
+const simpleCanonicalPlaceholder = structuredClone(screened.result);
+simpleCanonicalPlaceholder.methodology_revision = 'crsm-methodology.quality-v1';
+simpleCanonicalPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nLợi thế cạnh tranh: [MOAT] · thành phần [X]';
+const simpleCanonicalPlaceholderCheck = validateAnalysisResult(simpleCanonicalPlaceholder);
+assert.equal(simpleCanonicalPlaceholderCheck.valid, false);
+assert.ok(simpleCanonicalPlaceholderCheck.errors.some(error => error.includes('unresolved detail-report placeholder')));
+
+const underscoredNonTemplateLabel = structuredClone(screened.result);
+underscoredNonTemplateLabel.methodology_revision = 'crsm-methodology.quality-v1';
+underscoredNonTemplateLabel.outputs.node6b = '# BÁO CÁO NT2\nNhãn nguồn nội bộ [VN_INDEX]';
+assert.equal(validateAnalysisResult(underscoredNonTemplateLabel).valid, true);
+
+
 console.log('CRSM migration contract tests passed.');

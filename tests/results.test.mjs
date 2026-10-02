@@ -28,6 +28,45 @@ for (const fixture of [screened, evidence, webOnly]) {
   assert.equal(adapted.decisionRecord.ticker, fixture.result.ticker);
 }
 
+const newProfileResult = structuredClone(screened.result);
+newProfileResult.methodology_revision = 'crsm-methodology.quality-v1';
+newProfileResult.outputs.node2.technical_coverage = {
+  status: 'FULL',
+  coverage_model: 'CAPABILITY_BASED_V1',
+  sessions_used: 80,
+  missing_capabilities: [],
+  indicator_requirements: [
+    { capability: 'sma50', required_sessions: 50, satisfied: true },
+    { capability: 'volume_trend', required_sessions: 20, satisfied: true }
+  ],
+  note: 'Verified history supports the requested indicators.'
+};
+newProfileResult.outputs.node2.ohlcv_source = {
+  source: 'public OHLCV',
+  sessions_used: 80,
+  date_range: 'latest 80 verified sessions'
+};
+newProfileResult.outputs.node5.confidence = {
+  value: 74,
+  method: 'EVIDENCE_QUALITY_V1',
+  components: {
+    data_completeness: 72,
+    source_quality: 82,
+    freshness: 78,
+    cross_source_consistency: 76,
+    method_suitability: 80,
+    key_uncertainty_coverage: 60
+  }
+};
+const adaptedNewProfile = adaptMemoResult(newProfileResult);
+assert.equal(adaptedNewProfile.ticker, screened.result.ticker);
+assert.match(adaptedNewProfile.visualReport, /^<!DOCTYPE html>/);
+assert.match(adaptedNewProfile.visualReport, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
+assert.equal(adaptedNewProfile.detailReport, newProfileResult.outputs.node6b);
+assert.equal(adaptedNewProfile.outputs.node2.technical_coverage.coverage_model, 'CAPABILITY_BASED_V1');
+assert.equal(adaptedNewProfile.outputs.node5.confidence.method, 'EVIDENCE_QUALITY_V1');
+
+
 const run = normalizeMemoRun({
   request: {
     ...screened.request,

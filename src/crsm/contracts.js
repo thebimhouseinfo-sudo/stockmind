@@ -201,6 +201,9 @@ export function validateAnalysisResult(result) {
   requireString(result.run_id, 'run_id', errors);
   requireString(result.item_id, 'item_id', errors);
   requireTicker(result.ticker, 'ticker', errors);
+  if (result.methodology_revision != null) {
+    requireString(result.methodology_revision, 'methodology_revision', errors);
+  }
 
   if (!Object.values(ANALYSIS_SOURCES).includes(result.analysis_source)) {
     errors.push('analysis_source must be SCREENED_WEB, EVIDENCE_WEB, or WEB_ONLY');
@@ -250,7 +253,13 @@ export function validateAnalysisResult(result) {
       warnings.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
     }
     if (typeof result.outputs.node6b === 'string' && result.outputs.node6b.trim()) {
-      warnings.push(...validateNode6BReport(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
+      const node6bSemantic = validateNode6BSemanticCore(result.outputs.node6b);
+      if (result.methodology_revision) {
+        errors.push(...node6bSemantic.map(error => 'outputs.node6b: ' + error));
+      } else {
+        warnings.push(...node6bSemantic.map(error => 'outputs.node6b: ' + error));
+      }
+      warnings.push(...validateNode6BPresentation(result.outputs.node6b).map(error => 'outputs.node6b: ' + error));
     } else {
       warnings.push('outputs.node6b is missing or empty; deterministic detail fallback may be used');
     }
@@ -264,6 +273,8 @@ export function validateAnalysisResult(result) {
 
 export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP', 'WATCH']);
 export const NODE2_COVERAGE_STATES = Object.freeze(['FULL', 'DEGRADED']);
+export const NODE2_COVERAGE_MODELS = Object.freeze(['LEGACY_300_V1', 'CAPABILITY_BASED_V1']);
+export const NODE5_CONFIDENCE_METHODS = Object.freeze(['LEGACY_V1', 'EVIDENCE_QUALITY_V1']);
 
 function validateNode1Output(node) {
   return validateRequiredKeys(node, [
@@ -285,9 +296,44 @@ function validateNode2Output(node) {
   if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
     errors.push('technical_coverage.status must be FULL or DEGRADED');
   }
-  if (coverage.required_sessions !== 300) {
-    errors.push('technical_coverage.required_sessions must equal 300');
+
+  const coverageModel = coverage.coverage_model ?? 'LEGACY_300_V1';
+  if (!NODE2_COVERAGE_MODELS.includes(coverageModel)) {
+    errors.push('technical_coverage.coverage_model must be LEGACY_300_V1 or CAPABILITY_BASED_V1');
   }
+
+  if (coverageModel === 'LEGACY_300_V1') {
+    if (coverage.required_sessions !== 300) {
+      errors.push('legacy technical_coverage.required_sessions must equal 300');
+    }
+  } else if (coverageModel === 'CAPABILITY_BASED_V1') {
+    if ('required_sessions' in coverage && coverage.required_sessions != null
+      && (!Number.isFinite(coverage.required_sessions) || coverage.required_sessions < 0)) {
+      errors.push('capability-based technical_coverage.required_sessions must be null or a non-negative finite number');
+    }
+    if (!Array.isArray(coverage.indicator_requirements) || coverage.indicator_requirements.length === 0) {
+      errors.push('capability-based technical_coverage.indicator_requirements must be a non-empty array');
+    } else {
+      coverage.indicator_requirements.forEach((requirement, index) => {
+        if (!isPlainObject(requirement)) {
+          errors.push('technical_coverage.indicator_requirements[' + index + '] must be an object');
+          return;
+        }
+        requireString(requirement.capability, 'technical_coverage.indicator_requirements[' + index + '].capability', errors);
+        if (!(requirement.required_sessions == null
+          || (Number.isFinite(requirement.required_sessions) && requirement.required_sessions >= 0))) {
+          errors.push('technical_coverage.indicator_requirements[' + index + '].required_sessions must be null or a non-negative finite number');
+        }
+        if (typeof requirement.satisfied !== 'boolean') {
+          errors.push('technical_coverage.indicator_requirements[' + index + '].satisfied must be boolean');
+        }
+        if (coverage.status === 'FULL' && requirement.satisfied === false) {
+          errors.push('FULL capability-based technical coverage cannot contain unsatisfied indicator requirements');
+        }
+      });
+    }
+  }
+
   if (!(coverage.sessions_used == null || Number.isFinite(coverage.sessions_used))) {
     errors.push('technical_coverage.sessions_used must be a finite number or null');
   }
@@ -301,16 +347,32 @@ function validateNode2Output(node) {
     errors.push('DEGRADED technical coverage must name missing capabilities');
   }
 
-  // A degraded technical node is a valid analytical outcome. Missing OHLCV,
-  // SMA200 or sector-comparison fields must reduce confidence, not kill the ticker.
+  // Degraded technical evidence is a valid analytical outcome. Missing inputs
+  // reduce coverage/confidence; they do not invalidate the whole ticker.
   if (coverage.status === 'FULL') {
     const ohlcv = node.ohlcv_source;
     if (!isPlainObject(ohlcv)) {
       errors.push('FULL technical coverage requires ohlcv_source');
     } else {
       requireString(ohlcv.source, 'ohlcv_source.source', errors);
-      if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used < 200) {
-        errors.push('FULL technical coverage requires at least 200 verified sessions');
+      if (coverageModel === 'LEGACY_300_V1') {
+        if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used < 200) {
+          errors.push('FULL legacy technical coverage requires at least 200 verified sessions');
+        }
+      } else if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used <= 0) {
+        errors.push('FULL capability-based technical coverage requires verified OHLCV sessions_used');
+      } else {
+        if (Number.isFinite(coverage.sessions_used) && coverage.sessions_used !== ohlcv.sessions_used) {
+          errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
+        }
+        for (const [index, requirement] of (coverage.indicator_requirements || []).entries()) {
+          if (isPlainObject(requirement)
+            && requirement.satisfied === true
+            && Number.isFinite(requirement.required_sessions)
+            && requirement.required_sessions > ohlcv.sessions_used) {
+            errors.push('technical_coverage.indicator_requirements[' + index + '] cannot be satisfied with fewer verified sessions than required');
+          }
+        }
       }
     }
   }
@@ -351,25 +413,7 @@ function validateNode5Output(node) {
     errors.push('ai_score.value must be null or numeric from 0 to 100');
   }
 
-  if (!isPlainObject(node.confidence) || !('value' in node.confidence)) {
-    errors.push('confidence must be an object with value');
-  } else {
-    if (node.confidence.value != null && (!Number.isFinite(node.confidence.value) || node.confidence.value < 0 || node.confidence.value > 100)) {
-      errors.push('confidence.value must be null or numeric from 0 to 100');
-    }
-    const components = node.confidence.components;
-    if (!isPlainObject(components)) {
-      errors.push('confidence.components must be an object');
-    } else {
-      for (const key of ['data_completeness','source_quality','cross_source_agreement','fundamental_consistency','technical_confirmation','macro_clarity']) {
-        if (!(key in components)) errors.push('confidence.components missing field: ' + key);
-        const value = components[key];
-        if (value != null && (!Number.isFinite(value) || value < 0 || value > 100)) {
-          errors.push('confidence.components.' + key + ' must be null or numeric from 0 to 100');
-        }
-      }
-    }
-  }
+  errors.push(...validateNode5Confidence(node.confidence));
 
   if (!isPlainObject(node.conflict_detector)) {
     errors.push('conflict_detector must be an object');
@@ -416,6 +460,44 @@ function validateNode5Output(node) {
   return errors;
 }
 
+function validateNode5Confidence(confidence) {
+  const errors = [];
+  if (!isPlainObject(confidence) || !('value' in confidence)) {
+    errors.push('confidence must be an object with value');
+    return errors;
+  }
+
+  if (confidence.value != null && (!Number.isFinite(confidence.value) || confidence.value < 0 || confidence.value > 100)) {
+    errors.push('confidence.value must be null or numeric from 0 to 100');
+  }
+
+  const method = confidence.method ?? 'LEGACY_V1';
+  if (!NODE5_CONFIDENCE_METHODS.includes(method)) {
+    errors.push('confidence.method must be LEGACY_V1 or EVIDENCE_QUALITY_V1');
+    return errors;
+  }
+
+  const components = confidence.components;
+  if (!isPlainObject(components)) {
+    errors.push('confidence.components must be an object');
+    return errors;
+  }
+
+  const requiredKeys = method === 'EVIDENCE_QUALITY_V1'
+    ? ['data_completeness','source_quality','freshness','cross_source_consistency','method_suitability','key_uncertainty_coverage']
+    : ['data_completeness','source_quality','cross_source_agreement','fundamental_consistency','technical_confirmation','macro_clarity'];
+
+  for (const key of requiredKeys) {
+    if (!(key in components)) errors.push('confidence.components missing field: ' + key);
+    const value = components[key];
+    if (value != null && (!Number.isFinite(value) || value < 0 || value > 100)) {
+      errors.push('confidence.components.' + key + ' must be null or numeric from 0 to 100');
+    }
+  }
+
+  return errors;
+}
+
 function validateNode6AReport(html) {
   const errors = [];
   const requiredMarkers = [
@@ -438,9 +520,23 @@ function validateNode6AReport(html) {
   return errors;
 }
 
-function validateNode6BReport(markdown) {
+const NODE6B_TEMPLATE_PLACEHOLDERS = new Set(["ACCRUAL_RATIO","AI_SCORE","ALLOC_NOTE","ANALYSIS_MODE","BASE_CONDITION","BASE_PROB","BASE_TARGET","BEAR_CONDITION","BEAR_PRICE","BEAR_PROB","BULL_CONDITION","BULL_PROB","BULL_TARGET","CATALYST_BUCKET","CATALYST_NEAREST","CAUSAL_ASSUMPTIONS","CAUSAL_CHAIN_SUMMARY","CAUSAL_FACTS","CAUSAL_INFERENCES","CFO_NPAT","COMPANY_NAME","CONFIDENCE","DATA_PERIOD","DATE","DCF_FAIR_VALUE","DECISION","DRIVER_1","DRIVER_2","DRIVER_3","EARNINGS_QUALITY_RED_FLAGS","ECONOMIC_SPREAD","ENTRY_ZONE","FCF_NPAT","FED_RATE","F_SCORE","INFERENCE_CONFIDENCE","LIQUIDITY_NOTE","MACRO_CONCLUSION","MAX_PORTFOLIO_WEIGHT","MOAT","M_SCORE","M_SCORE_NOTE","OHLCV_DATE_RANGE","OHLCV_SESSIONS","OHLCV_SOURCE","OIL_PRICE","PB_DESC","PB_VALUE","PE_PEER_AVG","PE_VALUE","PLACEHOLDER","POSITION_TYPE","PROFIT_VALUE","PROFIT_YOY","REVENUE_PERIOD","REVENUE_VALUE","REVENUE_YOY","REVERSE_DCF_CAGR","REVERSE_DCF_COMMENTARY","RISK_COMPANY","RISK_MACRO","RISK_PER_TRADE_PCT_NAV","RISK_REGIME","ROIC_VALUE","SCREENING_MOMENTUM_EVIDENCE","SCREENING_MOMENTUM_STATUS","SCREEN_GRADE","SCREEN_GROWTH","SCREEN_MISPRICING","SCREEN_MOMENTUM","SCREEN_QUALITY","SCREEN_RANK","SCREEN_SCORE","SCREEN_VALUATION","SECTOR_BENCHMARK_METHOD","SECTOR_PERF","SECTOR_STRENGTH","SIGNAL_ALIGNMENT","SIGNAL_FUNDAMENTAL","SIGNAL_LIQUIDITY","SIGNAL_MACRO","SIGNAL_TECHNICAL","SMART_MONEY_INSIGHT","SMART_MONEY_PHASE","SMART_MONEY_ZONE","SMA_STATUS","STEP1_DESC","STEP2_DESC","STEP3_DESC","SUSTAINABILITY_CLASSIFICATION","SUSTAINABILITY_REASONING","THESIS_INVALIDATION","TICKER","TP1_DESC","TP1_PRICE","TP2_DESC","TP2_PRICE","TRADING_STOP_BASIS","TRADING_STOP_PRICE","TREND_LABEL","USD_VND","US_INFLATION","VNINDEX_PERF","VOLUME_CLASSIFICATION","VOLUME_RATIO","WACC_FORMULA_NOTE","WACC_VALUE","X"]);
+
+function validateNode6BSemanticCore(markdown) {
   const errors = [];
-  const requiredSections = [
+  const tokens = markdown.match(/\[([A-Z][A-Z0-9_]*)\](?!\()/g) || [];
+  const hasTemplatePlaceholder = tokens.some(token =>
+    NODE6B_TEMPLATE_PLACEHOLDERS.has(token.slice(1, -1))
+  );
+  if (hasTemplatePlaceholder) {
+    errors.push('unresolved detail-report placeholder remains');
+  }
+  return errors;
+}
+
+function validateNode6BPresentation(markdown) {
+  const warnings = [];
+  const recommendedSections = [
     '## 1. Quyết định đầu tư',
     'Tín hiệu tổng hợp',
     'Vĩ mô',
@@ -453,17 +549,14 @@ function validateNode6BReport(markdown) {
     'Chiến lược giao dịch',
     'Nguồn dữ liệu'
   ];
-  for (const section of requiredSections) {
-    if (!markdown.includes(section)) errors.push('full-report section missing: ' + section);
+  for (const section of recommendedSections) {
+    if (!markdown.includes(section)) warnings.push('recommended full-report section missing: ' + section);
   }
   const tableSeparators = (markdown.match(/\|\s*---/g) || []).length;
   if (tableSeparators < 3) {
-    errors.push('full report must contain at least 3 Markdown tables (peer, sensitivity/scenario, sources)');
+    warnings.push('full report has fewer than 3 Markdown tables; adaptive reports may omit immaterial modules');
   }
-  if (/\[[A-Z][A-Z0-9_]*\]/.test(markdown)) {
-    errors.push('unresolved detail-report placeholder remains');
-  }
-  return errors;
+  return warnings;
 }
 
 function validateRequiredKeys(value, keys) {
