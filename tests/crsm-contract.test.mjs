@@ -214,10 +214,31 @@ assert.equal(emptyMethodologyRevisionCheck.valid, false);
 assert.ok(emptyMethodologyRevisionCheck.errors.some(error => error.includes('methodology_revision')));
 
 const unresolvedDetailPlaceholder = structuredClone(screened.result);
+unresolvedDetailPlaceholder.methodology_revision = 'crsm-methodology.quality-v1';
 unresolvedDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nAI Score: [AI_SCORE]';
 const unresolvedDetailCheck = validateAnalysisResult(unresolvedDetailPlaceholder);
 assert.equal(unresolvedDetailCheck.valid, false);
 assert.ok(unresolvedDetailCheck.errors.some(error => error.includes('unresolved detail-report placeholder')));
+
+const legacyDetailPlaceholder = structuredClone(screened.result);
+legacyDetailPlaceholder.outputs.node6b = '# BÁO CÁO NT2\nAI Score: [AI_SCORE]';
+const legacyDetailPlaceholderCheck = validateAnalysisResult(legacyDetailPlaceholder);
+assert.equal(legacyDetailPlaceholderCheck.valid, true);
+assert.ok(legacyDetailPlaceholderCheck.warnings.some(warning => warning.includes('unresolved detail-report placeholder')));
+
+const impossibleSatisfiedHistory = structuredClone(capabilityBasedCoverage);
+impossibleSatisfiedHistory.outputs.node2.technical_coverage.indicator_requirements = [
+  { capability: 'sma200', required_sessions: 200, satisfied: true }
+];
+const impossibleHistoryCheck = validateAnalysisResult(impossibleSatisfiedHistory);
+assert.equal(impossibleHistoryCheck.valid, false);
+assert.ok(impossibleHistoryCheck.errors.some(error => error.includes('fewer verified sessions than required')));
+
+const mismatchedSessionCounts = structuredClone(capabilityBasedCoverage);
+mismatchedSessionCounts.outputs.node2.technical_coverage.sessions_used = 79;
+const mismatchedSessionsCheck = validateAnalysisResult(mismatchedSessionCounts);
+assert.equal(mismatchedSessionsCheck.valid, false);
+assert.ok(mismatchedSessionsCheck.errors.some(error => error.includes('sessions_used must match')));
 
 const legitimateBracketLabel = structuredClone(screened.result);
 legitimateBracketLabel.outputs.node6b = '# BÁO CÁO NT2\nNguồn tham chiếu [HOSE] và [VNDIRECT].';
