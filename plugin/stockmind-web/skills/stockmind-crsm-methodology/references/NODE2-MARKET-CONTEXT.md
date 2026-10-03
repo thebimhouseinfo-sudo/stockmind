@@ -155,3 +155,5 @@ Use `CAPABILITY_BASED_V1` for new analysis where possible:
 - `DEGRADED` explicitly names missing technical capabilities.
 
 VSA/Wyckoff/smart-money labels are optional and evidence-gated. Volume alone does not prove institutional activity. If the required OHLCV/context is missing, leave the label null or use cautious candidate language and reduce technical coverage.
+
+For capability-based coverage, `sma_200_rel` must be null unless a satisfied `sma200` requirement declares at least 200 verified sessions. In new market-context results, `smart_money_phase` is null or an evidence object `{label,evidence_status,supporting_evidence[]}`. A VSA candidate other than `none` also requires explicit supporting evidence.
