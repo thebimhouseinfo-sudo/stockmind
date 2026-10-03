@@ -317,66 +317,50 @@ For SCREENED_WEB, screening momentum remains a research trigger only. Record whe
 
 ---
 
-## Stage 2B — Node 3: Deep Fundamentals & Valuation
+## Stage 2B — Node 3: Sector Economics, Valuation & Expectation Gap
 
 Role: Senior Institutional Equity Analyst.
 
-Use Node 1 raw verified data. For EVIDENCE_WEB, use only evidence bound to this item when relevant, preserving provenance and identifying conflicts.
+Read `NODE3-EXPECTATION-VALUATION.md` and use Node 1 raw verified evidence. For EVIDENCE_WEB, use only evidence bound to this exact item when relevant and preserve provenance/conflicts.
 
-### Capital efficiency
+### Business economics first
 
-Calculate:
-- Cost of Equity = risk_free_rate + beta × equity_risk_premium
-- WACC = E/V × Cost of Equity + D/V × Cost of Debt × (1 − tax rate)
-- NOPAT from EBIT and tax
-- ROIC = NOPAT / Invested Capital
-- Economic Spread = ROIC − WACC
+Do not apply one universal corporate-finance checklist. Start from `node1.sector_profile`:
+- identify the material earnings bridge and normalize earnings only when adjustments are evidenced;
+- evaluate capital allocation and balance-sheet capacity using sector-appropriate economics;
+- choose the smallest useful valuation method set from the sector profile;
+- explain why each selected/conditional method fits the business.
 
-Show inputs/formulas. If inputs are insufficient, return null rather than back-solving.
+Generic ROIC/WACC/FCF analysis is appropriate only where the business model and evidence make those measures economically meaningful. Do not force bank/insurance economics through an industrial-company template.
 
-### Earnings quality
+Piotroski F-Score is null for BANK/INSURANCE. Beneish M-Score is conditional/trigger-only. Full DCF is conditional on defensible cash-flow and discount-rate inputs. Reverse-valuation reasoning is useful only when the implied expectation can be stated without fabricated precision.
 
-Calculate where possible:
-- CFO / NPAT
-- FCF / NPAT where FCF = CFO − Capex
-- Accrual Ratio = (NPAT − CFO) / Total Assets
-- receivables growth vs revenue growth
-- inventory growth vs revenue growth
-- debt growth vs NPAT growth
+New analytical-quality Node 3 should add:
+- `sector_economics {sector_profile,earnings_bridge,normalized_earnings,capital_allocation,balance_sheet_capacity,valuation_method_selection}`
+- `expectation_basis[]`
 
-High headline profit with weak/negative cash conversion must be explicitly flagged.
+Legacy Node 3 fields remain for compatibility.
 
-### Sustainability
+### Expectation and variant-view provenance
 
-Classify current earnings growth:
-- Structural
-- Cyclical
-- One-off
-- Low-base effect
+Every material claim about consensus, company guidance, what the price/valuation implies, or what appears priced in must use:
+- `OBSERVED_CONSENSUS`
+- `COMPANY_GUIDANCE`
+- `VALUATION_IMPLIED`
+- `PRICE_ACTION_INFERENCE`
 
-### Health scores
+Observed consensus/company guidance require dated source refs. Valuation/price-action inference must be labelled `INFERENCE`, must cite the evidence used, and cannot be worded as if it were observed consensus.
 
-- Piotroski F-Score 0–9; null for BANK/INSURANCE where unsuitable.
-- Beneish M-Score only when sector/coverage/governance conditions make it meaningful; otherwise null with reason.
+A strong variant view states:
+reference expectation + typed basis → analyst view → economic gap → investment implication → evidence that would close/invalidate the gap.
 
-### Valuation
-
-- forward DCF using Node 3 WACC;
-- mandatory reverse DCF: implied FCF CAGR embedded in current market price;
-- named 3–5 peer comparison with peer-selection reason;
-- relative P/E and P/B.
+If credible expectation evidence is unavailable, `expectation_basis` may be empty; do not manufacture a market expectation.
 
 ### SCREENED research triggers
 
-Use Screener values only as triggers:
-- EPS vs revenue disconnect;
-- valuation gap;
-- profitability vs leverage;
-- momentum vs fundamentals.
+Screener fields remain triggers only. Keep `screening_metrics_used` separate from independently derived Node 3 analysis. No averaging/blending with Screener score.
 
-Keep `screening_metrics_used` separate from independently calculated Node 3 metrics. No averaging/blending.
-
-Node 3 output must include:
+Legacy output fields remain:
 - `data_period`
 - `screening_flags`
 - `screening_metrics_used`
@@ -393,32 +377,51 @@ Node 3 output must include:
 
 ---
 
-## Stage 3 — Node 4: Macro Intelligence & Causal Inference
+## Stage 3 — Node 4: Exposure-First External Drivers & Causal Delta
 
-Role: Global Macro Intelligence Collector + Causal Inference Expert.
+Role: External Driver Analyst + Causal Inference Expert.
 
-Freshness:
-- search current macro/company-driver information mainly from the last 7–30 days relative to the run date;
-- older facts may be used only as historical context and should be labelled.
+Read `NODE4-CAUSAL-DELTA.md`.
 
-Research:
-- Fed/current USD/DXY/rate backdrop;
-- USD/VND, oil Brent and relevant global variables;
-- Vietnam GDP/credit/public-investment conditions;
-- geopolitical/logistics events relevant to the ticker;
-- 1–3 **company-specific** input prices/drivers that actually move earnings.
+### Start from exposure, not macro headlines
 
-Do not use Screener score/rank/grade as macro evidence.
+Build the company exposure map first. Research only external variables with a plausible material path to the company's economics:
+- policy/regulation;
+- rates/funding;
+- FX;
+- commodity/input prices;
+- legal/project approvals;
+- customer/end-market demand;
+- supply/freight/logistics or other company-external variables.
 
-Build a sensitivity table before causal conclusions.
+Fed, DXY, oil, GDP, credit and public investment are conditional inputs, not mandatory sections.
 
-Every causal chain separates:
-- FACT: sourced/dateable observation;
-- INFERENCE: reasoning from facts;
-- ASSUMPTION: condition required for inference;
-- inference confidence.
+### Consume Node 2; never duplicate it
 
-Node 4 output must include:
+Node 2 owns Vietnam market-internal measurement. Node 4 may interpret available Node 2 observations but must not re-fetch/recompute index return/trend, breadth, turnover, leadership/rotation, volatility, market foreign flow or stock relative strength.
+
+When material, add:
+- `market_context_use {source:"NODE2.market_context",measurement_policy:"CONSUME_ONLY",consumed_capabilities,interpretation}`
+
+Only capabilities actually available in Node 2 may be consumed.
+
+### what_changed causal delta
+
+New analytical-quality Node 4 should add `what_changed[]`. Each material driver records:
+- driver + driver_type;
+- exposure;
+- prior_state + current_state;
+- direction;
+- materiality;
+- transmission_lag;
+- dated source_refs;
+- transmission_targets to `REVENUE | MARGIN | CASH_FLOW | BALANCE_SHEET | VALUATION`;
+- separate `fact`, `inference`, `assumption`;
+- `inference_confidence` 0–100.
+
+If prior/current evidence is incomplete, use direction `UNKNOWN`. A useful causal chain reaches company economics or valuation; omit generic macro facts with no material transmission path.
+
+Legacy Node 4 fields remain:
 - `risk_regime`
 - `macro_indicators`
 - `company_specific_drivers`
