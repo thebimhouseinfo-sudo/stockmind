@@ -677,6 +677,16 @@ const observedWithInferenceLabelCheck = validateAnalysisResult(observedWithInfer
 assert.equal(observedWithInferenceLabelCheck.valid, false);
 assert.ok(observedWithInferenceLabelCheck.errors.some(error => error.includes('must be null for observed')));
 
+const inferredWithBareConsensusClaim = structuredClone(realEstateEconomics);
+inferredWithBareConsensusClaim.outputs.node3.expectation_basis[0].statement = 'Thị trường kỳ vọng lợi nhuận tăng 20%.';
+const inferredWithBareConsensusClaimCheck = validateAnalysisResult(inferredWithBareConsensusClaim);
+assert.equal(inferredWithBareConsensusClaimCheck.valid, false);
+assert.ok(inferredWithBareConsensusClaimCheck.errors.some(error => error.includes('statement must explicitly signal inference')));
+
+const inferredWithExplicitCue = structuredClone(realEstateEconomics);
+inferredWithExplicitCue.outputs.node3.expectation_basis[0].statement = 'Định giá hiện tại hàm ý lợi nhuận kỳ vọng cao hơn nền hiện tại.';
+assert.equal(validateAnalysisResult(inferredWithExplicitCue).valid, true);
+
 const sectorEconomicsWithoutExpectationField = structuredClone(bankEconomics);
 delete sectorEconomicsWithoutExpectationField.outputs.node3.expectation_basis;
 const sectorEconomicsWithoutExpectationCheck = validateAnalysisResult(sectorEconomicsWithoutExpectationField);
@@ -757,5 +767,20 @@ invalidTransmissionTarget.outputs.node4.what_changed[0].transmission_targets = [
 const invalidTransmissionTargetCheck = validateAnalysisResult(invalidTransmissionTarget);
 assert.equal(invalidTransmissionTargetCheck.valid, false);
 assert.ok(invalidTransmissionTargetCheck.errors.some(error => error.includes('canonical company-economics target')));
+
+const duplicatedVnindexDelta = structuredClone(causalDelta);
+duplicatedVnindexDelta.outputs.node4.what_changed[0].driver = 'VNINDEX 20D return';
+duplicatedVnindexDelta.outputs.node4.what_changed[0].driver_type = 'MACRO';
+const duplicatedVnindexDeltaCheck = validateAnalysisResult(duplicatedVnindexDelta);
+assert.equal(duplicatedVnindexDeltaCheck.valid, false);
+assert.ok(duplicatedVnindexDeltaCheck.errors.some(error => error.includes('Node2-owned market-internal measurement')));
+
+const duplicatedMarketFlowInLegacyMacro = structuredClone(causalDelta);
+duplicatedMarketFlowInLegacyMacro.outputs.node4.macro_indicators = {
+  market_foreign_flow: -850
+};
+const duplicatedMarketFlowInLegacyMacroCheck = validateAnalysisResult(duplicatedMarketFlowInLegacyMacro);
+assert.equal(duplicatedMarketFlowInLegacyMacroCheck.valid, false);
+assert.ok(duplicatedMarketFlowInLegacyMacroCheck.errors.some(error => error.includes('macro_indicators must not duplicate Node2')));
 
 console.log('CRSM migration contract tests passed.');
