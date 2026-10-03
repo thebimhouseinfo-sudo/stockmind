@@ -9,6 +9,7 @@ This skill is mandatory after `stockmind-worker-loop` selects/claims one canonic
 
 Before analyzing a ticker, read the canonical references from the Stockmind repository `thebimhouseinfo-sudo/stockmind` on `master` via the connected GitHub app:
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/SECTOR-PROFILES.md` — canonical Node 1 sector/materiality router and KPI/valuation method classes.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — Word-ready detailed report contract and depth standard.
 
 The webapp owns the visual Node 6A HTML through its deterministic renderer. The model must not spend reasoning budget reproducing template HTML. Legacy `outputs.node6a` may exist in old results, but new analysis does not need to generate it.
@@ -98,6 +99,17 @@ Node 2 and Node 3 are dependency-safe siblings after Node 1. Node 6B is written 
 - No screening context and no uploaded evidence.
 - Perform full CRSM web research.
 - Never synthesize a missing Screener snapshot.
+
+## Node 1 sector/materiality routing
+
+Before Node 1 searches broadly:
+1. classify the ticker into one canonical `sector_profile` from `SECTOR-PROFILES.md`; use `GENERIC` only with an explicit reason;
+2. collect the universal core;
+3. collect only the sector-pack KPI evidence material to that profile;
+4. create `material_questions[]` for thesis-changing uncertainties and triggered investigations;
+5. record source tier/freshness and capital-allocation evidence when material.
+
+This router controls **what evidence Node 1 seeks**. It does not score the company and does not force Node 3 to run every listed valuation method. `market_data.foreign_net_flow_20d` is ticker-specific; do not put broad-market foreign flow there.
 
 ## Missing data
 

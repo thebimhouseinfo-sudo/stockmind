@@ -16,6 +16,7 @@ const worker = read('skills/stockmind-worker-loop/SKILL.md');
 const methodology = read('skills/stockmind-crsm-methodology/SKILL.md');
 const methodologyRef = read('skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md');
 const node6aTemplate = read('skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md');
+const sectorProfiles = read('skills/stockmind-crsm-methodology/references/SECTOR-PROFILES.md');
 const node6bReport = read('skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md');
 const resultContract = read('skills/stockmind-result-contract/SKILL.md');
 
@@ -54,6 +55,17 @@ assert.match(methodologyRef, /decision_record/);
 assert.match(methodology, /node1\.\.node5|Node 1–5/);
 assert.match(methodology, /deterministic.*renderer/i);
 assert.match(methodology, /NODE6B-FULL-REPORT\.md/);
+assert.match(methodology, /SECTOR-PROFILES\.md/);
+assert.match(methodologyRef, /sector_profile/);
+assert.match(methodologyRef, /material_questions/);
+for (const profile of ['BANK','INSURANCE','SECURITIES','REAL_ESTATE','UTILITIES_POWER','COMMODITY_CYCLICAL','INDUSTRIAL_LOGISTICS','TECHNOLOGY_SERVICES','CONSUMER','GENERIC']) {
+  assert.match(sectorProfiles, new RegExp('\\b' + profile + '\\b'));
+}
+assert.match(sectorProfiles, /Universal core/);
+assert.match(sectorProfiles, /Sector pack|Profile packs/);
+assert.match(sectorProfiles, /Triggered evidence/);
+assert.match(sectorProfiles, /foreign_net_flow_20d/);
+assert.match(sectorProfiles, /capital allocation|Capital allocation/i);
 assert.match(methodologyRef, /technical_coverage/);
 assert.match(methodologyRef, /DEGRADED/);
 assert.match(node6aTemplate, /HTML TEMPLATE \(LOCKED/);

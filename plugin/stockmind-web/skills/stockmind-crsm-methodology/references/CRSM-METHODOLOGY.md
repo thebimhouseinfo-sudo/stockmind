@@ -35,18 +35,40 @@ A result can retain machine tokens such as FULL/DEGRADED/WATCH and abbreviations
 
 ## Stage 1 — Node 1: Financial Data Verification
 
-Role: Financial Data Completion Engine.
+Role: Financial Data Completion Engine + Materiality Router.
 
 Purpose:
 - collect and verify raw facts;
+- determine which evidence is material for this business model before searching exhaustively;
 - complete fields missing from the request context;
 - preserve trusted SCREENED_WEB input unchanged;
 - do **not** compute WACC, ROIC, DCF, fair value, target price, moat score, or final score.
 
+Read `SECTOR-PROFILES.md` before Node 1 research.
+
+### Sector/materiality routing
+
+Use exactly one canonical `sector_profile`: `BANK | INSURANCE | SECURITIES | REAL_ESTATE | UTILITIES_POWER | COMMODITY_CYCLICAL | INDUSTRIAL_LOGISTICS | TECHNOLOGY_SERVICES | CONSUMER | GENERIC`.
+
+Research in this order:
+1. **Universal core** — price/liquidity, ticker-specific foreign flow, earnings/cash flow, leverage/working capital, ownership/events/capital allocation, meaningful valuation multiples and source provenance.
+2. **Sector pack** — collect the KPI classes named for the selected profile; do not force generic industrial metrics onto banks/insurers/real estate or vice versa.
+3. **Triggered evidence** — investigate only material anomalies/dependencies surfaced by the first two passes.
+
+Create `material_questions[]` for thesis-changing issues. Each item has:
+- `question`: concise Vietnamese question;
+- `why_material`: causal reason it matters;
+- `status: ANSWERED | PARTIAL | MISSING`;
+- `answer`: evidence-based answer or null;
+- `source_refs[]`;
+- `freshness`: date/period/null.
+
+`PARTIAL` and `MISSING` are valid outcomes. Missing evidence must reduce downstream confidence instead of being filled with inferred numbers.
+
 ### DIRECT behavior
 
 For WEB_ONLY and EVIDENCE_WEB, Node 1 operates in DIRECT-style data collection:
-- fetch/verify the full raw schema externally;
+- fetch/verify the raw evidence required by the universal core + selected sector pack + triggered material questions;
 - no screening snapshot exists;
 - `screening_metrics`, `screening_summary`, `trusted_screener_snapshot`, `data_integrity`, `screening_as_of` are null.
 
@@ -57,27 +79,40 @@ EVIDENCE_WEB evidence is available to downstream evidence-aware analysis, but it
 For SCREENED_WEB:
 - `screening_context` is immutable trusted user-provided screening input;
 - carry it forward unchanged;
-- search only genuinely missing stock-level data, additional raw financial inputs, and requested anomaly explanations;
+- use it only to identify missing data/anomalies/material questions;
 - external conflicts are documented separately, never used to overwrite the snapshot.
 
 ### Node 1 research targets
 
-Collect where available:
-- latest price, liquidity, 20d volume/trading value, foreign flow/room, market cap;
-- P/E TTM, current P/B, dividend yield;
-- revenue, NPAT, EBIT, gross margin;
-- total debt/equity/cash, debt/equity, effective tax rate;
-- CFO, capex;
-- receivables/inventory and growth;
-- financial/other income and expense;
-- raw cost-of-capital inputs: VN 10Y risk-free rate, beta, Vietnam ERP, average cost of debt;
-- major ownership, recent insider transactions, related-party risk;
-- upcoming events/dividends/issuance/AGM/filings;
-- anomaly investigation.
+Universal core where available:
+- latest price, liquidity, 20d volume/trading value, **ticker-specific** foreign flow/room, market cap;
+- revenue/NPAT/cash-flow trend, leverage and relevant working-capital evidence;
+- ownership, insider/related-party events and material capital allocation: dividend, buyback, issuance, M&A/divestment, capex and refinancing;
+- current valuation multiples that are economically meaningful for the selected profile;
+- upcoming material events and anomaly investigation.
+
+Sector pack:
+- collect the material KPI classes from `SECTOR-PROFILES.md`;
+- store raw values/provenance in existing raw objects when they map cleanly;
+- where no canonical raw field exists yet, retain the evidence in `material_questions[].answer/source_refs` rather than inventing a new metric or forcing it into an unrelated field.
+
+Source discipline:
+- `TIER_1`: exchange/regulator/company filing/IR/audited report;
+- `TIER_2`: trusted Vietnamese market data/research provider;
+- `TIER_3`: reputable business press/secondary research;
+- `USER_EVIDENCE`: user-provided evidence bound to the exact item.
+- record source date/period/freshness when available;
+- newer lower-tier evidence does not silently overwrite a more authoritative source measuring the same fact.
 
 ### Node 1 JSON contract
 
-Required top-level keys:
+Legacy required keys remain unchanged. New analytical-quality results should additionally provide:
+- `sector_profile`
+- `material_questions`
+
+These are additive-v1 fields: legacy results without them remain readable.
+
+Required legacy top-level keys:
 - `ticker`
 - `sector_type`
 - `timestamp`
@@ -98,7 +133,25 @@ Required top-level keys:
 - `data_completion`
 - `sources`
 
-Required nested shape:
+Additive shape:
+
+```json
+{
+  "sector_profile": "BANK",
+  "material_questions": [
+    {
+      "question": "Điều gì đang chi phối chất lượng tài sản?",
+      "why_material": "Chi phí tín dụng và ROE bền vững phụ thuộc trực tiếp vào NPL mới hình thành.",
+      "status": "ANSWERED",
+      "answer": "…",
+      "source_refs": ["company-filing-Q2"],
+      "freshness": "Q2/2026"
+    }
+  ]
+}
+```
+
+Existing raw shape remains valid:
 
 ```json
 {
@@ -161,7 +214,9 @@ Required nested shape:
 Hard rules:
 - no long OHLCV fetch here;
 - no industry-median substitution for missing stock-level values;
-- searched but unverifiable = null.
+- searched but unverifiable = null;
+- `market_data.foreign_net_flow_20d` is stock-specific, never market-wide flow;
+- Node 1 records raw evidence/provenance only and does not choose the final valuation output.
 
 ---
 
