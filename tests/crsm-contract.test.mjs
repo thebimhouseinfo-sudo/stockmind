@@ -385,8 +385,9 @@ riskOffMarketContext.outputs.node2.market_context.stock_relative_strength.vs_vni
 assert.equal(validateAnalysisResult(riskOffMarketContext).valid, true);
 
 const degradedMarketContext = structuredClone(riskOnMarketContext);
-const missingMarketCapabilities = ['breadth','leadership_rotation','market_foreign_flow'];
+const missingMarketCapabilities = ['secondary_benchmark','breadth','leadership_rotation','market_foreign_flow'];
 const availableMarketCapabilities = NODE2_MARKET_CONTEXT_CAPABILITIES.filter(capability => !missingMarketCapabilities.includes(capability));
+degradedMarketContext.outputs.node2.market_context.benchmarks.secondary = [];
 degradedMarketContext.outputs.node2.market_context.breadth = null;
 degradedMarketContext.outputs.node2.market_context.leadership_rotation = null;
 degradedMarketContext.outputs.node2.market_context.market_foreign_flow = null;
@@ -395,7 +396,7 @@ degradedMarketContext.outputs.node2.market_context.coverage = {
   available_capabilities: availableMarketCapabilities,
   missing_capabilities: missingMarketCapabilities,
   provenance: marketProvenance(availableMarketCapabilities),
-  note: 'Không xác minh được độ rộng, luân chuyển dẫn dắt và khối ngoại toàn thị trường từ nguồn công khai.'
+  note: 'Không xác minh được benchmark phụ, độ rộng, luân chuyển dẫn dắt và khối ngoại toàn thị trường từ nguồn công khai.'
 };
 assert.equal(validateAnalysisResult(degradedMarketContext).valid, true);
 
@@ -485,6 +486,26 @@ emptyRelativeStrengthSource.outputs.node2.market_context.stock_relative_strength
 const emptyRelativeStrengthSourceCheck = validateAnalysisResult(emptyRelativeStrengthSource);
 assert.equal(emptyRelativeStrengthSourceCheck.valid, false);
 assert.ok(emptyRelativeStrengthSourceCheck.errors.some(error => error.includes('stock_relative_strength.source_refs[0]')));
+
+const degradedTechnicalSma200 = structuredClone(capabilityBasedCoverage);
+degradedTechnicalSma200.outputs.node2.technical_coverage = {
+  status: 'DEGRADED',
+  coverage_model: 'CAPABILITY_BASED_V1',
+  sessions_used: 80,
+  missing_capabilities: ['sma200'],
+  indicator_requirements: [
+    { capability: 'sma200', required_sessions: 200, satisfied: false },
+    { capability: 'volume_trend', required_sessions: 20, satisfied: true }
+  ],
+  note: 'Chỉ có 80 phiên xác minh nên không tính SMA200.'
+};
+degradedTechnicalSma200.outputs.node2.ohlcv_source = {
+  source: 'public OHLCV',
+  sessions_used: 80,
+  date_range: 'latest 80 verified sessions'
+};
+degradedTechnicalSma200.outputs.node2.sma_200_rel = null;
+assert.equal(validateAnalysisResult(degradedTechnicalSma200).valid, true);
 
 const unsupportedSma200 = structuredClone(capabilityBasedCoverage);
 unsupportedSma200.outputs.node2.sma_200_rel = 'ABOVE';
