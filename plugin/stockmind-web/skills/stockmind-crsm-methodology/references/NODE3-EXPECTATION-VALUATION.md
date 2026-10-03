@@ -92,6 +92,7 @@ Rules:
 - `OBSERVED_CONSENSUS` and `COMPANY_GUIDANCE`: source_refs must be non-empty and `as_of` dated; `inference_label` must be null.
 - `VALUATION_IMPLIED` and `PRICE_ACTION_INFERENCE`: `inference_label` must equal `INFERENCE`; source_refs and `as_of` still identify the price/valuation/technical evidence used.
 - Do not phrase an inference as observed consensus. Say “định giá hiện tại hàm ý…” or “diễn biến giá cho thấy khả năng…” rather than asserting “thị trường kỳ vọng…” as a sourced fact.
+- For inferred bases, the reader-facing `statement` itself must contain an explicit inference cue such as “hàm ý”, “cho thấy khả năng”, “gợi ý”, or “có thể phản ánh”; the machine label alone is not sufficient.
 - If there is no credible expectation basis, use an empty array and state uncertainty in the thesis; never manufacture a consensus estimate.
 
 ## Variant view
