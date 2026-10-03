@@ -791,6 +791,35 @@ function validateNode2MarketContext(context) {
 
 
 
+
+function hasExplicitExpectationInferenceCue(statement) {
+  return /(hàm\s*ý|suy\s*luận|cho\s*thấy\s*khả\s*năng|gợi\s*ý|có\s*thể\s*phản\s*ánh|ước\s*tính\s*từ|implies?|suggests?|may\s+reflect|inferred?\s+from)/i.test(statement);
+}
+
+function looksLikeNode2MarketInternalMeasurement(value) {
+  if (typeof value !== 'string') return false;
+  const normalized = value
+    .toLowerCase()
+    .replace(/[_/]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const patterns = [
+    /\bvn\s*-?\s*index\b/,
+    /\bvn30\b/,
+    /\bhnxindex\b|\bhnx\s*index\b/,
+    /\bupcomindex\b|\bupcom\s*index\b/,
+    /\bmarket\s+breadth\b|độ\s*rộng\s*thị\s*trường/,
+    /\bmarket\s+turnover\b|thanh\s*khoản\s*thị\s*trường/,
+    /\bmarket\s+foreign\s+flow\b|khối\s*ngoại.*toàn\s*thị\s*trường/,
+    /\brelative\s+strength\b|sức\s*mạnh\s*tương\s*đối/,
+    /\bmarket\s+volatility\b|biến\s*động\s*thị\s*trường/,
+    /\bleadership\s+rotation\b|luân\s*chuyển.*(?:ngành|nhóm)/
+  ];
+  return patterns.some(pattern => pattern.test(normalized));
+}
+
+
 function validateNode3AdaptiveOutput(node, node1) {
   const errors = [];
 
@@ -945,6 +974,10 @@ function validateNode3AdaptiveOutput(node, node1) {
         if (inferred && entry.inference_label !== 'INFERENCE') {
           errors.push(prefix + '.inference_label must equal INFERENCE for inferred expectation bases');
         }
+        if (inferred && typeof entry.statement === 'string' && entry.statement.trim()
+          && !hasExplicitExpectationInferenceCue(entry.statement)) {
+          errors.push(prefix + '.statement must explicitly signal inference for VALUATION_IMPLIED/PRICE_ACTION_INFERENCE');
+        }
       });
     }
   }
@@ -954,6 +987,15 @@ function validateNode3AdaptiveOutput(node, node1) {
 
 function validateNode4CausalOutput(node, node2) {
   const errors = [];
+  const adaptiveNode4 = 'market_context_use' in node || 'what_changed' in node;
+
+  if (adaptiveNode4 && isPlainObject(node.macro_indicators)) {
+    for (const key of Object.keys(node.macro_indicators)) {
+      if (looksLikeNode2MarketInternalMeasurement(key)) {
+        errors.push('adaptive Node4 macro_indicators must not duplicate Node2 market-internal measurement: ' + key);
+      }
+    }
+  }
 
   if ('market_context_use' in node) {
     const use = node.market_context_use;
@@ -1002,6 +1044,9 @@ function validateNode4CausalOutput(node, node2) {
           return;
         }
         requireString(entry.driver, prefix + '.driver', errors);
+        if (typeof entry.driver === 'string' && looksLikeNode2MarketInternalMeasurement(entry.driver)) {
+          errors.push(prefix + '.driver is a Node2-owned market-internal measurement and must be consumed via market_context_use');
+        }
         if (!NODE4_DRIVER_TYPES.includes(entry.driver_type)) {
           errors.push(prefix + '.driver_type must be a canonical external driver type');
         }
