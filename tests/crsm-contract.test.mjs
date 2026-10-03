@@ -456,4 +456,32 @@ const badPeerBasketCheck = validateAnalysisResult(badPeerBasket);
 assert.equal(badPeerBasketCheck.valid, false);
 assert.ok(badPeerBasketCheck.errors.some(error => error.includes('3-5 constituents')));
 
+const missingContextFreshness = structuredClone(riskOnMarketContext);
+missingContextFreshness.outputs.node2.market_context.as_of = null;
+const missingContextFreshnessCheck = validateAnalysisResult(missingContextFreshness);
+assert.equal(missingContextFreshnessCheck.valid, false);
+assert.ok(missingContextFreshnessCheck.errors.some(error => error.includes('market_context.as_of')));
+
+const staleProvenance = structuredClone(riskOnMarketContext);
+staleProvenance.outputs.node2.market_context.coverage.provenance[0].as_of = null;
+const staleProvenanceCheck = validateAnalysisResult(staleProvenance);
+assert.equal(staleProvenanceCheck.valid, false);
+assert.ok(staleProvenanceCheck.errors.some(error => error.includes('provenance[0].as_of')));
+
+const provenanceForMissingCapability = structuredClone(degradedMarketContext);
+provenanceForMissingCapability.outputs.node2.market_context.coverage.provenance.push({
+  capability: 'breadth',
+  source: 'stale breadth source',
+  as_of: '2026-09-01'
+});
+const provenanceForMissingCheck = validateAnalysisResult(provenanceForMissingCapability);
+assert.equal(provenanceForMissingCheck.valid, false);
+assert.ok(provenanceForMissingCheck.errors.some(error => error.includes('must not declare provenance: breadth')));
+
+const emptyRelativeStrengthSource = structuredClone(riskOnMarketContext);
+emptyRelativeStrengthSource.outputs.node2.market_context.stock_relative_strength.source_refs = [''];
+const emptyRelativeStrengthSourceCheck = validateAnalysisResult(emptyRelativeStrengthSource);
+assert.equal(emptyRelativeStrengthSourceCheck.valid, false);
+assert.ok(emptyRelativeStrengthSourceCheck.errors.some(error => error.includes('stock_relative_strength.source_refs[0]')));
+
 console.log('CRSM migration contract tests passed.');
