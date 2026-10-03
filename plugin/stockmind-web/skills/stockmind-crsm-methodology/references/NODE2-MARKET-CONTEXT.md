@@ -15,7 +15,7 @@ Then choose the most relevant comparison set:
 
 Do not invent a proprietary benchmark. Public VNDIRECT/SSI or similar research/data may be used as a source when accessible, but the benchmark identity must remain the actual index/sector/peer basket being measured.
 
-Use the same stated period when comparing stock, VN-Index and the selected secondary benchmark.
+Use the same stated period when comparing stock, VN-Index and the selected secondary benchmark. `stock_relative_strength` must name the selected secondary benchmark and carry its performance plus relative spread whenever `secondary_benchmark` is available.
 
 ## Canonical market capabilities
 
@@ -153,6 +153,8 @@ Use `CAPABILITY_BASED_V1` for new analysis where possible:
 - each indicator requirement states the verified history required;
 - FULL cannot claim an indicator whose history is insufficient;
 - `DEGRADED` explicitly names missing technical capabilities.
+- for `CAPABILITY_BASED_V1`, every `satisfied:false` indicator capability must appear by the same capability name in `missing_capabilities`, and a satisfied capability cannot also be listed missing;
+- when both are known, `technical_coverage.sessions_used` and `ohlcv_source.sessions_used` must agree.
 
 VSA/Wyckoff/smart-money labels are optional and evidence-gated. Volume alone does not prove institutional activity. If the required OHLCV/context is missing, leave the label null or use cautious candidate language and reduce technical coverage.
 
