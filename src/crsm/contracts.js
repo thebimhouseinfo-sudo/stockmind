@@ -432,8 +432,72 @@ function validateNode2Output(node) {
     }
   }
 
+  if (coverageModel === 'CAPABILITY_BASED_V1') {
+    const requirements = Array.isArray(coverage.indicator_requirements) ? coverage.indicator_requirements : [];
+    const sma200Requirement = requirements.find(requirement =>
+      isPlainObject(requirement)
+      && typeof requirement.capability === 'string'
+      && requirement.capability.toLowerCase() === 'sma200'
+    );
+    if (node.sma_200_rel != null) {
+      if (!sma200Requirement || sma200Requirement.satisfied !== true
+        || !Number.isFinite(sma200Requirement.required_sessions)
+        || sma200Requirement.required_sessions < 200) {
+        errors.push('capability-based sma_200_rel requires a satisfied sma200 indicator requirement with at least 200 sessions');
+      }
+    }
+  }
+
   if ('market_context' in node) {
+    errors.push(...validateNode2EvidenceGatedSignals(node));
     errors.push(...validateNode2MarketContext(node.market_context));
+  }
+
+  return errors;
+}
+
+function validateNode2EvidenceGatedSignals(node) {
+  const errors = [];
+
+  if (node.smart_money_phase != null) {
+    if (!isPlainObject(node.smart_money_phase)) {
+      errors.push('market-context smart_money_phase must be null or an evidence-gated object');
+    } else {
+      requireString(node.smart_money_phase.label, 'smart_money_phase.label', errors);
+      if (!['CANDIDATE','VERIFIED'].includes(node.smart_money_phase.evidence_status)) {
+        errors.push('smart_money_phase.evidence_status must be CANDIDATE or VERIFIED');
+      }
+      if (!Array.isArray(node.smart_money_phase.supporting_evidence)
+        || node.smart_money_phase.supporting_evidence.length === 0) {
+        errors.push('smart_money_phase requires supporting_evidence');
+      } else {
+        node.smart_money_phase.supporting_evidence.forEach((evidence, index) => {
+          requireString(evidence, 'smart_money_phase.supporting_evidence[' + index + ']', errors);
+        });
+      }
+      if (node.smart_money_phase.evidence_status === 'VERIFIED'
+        && (!Array.isArray(node.smart_money_phase.supporting_evidence)
+          || node.smart_money_phase.supporting_evidence.length < 2)) {
+        errors.push('VERIFIED smart_money_phase requires at least two supporting evidence items');
+      }
+    }
+  }
+
+  const volume = node.volume_analysis;
+  if (isPlainObject(volume)) {
+    const candidate = typeof volume.vsa_signal_candidate === 'string'
+      ? volume.vsa_signal_candidate.trim().toLowerCase()
+      : volume.vsa_signal_candidate;
+    const claimsSignal = candidate != null && candidate !== '' && candidate !== 'none' && candidate !== 'null';
+    if (claimsSignal) {
+      if (!Array.isArray(volume.supporting_evidence) || volume.supporting_evidence.length === 0) {
+        errors.push('VSA signal candidate requires supporting_evidence');
+      } else {
+        volume.supporting_evidence.forEach((evidence, index) => {
+          requireString(evidence, 'volume_analysis.supporting_evidence[' + index + ']', errors);
+        });
+      }
+    }
   }
 
   return errors;
