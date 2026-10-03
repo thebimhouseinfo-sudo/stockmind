@@ -400,6 +400,8 @@ Fed, DXY, oil, GDP, credit and public investment are conditional inputs, not man
 
 Node 2 owns Vietnam market-internal measurement. Node 4 may interpret available Node 2 observations but must not re-fetch/recompute index return/trend, breadth, turnover, leadership/rotation, volatility, market foreign flow or stock relative strength.
 
+In adaptive Node 4 output, the same Node2-owned measurements must not be duplicated into `what_changed` or `macro_indicators`; route them exclusively through `market_context_use`.
+
 When material, add:
 - `market_context_use {source:"NODE2.market_context",measurement_policy:"CONSUME_ONLY",consumed_capabilities,interpretation}`
 
