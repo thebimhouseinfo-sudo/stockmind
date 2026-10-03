@@ -11,6 +11,8 @@ Before analyzing a ticker, read the canonical references from the Stockmind repo
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/SECTOR-PROFILES.md` — canonical Node 1 sector/materiality router and KPI/valuation method classes.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE2-MARKET-CONTEXT.md` — canonical Vietnam market-internals/benchmark/coverage contract for Node 2.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE3-EXPECTATION-VALUATION.md` — sector-adaptive economics/valuation and typed expectation provenance for Node 3.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE4-CAUSAL-DELTA.md` — exposure-first external-driver delta and Node 2 consumption boundary for Node 4.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — Word-ready detailed report contract and depth standard.
 
 The webapp owns the visual Node 6A HTML through its deterministic renderer. The model must not spend reasoning budget reproducing template HTML. Legacy `outputs.node6a` may exist in old results, but new analysis does not need to generate it.
@@ -124,6 +126,18 @@ Keep ownership strict:
 - Node 2 measures market internals; Node 4 later interprets macro/policy causes.
 - Missing public market data produces `DEGRADED` coverage, never invented values.
 - VSA/Wyckoff/smart-money labels are optional and evidence-gated.
+
+## Node 3 expectation/valuation routing
+
+Read `NODE3-EXPECTATION-VALUATION.md`. Node 3 selects valuation methods from `node1.sector_profile` and actual business economics; Piotroski/Beneish/full DCF are conditional, not ritual requirements.
+
+Any statement about consensus, guidance, what is priced, or a variant view must be recorded in `expectation_basis[]` with one of `OBSERVED_CONSENSUS | COMPANY_GUIDANCE | VALUATION_IMPLIED | PRICE_ACTION_INFERENCE`. Observed consensus/guidance need dated sources. Inferred bases must be explicitly labelled `INFERENCE` and must not masquerade as observed market consensus.
+
+## Node 4 causal-delta routing
+
+Read `NODE4-CAUSAL-DELTA.md`. Start from the company's material exposures, not a fixed Fed/DXY/oil/GDP checklist. Add `what_changed[]` only for drivers with a credible company transmission path and preserve FACT/INFERENCE/ASSUMPTION separation.
+
+Node 4 may interpret available Node 2 `market_context` through `market_context_use`, but it must use `source: NODE2.market_context`, `measurement_policy: CONSUME_ONLY`, and must not remeasure breadth, turnover, leadership, volatility, market foreign flow, index returns or relative strength.
 
 ## Missing data
 
