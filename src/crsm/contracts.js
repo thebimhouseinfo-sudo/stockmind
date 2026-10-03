@@ -274,6 +274,7 @@ export function validateAnalysisResult(result) {
 export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP', 'WATCH']);
 export const NODE2_COVERAGE_STATES = Object.freeze(['FULL', 'DEGRADED']);
 export const NODE2_COVERAGE_MODELS = Object.freeze(['LEGACY_300_V1', 'CAPABILITY_BASED_V1']);
+export const NODE2_MARKET_CONTEXT_CAPABILITIES = Object.freeze(['vnindex_baseline','secondary_benchmark','breadth','turnover_liquidity','leadership_rotation','volatility','market_foreign_flow','stock_relative_strength']);
 export const NODE5_CONFIDENCE_METHODS = Object.freeze(['LEGACY_V1', 'EVIDENCE_QUALITY_V1']);
 export const NODE1_SECTOR_PROFILES = Object.freeze(['BANK','INSURANCE','SECURITIES','REAL_ESTATE','UTILITIES_POWER','COMMODITY_CYCLICAL','INDUSTRIAL_LOGISTICS','TECHNOLOGY_SERVICES','CONSUMER','GENERIC']);
 export const NODE1_MATERIAL_QUESTION_STATES = Object.freeze(['ANSWERED','PARTIAL','MISSING']);
@@ -401,6 +402,27 @@ function validateNode2Output(node) {
     errors.push('DEGRADED technical coverage must name missing capabilities');
   }
 
+  if (coverageModel === 'CAPABILITY_BASED_V1') {
+    const requirements = Array.isArray(coverage.indicator_requirements) ? coverage.indicator_requirements : [];
+    const missingCapabilities = Array.isArray(coverage.missing_capabilities) ? coverage.missing_capabilities : [];
+    for (const requirement of requirements) {
+      if (!isPlainObject(requirement) || typeof requirement.capability !== 'string' || !requirement.capability.trim()) continue;
+      const capability = requirement.capability.trim();
+      if (requirement.satisfied === false && !missingCapabilities.includes(capability)) {
+        errors.push('unsatisfied technical capability must be named in missing_capabilities: ' + capability);
+      }
+      if (requirement.satisfied === true && missingCapabilities.includes(capability)) {
+        errors.push('satisfied technical capability cannot also be missing: ' + capability);
+      }
+    }
+    if (Number.isFinite(coverage.sessions_used)
+      && isPlainObject(node.ohlcv_source)
+      && Number.isFinite(node.ohlcv_source.sessions_used)
+      && coverage.sessions_used !== node.ohlcv_source.sessions_used) {
+      errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
+    }
+  }
+
   // Degraded technical evidence is a valid analytical outcome. Missing inputs
   // reduce coverage/confidence; they do not invalidate the whole ticker.
   if (coverage.status === 'FULL') {
@@ -416,9 +438,6 @@ function validateNode2Output(node) {
       } else if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used <= 0) {
         errors.push('FULL capability-based technical coverage requires verified OHLCV sessions_used');
       } else {
-        if (Number.isFinite(coverage.sessions_used) && coverage.sessions_used !== ohlcv.sessions_used) {
-          errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
-        }
         for (const [index, requirement] of (coverage.indicator_requirements || []).entries()) {
           if (isPlainObject(requirement)
             && requirement.satisfied === true
@@ -431,8 +450,324 @@ function validateNode2Output(node) {
     }
   }
 
+  if (coverageModel === 'CAPABILITY_BASED_V1') {
+    const requirements = Array.isArray(coverage.indicator_requirements) ? coverage.indicator_requirements : [];
+    const sma200Requirement = requirements.find(requirement =>
+      isPlainObject(requirement)
+      && typeof requirement.capability === 'string'
+      && requirement.capability.toLowerCase() === 'sma200'
+    );
+    if (node.sma_200_rel != null) {
+      if (!sma200Requirement || sma200Requirement.satisfied !== true
+        || !Number.isFinite(sma200Requirement.required_sessions)
+        || sma200Requirement.required_sessions < 200) {
+        errors.push('capability-based sma_200_rel requires a satisfied sma200 indicator requirement with at least 200 sessions');
+      }
+    }
+  }
+
+  if ('market_context' in node) {
+    errors.push(...validateNode2EvidenceGatedSignals(node));
+    errors.push(...validateNode2MarketContext(node.market_context));
+  }
+
   return errors;
 }
+
+function validateNode2EvidenceGatedSignals(node) {
+  const errors = [];
+
+  if (node.smart_money_phase != null) {
+    if (!isPlainObject(node.smart_money_phase)) {
+      errors.push('market-context smart_money_phase must be null or an evidence-gated object');
+    } else {
+      requireString(node.smart_money_phase.label, 'smart_money_phase.label', errors);
+      if (!['CANDIDATE','VERIFIED'].includes(node.smart_money_phase.evidence_status)) {
+        errors.push('smart_money_phase.evidence_status must be CANDIDATE or VERIFIED');
+      }
+      if (!Array.isArray(node.smart_money_phase.supporting_evidence)
+        || node.smart_money_phase.supporting_evidence.length === 0) {
+        errors.push('smart_money_phase requires supporting_evidence');
+      } else {
+        node.smart_money_phase.supporting_evidence.forEach((evidence, index) => {
+          requireString(evidence, 'smart_money_phase.supporting_evidence[' + index + ']', errors);
+        });
+      }
+      if (node.smart_money_phase.evidence_status === 'VERIFIED'
+        && (!Array.isArray(node.smart_money_phase.supporting_evidence)
+          || node.smart_money_phase.supporting_evidence.length < 2)) {
+        errors.push('VERIFIED smart_money_phase requires at least two supporting evidence items');
+      }
+    }
+  }
+
+  const volume = node.volume_analysis;
+  if (isPlainObject(volume)) {
+    const candidate = typeof volume.vsa_signal_candidate === 'string'
+      ? volume.vsa_signal_candidate.trim().toLowerCase()
+      : volume.vsa_signal_candidate;
+    const claimsSignal = candidate != null && candidate !== '' && candidate !== 'none' && candidate !== 'null';
+    if (claimsSignal) {
+      if (!Array.isArray(volume.supporting_evidence) || volume.supporting_evidence.length === 0) {
+        errors.push('VSA signal candidate requires supporting_evidence');
+      } else {
+        volume.supporting_evidence.forEach((evidence, index) => {
+          requireString(evidence, 'volume_analysis.supporting_evidence[' + index + ']', errors);
+        });
+      }
+    }
+  }
+
+  return errors;
+}
+
+function validateNode2MarketContext(context) {
+  const errors = [];
+  if (!isPlainObject(context)) {
+    errors.push('market_context must be an object');
+    return errors;
+  }
+
+  const requiredKeys = [
+    'as_of','benchmarks','breadth','turnover_liquidity','leadership_rotation',
+    'volatility','market_foreign_flow','stock_relative_strength','coverage'
+  ];
+  errors.push(...validateRequiredKeys(context, requiredKeys).map(error => 'market_context ' + error));
+
+  const coverage = context.coverage;
+  if (!isPlainObject(coverage)) {
+    errors.push('market_context.coverage must be an object');
+    return errors;
+  }
+
+  if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
+    errors.push('market_context.coverage.status must be FULL or DEGRADED');
+  }
+  if (!Array.isArray(coverage.available_capabilities)) {
+    errors.push('market_context.coverage.available_capabilities must be an array');
+  }
+  if (!Array.isArray(coverage.missing_capabilities)) {
+    errors.push('market_context.coverage.missing_capabilities must be an array');
+  }
+
+  const available = Array.isArray(coverage.available_capabilities) ? coverage.available_capabilities : [];
+  const missing = Array.isArray(coverage.missing_capabilities) ? coverage.missing_capabilities : [];
+  const combined = [...available, ...missing];
+
+  for (const capability of combined) {
+    if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(capability)) {
+      errors.push('market_context.coverage contains unsupported capability: ' + capability);
+    }
+  }
+  if (new Set(available).size !== available.length) {
+    errors.push('market_context.coverage.available_capabilities must not contain duplicates');
+  }
+  if (new Set(missing).size !== missing.length) {
+    errors.push('market_context.coverage.missing_capabilities must not contain duplicates');
+  }
+  for (const capability of available) {
+    if (missing.includes(capability)) {
+      errors.push('market_context capability cannot be both available and missing: ' + capability);
+    }
+  }
+  for (const capability of NODE2_MARKET_CONTEXT_CAPABILITIES) {
+    if (!available.includes(capability) && !missing.includes(capability)) {
+      errors.push('market_context.coverage must account for capability: ' + capability);
+    }
+  }
+  if (coverage.status === 'FULL' && missing.length) {
+    errors.push('FULL market_context coverage cannot declare missing capabilities');
+  }
+  if (coverage.status === 'DEGRADED' && missing.length === 0) {
+    errors.push('DEGRADED market_context coverage must name missing capabilities');
+  }
+
+  if (!Array.isArray(coverage.provenance)) {
+    errors.push('market_context.coverage.provenance must be an array');
+  } else {
+    coverage.provenance.forEach((entry, index) => {
+      if (!isPlainObject(entry)) {
+        errors.push('market_context.coverage.provenance[' + index + '] must be an object');
+        return;
+      }
+      if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(entry.capability)) {
+        errors.push('market_context.coverage.provenance[' + index + '].capability must be canonical');
+      }
+      requireString(entry.source, 'market_context.coverage.provenance[' + index + '].source', errors);
+      requireString(entry.as_of, 'market_context.coverage.provenance[' + index + '].as_of', errors);
+      if (missing.includes(entry.capability)) {
+        errors.push('missing market_context capability must not declare provenance: ' + entry.capability);
+      }
+    });
+
+    for (const capability of available) {
+      const hasSource = coverage.provenance.some(entry =>
+        isPlainObject(entry)
+        && entry.capability === capability
+        && typeof entry.source === 'string'
+        && entry.source.trim()
+      );
+      if (!hasSource) {
+        errors.push('available market_context capability lacks provenance: ' + capability);
+      }
+    }
+  }
+
+  requireString(context.as_of, 'market_context.as_of', errors);
+
+  if (!isPlainObject(context.benchmarks)) {
+    errors.push('market_context.benchmarks must be an object');
+  } else {
+    const vnindex = context.benchmarks.vnindex;
+    const secondary = context.benchmarks.secondary;
+    if (available.includes('vnindex_baseline')) {
+      if (!isPlainObject(vnindex)) {
+        errors.push('available vnindex_baseline requires market_context.benchmarks.vnindex');
+      } else {
+        if (vnindex.name !== 'VNINDEX') errors.push('market_context.benchmarks.vnindex.name must be VNINDEX');
+        requireString(vnindex.period, 'market_context.benchmarks.vnindex.period', errors);
+        if (!Number.isFinite(vnindex.performance_pct)) {
+          errors.push('available vnindex_baseline requires numeric performance_pct');
+        }
+        requireString(vnindex.source, 'market_context.benchmarks.vnindex.source', errors);
+      }
+    } else if (missing.includes('vnindex_baseline') && vnindex != null) {
+      errors.push('missing vnindex_baseline must use null market_context.benchmarks.vnindex');
+    }
+
+    if (available.includes('secondary_benchmark')) {
+      if (!Array.isArray(secondary) || secondary.length === 0) {
+        errors.push('available secondary_benchmark requires at least one market_context.benchmarks.secondary entry');
+      } else {
+        secondary.forEach((benchmark, index) => {
+          if (!isPlainObject(benchmark)) {
+            errors.push('market_context.benchmarks.secondary[' + index + '] must be an object');
+            return;
+          }
+          requireString(benchmark.name, 'market_context.benchmarks.secondary[' + index + '].name', errors);
+          if (!['INDEX','SECTOR','PEER_BASKET'].includes(benchmark.kind)) {
+            errors.push('market_context.benchmarks.secondary[' + index + '].kind must be INDEX, SECTOR, or PEER_BASKET');
+          }
+          requireString(benchmark.period, 'market_context.benchmarks.secondary[' + index + '].period', errors);
+          if (!Number.isFinite(benchmark.performance_pct)) {
+            errors.push('market_context.benchmarks.secondary[' + index + '].performance_pct must be numeric');
+          }
+          requireString(benchmark.source, 'market_context.benchmarks.secondary[' + index + '].source', errors);
+          if (benchmark.kind === 'PEER_BASKET'
+            && (!Array.isArray(benchmark.constituents) || benchmark.constituents.length < 3 || benchmark.constituents.length > 5)) {
+            errors.push('PEER_BASKET secondary benchmark must name 3-5 constituents');
+          }
+        });
+      }
+    } else if (missing.includes('secondary_benchmark') && Array.isArray(secondary) && secondary.length) {
+      errors.push('missing secondary_benchmark must use an empty market_context.benchmarks.secondary array');
+    }
+  }
+
+  const capabilityFields = {
+    breadth: 'breadth',
+    turnover_liquidity: 'turnover_liquidity',
+    leadership_rotation: 'leadership_rotation',
+    volatility: 'volatility',
+    market_foreign_flow: 'market_foreign_flow',
+    stock_relative_strength: 'stock_relative_strength'
+  };
+  for (const [capability, field] of Object.entries(capabilityFields)) {
+    if (available.includes(capability) && !isPlainObject(context[field])) {
+      errors.push('available ' + capability + ' requires market_context.' + field);
+    }
+    if (missing.includes(capability) && context[field] != null) {
+      errors.push('missing ' + capability + ' must use null market_context.' + field);
+    }
+  }
+
+  if (available.includes('breadth') && isPlainObject(context.breadth)) {
+    if (!Number.isFinite(context.breadth.advancers) || !Number.isFinite(context.breadth.decliners)) {
+      errors.push('available breadth requires numeric advancers and decliners');
+    }
+    requireString(context.breadth.source, 'market_context.breadth.source', errors);
+  }
+  if (available.includes('turnover_liquidity') && isPlainObject(context.turnover_liquidity)) {
+    if (!Number.isFinite(context.turnover_liquidity.market_turnover_value)) {
+      errors.push('available turnover_liquidity requires numeric market_turnover_value');
+    }
+    requireString(context.turnover_liquidity.source, 'market_context.turnover_liquidity.source', errors);
+  }
+  if (available.includes('leadership_rotation') && isPlainObject(context.leadership_rotation)) {
+    if (!Array.isArray(context.leadership_rotation.leaders) || !Array.isArray(context.leadership_rotation.laggards)) {
+      errors.push('available leadership_rotation requires leaders and laggards arrays');
+    }
+    if (!Array.isArray(context.leadership_rotation.source_refs) || context.leadership_rotation.source_refs.length === 0) {
+      errors.push('available leadership_rotation requires source_refs');
+    } else {
+      context.leadership_rotation.source_refs.forEach((ref, index) => {
+        requireString(ref, 'market_context.leadership_rotation.source_refs[' + index + ']', errors);
+      });
+    }
+  }
+  if (available.includes('volatility') && isPlainObject(context.volatility)) {
+    requireString(context.volatility.measure, 'market_context.volatility.measure', errors);
+    if (!Number.isFinite(context.volatility.value)) {
+      errors.push('available volatility requires numeric value');
+    }
+    requireString(context.volatility.source, 'market_context.volatility.source', errors);
+  }
+  if (available.includes('market_foreign_flow') && isPlainObject(context.market_foreign_flow)) {
+    if (!Number.isFinite(context.market_foreign_flow.net_value)) {
+      errors.push('available market_foreign_flow requires numeric net_value');
+    }
+    requireString(context.market_foreign_flow.source, 'market_context.market_foreign_flow.source', errors);
+  }
+  if (available.includes('stock_relative_strength') && isPlainObject(context.stock_relative_strength)) {
+    const relative = context.stock_relative_strength;
+    requireString(relative.period, 'market_context.stock_relative_strength.period', errors);
+    for (const key of ['stock_perf_pct','vnindex_perf_pct','vs_vnindex_pct']) {
+      if (!Number.isFinite(relative[key])) {
+        errors.push('available stock_relative_strength requires numeric ' + key);
+      }
+    }
+    if (!Array.isArray(relative.source_refs) || relative.source_refs.length === 0) {
+      errors.push('available stock_relative_strength requires source_refs');
+    } else {
+      relative.source_refs.forEach((ref, index) => {
+        requireString(ref, 'market_context.stock_relative_strength.source_refs[' + index + ']', errors);
+      });
+    }
+
+    const vnindex = isPlainObject(context.benchmarks) ? context.benchmarks.vnindex : null;
+    if (available.includes('vnindex_baseline') && isPlainObject(vnindex)
+      && typeof relative.period === 'string' && relative.period.trim()
+      && vnindex.period !== relative.period) {
+      errors.push('stock_relative_strength period must match VNINDEX benchmark period');
+    }
+
+    if (available.includes('secondary_benchmark')) {
+      requireString(relative.secondary_benchmark_name, 'market_context.stock_relative_strength.secondary_benchmark_name', errors);
+      if (!Number.isFinite(relative.secondary_benchmark_perf_pct)) {
+        errors.push('available secondary_benchmark requires stock_relative_strength.secondary_benchmark_perf_pct');
+      }
+      if (!Number.isFinite(relative.vs_secondary_benchmark_pct)) {
+        errors.push('available secondary_benchmark requires stock_relative_strength.vs_secondary_benchmark_pct');
+      }
+      const secondary = isPlainObject(context.benchmarks) && Array.isArray(context.benchmarks.secondary)
+        ? context.benchmarks.secondary
+        : [];
+      const selected = secondary.find(benchmark =>
+        isPlainObject(benchmark)
+        && typeof relative.secondary_benchmark_name === 'string'
+        && benchmark.name === relative.secondary_benchmark_name
+      );
+      if (!selected) {
+        errors.push('stock_relative_strength secondary_benchmark_name must match a declared secondary benchmark');
+      } else if (typeof relative.period === 'string' && relative.period.trim() && selected.period !== relative.period) {
+        errors.push('stock_relative_strength period must match selected secondary benchmark period');
+      }
+    }
+  }
+
+  return errors;
+}
+
 
 function validateNode5Output(node) {
   const errors = validateRequiredKeys(node, [

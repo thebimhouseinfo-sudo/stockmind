@@ -46,6 +46,7 @@ newProfileResult.outputs.node2.ohlcv_source = {
   sessions_used: 80,
   date_range: 'latest 80 verified sessions'
 };
+newProfileResult.outputs.node2.sma_200_rel = null;
 newProfileResult.outputs.node5.confidence = {
   value: 74,
   method: 'EVIDENCE_QUALITY_V1',

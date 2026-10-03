@@ -10,6 +10,7 @@ This skill is mandatory after `stockmind-worker-loop` selects/claims one canonic
 Before analyzing a ticker, read the canonical references from the Stockmind repository `thebimhouseinfo-sudo/stockmind` on `master` via the connected GitHub app:
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/CRSM-METHODOLOGY.md` — current analytical contract and architecture overrides.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/SECTOR-PROFILES.md` — canonical Node 1 sector/materiality router and KPI/valuation method classes.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE2-MARKET-CONTEXT.md` — canonical Vietnam market-internals/benchmark/coverage contract for Node 2.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — Word-ready detailed report contract and depth standard.
 
 The webapp owns the visual Node 6A HTML through its deterministic renderer. The model must not spend reasoning budget reproducing template HTML. Legacy `outputs.node6a` may exist in old results, but new analysis does not need to generate it.
@@ -111,6 +112,19 @@ Before Node 1 searches broadly:
 
 This router controls **what evidence Node 1 seeks**. It does not score the company and does not force Node 3 to run every listed valuation method. `market_data.foreign_net_flow_20d` is ticker-specific; do not put broad-market foreign flow there.
 
+## Node 2 Vietnam market-context routing
+
+Node 2 measures **both the stock and the market around it**. Read `NODE2-MARKET-CONTEXT.md` before technical analysis.
+
+Always attempt a VN-Index baseline and a relevant secondary comparison (VN30/HNXINDEX/UPCOMINDEX, reliable sector index, or named peer basket). Measure breadth, turnover/liquidity, leadership/rotation, volatility, broad-market foreign flow and stock relative strength when public evidence is available.
+
+Keep ownership strict:
+- Node 1 `foreign_net_flow_20d` = ticker-specific flow.
+- Node 2 `market_context.market_foreign_flow` = broad-market flow.
+- Node 2 measures market internals; Node 4 later interprets macro/policy causes.
+- Missing public market data produces `DEGRADED` coverage, never invented values.
+- VSA/Wyckoff/smart-money labels are optional and evidence-gated.
+
 ## Missing data
 
 Never invent a number to satisfy a schema.
@@ -141,7 +155,7 @@ The current source architecture explicitly requires:
 
 ## Strict output shape reminder
 
-Node 2 must include `technical_coverage` with `status: FULL|DEGRADED`, `required_sessions: 300`, `sessions_used`, and `missing_capabilities[]`. If ~300 daily sessions/SMA200 or quantified sector-vs-VNINDEX comparison is unavailable, use `DEGRADED` and disclose the gap.
+Node 2 must include `technical_coverage` with `status: FULL|DEGRADED`. New analysis should use `coverage_model: CAPABILITY_BASED_V1` and declare only the indicators actually required, with verified history per indicator; legacy `required_sessions: 300` remains readable. Node 2 should also include additive-v1 `market_context` using the canonical capabilities from `NODE2-MARKET-CONTEXT.md`. If breadth, benchmark, market foreign flow or another public-market capability cannot be verified, mark `market_context.coverage` as `DEGRADED` and name the gap instead of fabricating data.
 
 Node 5 must use only decisions `BUY | HOLD | SELL | BUY ON DIP | WATCH`. Its six factor scores are scalar 0–20 fields named exactly `fundamental, valuation, technical, flow, sector_macro, risk`. `catalyst_horizon` is an object, `thesis_invalidation` is one non-empty string, and `strategy` must contain `entry_zone, allocation_plan, tp1, tp2, risk_per_trade_pct_nav, position_size_note, max_portfolio_weight_pct, position_type`.
 

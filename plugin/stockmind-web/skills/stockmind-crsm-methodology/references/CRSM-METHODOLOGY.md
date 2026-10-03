@@ -220,40 +220,100 @@ Hard rules:
 
 ---
 
-## Stage 2A — Node 2: Technical & VSA
+## Stage 2A — Node 2: Technical + Vietnam Market Context
 
-Role: Quant Technical Analyst + VSA Specialist.
+Role: Quant Technical Analyst + Market Internals Measurer.
 
-Mandatory research:
-- obtain about 300 daily OHLCV sessions, enough for a real SMA200;
-- do not infer technical structure from Node 1 single-volume snapshots.
+Read `NODE2-MARKET-CONTEXT.md` before Node 2.
 
-Compute/analyze:
-- current volume / 20D average;
-- price spread + close location + volume + prior trend context;
-- Wyckoff/VSA candidate signals;
-- accumulation / markup / distribution / markdown only with evidence;
-- fresh demand/supply zones;
-- official sector benchmark when reliable, otherwise 3–5 ticker peer basket;
-- benchmark vs VNINDEX over a stated period.
+### Ownership
 
-Never claim institutional activity from volume alone. Use "candidate" language unless direct evidence exists.
+Node 2 measures:
+- stock OHLCV/technical structure;
+- VN-Index and relevant secondary benchmark performance;
+- market breadth;
+- turnover/liquidity;
+- leadership/rotation;
+- volatility;
+- broad-market foreign flow;
+- stock relative strength versus VN-Index and the selected secondary benchmark.
 
-Node 2 output must include:
-- `technical_coverage {status,required_sessions,sessions_used,missing_capabilities,note}` where `status` is `FULL` or `DEGRADED`; `required_sessions` is 300; if fewer than ~300 daily sessions are verified or a quantified sector-vs-VNINDEX comparison is unavailable, status must be `DEGRADED` and the missing capability must be named explicitly.
-- `ohlcv_source {source,sessions_used,date_range}`
+Node 4 may interpret the macro/policy/FX/rates/commodity causes behind these observations, but must not recompute Node 2 market internals.
+
+Node 1 `market_data.foreign_net_flow_20d` is stock-specific. Node 2 `market_context.market_foreign_flow` is broad-market. Never substitute one for the other.
+
+### Technical evidence
+
+For new analysis prefer `technical_coverage.coverage_model: CAPABILITY_BASED_V1`.
+- Declare only the indicators actually needed.
+- Each `indicator_requirements[]` entry states the required verified history and whether it is satisfied.
+- Use `FULL` only when every declared technical requirement is satisfied.
+- Use `DEGRADED` and name missing capabilities when public OHLCV/history is insufficient.
+- Legacy `required_sessions: 300` remains readable for historical results; do not force a fixed 300-session requirement onto every new analysis.
+
+Compute only when evidence supports it:
+- price trend/structure;
+- current volume versus 20D average;
+- SMA/other indicators whose declared history requirement is satisfied;
+- demand/supply zones;
+- VSA/Wyckoff candidate signals only with suitable OHLCV/context.
+
+Never claim institutional activity from volume alone. `smart_money_phase` and VSA/Wyckoff labels are optional/evidence-gated; null/cautious candidate language is preferable to fabrication.
+
+With `CAPABILITY_BASED_V1`, set `sma_200_rel` to null unless `indicator_requirements` contains a satisfied `sma200` requirement needing at least 200 verified sessions. For new `market_context` results, a non-null `smart_money_phase` must carry evidence status and supporting evidence; a non-empty VSA candidate likewise requires supporting evidence.
+
+### Vietnam market context
+
+Always attempt:
+1. **VN-Index baseline** for the stated comparison period.
+2. **Relevant secondary benchmark**:
+   - VN30 for materially representative large-cap context;
+   - HNXINDEX for HNX-listed names;
+   - UPCOMINDEX for UPCoM-listed names;
+   - reliable official sector index when available;
+   - otherwise a named 3–5 stock peer basket.
+3. **Market internals**: breadth, turnover/liquidity, leadership/rotation, volatility and broad-market foreign flow.
+4. **Relative strength**: ticker versus VN-Index and the selected secondary benchmark over the same period.
+
+Public VNDIRECT/SSI or similar sources may supply market data, but do not invent a proprietary benchmark name. Preserve the actual benchmark identity and source/freshness.
+
+### market_context coverage
+
+Use exactly these canonical capabilities:
+- `vnindex_baseline`
+- `secondary_benchmark`
+- `breadth`
+- `turnover_liquidity`
+- `leadership_rotation`
+- `volatility`
+- `market_foreign_flow`
+- `stock_relative_strength`
+
+`available_capabilities[]` and `missing_capabilities[]` must partition all eight capabilities with no overlap.
+- `FULL`: none missing.
+- `DEGRADED`: at least one missing.
+- Every available capability must have source provenance.
+- Missing public data remains null/missing and lowers downstream confidence; never synthesize it.
+
+### Node 2 output
+
+Keep the existing technical fields for compatibility:
+- `technical_coverage`
+- `ohlcv_source`
 - `trend_status`
 - `sma_200_rel`
-- `volume_analysis {ratio,classification,vsa_signal_candidate,supporting_evidence}`
+- `volume_analysis`
 - `smart_money_phase`
-- `zones {demand,supply,is_fresh}`
-- `sector_benchmark {method,name,constituents_if_peer_basket,source,date}`
-- `sector_vs_market {period,sector_perf_pct,vnindex_perf_pct,sector_strength_label}`
+- `zones`
+- `sector_benchmark`
+- `sector_vs_market`
 - `screening_signal_analysis`
 - `signal_strength`
 - `conclusion`
 
-For SCREENED_WEB, screening momentum is a research trigger only. Record whether independently verified technical structure confirms/partially supports/contradicts the preliminary move. Do not inherit the screener momentum score as Node 2 signal strength.
+New analytical-quality results should additionally include additive-v1 `market_context` as defined in `NODE2-MARKET-CONTEXT.md`.
+
+For SCREENED_WEB, screening momentum remains a research trigger only. Record whether independently verified technical/market structure confirms, partially supports or contradicts the preliminary move. Never inherit Screener momentum score as Node 2 signal strength.
 
 ---
 
