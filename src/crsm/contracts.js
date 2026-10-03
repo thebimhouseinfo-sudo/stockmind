@@ -274,6 +274,7 @@ export function validateAnalysisResult(result) {
 export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP', 'WATCH']);
 export const NODE2_COVERAGE_STATES = Object.freeze(['FULL', 'DEGRADED']);
 export const NODE2_COVERAGE_MODELS = Object.freeze(['LEGACY_300_V1', 'CAPABILITY_BASED_V1']);
+export const NODE2_MARKET_CONTEXT_CAPABILITIES = Object.freeze(['vnindex_baseline','secondary_benchmark','breadth','turnover_liquidity','leadership_rotation','volatility','market_foreign_flow','stock_relative_strength']);
 export const NODE5_CONFIDENCE_METHODS = Object.freeze(['LEGACY_V1', 'EVIDENCE_QUALITY_V1']);
 export const NODE1_SECTOR_PROFILES = Object.freeze(['BANK','INSURANCE','SECURITIES','REAL_ESTATE','UTILITIES_POWER','COMMODITY_CYCLICAL','INDUSTRIAL_LOGISTICS','TECHNOLOGY_SERVICES','CONSUMER','GENERIC']);
 export const NODE1_MATERIAL_QUESTION_STATES = Object.freeze(['ANSWERED','PARTIAL','MISSING']);
@@ -433,6 +434,136 @@ function validateNode2Output(node) {
 
   return errors;
 }
+
+  if ('market_context' in node) {
+    errors.push(...validateNode2MarketContext(node.market_context));
+  }
+
+
+
+function validateNode2MarketContext(context) {
+  const errors = [];
+  if (!isPlainObject(context)) {
+    errors.push('market_context must be an object');
+    return errors;
+  }
+
+  const requiredKeys = [
+    'as_of','benchmarks','breadth','turnover_liquidity','leadership_rotation',
+    'volatility','market_foreign_flow','stock_relative_strength','coverage'
+  ];
+  errors.push(...validateRequiredKeys(context, requiredKeys).map(error => 'market_context ' + error));
+
+  const coverage = context.coverage;
+  if (!isPlainObject(coverage)) {
+    errors.push('market_context.coverage must be an object');
+    return errors;
+  }
+
+  if (!NODE2_COVERAGE_STATES.includes(coverage.status)) {
+    errors.push('market_context.coverage.status must be FULL or DEGRADED');
+  }
+  if (!Array.isArray(coverage.available_capabilities)) {
+    errors.push('market_context.coverage.available_capabilities must be an array');
+  }
+  if (!Array.isArray(coverage.missing_capabilities)) {
+    errors.push('market_context.coverage.missing_capabilities must be an array');
+  }
+
+  const available = Array.isArray(coverage.available_capabilities) ? coverage.available_capabilities : [];
+  const missing = Array.isArray(coverage.missing_capabilities) ? coverage.missing_capabilities : [];
+  const combined = [...available, ...missing];
+
+  for (const capability of combined) {
+    if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(capability)) {
+      errors.push('market_context.coverage contains unsupported capability: ' + capability);
+    }
+  }
+  if (new Set(available).size !== available.length) {
+    errors.push('market_context.coverage.available_capabilities must not contain duplicates');
+  }
+  if (new Set(missing).size !== missing.length) {
+    errors.push('market_context.coverage.missing_capabilities must not contain duplicates');
+  }
+  for (const capability of available) {
+    if (missing.includes(capability)) {
+      errors.push('market_context capability cannot be both available and missing: ' + capability);
+    }
+  }
+  for (const capability of NODE2_MARKET_CONTEXT_CAPABILITIES) {
+    if (!available.includes(capability) && !missing.includes(capability)) {
+      errors.push('market_context.coverage must account for capability: ' + capability);
+    }
+  }
+  if (coverage.status === 'FULL' && missing.length) {
+    errors.push('FULL market_context coverage cannot declare missing capabilities');
+  }
+  if (coverage.status === 'DEGRADED' && missing.length === 0) {
+    errors.push('DEGRADED market_context coverage must name missing capabilities');
+  }
+
+  if (!Array.isArray(coverage.provenance)) {
+    errors.push('market_context.coverage.provenance must be an array');
+  } else {
+    coverage.provenance.forEach((entry, index) => {
+      if (!isPlainObject(entry)) {
+        errors.push('market_context.coverage.provenance[' + index + '] must be an object');
+        return;
+      }
+      if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(entry.capability)) {
+        errors.push('market_context.coverage.provenance[' + index + '].capability must be canonical');
+      }
+      requireString(entry.source, 'market_context.coverage.provenance[' + index + '].source', errors);
+      if (!(entry.as_of == null || (typeof entry.as_of === 'string' && entry.as_of.trim()))) {
+        errors.push('market_context.coverage.provenance[' + index + '].as_of must be string or null');
+      }
+    });
+
+    for (const capability of available) {
+      const hasSource = coverage.provenance.some(entry =>
+        isPlainObject(entry)
+        && entry.capability === capability
+        && typeof entry.source === 'string'
+        && entry.source.trim()
+      );
+      if (!hasSource) {
+        errors.push('available market_context capability lacks provenance: ' + capability);
+      }
+    }
+  }
+
+  if (!isPlainObject(context.benchmarks)) {
+    errors.push('market_context.benchmarks must be an object');
+  } else {
+    if (available.includes('vnindex_baseline') && !isPlainObject(context.benchmarks.vnindex)) {
+      errors.push('available vnindex_baseline requires market_context.benchmarks.vnindex');
+    }
+    if (available.includes('secondary_benchmark')
+      && (!Array.isArray(context.benchmarks.secondary) || context.benchmarks.secondary.length === 0)) {
+      errors.push('available secondary_benchmark requires at least one market_context.benchmarks.secondary entry');
+    }
+  }
+
+  const capabilityFields = {
+    breadth: 'breadth',
+    turnover_liquidity: 'turnover_liquidity',
+    leadership_rotation: 'leadership_rotation',
+    volatility: 'volatility',
+    market_foreign_flow: 'market_foreign_flow',
+    stock_relative_strength: 'stock_relative_strength'
+  };
+  for (const [capability, field] of Object.entries(capabilityFields)) {
+    if (available.includes(capability) && !isPlainObject(context[field])) {
+      errors.push('available ' + capability + ' requires market_context.' + field);
+    }
+    if (missing.includes(capability) && context[field] != null) {
+      errors.push('missing ' + capability + ' must use null market_context.' + field);
+    }
+  }
+
+  return errors;
+}
+
 
 function validateNode5Output(node) {
   const errors = validateRequiredKeys(node, [
