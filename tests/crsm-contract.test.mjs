@@ -321,4 +321,22 @@ const fabricatedMissingAnswerCheck = validateAnalysisResult(fabricatedMissingAns
 assert.equal(fabricatedMissingAnswerCheck.valid, false);
 assert.ok(fabricatedMissingAnswerCheck.errors.some(error => error.includes('MISSING material question answer must be null')));
 
+const partialWithoutEvidence = structuredClone(realEstateRoute);
+partialWithoutEvidence.outputs.node1.material_questions[0].source_refs = [];
+const partialWithoutEvidenceCheck = validateAnalysisResult(partialWithoutEvidence);
+assert.equal(partialWithoutEvidenceCheck.valid, false);
+assert.ok(partialWithoutEvidenceCheck.errors.some(error => error.includes('PARTIAL material question must cite')));
+
+const answeredWithoutAnswer = structuredClone(bankSectorRoute);
+answeredWithoutAnswer.outputs.node1.material_questions[0].answer = null;
+const answeredWithoutAnswerCheck = validateAnalysisResult(answeredWithoutAnswer);
+assert.equal(answeredWithoutAnswerCheck.valid, false);
+assert.ok(answeredWithoutAnswerCheck.errors.some(error => error.includes('ANSWERED material question answer must be')));
+
+const emptySourceRef = structuredClone(bankSectorRoute);
+emptySourceRef.outputs.node1.material_questions[0].source_refs = [''];
+const emptySourceRefCheck = validateAnalysisResult(emptySourceRef);
+assert.equal(emptySourceRefCheck.valid, false);
+assert.ok(emptySourceRefCheck.errors.some(error => error.includes('source_refs[0] must be a non-empty string')));
+
 console.log('CRSM migration contract tests passed.');
