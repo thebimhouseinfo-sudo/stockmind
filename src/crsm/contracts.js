@@ -275,14 +275,56 @@ export const NODE5_DECISIONS = Object.freeze(['BUY', 'HOLD', 'SELL', 'BUY ON DIP
 export const NODE2_COVERAGE_STATES = Object.freeze(['FULL', 'DEGRADED']);
 export const NODE2_COVERAGE_MODELS = Object.freeze(['LEGACY_300_V1', 'CAPABILITY_BASED_V1']);
 export const NODE5_CONFIDENCE_METHODS = Object.freeze(['LEGACY_V1', 'EVIDENCE_QUALITY_V1']);
+export const NODE1_SECTOR_PROFILES = Object.freeze(['BANK','INSURANCE','SECURITIES','REAL_ESTATE','UTILITIES_POWER','COMMODITY_CYCLICAL','INDUSTRIAL_LOGISTICS','TECHNOLOGY_SERVICES','CONSUMER','GENERIC']);
+export const NODE1_MATERIAL_QUESTION_STATES = Object.freeze(['ANSWERED','PARTIAL','MISSING']);
 
 function validateNode1Output(node) {
-  return validateRequiredKeys(node, [
+  const errors = validateRequiredKeys(node, [
     'ticker','sector_type','timestamp','data_period','analysis_mode','screening_metrics',
     'screening_summary','trusted_screener_snapshot','screening_as_of','data_integrity',
     'market_data','valuation_multiples','financial_core_raw','cost_of_capital_raw_inputs',
     'ownership_insider','upcoming_events','anomaly_investigation','data_completion','sources'
   ]);
+
+  if ('sector_profile' in node) {
+    if (!NODE1_SECTOR_PROFILES.includes(node.sector_profile)) {
+      errors.push('sector_profile must be a canonical CRSM sector profile');
+    }
+  }
+
+  if ('material_questions' in node) {
+    if (!Array.isArray(node.material_questions)) {
+      errors.push('material_questions must be an array');
+    } else {
+      node.material_questions.forEach((item, index) => {
+        if (!isPlainObject(item)) {
+          errors.push('material_questions[' + index + '] must be an object');
+          return;
+        }
+        requireString(item.question, 'material_questions[' + index + '].question', errors);
+        requireString(item.why_material, 'material_questions[' + index + '].why_material', errors);
+        if (!NODE1_MATERIAL_QUESTION_STATES.includes(item.status)) {
+          errors.push('material_questions[' + index + '].status must be ANSWERED, PARTIAL, or MISSING');
+        }
+        if (!(item.answer == null || typeof item.answer === 'string')) {
+          errors.push('material_questions[' + index + '].answer must be string or null');
+        }
+        if (!Array.isArray(item.source_refs)) {
+          errors.push('material_questions[' + index + '].source_refs must be an array');
+        } else if (item.status === 'ANSWERED' && item.source_refs.length === 0) {
+          errors.push('ANSWERED material question must cite at least one source_ref');
+        }
+        if (item.status === 'MISSING' && item.answer != null) {
+          errors.push('MISSING material question answer must be null');
+        }
+        if (!(item.freshness == null || typeof item.freshness === 'string')) {
+          errors.push('material_questions[' + index + '].freshness must be string or null');
+        }
+      });
+    }
+  }
+
+  return errors;
 }
 
 function validateNode2Output(node) {
