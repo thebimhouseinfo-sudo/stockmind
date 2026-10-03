@@ -18,6 +18,8 @@ const methodologyRef = read('skills/stockmind-crsm-methodology/references/CRSM-M
 const node6aTemplate = read('skills/stockmind-crsm-methodology/references/NODE6A-LOCKED-TEMPLATE.md');
 const sectorProfiles = read('skills/stockmind-crsm-methodology/references/SECTOR-PROFILES.md');
 const node2MarketContext = read('skills/stockmind-crsm-methodology/references/NODE2-MARKET-CONTEXT.md');
+const node3Expectation = read('skills/stockmind-crsm-methodology/references/NODE3-EXPECTATION-VALUATION.md');
+const node4CausalDelta = read('skills/stockmind-crsm-methodology/references/NODE4-CAUSAL-DELTA.md');
 const node6bReport = read('skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md');
 const resultContract = read('skills/stockmind-result-contract/SKILL.md');
 
@@ -78,6 +80,17 @@ assert.match(node2MarketContext, /stock_relative_strength/);
 assert.match(node2MarketContext, /available_capabilities/);
 assert.match(node2MarketContext, /Missing public data is a valid analytical state/);
 assert.match(node2MarketContext, /Node 4.*interpret/s);
+assert.match(methodology, /NODE3-EXPECTATION-VALUATION\.md/);
+assert.match(methodology, /NODE4-CAUSAL-DELTA\.md/);
+assert.match(node3Expectation, /OBSERVED_CONSENSUS/);
+assert.match(node3Expectation, /COMPANY_GUIDANCE/);
+assert.match(node3Expectation, /VALUATION_IMPLIED/);
+assert.match(node3Expectation, /PRICE_ACTION_INFERENCE/);
+assert.match(node3Expectation, /Piotroski.*BANK\/INSURANCE/s);
+assert.match(node4CausalDelta, /CONSUME_ONLY/);
+assert.match(node4CausalDelta, /what_changed/);
+assert.match(node4CausalDelta, /FACT \/ INFERENCE \/ ASSUMPTION/);
+assert.match(node4CausalDelta, /transmission_targets/);
 assert.match(methodologyRef, /technical_coverage/);
 assert.match(methodologyRef, /DEGRADED/);
 assert.match(node6aTemplate, /HTML TEMPLATE \(LOCKED/);

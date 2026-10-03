@@ -14,7 +14,9 @@ The durable identity remains `crsm-request.v1`, `crsm-result.v1`, and `crsm-pipe
 | Node 6B unresolved placeholders | Dual-compatible v1 | Legacy reader: warning/fallback | New result with `methodology_revision`: hard invalid | Historical immutable v1 remains readable; new-profile writes must never publish template tokens such as `[AI_SCORE]`. Ordinary bracketed source labels are not rejected. |
 | `sector_profile`, `material_questions` | Additive v1 | Absent | Optional; validated when present | Legacy absence remains valid. |
 | `market_context` | Additive v1 | Absent | Optional object; when present its eight canonical capabilities, coverage partition and provenance are validated | Legacy absence remains valid; missing public market data is represented by DEGRADED coverage, not fabricated values. |
-| `expectation_basis`, `thesis_conviction`, `decision_overlay`, `risk_attribution`, `report_modules` | Additive v1 | Absent | Optional until the owning checkpoint defines shape/validation | Legacy absence remains valid; later checkpoints may validate the field when present. |
+| Node 3 `sector_economics`, `expectation_basis` | Additive v1 | Absent | Optional; validated when present | Legacy absence remains valid. Selected valuation methods must fit the sector profile; expectation provenance cannot masquerade inference as observed consensus. |
+| Node 4 `market_context_use`, `what_changed` | Additive v1 | Absent | Optional; validated when present | Legacy absence remains valid. Node 4 consumes Node 2 market internals and owns only external-driver interpretation/deltas. |
+| `thesis_conviction`, `decision_overlay`, `risk_attribution`, `report_modules` | Additive v1 | Absent | Optional until the owning checkpoint defines shape/validation | Legacy absence remains valid; later checkpoints may validate the field when present. |
 | Existing 11-field `decision_record` | Fixed v1 core | Required | Required | Additive decision context must not remove or reinterpret the current fields. |
 | Six-factor AI Score formula/weights | Fixed methodology invariant | Current formula | Unchanged | Any change requires separate Human-approved versioned work. |
 
@@ -41,6 +43,12 @@ A FULL capability-based result cannot contain an unsatisfied indicator requireme
 New Node 2 outputs may add `market_context` without changing `crsm-result.v1`. Its coverage partitions these capabilities: `vnindex_baseline`, `secondary_benchmark`, `breadth`, `turnover_liquidity`, `leadership_rotation`, `volatility`, `market_foreign_flow`, `stock_relative_strength`.
 
 `FULL` means all eight are available with provenance. `DEGRADED` names every missing capability. Node 1 ticker foreign flow and Node 2 broad-market foreign flow remain separate measurements.
+
+## Node 3 expectation provenance and Node 4 causal delta
+
+New Node 3 results may add `sector_economics` and `expectation_basis[]`. Observed consensus/company guidance require dated source evidence; valuation/price-action inference requires an explicit `INFERENCE` label. Sector method selection is validated against the canonical sector profile while legacy Node 3 remains readable.
+
+New Node 4 results may add `market_context_use` and `what_changed[]`. `market_context_use` is consume-only and may reference only capabilities available in Node 2. `what_changed` stores dated external-driver deltas plus FACT/INFERENCE/ASSUMPTION separation and company-economics transmission targets.
 
 ## Evidence-quality confidence
 
