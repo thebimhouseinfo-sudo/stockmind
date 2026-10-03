@@ -175,6 +175,7 @@ capabilityBasedCoverage.outputs.node2.ohlcv_source = {
   sessions_used: 80,
   date_range: 'latest 80 verified sessions'
 };
+capabilityBasedCoverage.outputs.node2.sma_200_rel = null;
 assert.equal(validateAnalysisResult(capabilityBasedCoverage).valid, true);
 
 const capabilityCoverageWithoutRequirements = structuredClone(capabilityBasedCoverage);
@@ -356,6 +357,7 @@ function marketProvenance(capabilities) {
 
 const fullMarketCapabilities = [...NODE2_MARKET_CONTEXT_CAPABILITIES];
 const riskOnMarketContext = structuredClone(capabilityBasedCoverage);
+riskOnMarketContext.outputs.node2.smart_money_phase = null;
 riskOnMarketContext.outputs.node2.market_context = {
   as_of: '2026-10-03',
   benchmarks: {
@@ -483,5 +485,32 @@ emptyRelativeStrengthSource.outputs.node2.market_context.stock_relative_strength
 const emptyRelativeStrengthSourceCheck = validateAnalysisResult(emptyRelativeStrengthSource);
 assert.equal(emptyRelativeStrengthSourceCheck.valid, false);
 assert.ok(emptyRelativeStrengthSourceCheck.errors.some(error => error.includes('stock_relative_strength.source_refs[0]')));
+
+const unsupportedSma200 = structuredClone(capabilityBasedCoverage);
+unsupportedSma200.outputs.node2.sma_200_rel = 'ABOVE';
+const unsupportedSma200Check = validateAnalysisResult(unsupportedSma200);
+assert.equal(unsupportedSma200Check.valid, false);
+assert.ok(unsupportedSma200Check.errors.some(error => error.includes('sma_200_rel requires a satisfied sma200')));
+
+const unsupportedSmartMoney = structuredClone(riskOnMarketContext);
+unsupportedSmartMoney.outputs.node2.smart_money_phase = 'accumulation';
+const unsupportedSmartMoneyCheck = validateAnalysisResult(unsupportedSmartMoney);
+assert.equal(unsupportedSmartMoneyCheck.valid, false);
+assert.ok(unsupportedSmartMoneyCheck.errors.some(error => error.includes('smart_money_phase must be null or an evidence-gated object')));
+
+const candidateSmartMoney = structuredClone(riskOnMarketContext);
+candidateSmartMoney.outputs.node2.smart_money_phase = {
+  label: 'possible accumulation',
+  evidence_status: 'CANDIDATE',
+  supporting_evidence: ['Giá giữ vùng cầu trong khi khối lượng co lại sau nhịp giảm.']
+};
+assert.equal(validateAnalysisResult(candidateSmartMoney).valid, true);
+
+const unsupportedVsaSignal = structuredClone(riskOnMarketContext);
+unsupportedVsaSignal.outputs.node2.volume_analysis.vsa_signal_candidate = 'stopping volume';
+unsupportedVsaSignal.outputs.node2.volume_analysis.supporting_evidence = [];
+const unsupportedVsaSignalCheck = validateAnalysisResult(unsupportedVsaSignal);
+assert.equal(unsupportedVsaSignalCheck.valid, false);
+assert.ok(unsupportedVsaSignalCheck.errors.some(error => error.includes('VSA signal candidate requires supporting_evidence')));
 
 console.log('CRSM migration contract tests passed.');
