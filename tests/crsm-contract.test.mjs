@@ -8,6 +8,7 @@ import {
   DECISION_RECORD_FIELDS,
   NODE1_SECTOR_PROFILES,
   NODE1_MATERIAL_QUESTION_STATES,
+  NODE2_MARKET_CONTEXT_CAPABILITIES,
   REQUIRED_RENDER_OUTPUT_KEYS,
   validateAnalysisItem,
   validateAnalysisRequest,
@@ -338,5 +339,90 @@ emptySourceRef.outputs.node1.material_questions[0].source_refs = [''];
 const emptySourceRefCheck = validateAnalysisResult(emptySourceRef);
 assert.equal(emptySourceRefCheck.valid, false);
 assert.ok(emptySourceRefCheck.errors.some(error => error.includes('source_refs[0] must be a non-empty string')));
+
+
+assert.deepEqual(NODE2_MARKET_CONTEXT_CAPABILITIES, [
+  'vnindex_baseline','secondary_benchmark','breadth','turnover_liquidity',
+  'leadership_rotation','volatility','market_foreign_flow','stock_relative_strength'
+]);
+
+function marketProvenance(capabilities) {
+  return capabilities.map(capability => ({
+    capability,
+    source: capability === 'market_foreign_flow' ? 'VNDIRECT public market data' : 'HOSE public market data',
+    as_of: '2026-10-03'
+  }));
+}
+
+const fullMarketCapabilities = [...NODE2_MARKET_CONTEXT_CAPABILITIES];
+const riskOnMarketContext = structuredClone(capabilityBasedCoverage);
+riskOnMarketContext.outputs.node2.market_context = {
+  as_of: '2026-10-03',
+  benchmarks: {
+    vnindex: { name: 'VNINDEX', period: '20D', performance_pct: 4.2, trend: 'UP', source: 'HOSE', freshness: '2026-10-03' },
+    secondary: [{ name: 'VN30', kind: 'INDEX', period: '20D', performance_pct: 4.8, source: 'HOSE', freshness: '2026-10-03', constituents: [] }]
+  },
+  breadth: { advancers: 230, decliners: 92, unchanged: 41, advance_decline_ratio: 2.5, source: 'HOSE', freshness: '2026-10-03' },
+  turnover_liquidity: { market_turnover_value: 22000, unit: 'Bn VND', change_vs_20d_pct: 15, source: 'HOSE', freshness: '2026-10-03' },
+  leadership_rotation: { leaders: ['BANK','SECURITIES'], laggards: ['UTILITIES'], note: 'Độ rộng lan tỏa tích cực.', source_refs: ['HOSE'], freshness: '2026-10-03' },
+  volatility: { measure: '20D realized volatility', value: 14.5, period: '20D', source: 'public OHLCV', freshness: '2026-10-03' },
+  market_foreign_flow: { net_value: -850, unit: 'Bn VND', period: '5D', source: 'VNDIRECT public market data', freshness: '2026-10-03' },
+  stock_relative_strength: { period: '20D', stock_perf_pct: 7.1, vnindex_perf_pct: 4.2, secondary_benchmark_name: 'VN30', secondary_benchmark_perf_pct: 4.8, vs_vnindex_pct: 2.9, vs_secondary_benchmark_pct: 2.3, source_refs: ['HOSE'] },
+  coverage: { status: 'FULL', available_capabilities: fullMarketCapabilities, missing_capabilities: [], provenance: marketProvenance(fullMarketCapabilities), note: 'Đủ dữ liệu thị trường công khai cho bộ đo đã định nghĩa.' }
+};
+assert.equal(validateAnalysisResult(riskOnMarketContext).valid, true);
+
+const riskOffMarketContext = structuredClone(riskOnMarketContext);
+riskOffMarketContext.outputs.node2.market_context.benchmarks.vnindex.performance_pct = -5.4;
+riskOffMarketContext.outputs.node2.market_context.breadth = { advancers: 61, decliners: 278, unchanged: 24, advance_decline_ratio: 0.22, source: 'HOSE', freshness: '2026-10-03' };
+riskOffMarketContext.outputs.node2.market_context.turnover_liquidity.change_vs_20d_pct = 28;
+riskOffMarketContext.outputs.node2.market_context.market_foreign_flow.net_value = -3200;
+riskOffMarketContext.outputs.node2.market_context.stock_relative_strength.stock_perf_pct = -2.1;
+riskOffMarketContext.outputs.node2.market_context.stock_relative_strength.vnindex_perf_pct = -5.4;
+riskOffMarketContext.outputs.node2.market_context.stock_relative_strength.vs_vnindex_pct = 3.3;
+assert.equal(validateAnalysisResult(riskOffMarketContext).valid, true);
+
+const degradedMarketContext = structuredClone(riskOnMarketContext);
+const missingMarketCapabilities = ['breadth','leadership_rotation','market_foreign_flow'];
+const availableMarketCapabilities = NODE2_MARKET_CONTEXT_CAPABILITIES.filter(capability => !missingMarketCapabilities.includes(capability));
+degradedMarketContext.outputs.node2.market_context.breadth = null;
+degradedMarketContext.outputs.node2.market_context.leadership_rotation = null;
+degradedMarketContext.outputs.node2.market_context.market_foreign_flow = null;
+degradedMarketContext.outputs.node2.market_context.coverage = {
+  status: 'DEGRADED',
+  available_capabilities: availableMarketCapabilities,
+  missing_capabilities: missingMarketCapabilities,
+  provenance: marketProvenance(availableMarketCapabilities),
+  note: 'Không xác minh được độ rộng, luân chuyển dẫn dắt và khối ngoại toàn thị trường từ nguồn công khai.'
+};
+assert.equal(validateAnalysisResult(degradedMarketContext).valid, true);
+
+const fullMarketWithMissingCapability = structuredClone(riskOnMarketContext);
+fullMarketWithMissingCapability.outputs.node2.market_context.coverage.missing_capabilities = ['breadth'];
+fullMarketWithMissingCapability.outputs.node2.market_context.coverage.available_capabilities =
+  fullMarketCapabilities.filter(capability => capability !== 'breadth');
+fullMarketWithMissingCapability.outputs.node2.market_context.breadth = null;
+const fullMarketWithMissingCheck = validateAnalysisResult(fullMarketWithMissingCapability);
+assert.equal(fullMarketWithMissingCheck.valid, false);
+assert.ok(fullMarketWithMissingCheck.errors.some(error => error.includes('FULL market_context coverage cannot declare missing capabilities')));
+
+const missingMarketProvenance = structuredClone(riskOnMarketContext);
+missingMarketProvenance.outputs.node2.market_context.coverage.provenance =
+  marketProvenance(fullMarketCapabilities.filter(capability => capability !== 'market_foreign_flow'));
+const missingMarketProvenanceCheck = validateAnalysisResult(missingMarketProvenance);
+assert.equal(missingMarketProvenanceCheck.valid, false);
+assert.ok(missingMarketProvenanceCheck.errors.some(error => error.includes('lacks provenance: market_foreign_flow')));
+
+const leakedTickerFlowIntoMissingMarket = structuredClone(degradedMarketContext);
+leakedTickerFlowIntoMissingMarket.outputs.node2.market_context.market_foreign_flow = {
+  net_value: leakedTickerFlowIntoMissingMarket.outputs.node1.market_data.foreign_net_flow_20d?.value ?? 0,
+  unit: 'Bn VND',
+  period: '20D',
+  source: 'ticker field copied incorrectly',
+  freshness: '2026-10-03'
+};
+const leakedTickerFlowCheck = validateAnalysisResult(leakedTickerFlowIntoMissingMarket);
+assert.equal(leakedTickerFlowCheck.valid, false);
+assert.ok(leakedTickerFlowCheck.errors.some(error => error.includes('missing market_foreign_flow must use null')));
 
 console.log('CRSM migration contract tests passed.');
