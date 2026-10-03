@@ -9,6 +9,10 @@ import {
   NODE1_SECTOR_PROFILES,
   NODE1_MATERIAL_QUESTION_STATES,
   NODE2_MARKET_CONTEXT_CAPABILITIES,
+  NODE3_EXPECTATION_BASES,
+  NODE3_VALUATION_METHODS_BY_SECTOR,
+  NODE4_DRIVER_TYPES,
+  NODE4_TRANSMISSION_TARGETS,
   REQUIRED_RENDER_OUTPUT_KEYS,
   validateAnalysisItem,
   validateAnalysisRequest,
@@ -565,5 +569,166 @@ unsupportedVsaSignal.outputs.node2.volume_analysis.supporting_evidence = [];
 const unsupportedVsaSignalCheck = validateAnalysisResult(unsupportedVsaSignal);
 assert.equal(unsupportedVsaSignalCheck.valid, false);
 assert.ok(unsupportedVsaSignalCheck.errors.some(error => error.includes('VSA signal candidate requires supporting_evidence')));
+
+
+assert.deepEqual(NODE3_EXPECTATION_BASES, [
+  'OBSERVED_CONSENSUS','COMPANY_GUIDANCE','VALUATION_IMPLIED','PRICE_ACTION_INFERENCE'
+]);
+assert.ok(NODE3_VALUATION_METHODS_BY_SECTOR.BANK.includes('PB_ROE'));
+assert.ok(NODE3_VALUATION_METHODS_BY_SECTOR.REAL_ESTATE.includes('RNAV'));
+assert.ok(NODE3_VALUATION_METHODS_BY_SECTOR.TECHNOLOGY_SERVICES.includes('EV_EBITDA'));
+assert.ok(NODE4_DRIVER_TYPES.includes('FX'));
+assert.deepEqual(NODE4_TRANSMISSION_TARGETS, ['REVENUE','MARGIN','CASH_FLOW','BALANCE_SHEET','VALUATION']);
+
+function addSectorEconomics(result, sectorProfile, method) {
+  result.outputs.node1.sector_profile = sectorProfile;
+  result.outputs.node3.sector_economics = {
+    sector_profile: sectorProfile,
+    earnings_bridge: [],
+    normalized_earnings: null,
+    capital_allocation: [],
+    balance_sheet_capacity: null,
+    valuation_method_selection: [{
+      method,
+      status: 'SELECTED',
+      reason: 'Phương pháp phù hợp với kinh tế ngành và dữ liệu hiện có.',
+      evidence_refs: ['node1-sector-evidence']
+    }]
+  };
+  return result;
+}
+
+const bankEconomics = addSectorEconomics(structuredClone(screened.result), 'BANK', 'PB_ROE');
+bankEconomics.outputs.node3.f_score = null;
+bankEconomics.outputs.node3.expectation_basis = [{
+  topic: 'Tăng trưởng lợi nhuận năm tới',
+  statement: 'Đồng thuận quan sát được kỳ vọng tăng trưởng lợi nhuận 15%.',
+  expectation_basis: 'OBSERVED_CONSENSUS',
+  expected_value: 15,
+  expected_unit: '%',
+  analyst_view: 18,
+  gap_direction: 'ABOVE',
+  source_refs: ['broker-consensus-2026-10-02'],
+  as_of: '2026-10-02',
+  inference_label: null,
+  investment_implication: 'Nếu NIM phục hồi nhanh hơn đồng thuận, ROE bền vững và mức P/B hợp lý có thể tăng.'
+}];
+assert.equal(validateAnalysisResult(bankEconomics).valid, true);
+
+const realEstateEconomics = addSectorEconomics(structuredClone(screened.result), 'REAL_ESTATE', 'RNAV');
+realEstateEconomics.outputs.node3.expectation_basis = [{
+  topic: 'Giá trị dự án hàm ý trong thị giá',
+  statement: 'Định giá hiện tại hàm ý thị trường đang chiết khấu đáng kể tiến độ pháp lý dự án.',
+  expectation_basis: 'VALUATION_IMPLIED',
+  expected_value: null,
+  expected_unit: null,
+  analyst_view: 'Mức chiết khấu có thể thu hẹp nếu pháp lý hoàn tất đúng tiến độ.',
+  gap_direction: 'ABOVE',
+  source_refs: ['current-price-2026-10-03','project-nav-evidence'],
+  as_of: '2026-10-03',
+  inference_label: 'INFERENCE',
+  investment_implication: 'Catalyst pháp lý có thể thu hẹp discount-to-RNAV.'
+}];
+assert.equal(validateAnalysisResult(realEstateEconomics).valid, true);
+
+const techEconomics = addSectorEconomics(structuredClone(screened.result), 'TECHNOLOGY_SERVICES', 'EV_EBITDA');
+techEconomics.outputs.node3.expectation_basis = [{
+  topic: 'Kỳ vọng tăng trưởng phản ánh qua giá',
+  statement: 'Diễn biến giá và relative strength cho thấy khả năng nhà đầu tư đang định giá tăng trưởng cao hơn nền hiện tại.',
+  expectation_basis: 'PRICE_ACTION_INFERENCE',
+  expected_value: null,
+  expected_unit: null,
+  analyst_view: 'Cần backlog và biên lợi nhuận xác nhận trước khi nâng giả định.',
+  gap_direction: 'UNCERTAIN',
+  source_refs: ['node2-relative-strength'],
+  as_of: '2026-10-03',
+  inference_label: 'INFERENCE',
+  investment_implication: 'Giá đã phản ánh một phần tăng trưởng nên upside phụ thuộc vào earnings surprise.'
+}];
+assert.equal(validateAnalysisResult(techEconomics).valid, true);
+
+const bankWithIndustrialDcf = structuredClone(bankEconomics);
+bankWithIndustrialDcf.outputs.node3.sector_economics.valuation_method_selection[0].method = 'DCF';
+const bankDcfCheck = validateAnalysisResult(bankWithIndustrialDcf);
+assert.equal(bankDcfCheck.valid, false);
+assert.ok(bankDcfCheck.errors.some(error => error.includes('not suitable for sector_profile BANK')));
+
+const bankWithFScore = structuredClone(bankEconomics);
+bankWithFScore.outputs.node3.f_score = 7;
+const bankFScoreCheck = validateAnalysisResult(bankWithFScore);
+assert.equal(bankFScoreCheck.valid, false);
+assert.ok(bankFScoreCheck.errors.some(error => error.includes('f_score must be null')));
+
+const consensusWithoutSource = structuredClone(bankEconomics);
+consensusWithoutSource.outputs.node3.expectation_basis[0].source_refs = [];
+const consensusWithoutSourceCheck = validateAnalysisResult(consensusWithoutSource);
+assert.equal(consensusWithoutSourceCheck.valid, false);
+assert.ok(consensusWithoutSourceCheck.errors.some(error => error.includes('source_refs must be a non-empty array')));
+
+const inferredWithoutLabel = structuredClone(realEstateEconomics);
+inferredWithoutLabel.outputs.node3.expectation_basis[0].inference_label = null;
+const inferredWithoutLabelCheck = validateAnalysisResult(inferredWithoutLabel);
+assert.equal(inferredWithoutLabelCheck.valid, false);
+assert.ok(inferredWithoutLabelCheck.errors.some(error => error.includes('must equal INFERENCE')));
+
+const observedWithInferenceLabel = structuredClone(bankEconomics);
+observedWithInferenceLabel.outputs.node3.expectation_basis[0].inference_label = 'INFERENCE';
+const observedWithInferenceLabelCheck = validateAnalysisResult(observedWithInferenceLabel);
+assert.equal(observedWithInferenceLabelCheck.valid, false);
+assert.ok(observedWithInferenceLabelCheck.errors.some(error => error.includes('must be null for observed')));
+
+const causalDelta = structuredClone(riskOnMarketContext);
+causalDelta.outputs.node4.market_context_use = {
+  source: 'NODE2.market_context',
+  measurement_policy: 'CONSUME_ONLY',
+  consumed_capabilities: ['market_foreign_flow','stock_relative_strength'],
+  interpretation: 'Khối ngoại bán ròng là lực cản ngắn hạn, trong khi cổ phiếu vẫn mạnh hơn VN-Index và VN30.'
+};
+causalDelta.outputs.node4.what_changed = [{
+  driver: 'USD/VND',
+  driver_type: 'FX',
+  exposure: 'Doanh thu ngoại tệ lớn hơn chi phí ngoại tệ.',
+  prior_state: '25,000',
+  current_state: '25,400',
+  direction: 'UP',
+  materiality: 'MEDIUM',
+  transmission_lag: '1-2 quý',
+  source_refs: ['sbv-fx-2026-10-03'],
+  as_of: '2026-10-03',
+  transmission_targets: ['REVENUE','MARGIN','VALUATION'],
+  fact: 'USD/VND tăng so với mốc so sánh.',
+  inference: 'Nếu cơ cấu tiền tệ không đổi, VND yếu hơn hỗ trợ doanh thu quy đổi nhưng có thể tăng chi phí nhập khẩu.',
+  assumption: 'Cơ cấu hedging và tiền tệ không thay đổi đáng kể.',
+  inference_confidence: 72
+}];
+assert.equal(validateAnalysisResult(causalDelta).valid, true);
+
+const consumeMissingMarketCapability = structuredClone(degradedMarketContext);
+consumeMissingMarketCapability.outputs.node4.market_context_use = {
+  source: 'NODE2.market_context',
+  measurement_policy: 'CONSUME_ONLY',
+  consumed_capabilities: ['market_foreign_flow'],
+  interpretation: 'Không được phép diễn giải capability chưa có dữ liệu.'
+};
+const consumeMissingMarketCapabilityCheck = validateAnalysisResult(consumeMissingMarketCapability);
+assert.equal(consumeMissingMarketCapabilityCheck.valid, false);
+assert.ok(consumeMissingMarketCapabilityCheck.errors.some(error => error.includes('cannot consume unavailable Node2 capability')));
+
+const causalDeltaWithoutPrior = structuredClone(causalDelta);
+causalDeltaWithoutPrior.outputs.node4.what_changed[0].prior_state = null;
+const causalDeltaWithoutPriorCheck = validateAnalysisResult(causalDeltaWithoutPrior);
+assert.equal(causalDeltaWithoutPriorCheck.valid, false);
+assert.ok(causalDeltaWithoutPriorCheck.errors.some(error => error.includes('direction must be UNKNOWN')));
+
+const causalDeltaUnknownDirection = structuredClone(causalDelta);
+causalDeltaUnknownDirection.outputs.node4.what_changed[0].prior_state = null;
+causalDeltaUnknownDirection.outputs.node4.what_changed[0].direction = 'UNKNOWN';
+assert.equal(validateAnalysisResult(causalDeltaUnknownDirection).valid, true);
+
+const invalidTransmissionTarget = structuredClone(causalDelta);
+invalidTransmissionTarget.outputs.node4.what_changed[0].transmission_targets = ['MARKET_SENTIMENT'];
+const invalidTransmissionTargetCheck = validateAnalysisResult(invalidTransmissionTarget);
+assert.equal(invalidTransmissionTargetCheck.valid, false);
+assert.ok(invalidTransmissionTargetCheck.errors.some(error => error.includes('canonical company-economics target')));
 
 console.log('CRSM migration contract tests passed.');
