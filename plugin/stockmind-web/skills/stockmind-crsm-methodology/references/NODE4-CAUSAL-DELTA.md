@@ -15,6 +15,8 @@ Node 2 owns measurement of:
 
 Node 4 must not re-fetch or recompute those measurements merely to produce a macro paragraph.
 
+For new adaptive Node 4 output, do not place VN-Index/VN30/HNX/UPCoM returns, breadth, market turnover, broad-market foreign flow, market volatility, leadership/rotation or relative-strength measurements inside `what_changed` or legacy `macro_indicators`. Those measurements enter Node 4 only through `market_context_use`.
+
 When Node 4 uses market context, record:
 
 ```json
