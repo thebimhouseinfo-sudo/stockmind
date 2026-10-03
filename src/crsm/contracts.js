@@ -402,6 +402,27 @@ function validateNode2Output(node) {
     errors.push('DEGRADED technical coverage must name missing capabilities');
   }
 
+  if (coverageModel === 'CAPABILITY_BASED_V1') {
+    const requirements = Array.isArray(coverage.indicator_requirements) ? coverage.indicator_requirements : [];
+    const missingCapabilities = Array.isArray(coverage.missing_capabilities) ? coverage.missing_capabilities : [];
+    for (const requirement of requirements) {
+      if (!isPlainObject(requirement) || typeof requirement.capability !== 'string' || !requirement.capability.trim()) continue;
+      const capability = requirement.capability.trim();
+      if (requirement.satisfied === false && !missingCapabilities.includes(capability)) {
+        errors.push('unsatisfied technical capability must be named in missing_capabilities: ' + capability);
+      }
+      if (requirement.satisfied === true && missingCapabilities.includes(capability)) {
+        errors.push('satisfied technical capability cannot also be missing: ' + capability);
+      }
+    }
+    if (Number.isFinite(coverage.sessions_used)
+      && isPlainObject(node.ohlcv_source)
+      && Number.isFinite(node.ohlcv_source.sessions_used)
+      && coverage.sessions_used !== node.ohlcv_source.sessions_used) {
+      errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
+    }
+  }
+
   // Degraded technical evidence is a valid analytical outcome. Missing inputs
   // reduce coverage/confidence; they do not invalidate the whole ticker.
   if (coverage.status === 'FULL') {
@@ -417,9 +438,6 @@ function validateNode2Output(node) {
       } else if (!Number.isFinite(ohlcv.sessions_used) || ohlcv.sessions_used <= 0) {
         errors.push('FULL capability-based technical coverage requires verified OHLCV sessions_used');
       } else {
-        if (Number.isFinite(coverage.sessions_used) && coverage.sessions_used !== ohlcv.sessions_used) {
-          errors.push('capability-based technical_coverage.sessions_used must match ohlcv_source.sessions_used');
-        }
         for (const [index, requirement] of (coverage.indicator_requirements || []).entries()) {
           if (isPlainObject(requirement)
             && requirement.satisfied === true
@@ -701,18 +719,49 @@ function validateNode2MarketContext(context) {
     requireString(context.market_foreign_flow.source, 'market_context.market_foreign_flow.source', errors);
   }
   if (available.includes('stock_relative_strength') && isPlainObject(context.stock_relative_strength)) {
+    const relative = context.stock_relative_strength;
+    requireString(relative.period, 'market_context.stock_relative_strength.period', errors);
     for (const key of ['stock_perf_pct','vnindex_perf_pct','vs_vnindex_pct']) {
-      if (!Number.isFinite(context.stock_relative_strength[key])) {
+      if (!Number.isFinite(relative[key])) {
         errors.push('available stock_relative_strength requires numeric ' + key);
       }
     }
-    if (!Array.isArray(context.stock_relative_strength.source_refs)
-      || context.stock_relative_strength.source_refs.length === 0) {
+    if (!Array.isArray(relative.source_refs) || relative.source_refs.length === 0) {
       errors.push('available stock_relative_strength requires source_refs');
     } else {
-      context.stock_relative_strength.source_refs.forEach((ref, index) => {
+      relative.source_refs.forEach((ref, index) => {
         requireString(ref, 'market_context.stock_relative_strength.source_refs[' + index + ']', errors);
       });
+    }
+
+    const vnindex = isPlainObject(context.benchmarks) ? context.benchmarks.vnindex : null;
+    if (available.includes('vnindex_baseline') && isPlainObject(vnindex)
+      && typeof relative.period === 'string' && relative.period.trim()
+      && vnindex.period !== relative.period) {
+      errors.push('stock_relative_strength period must match VNINDEX benchmark period');
+    }
+
+    if (available.includes('secondary_benchmark')) {
+      requireString(relative.secondary_benchmark_name, 'market_context.stock_relative_strength.secondary_benchmark_name', errors);
+      if (!Number.isFinite(relative.secondary_benchmark_perf_pct)) {
+        errors.push('available secondary_benchmark requires stock_relative_strength.secondary_benchmark_perf_pct');
+      }
+      if (!Number.isFinite(relative.vs_secondary_benchmark_pct)) {
+        errors.push('available secondary_benchmark requires stock_relative_strength.vs_secondary_benchmark_pct');
+      }
+      const secondary = isPlainObject(context.benchmarks) && Array.isArray(context.benchmarks.secondary)
+        ? context.benchmarks.secondary
+        : [];
+      const selected = secondary.find(benchmark =>
+        isPlainObject(benchmark)
+        && typeof relative.secondary_benchmark_name === 'string'
+        && benchmark.name === relative.secondary_benchmark_name
+      );
+      if (!selected) {
+        errors.push('stock_relative_strength secondary_benchmark_name must match a declared secondary benchmark');
+      } else if (typeof relative.period === 'string' && relative.period.trim() && selected.period !== relative.period) {
+        errors.push('stock_relative_strength period must match selected secondary benchmark period');
+      }
     }
   }
 
