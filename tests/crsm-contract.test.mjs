@@ -487,6 +487,26 @@ const emptyRelativeStrengthSourceCheck = validateAnalysisResult(emptyRelativeStr
 assert.equal(emptyRelativeStrengthSourceCheck.valid, false);
 assert.ok(emptyRelativeStrengthSourceCheck.errors.some(error => error.includes('stock_relative_strength.source_refs[0]')));
 
+const missingSecondaryRelative = structuredClone(riskOnMarketContext);
+missingSecondaryRelative.outputs.node2.market_context.stock_relative_strength.secondary_benchmark_name = null;
+missingSecondaryRelative.outputs.node2.market_context.stock_relative_strength.secondary_benchmark_perf_pct = null;
+missingSecondaryRelative.outputs.node2.market_context.stock_relative_strength.vs_secondary_benchmark_pct = null;
+const missingSecondaryRelativeCheck = validateAnalysisResult(missingSecondaryRelative);
+assert.equal(missingSecondaryRelativeCheck.valid, false);
+assert.ok(missingSecondaryRelativeCheck.errors.some(error => error.includes('secondary_benchmark_name')));
+
+const mismatchedRelativePeriod = structuredClone(riskOnMarketContext);
+mismatchedRelativePeriod.outputs.node2.market_context.stock_relative_strength.period = '60D';
+const mismatchedRelativePeriodCheck = validateAnalysisResult(mismatchedRelativePeriod);
+assert.equal(mismatchedRelativePeriodCheck.valid, false);
+assert.ok(mismatchedRelativePeriodCheck.errors.some(error => error.includes('period must match VNINDEX')));
+
+const unknownSecondaryRelative = structuredClone(riskOnMarketContext);
+unknownSecondaryRelative.outputs.node2.market_context.stock_relative_strength.secondary_benchmark_name = 'VN100';
+const unknownSecondaryRelativeCheck = validateAnalysisResult(unknownSecondaryRelative);
+assert.equal(unknownSecondaryRelativeCheck.valid, false);
+assert.ok(unknownSecondaryRelativeCheck.errors.some(error => error.includes('must match a declared secondary benchmark')));
+
 const degradedTechnicalSma200 = structuredClone(capabilityBasedCoverage);
 degradedTechnicalSma200.outputs.node2.technical_coverage = {
   status: 'DEGRADED',
@@ -506,6 +526,18 @@ degradedTechnicalSma200.outputs.node2.ohlcv_source = {
 };
 degradedTechnicalSma200.outputs.node2.sma_200_rel = null;
 assert.equal(validateAnalysisResult(degradedTechnicalSma200).valid, true);
+
+const degradedWithWrongMissingCapability = structuredClone(degradedTechnicalSma200);
+degradedWithWrongMissingCapability.outputs.node2.technical_coverage.missing_capabilities = ['volume_trend'];
+const degradedWrongMissingCheck = validateAnalysisResult(degradedWithWrongMissingCapability);
+assert.equal(degradedWrongMissingCheck.valid, false);
+assert.ok(degradedWrongMissingCheck.errors.some(error => error.includes('unsatisfied technical capability must be named')));
+
+const degradedWithSessionMismatch = structuredClone(degradedTechnicalSma200);
+degradedWithSessionMismatch.outputs.node2.technical_coverage.sessions_used = 79;
+const degradedSessionMismatchCheck = validateAnalysisResult(degradedWithSessionMismatch);
+assert.equal(degradedSessionMismatchCheck.valid, false);
+assert.ok(degradedSessionMismatchCheck.errors.some(error => error.includes('sessions_used must match')));
 
 const unsupportedSma200 = structuredClone(capabilityBasedCoverage);
 unsupportedSma200.outputs.node2.sma_200_rel = 'ABOVE';
