@@ -311,8 +311,20 @@ function validateNode1Output(node) {
         }
         if (!Array.isArray(item.source_refs)) {
           errors.push('material_questions[' + index + '].source_refs must be an array');
-        } else if (item.status === 'ANSWERED' && item.source_refs.length === 0) {
-          errors.push('ANSWERED material question must cite at least one source_ref');
+        } else {
+          item.source_refs.forEach((ref, sourceIndex) => {
+            if (typeof ref !== 'string' || !ref.trim()) {
+              errors.push('material_questions[' + index + '].source_refs[' + sourceIndex + '] must be a non-empty string');
+            }
+          });
+        }
+        if (item.status === 'ANSWERED' || item.status === 'PARTIAL') {
+          if (typeof item.answer !== 'string' || !item.answer.trim()) {
+            errors.push(item.status + ' material question answer must be a non-empty string');
+          }
+          if (!Array.isArray(item.source_refs) || item.source_refs.length === 0) {
+            errors.push(item.status + ' material question must cite at least one source_ref');
+          }
         }
         if (item.status === 'MISSING' && item.answer != null) {
           errors.push('MISSING material question answer must be null');
