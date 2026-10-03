@@ -831,6 +831,7 @@ function validateNode3AdaptiveOutput(node, node1) {
       } else {
         const allMethods = new Set(Object.values(NODE3_VALUATION_METHODS_BY_SECTOR).flat());
         const allowed = NODE3_VALUATION_METHODS_BY_SECTOR[economics.sector_profile] || [];
+        const seenMethods = new Set();
         let hasUsableMethod = false;
 
         selections.forEach((selection, index) => {
@@ -840,6 +841,12 @@ function validateNode3AdaptiveOutput(node, node1) {
             return;
           }
           requireString(selection.method, prefix + '.method', errors);
+          if (typeof selection.method === 'string' && selection.method.trim()) {
+            if (seenMethods.has(selection.method)) {
+              errors.push(prefix + '.method must not duplicate another valuation method');
+            }
+            seenMethods.add(selection.method);
+          }
           if (typeof selection.method === 'string' && selection.method.trim() && !allMethods.has(selection.method)) {
             errors.push(prefix + '.method must be a canonical Node3 valuation method');
           }
@@ -877,6 +884,9 @@ function validateNode3AdaptiveOutput(node, node1) {
         && node.f_score != null) {
         errors.push('f_score must be null for BANK/INSURANCE sector economics');
       }
+      if (!('expectation_basis' in node)) {
+        errors.push('sector_economics requires explicit expectation_basis array, which may be empty');
+      }
     }
   }
 
@@ -906,15 +916,21 @@ function validateNode3AdaptiveOutput(node, node1) {
           });
         }
         requireString(entry.as_of, prefix + '.as_of', errors);
-        if (!('expected_value' in entry)) errors.push(prefix + ' missing field: expected_value');
+        if (!('expected_value' in entry)) {
+          errors.push(prefix + ' missing field: expected_value');
+        } else if (!(entry.expected_value == null
+          || typeof entry.expected_value === 'string'
+          || Number.isFinite(entry.expected_value))) {
+          errors.push(prefix + '.expected_value must be string, finite number, or null');
+        }
         if (!('expected_unit' in entry)) errors.push(prefix + ' missing field: expected_unit');
         if (!(entry.expected_unit == null || (typeof entry.expected_unit === 'string' && entry.expected_unit.trim()))) {
           errors.push(prefix + '.expected_unit must be string or null');
         }
         if (!('analyst_view' in entry) || entry.analyst_view == null
-          || !['string','number'].includes(typeof entry.analyst_view)
-          || (typeof entry.analyst_view === 'string' && !entry.analyst_view.trim())) {
-          errors.push(prefix + '.analyst_view must be a non-empty string or number');
+          || !((typeof entry.analyst_view === 'string' && entry.analyst_view.trim())
+            || Number.isFinite(entry.analyst_view))) {
+          errors.push(prefix + '.analyst_view must be a non-empty string or finite number');
         }
         requireString(entry.investment_implication, prefix + '.investment_implication', errors);
 
@@ -953,6 +969,9 @@ function validateNode4CausalOutput(node, node2) {
       if (!Array.isArray(use.consumed_capabilities)) {
         errors.push('market_context_use.consumed_capabilities must be an array');
       } else {
+        if (use.consumed_capabilities.length === 0) {
+          errors.push('market_context_use.consumed_capabilities must be non-empty when market_context_use is present');
+        }
         if (new Set(use.consumed_capabilities).size !== use.consumed_capabilities.length) {
           errors.push('market_context_use.consumed_capabilities must not contain duplicates');
         }
