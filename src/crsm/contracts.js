@@ -512,8 +512,9 @@ function validateNode2MarketContext(context) {
         errors.push('market_context.coverage.provenance[' + index + '].capability must be canonical');
       }
       requireString(entry.source, 'market_context.coverage.provenance[' + index + '].source', errors);
-      if (!(entry.as_of == null || (typeof entry.as_of === 'string' && entry.as_of.trim()))) {
-        errors.push('market_context.coverage.provenance[' + index + '].as_of must be string or null');
+      requireString(entry.as_of, 'market_context.coverage.provenance[' + index + '].as_of', errors);
+      if (missing.includes(entry.capability)) {
+        errors.push('missing market_context capability must not declare provenance: ' + entry.capability);
       }
     });
 
@@ -530,9 +531,7 @@ function validateNode2MarketContext(context) {
     }
   }
 
-  if (!(context.as_of == null || (typeof context.as_of === 'string' && context.as_of.trim()))) {
-    errors.push('market_context.as_of must be string or null');
-  }
+  requireString(context.as_of, 'market_context.as_of', errors);
 
   if (!isPlainObject(context.benchmarks)) {
     errors.push('market_context.benchmarks must be an object');
@@ -618,6 +617,10 @@ function validateNode2MarketContext(context) {
     }
     if (!Array.isArray(context.leadership_rotation.source_refs) || context.leadership_rotation.source_refs.length === 0) {
       errors.push('available leadership_rotation requires source_refs');
+    } else {
+      context.leadership_rotation.source_refs.forEach((ref, index) => {
+        requireString(ref, 'market_context.leadership_rotation.source_refs[' + index + ']', errors);
+      });
     }
   }
   if (available.includes('volatility') && isPlainObject(context.volatility)) {
@@ -642,6 +645,10 @@ function validateNode2MarketContext(context) {
     if (!Array.isArray(context.stock_relative_strength.source_refs)
       || context.stock_relative_strength.source_refs.length === 0) {
       errors.push('available stock_relative_strength requires source_refs');
+    } else {
+      context.stock_relative_strength.source_refs.forEach((ref, index) => {
+        requireString(ref, 'market_context.stock_relative_strength.source_refs[' + index + ']', errors);
+      });
     }
   }
 
