@@ -6,6 +6,8 @@ import {
   CRSM_REQUEST_VERSION,
   CRSM_RESULT_VERSION,
   DECISION_RECORD_FIELDS,
+  NODE1_SECTOR_PROFILES,
+  NODE1_MATERIAL_QUESTION_STATES,
   REQUIRED_RENDER_OUTPUT_KEYS,
   validateAnalysisItem,
   validateAnalysisRequest,
@@ -256,5 +258,67 @@ underscoredNonTemplateLabel.methodology_revision = 'crsm-methodology.quality-v1'
 underscoredNonTemplateLabel.outputs.node6b = '# BÁO CÁO NT2\nNhãn nguồn nội bộ [VN_INDEX]';
 assert.equal(validateAnalysisResult(underscoredNonTemplateLabel).valid, true);
 
+
+
+assert.deepEqual(NODE1_SECTOR_PROFILES, [
+  'BANK','INSURANCE','SECURITIES','REAL_ESTATE','UTILITIES_POWER',
+  'COMMODITY_CYCLICAL','INDUSTRIAL_LOGISTICS','TECHNOLOGY_SERVICES','CONSUMER','GENERIC'
+]);
+assert.deepEqual(NODE1_MATERIAL_QUESTION_STATES, ['ANSWERED','PARTIAL','MISSING']);
+
+const bankSectorRoute = structuredClone(screened.result);
+bankSectorRoute.methodology_revision = 'crsm-methodology.quality-v1';
+bankSectorRoute.outputs.node1.sector_profile = 'BANK';
+bankSectorRoute.outputs.node1.material_questions = [{
+  question: 'Chất lượng tài sản đang thay đổi theo hướng nào?',
+  why_material: 'NPL và chi phí tín dụng quyết định ROE bền vững.',
+  status: 'ANSWERED',
+  answer: 'NPL cần theo dõi theo kỳ công bố mới nhất.',
+  source_refs: ['company-filing'],
+  freshness: 'Q2/2026'
+}];
+assert.equal(validateAnalysisResult(bankSectorRoute).valid, true);
+
+const realEstateRoute = structuredClone(screened.result);
+realEstateRoute.outputs.node1.sector_profile = 'REAL_ESTATE';
+realEstateRoute.outputs.node1.material_questions = [{
+  question: 'Pháp lý dự án trọng yếu đã đủ điều kiện triển khai chưa?',
+  why_material: 'Tiến độ pháp lý chi phối presales, thu tiền và lịch ghi nhận.',
+  status: 'PARTIAL',
+  answer: 'Đã có một phần phê duyệt nhưng còn bước chưa xác minh.',
+  source_refs: ['company-ir'],
+  freshness: '2026-09-30'
+}];
+assert.equal(validateAnalysisResult(realEstateRoute).valid, true);
+
+const genericMissingRoute = structuredClone(webOnly.result);
+genericMissingRoute.outputs.node1.sector_profile = 'GENERIC';
+genericMissingRoute.outputs.node1.material_questions = [{
+  question: 'Có dữ liệu đủ tin cậy để phân loại sâu hơn không?',
+  why_material: 'Phân loại sai có thể kéo theo KPI và phương pháp định giá không phù hợp.',
+  status: 'MISSING',
+  answer: null,
+  source_refs: [],
+  freshness: null
+}];
+assert.equal(validateAnalysisResult(genericMissingRoute).valid, true);
+
+const invalidSectorProfile = structuredClone(bankSectorRoute);
+invalidSectorProfile.outputs.node1.sector_profile = 'FINANCIALS';
+const invalidSectorCheck = validateAnalysisResult(invalidSectorProfile);
+assert.equal(invalidSectorCheck.valid, false);
+assert.ok(invalidSectorCheck.errors.some(error => error.includes('sector_profile')));
+
+const missingAnsweredSource = structuredClone(bankSectorRoute);
+missingAnsweredSource.outputs.node1.material_questions[0].source_refs = [];
+const missingAnsweredSourceCheck = validateAnalysisResult(missingAnsweredSource);
+assert.equal(missingAnsweredSourceCheck.valid, false);
+assert.ok(missingAnsweredSourceCheck.errors.some(error => error.includes('ANSWERED material question')));
+
+const fabricatedMissingAnswer = structuredClone(genericMissingRoute);
+fabricatedMissingAnswer.outputs.node1.material_questions[0].answer = 'Suy đoán không có nguồn';
+const fabricatedMissingAnswerCheck = validateAnalysisResult(fabricatedMissingAnswer);
+assert.equal(fabricatedMissingAnswerCheck.valid, false);
+assert.ok(fabricatedMissingAnswerCheck.errors.some(error => error.includes('MISSING material question answer must be null')));
 
 console.log('CRSM migration contract tests passed.');
