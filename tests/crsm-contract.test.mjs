@@ -425,4 +425,35 @@ const leakedTickerFlowCheck = validateAnalysisResult(leakedTickerFlowIntoMissing
 assert.equal(leakedTickerFlowCheck.valid, false);
 assert.ok(leakedTickerFlowCheck.errors.some(error => error.includes('missing market_foreign_flow must use null')));
 
+const availableButEmptyBreadth = structuredClone(riskOnMarketContext);
+availableButEmptyBreadth.outputs.node2.market_context.breadth = {};
+const availableButEmptyBreadthCheck = validateAnalysisResult(availableButEmptyBreadth);
+assert.equal(availableButEmptyBreadthCheck.valid, false);
+assert.ok(availableButEmptyBreadthCheck.errors.some(error => error.includes('available breadth requires numeric')));
+
+const missingVnindexWithStaleMeasurement = structuredClone(degradedMarketContext);
+missingVnindexWithStaleMeasurement.outputs.node2.market_context.coverage.available_capabilities =
+  availableMarketCapabilities.filter(capability => capability !== 'vnindex_baseline');
+missingVnindexWithStaleMeasurement.outputs.node2.market_context.coverage.missing_capabilities =
+  [...missingMarketCapabilities, 'vnindex_baseline'];
+missingVnindexWithStaleMeasurement.outputs.node2.market_context.coverage.provenance =
+  marketProvenance(missingVnindexWithStaleMeasurement.outputs.node2.market_context.coverage.available_capabilities);
+const missingVnindexStaleCheck = validateAnalysisResult(missingVnindexWithStaleMeasurement);
+assert.equal(missingVnindexStaleCheck.valid, false);
+assert.ok(missingVnindexStaleCheck.errors.some(error => error.includes('missing vnindex_baseline must use null')));
+
+const badPeerBasket = structuredClone(riskOnMarketContext);
+badPeerBasket.outputs.node2.market_context.benchmarks.secondary = [{
+  name: 'Peer basket',
+  kind: 'PEER_BASKET',
+  period: '20D',
+  performance_pct: 3.1,
+  source: 'public OHLCV',
+  freshness: '2026-10-03',
+  constituents: ['AAA','BBB']
+}];
+const badPeerBasketCheck = validateAnalysisResult(badPeerBasket);
+assert.equal(badPeerBasketCheck.valid, false);
+assert.ok(badPeerBasketCheck.errors.some(error => error.includes('3-5 constituents')));
+
 console.log('CRSM migration contract tests passed.');
