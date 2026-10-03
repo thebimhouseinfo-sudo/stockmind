@@ -677,6 +677,27 @@ const observedWithInferenceLabelCheck = validateAnalysisResult(observedWithInfer
 assert.equal(observedWithInferenceLabelCheck.valid, false);
 assert.ok(observedWithInferenceLabelCheck.errors.some(error => error.includes('must be null for observed')));
 
+const sectorEconomicsWithoutExpectationField = structuredClone(bankEconomics);
+delete sectorEconomicsWithoutExpectationField.outputs.node3.expectation_basis;
+const sectorEconomicsWithoutExpectationCheck = validateAnalysisResult(sectorEconomicsWithoutExpectationField);
+assert.equal(sectorEconomicsWithoutExpectationCheck.valid, false);
+assert.ok(sectorEconomicsWithoutExpectationCheck.errors.some(error => error.includes('requires explicit expectation_basis array')));
+
+const sectorEconomicsWithNoExpectationEvidence = structuredClone(bankEconomics);
+sectorEconomicsWithNoExpectationEvidence.outputs.node3.expectation_basis = [];
+assert.equal(validateAnalysisResult(sectorEconomicsWithNoExpectationEvidence).valid, true);
+
+const duplicateValuationMethod = structuredClone(realEstateEconomics);
+duplicateValuationMethod.outputs.node3.sector_economics.valuation_method_selection.push({
+  method: 'RNAV',
+  status: 'CONDITIONAL',
+  reason: 'Trùng phương pháp để kiểm tra validator.',
+  evidence_refs: ['project-nav-evidence']
+});
+const duplicateValuationMethodCheck = validateAnalysisResult(duplicateValuationMethod);
+assert.equal(duplicateValuationMethodCheck.valid, false);
+assert.ok(duplicateValuationMethodCheck.errors.some(error => error.includes('must not duplicate another valuation method')));
+
 const causalDelta = structuredClone(riskOnMarketContext);
 causalDelta.outputs.node4.market_context_use = {
   source: 'NODE2.market_context',
@@ -713,6 +734,12 @@ consumeMissingMarketCapability.outputs.node4.market_context_use = {
 const consumeMissingMarketCapabilityCheck = validateAnalysisResult(consumeMissingMarketCapability);
 assert.equal(consumeMissingMarketCapabilityCheck.valid, false);
 assert.ok(consumeMissingMarketCapabilityCheck.errors.some(error => error.includes('cannot consume unavailable Node2 capability')));
+
+const emptyMarketContextUse = structuredClone(causalDelta);
+emptyMarketContextUse.outputs.node4.market_context_use.consumed_capabilities = [];
+const emptyMarketContextUseCheck = validateAnalysisResult(emptyMarketContextUse);
+assert.equal(emptyMarketContextUseCheck.valid, false);
+assert.ok(emptyMarketContextUseCheck.errors.some(error => error.includes('must be non-empty when market_context_use is present')));
 
 const causalDeltaWithoutPrior = structuredClone(causalDelta);
 causalDeltaWithoutPrior.outputs.node4.what_changed[0].prior_state = null;
