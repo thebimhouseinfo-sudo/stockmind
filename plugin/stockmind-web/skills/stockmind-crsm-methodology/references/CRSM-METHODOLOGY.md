@@ -260,6 +260,8 @@ Compute only when evidence supports it:
 
 Never claim institutional activity from volume alone. `smart_money_phase` and VSA/Wyckoff labels are optional/evidence-gated; null/cautious candidate language is preferable to fabrication.
 
+With `CAPABILITY_BASED_V1`, set `sma_200_rel` to null unless `indicator_requirements` contains a satisfied `sma200` requirement needing at least 200 verified sessions. For new `market_context` results, a non-null `smart_money_phase` must carry evidence status and supporting evidence; a non-empty VSA candidate likewise requires supporting evidence.
+
 ### Vietnam market context
 
 Always attempt:
