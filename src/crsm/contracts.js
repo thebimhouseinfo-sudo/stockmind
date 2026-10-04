@@ -187,13 +187,19 @@ export function validateDecisionRecord(record, ticker = null, node5 = null) {
     if (record.decision !== node5.decision) {
       errors.push('decision_record.decision must match adaptive Node5 decision');
     }
-    if (Number.isFinite(record.ai_score) && Number.isFinite(node5.ai_score?.value)
-      && !nearlyEqual(record.ai_score, node5.ai_score.value, 0.11)) {
-      errors.push('decision_record.ai_score must match adaptive Node5 ai_score.value');
+    if (Number.isFinite(node5.ai_score?.value)) {
+      if (!Number.isFinite(record.ai_score) || !nearlyEqual(record.ai_score, node5.ai_score.value, 0.11)) {
+        errors.push('decision_record.ai_score must be numeric and match adaptive Node5 ai_score.value');
+      }
+    } else if (node5.ai_score?.value == null && record.ai_score != null) {
+      errors.push('decision_record.ai_score must be null when adaptive Node5 ai_score.value is null');
     }
-    if (Number.isFinite(record.confidence) && Number.isFinite(node5.confidence?.value)
-      && !nearlyEqual(record.confidence, node5.confidence.value, 0.11)) {
-      errors.push('decision_record.confidence must match adaptive Node5 confidence.value');
+    if (Number.isFinite(node5.confidence?.value)) {
+      if (!Number.isFinite(record.confidence) || !nearlyEqual(record.confidence, node5.confidence.value, 0.11)) {
+        errors.push('decision_record.confidence must be numeric and match adaptive Node5 confidence.value');
+      }
+    } else if (node5.confidence?.value == null && record.confidence != null) {
+      errors.push('decision_record.confidence must be null when adaptive Node5 confidence.value is null');
     }
 
     if ('thesis_conviction' in record) {
@@ -1266,11 +1272,13 @@ function validateAdaptiveNode5Synthesis(node, upstream) {
     } else if (!nearlyEqual(node.ai_score.value, calculatedAiScore, 0.11)) {
       errors.push('adaptive CIO ai_score.value must equal the fixed six-factor AI Score formula');
     }
+  } else if (node.ai_score?.value != null) {
+    errors.push('adaptive CIO ai_score.value must be null when any six-factor score is unavailable');
   }
 
   errors.push(...validateNode5Conviction(node.thesis_conviction, upstream?.node3));
-  errors.push(...validateNode5DecisionOverlay(node.decision_overlay, node));
-  errors.push(...validateNode5RiskAttribution(node.risk_attribution));
+  errors.push(...validateNode5DecisionOverlay(node.decision_overlay, node, upstream));
+  errors.push(...validateNode5RiskAttribution(node.risk_attribution, node.scores?.risk));
   errors.push(...validateNode5Monitoring(node, upstream?.node3));
 
   return errors;
@@ -1304,6 +1312,9 @@ function validateNode5Conviction(conviction, node3) {
         errors.push('thesis_conviction.expectation_basis_refs[' + index + '] must reference an existing Node3 expectation_basis entry');
       }
     });
+    if (basis.length > 0 && conviction.expectation_basis_refs.length === 0) {
+      errors.push('thesis_conviction must reference at least one Node3 expectation_basis entry when expectation evidence exists');
+    }
   }
   for (const field of ['supporting_evidence_refs','contradictory_evidence_refs']) {
     if (!Array.isArray(conviction[field])) {
@@ -1311,6 +1322,9 @@ function validateNode5Conviction(conviction, node3) {
     } else {
       conviction[field].forEach((ref, index) => requireString(ref, 'thesis_conviction.' + field + '[' + index + ']', errors));
     }
+  }
+  if (Array.isArray(conviction.supporting_evidence_refs) && conviction.supporting_evidence_refs.length === 0) {
+    errors.push('thesis_conviction.supporting_evidence_refs must be non-empty');
   }
   if (!NODE5_CATALYST_VISIBILITY.includes(conviction.catalyst_visibility)) {
     errors.push('thesis_conviction.catalyst_visibility must be LOW, MEDIUM, HIGH, or UNKNOWN');
@@ -1321,7 +1335,7 @@ function validateNode5Conviction(conviction, node3) {
   return errors;
 }
 
-function validateNode5DecisionOverlay(overlay, node) {
+function validateNode5DecisionOverlay(overlay, node, upstream = {}) {
   const errors = [];
   if (!isPlainObject(overlay)) {
     errors.push('decision_overlay must be an object');
@@ -1364,11 +1378,13 @@ function validateNode5DecisionOverlay(overlay, node) {
   if (overlay.ai_score_effect !== 'NONE') {
     errors.push('decision_overlay.ai_score_effect must equal NONE');
   }
-  if (!Number.isFinite(overlay.ai_score_reference)) {
-    errors.push('decision_overlay.ai_score_reference must be numeric');
-  } else if (Number.isFinite(node.ai_score?.value)
-    && !nearlyEqual(overlay.ai_score_reference, node.ai_score.value, 0.11)) {
-    errors.push('decision_overlay.ai_score_reference must equal Node5 ai_score.value');
+  if (Number.isFinite(node.ai_score?.value)) {
+    if (!Number.isFinite(overlay.ai_score_reference)
+      || !nearlyEqual(overlay.ai_score_reference, node.ai_score.value, 0.11)) {
+      errors.push('decision_overlay.ai_score_reference must be numeric and equal Node5 ai_score.value');
+    }
+  } else if (node.ai_score?.value == null && overlay.ai_score_reference != null) {
+    errors.push('decision_overlay.ai_score_reference must be null when Node5 ai_score.value is null');
   }
 
   const changedDecision = overlay.pre_overlay_decision !== overlay.post_overlay_decision;
@@ -1397,14 +1413,39 @@ function validateNode5DecisionOverlay(overlay, node) {
     errors.push('known market regime requires evidence_refs');
   }
 
+  if (Array.isArray(evidenceRefs)) {
+    evidenceRefs.forEach((ref, index) => {
+      if (typeof ref !== 'string') return;
+      if (ref.startsWith('NODE2.market_context:')) {
+        const capability = ref.slice('NODE2.market_context:'.length);
+        const available = upstream?.node2?.market_context?.coverage?.available_capabilities;
+        if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(capability)) {
+          errors.push('decision_overlay.market_regime.evidence_refs[' + index + '] names unknown Node2 capability');
+        } else if (!Array.isArray(available) || !available.includes(capability)) {
+          errors.push('decision_overlay cannot cite unavailable Node2 market capability: ' + capability);
+        }
+      }
+      if (ref.startsWith('NODE4.what_changed:')) {
+        const raw = ref.slice('NODE4.what_changed:'.length);
+        const idx = Number(raw);
+        if (!Number.isInteger(idx) || idx < 0 || !Array.isArray(upstream?.node4?.what_changed) || idx >= upstream.node4.what_changed.length) {
+          errors.push('decision_overlay.market_regime.evidence_refs[' + index + '] must reference an existing Node4.what_changed entry');
+        }
+      }
+    });
+  }
+
   return errors;
 }
 
-function validateNode5RiskAttribution(entries) {
+function validateNode5RiskAttribution(entries, riskScore = null) {
   const errors = [];
   if (!Array.isArray(entries)) {
     errors.push('risk_attribution must be an array');
     return errors;
+  }
+  if (Number.isFinite(riskScore) && riskScore < 20 && entries.length === 0) {
+    errors.push('risk_attribution must explain a non-maximal Risk score in adaptive CIO synthesis');
   }
   const seenDrivers = new Set();
   entries.forEach((entry, index) => {
@@ -1564,13 +1605,16 @@ function validateNode5Confidence(confidence) {
       method_suitability: 15,
       key_uncertainty_coverage: 10
     };
-    if (Object.keys(weights).every(key => Number.isFinite(components[key]))) {
+    const complete = Object.keys(weights).every(key => Number.isFinite(components[key]));
+    if (complete) {
       const expected = Object.entries(weights).reduce((sum, [key, weight]) => (
         sum + components[key] * weight / 100
       ), 0);
       if (!Number.isFinite(confidence.value) || !nearlyEqual(confidence.value, expected, 0.11)) {
         errors.push('EVIDENCE_QUALITY_V1 confidence.value must equal the fixed weighted evidence-quality formula');
       }
+    } else if (confidence.value != null) {
+      errors.push('EVIDENCE_QUALITY_V1 confidence.value must be null when any weighted component is unavailable');
     }
   }
 
