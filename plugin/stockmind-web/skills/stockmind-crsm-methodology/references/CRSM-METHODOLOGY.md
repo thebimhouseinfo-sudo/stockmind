@@ -546,6 +546,7 @@ Keep:
 ### Current Screener role
 
 For SCREENED_WEB, Screener remains candidate-selection/research context only. Never compare Screener score with CRSM AI Score and never create `screen_vs_crsm`.
+- do not output `screen_vs_crsm` or any Screener-vs-CRSM score-difference field.
 
 ### Compatibility
 
