@@ -195,7 +195,7 @@ assert.ok(missingRequirementsCheck.errors.some(error => error.includes('indicato
 
 const evidenceQualityConfidence = structuredClone(screened.result);
 evidenceQualityConfidence.outputs.node5.confidence = {
-  value: 75.5,
+  value: 74,
   method: 'EVIDENCE_QUALITY_V1',
   components: {
     data_completeness: 72,
@@ -207,6 +207,11 @@ evidenceQualityConfidence.outputs.node5.confidence = {
   }
 };
 assert.equal(validateAnalysisResult(evidenceQualityConfidence).valid, true);
+
+const legacyEvidenceQualityPreCp5 = structuredClone(evidenceQualityConfidence);
+legacyEvidenceQualityPreCp5.outputs.node5.confidence.value = 74;
+legacyEvidenceQualityPreCp5.outputs.node5.confidence.components.freshness = null;
+assert.equal(validateAnalysisResult(legacyEvidenceQualityPreCp5).valid, true);
 
 const incompleteEvidenceQualityConfidence = structuredClone(evidenceQualityConfidence);
 delete incompleteEvidenceQualityConfidence.outputs.node5.confidence.components.freshness;
@@ -915,7 +920,7 @@ badEvidenceConfidence.outputs.node5.confidence.value = 82;
 badEvidenceConfidence.decision_record.confidence = 82;
 const badEvidenceConfidenceCheck = validateAnalysisResult(badEvidenceConfidence);
 assert.equal(badEvidenceConfidenceCheck.valid, false);
-assert.ok(badEvidenceConfidenceCheck.errors.some(error => error.includes('fixed weighted evidence-quality formula')));
+assert.ok(badEvidenceConfidenceCheck.errors.some(error => error.includes('adaptive EVIDENCE_QUALITY_V1 confidence.value must equal the fixed weighted evidence-quality formula')));
 
 const partialAdaptiveCio = structuredClone(adaptiveCio);
 delete partialAdaptiveCio.outputs.node5.risk_attribution;
@@ -989,12 +994,13 @@ adaptiveMissingFactorHonest.outputs.node5.decision_overlay.ai_score_reference = 
 adaptiveMissingFactorHonest.decision_record.ai_score = null;
 assert.equal(validateAnalysisResult(adaptiveMissingFactorHonest).valid, true);
 
-const incompleteEvidenceWithFalsePrecision = structuredClone(evidenceQualityConfidence);
+const incompleteEvidenceWithFalsePrecision = structuredClone(adaptiveCio);
 incompleteEvidenceWithFalsePrecision.outputs.node5.confidence.components.freshness = null;
 incompleteEvidenceWithFalsePrecision.outputs.node5.confidence.value = 75;
+incompleteEvidenceWithFalsePrecision.decision_record.confidence = 75;
 const incompleteEvidenceWithFalsePrecisionCheck = validateAnalysisResult(incompleteEvidenceWithFalsePrecision);
 assert.equal(incompleteEvidenceWithFalsePrecisionCheck.valid, false);
-assert.ok(incompleteEvidenceWithFalsePrecisionCheck.errors.some(error => error.includes('confidence.value must be null when any weighted component is unavailable')));
+assert.ok(incompleteEvidenceWithFalsePrecisionCheck.errors.some(error => error.includes('adaptive EVIDENCE_QUALITY_V1 confidence.value must be null when any weighted component is unavailable')));
 
 const convictionWithoutSupport = structuredClone(adaptiveCio);
 convictionWithoutSupport.outputs.node5.thesis_conviction.supporting_evidence_refs = [];
