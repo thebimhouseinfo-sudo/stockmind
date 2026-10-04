@@ -37,6 +37,7 @@ Use the repository's canonical `crsm-result.v1` contract. The compatibility rule
 - Node 2 legacy technical coverage keeps `required_sessions: 300`; new analysis may use `coverage_model: CAPABILITY_BASED_V1` with explicit `indicator_requirements`.
 - Node 5 legacy confidence remains readable; new analysis may use `confidence.method: EVIDENCE_QUALITY_V1` with evidence-quality components.
 - `methodology_revision` and later CR-reviewed analytical fields are additive/optional for legacy results until their owning checkpoint defines validation.
+- Node 3 `sector_economics` / `expectation_basis` and Node 4 `market_context_use` / `what_changed` remain additive v1: legacy absence is valid, but when present their provenance/method/ownership semantics are hard-validated.
 - Node 6B exact headings/table counts are presentation guidance, not result-fatal structure. Historical v1 placeholder defects stay readable as warnings; new results carrying `methodology_revision` must reject unresolved machine placeholders before write.
 
 Never rewrite immutable legacy results merely to adopt a newer compatibility profile.
