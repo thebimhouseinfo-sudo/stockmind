@@ -48,7 +48,7 @@ newProfileResult.outputs.node2.ohlcv_source = {
 };
 newProfileResult.outputs.node2.sma_200_rel = null;
 newProfileResult.outputs.node5.confidence = {
-  value: 74,
+  value: 75.5,
   method: 'EVIDENCE_QUALITY_V1',
   components: {
     data_completeness: 72,
@@ -83,7 +83,7 @@ adaptiveCioResult.outputs.node3.expectation_basis = [{
 }];
 adaptiveCioResult.outputs.node5.ai_score.value = 70;
 adaptiveCioResult.outputs.node5.confidence = {
-  value: 75.4,
+  value: 76.25,
   method: 'EVIDENCE_QUALITY_V1',
   components: {
     data_completeness:80, source_quality:85, freshness:75,
@@ -120,7 +120,7 @@ adaptiveCioResult.outputs.node5.monitoring_kpis = [
 ];
 adaptiveCioResult.outputs.node5.what_would_change_my_mind = ['KPI1 phá ngưỡng'];
 adaptiveCioResult.decision_record.ai_score = 70;
-adaptiveCioResult.decision_record.confidence = 75.4;
+adaptiveCioResult.decision_record.confidence = 76.25;
 adaptiveCioResult.decision_record.thesis_conviction = 'MEDIUM';
 adaptiveCioResult.decision_record.market_regime = 'RISK_OFF';
 adaptiveCioResult.decision_record.investment_horizon = '3-12M';
