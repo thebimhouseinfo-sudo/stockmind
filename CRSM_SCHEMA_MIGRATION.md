@@ -16,7 +16,8 @@ The durable identity remains `crsm-request.v1`, `crsm-result.v1`, and `crsm-pipe
 | `market_context` | Additive v1 | Absent | Optional object; when present its eight canonical capabilities, coverage partition and provenance are validated | Legacy absence remains valid; missing public market data is represented by DEGRADED coverage, not fabricated values. |
 | Node 3 `sector_economics`, `expectation_basis` | Additive v1 | Absent | Optional; validated when present | Legacy absence remains valid. Selected valuation methods must fit the sector profile; expectation provenance cannot masquerade inference as observed consensus. |
 | Node 4 `market_context_use`, `what_changed` | Additive v1 | Absent | Optional; validated when present | Legacy absence remains valid. Node 4 consumes Node 2 market internals and owns only external-driver interpretation/deltas. |
-| `thesis_conviction`, `decision_overlay`, `risk_attribution`, `report_modules` | Additive v1 | Absent | Optional until the owning checkpoint defines shape/validation | Legacy absence remains valid; later checkpoints may validate the field when present. |
+| Node 5 `thesis_conviction`, `decision_overlay`, `risk_attribution`, `investment_horizon`, `anti_thesis`, `variant_view`, `monitoring_kpis`, `what_would_change_my_mind` | Additive v1 | Absent | Legacy absence valid; if any adaptive CIO field is present the complete CP5 set is validated together | AI Score formula remains fixed; overlay is score-neutral; Risk uses residual-risk ownership. |
+| `report_modules` | Additive v1 | Absent | Optional until the owning report checkpoint defines shape/validation | Legacy absence remains valid. |
 | Existing 11-field `decision_record` | Fixed v1 core | Required | Required | Additive decision context must not remove or reinterpret the current fields. |
 | Six-factor AI Score formula/weights | Fixed methodology invariant | Current formula | Unchanged | Any change requires separate Human-approved versioned work. |
 
@@ -52,16 +53,23 @@ New Node 4 results may add `market_context_use` and `what_changed[]`. `market_co
 
 ## Evidence-quality confidence
 
-New Node 5 outputs may use `method: EVIDENCE_QUALITY_V1` with these 0–100 components:
+New Node 5 outputs may use `method: EVIDENCE_QUALITY_V1` with fixed weights:
+- `data_completeness`: 25%
+- `source_quality`: 20%
+- `freshness`: 15%
+- `cross_source_consistency`: 15%
+- `method_suitability`: 15%
+- `key_uncertainty_coverage`: 10%
 
-- `data_completeness`
-- `source_quality`
-- `freshness`
-- `cross_source_consistency`
-- `method_suitability`
-- `key_uncertainty_coverage`
+The legacy confidence shape remains valid for historical results. Confidence measures evidence quality; thesis conviction remains a separate field.
 
-The legacy confidence shape remains valid for historical results. Thesis conviction is a later additive field and is not encoded into this confidence score.
+## CP5 CIO synthesis compatibility
+
+The fixed six-factor AI Score remains unchanged. Adaptive CP5 output adds conviction, score-neutral market-regime overlay, residual-risk attribution, horizon, anti-thesis, variant view, monitoring KPIs and change-my-mind conditions.
+
+Legacy results may omit all CP5 fields. If any adaptive CP5 field is present, the validator requires the complete CP5 set so a result cannot persist an overlay without conviction/risk ownership or vice versa.
+
+Existing 11-field `decision_record` remains valid. Optional additive conviction/regime/horizon fields may be persisted and, when present, must agree with Node 5.
 
 ## v2 escalation gate
 
