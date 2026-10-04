@@ -1261,10 +1261,6 @@ function validateAdaptiveNode5Synthesis(node, upstream) {
     if (!(field in node)) errors.push('adaptive CIO synthesis missing field: ' + field);
   }
 
-  if (node.confidence?.method !== 'EVIDENCE_QUALITY_V1') {
-    errors.push('adaptive CIO synthesis requires confidence.method EVIDENCE_QUALITY_V1');
-  }
-
   const calculatedAiScore = calculateFixedAiScore(node.scores);
   if (calculatedAiScore != null) {
     if (!Number.isFinite(node.ai_score?.value)) {
@@ -1276,6 +1272,7 @@ function validateAdaptiveNode5Synthesis(node, upstream) {
     errors.push('adaptive CIO ai_score.value must be null when any six-factor score is unavailable');
   }
 
+  errors.push(...validateAdaptiveEvidenceQualityConfidence(node.confidence));
   errors.push(...validateNode5Conviction(node.thesis_conviction, upstream?.node3));
   errors.push(...validateNode5DecisionOverlay(node.decision_overlay, node, upstream));
   errors.push(...validateNode5RiskAttribution(node.risk_attribution, node.scores?.risk));
@@ -1291,6 +1288,38 @@ function calculateFixedAiScore(scores) {
   return keys.reduce((sum, key) => (
     sum + (scores[key] / 20) * NODE5_AI_SCORE_WEIGHTS[key]
   ), 0);
+}
+
+function validateAdaptiveEvidenceQualityConfidence(confidence) {
+  const errors = [];
+  if (!isPlainObject(confidence) || confidence.method !== 'EVIDENCE_QUALITY_V1') {
+    errors.push('adaptive CIO synthesis requires confidence.method EVIDENCE_QUALITY_V1');
+    return errors;
+  }
+
+  const components = confidence.components;
+  if (!isPlainObject(components)) return errors;
+
+  const weights = {
+    data_completeness: 25,
+    source_quality: 20,
+    freshness: 15,
+    cross_source_consistency: 15,
+    method_suitability: 15,
+    key_uncertainty_coverage: 10
+  };
+  const complete = Object.keys(weights).every(key => Number.isFinite(components[key]));
+  if (complete) {
+    const expected = Object.entries(weights).reduce((sum, [key, weight]) => (
+      sum + components[key] * weight / 100
+    ), 0);
+    if (!Number.isFinite(confidence.value) || !nearlyEqual(confidence.value, expected, 0.11)) {
+      errors.push('adaptive EVIDENCE_QUALITY_V1 confidence.value must equal the fixed weighted evidence-quality formula');
+    }
+  } else if (confidence.value != null) {
+    errors.push('adaptive EVIDENCE_QUALITY_V1 confidence.value must be null when any weighted component is unavailable');
+  }
+  return errors;
 }
 
 function validateNode5Conviction(conviction, node3) {
@@ -1593,28 +1622,6 @@ function validateNode5Confidence(confidence) {
     const value = components[key];
     if (value != null && (!Number.isFinite(value) || value < 0 || value > 100)) {
       errors.push('confidence.components.' + key + ' must be null or numeric from 0 to 100');
-    }
-  }
-
-  if (method === 'EVIDENCE_QUALITY_V1') {
-    const weights = {
-      data_completeness: 25,
-      source_quality: 20,
-      freshness: 15,
-      cross_source_consistency: 15,
-      method_suitability: 15,
-      key_uncertainty_coverage: 10
-    };
-    const complete = Object.keys(weights).every(key => Number.isFinite(components[key]));
-    if (complete) {
-      const expected = Object.entries(weights).reduce((sum, [key, weight]) => (
-        sum + components[key] * weight / 100
-      ), 0);
-      if (!Number.isFinite(confidence.value) || !nearlyEqual(confidence.value, expected, 0.11)) {
-        errors.push('EVIDENCE_QUALITY_V1 confidence.value must equal the fixed weighted evidence-quality formula');
-      }
-    } else if (confidence.value != null) {
-      errors.push('EVIDENCE_QUALITY_V1 confidence.value must be null when any weighted component is unavailable');
     }
   }
 
