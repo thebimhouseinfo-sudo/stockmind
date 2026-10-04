@@ -96,7 +96,7 @@ adaptiveCioResult.outputs.node5.thesis_conviction = {
   contradictory_evidence_refs:['node2'], catalyst_visibility:'MEDIUM', payoff_asymmetry:'POSITIVE'
 };
 adaptiveCioResult.outputs.node5.decision_overlay = {
-  market_regime:{regime_state:'RISK_OFF',evidence_refs:['NODE2.market_context:breadth']},
+  market_regime:{regime_state:'RISK_OFF',evidence_refs:['market-regime-public-evidence']},
   timing_effect:'WAIT_FOR_ENTRY', sizing_effect:'REDUCE', decision_effect:'OVERRIDE',
   pre_overlay_decision:'BUY', post_overlay_decision:'HOLD',
   override_rationale:'Risk-off làm giảm chất lượng điểm vào.',
