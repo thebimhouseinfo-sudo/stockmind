@@ -20,6 +20,7 @@ const sectorProfiles = read('skills/stockmind-crsm-methodology/references/SECTOR
 const node2MarketContext = read('skills/stockmind-crsm-methodology/references/NODE2-MARKET-CONTEXT.md');
 const node3Expectation = read('skills/stockmind-crsm-methodology/references/NODE3-EXPECTATION-VALUATION.md');
 const node4CausalDelta = read('skills/stockmind-crsm-methodology/references/NODE4-CAUSAL-DELTA.md');
+const node5CioSynthesis = read('skills/stockmind-crsm-methodology/references/NODE5-CIO-SYNTHESIS.md');
 const node6bReport = read('skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md');
 const resultContract = read('skills/stockmind-result-contract/SKILL.md');
 
@@ -91,6 +92,13 @@ assert.match(node4CausalDelta, /CONSUME_ONLY/);
 assert.match(node4CausalDelta, /what_changed/);
 assert.match(node4CausalDelta, /FACT \/ INFERENCE \/ ASSUMPTION/);
 assert.match(node4CausalDelta, /transmission_targets/);
+assert.match(methodology, /NODE5-CIO-SYNTHESIS\.md/);
+assert.match(node5CioSynthesis, /EVIDENCE_QUALITY_V1/);
+assert.match(node5CioSynthesis, /data_completeness.*25%/s);
+assert.match(node5CioSynthesis, /ai_score_effect.*NONE/s);
+assert.match(node5CioSynthesis, /RESIDUAL_TAIL_PENALTY/);
+assert.match(node5CioSynthesis, /3–5 monitoring KPIs/);
+assert.match(node5CioSynthesis, /AI Score.*never modify/s);
 assert.match(methodologyRef, /technical_coverage/);
 assert.match(methodologyRef, /DEGRADED/);
 assert.match(node6aTemplate, /HTML TEMPLATE \(LOCKED/);
