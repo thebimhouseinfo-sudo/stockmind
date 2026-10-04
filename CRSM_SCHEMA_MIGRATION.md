@@ -61,7 +61,7 @@ New Node 5 outputs may use `method: EVIDENCE_QUALITY_V1` with fixed weights:
 - `method_suitability`: 15%
 - `key_uncertainty_coverage`: 10%
 
-The legacy confidence shape remains valid for historical results. Confidence measures evidence quality; thesis conviction remains a separate field.
+The legacy confidence shape remains valid for historical results. Pre-CP5 immutable results that already used `EVIDENCE_QUALITY_V1` retain the earlier v1 read semantics (required component names/ranges only); they are **not** retroactively rejected because their stored `confidence.value` was not produced by the CP5 fixed weighting. The fixed 25/20/15/15/15/10 value formula and honest-null rule are enforced only when the adaptive CP5 CIO synthesis fields are present. Confidence measures evidence quality; thesis conviction remains a separate field.
 
 ## CP5 CIO synthesis compatibility
 
