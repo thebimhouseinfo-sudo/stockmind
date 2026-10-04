@@ -195,7 +195,7 @@ assert.ok(missingRequirementsCheck.errors.some(error => error.includes('indicato
 
 const evidenceQualityConfidence = structuredClone(screened.result);
 evidenceQualityConfidence.outputs.node5.confidence = {
-  value: 74,
+  value: 75.5,
   method: 'EVIDENCE_QUALITY_V1',
   components: {
     data_completeness: 72,
@@ -816,7 +816,7 @@ function addAdaptiveCioSynthesis(result) {
   const n5 = copy.outputs.node5;
   n5.ai_score.value = 70;
   n5.confidence = {
-    value: 75.4,
+    value: 76.25,
     method: 'EVIDENCE_QUALITY_V1',
     components: {
       data_completeness: 80,
@@ -892,7 +892,7 @@ function addAdaptiveCioSynthesis(result) {
   ];
 
   copy.decision_record.ai_score = 70;
-  copy.decision_record.confidence = 75.4;
+  copy.decision_record.confidence = 76.25;
   copy.decision_record.decision = 'HOLD';
   copy.decision_record.thesis_conviction = 'MEDIUM';
   copy.decision_record.market_regime = 'RISK_OFF';
