@@ -13,6 +13,7 @@ Before analyzing a ticker, read the canonical references from the Stockmind repo
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE2-MARKET-CONTEXT.md` — canonical Vietnam market-internals/benchmark/coverage contract for Node 2.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE3-EXPECTATION-VALUATION.md` — sector-adaptive economics/valuation and typed expectation provenance for Node 3.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE4-CAUSAL-DELTA.md` — exposure-first external-driver delta and Node 2 consumption boundary for Node 4.
+- `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE5-CIO-SYNTHESIS.md` — fixed-score CIO synthesis, evidence confidence, thesis conviction, market-regime overlay and residual-risk ownership.
 - `plugin/stockmind-web/skills/stockmind-crsm-methodology/references/NODE6B-FULL-REPORT.md` — Word-ready detailed report contract and depth standard.
 
 The webapp owns the visual Node 6A HTML through its deterministic renderer. The model must not spend reasoning budget reproducing template HTML. Legacy `outputs.node6a` may exist in old results, but new analysis does not need to generate it.
@@ -138,6 +139,18 @@ Any statement about consensus, guidance, what is priced, or a variant view must 
 Read `NODE4-CAUSAL-DELTA.md`. Start from the company's material exposures, not a fixed Fed/DXY/oil/GDP checklist. Add `what_changed[]` only for drivers with a credible company transmission path and preserve FACT/INFERENCE/ASSUMPTION separation.
 
 Node 4 may interpret available Node 2 `market_context` through `market_context_use`, but it must use `source: NODE2.market_context`, `measurement_policy: CONSUME_ONLY`, and must not remeasure breadth, turnover, leadership, volatility, market foreign flow, index returns or relative strength.
+
+## Node 5 CIO synthesis routing
+
+Read `NODE5-CIO-SYNTHESIS.md` before final synthesis.
+
+Keep four concepts separate:
+- **AI Score** = fixed six-factor formula only; never change weights or add Market Regime/Conviction/Confidence as score factors.
+- **Evidence Confidence** = `EVIDENCE_QUALITY_V1` quality/completeness of evidence and method.
+- **Thesis Conviction** = LOW/MEDIUM/HIGH belief in the thesis from expectation gap, supporting/contradictory evidence, catalysts and payoff asymmetry.
+- **Decision Overlay** = score-neutral market-regime effect on timing/sizing/decision wording with evidence and rationale.
+
+Use `risk_attribution[]` so every adverse driver has one primary scoring owner and Risk contains only residual tail fragility not already penalized elsewhere. Adaptive Node 5 also emits investment horizon, anti-thesis, variant view, 3–5 monitoring KPIs and observable what-would-change-my-mind conditions.
 
 ## Missing data
 

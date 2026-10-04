@@ -67,6 +67,72 @@ assert.equal(adaptedNewProfile.detailReport, newProfileResult.outputs.node6b);
 assert.equal(adaptedNewProfile.outputs.node2.technical_coverage.coverage_model, 'CAPABILITY_BASED_V1');
 assert.equal(adaptedNewProfile.outputs.node5.confidence.method, 'EVIDENCE_QUALITY_V1');
 
+const adaptiveCioResult = structuredClone(newProfileResult);
+adaptiveCioResult.outputs.node3.expectation_basis = [{
+  topic: 'Tăng trưởng lợi nhuận',
+  statement: 'Định giá hiện tại hàm ý tăng trưởng lợi nhuận khoảng 12%.',
+  expectation_basis: 'VALUATION_IMPLIED',
+  expected_value: 12,
+  expected_unit: '%',
+  analyst_view: 16,
+  gap_direction: 'ABOVE',
+  source_refs: ['valuation-implied-ref'],
+  as_of: '2026-10-04',
+  inference_label: 'INFERENCE',
+  investment_implication: 'Nếu tăng trưởng đạt 16%, dư địa định giá có thể mở rộng.'
+}];
+adaptiveCioResult.outputs.node5.ai_score.value = 70;
+adaptiveCioResult.outputs.node5.confidence = {
+  value: 76.25,
+  method: 'EVIDENCE_QUALITY_V1',
+  components: {
+    data_completeness:80, source_quality:85, freshness:75,
+    cross_source_consistency:70, method_suitability:80, key_uncertainty_coverage:55
+  }
+};
+adaptiveCioResult.outputs.node5.thesis_conviction = {
+  level:'MEDIUM', rationale:'Có upside nhưng còn bất định.',
+  expectation_basis_refs:[0], supporting_evidence_refs:['node3'],
+  contradictory_evidence_refs:['node2'], catalyst_visibility:'MEDIUM', payoff_asymmetry:'POSITIVE'
+};
+adaptiveCioResult.outputs.node5.decision_overlay = {
+  market_regime:{regime_state:'RISK_OFF',evidence_refs:['market-regime-public-evidence']},
+  timing_effect:'WAIT_FOR_ENTRY', sizing_effect:'REDUCE', decision_effect:'OVERRIDE',
+  pre_overlay_decision:'BUY', post_overlay_decision:'HOLD',
+  override_rationale:'Risk-off làm giảm chất lượng điểm vào.',
+  ai_score_effect:'NONE', ai_score_reference:70
+};
+adaptiveCioResult.outputs.node5.risk_attribution = [{
+  driver:'Thanh khoản', primary_owner:'RISK', residual_risk_effect:'MEDIUM',
+  risk_score_treatment:'PRIMARY_RISK_PENALTY', rationale:'Fragility thoát vị thế.', evidence_refs:['liquidity-ref']
+}];
+adaptiveCioResult.outputs.node5.investment_horizon = {bucket:'3-12M',rationale:'Catalyst cần vài quý.'};
+adaptiveCioResult.outputs.node5.anti_thesis = 'Lợi nhuận không phục hồi như kỳ vọng.';
+adaptiveCioResult.outputs.node5.variant_view = {
+  summary:'Lợi nhuận có thể cao hơn mức hàm ý.', expectation_basis_refs:[0],
+  why_different:'Biên lợi nhuận phục hồi nhanh hơn.', payoff_if_right:'Định giá mở rộng.',
+  what_proves_wrong:'Biên lợi nhuận tiếp tục giảm.'
+};
+adaptiveCioResult.outputs.node5.monitoring_kpis = [
+  {kpi:'KPI1',current_state:1,watch_condition:'<0',thesis_link:'Invalidates A',source_refs:['s1']},
+  {kpi:'KPI2',current_state:2,watch_condition:'<1',thesis_link:'Invalidates B',source_refs:['s2']},
+  {kpi:'KPI3',current_state:3,watch_condition:'<2',thesis_link:'Invalidates C',source_refs:['s3']}
+];
+adaptiveCioResult.outputs.node5.what_would_change_my_mind = ['KPI1 phá ngưỡng'];
+adaptiveCioResult.decision_record.ai_score = 70;
+adaptiveCioResult.decision_record.confidence = 76.25;
+adaptiveCioResult.decision_record.thesis_conviction = 'MEDIUM';
+adaptiveCioResult.decision_record.market_regime = 'RISK_OFF';
+adaptiveCioResult.decision_record.investment_horizon = '3-12M';
+
+const adaptedAdaptiveCio = adaptMemoResult(adaptiveCioResult);
+assert.equal(adaptedAdaptiveCio.thesisConviction.level, 'MEDIUM');
+assert.equal(adaptedAdaptiveCio.marketRegime.regime_state, 'RISK_OFF');
+assert.equal(adaptedAdaptiveCio.investmentHorizon.bucket, '3-12M');
+assert.equal(adaptedAdaptiveCio.riskAttribution.length, 1);
+assert.equal(adaptedAdaptiveCio.monitoringKpis.length, 3);
+
+
 
 const run = normalizeMemoRun({
   request: {
