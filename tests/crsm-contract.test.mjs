@@ -13,6 +13,11 @@ import {
   NODE3_VALUATION_METHODS_BY_SECTOR,
   NODE4_DRIVER_TYPES,
   NODE4_TRANSMISSION_TARGETS,
+  NODE5_AI_SCORE_WEIGHTS,
+  NODE5_CONVICTION_LEVELS,
+  NODE5_REGIME_STATES,
+  NODE5_RISK_OWNERS,
+  NODE5_HORIZONS,
   REQUIRED_RENDER_OUTPUT_KEYS,
   validateAnalysisItem,
   validateAnalysisRequest,
@@ -782,5 +787,189 @@ duplicatedMarketFlowInLegacyMacro.outputs.node4.macro_indicators = {
 const duplicatedMarketFlowInLegacyMacroCheck = validateAnalysisResult(duplicatedMarketFlowInLegacyMacro);
 assert.equal(duplicatedMarketFlowInLegacyMacroCheck.valid, false);
 assert.ok(duplicatedMarketFlowInLegacyMacroCheck.errors.some(error => error.includes('macro_indicators must not duplicate Node2')));
+
+
+assert.deepEqual(NODE5_AI_SCORE_WEIGHTS, {
+  fundamental:30, valuation:20, technical:15, flow:15, sector_macro:10, risk:10
+});
+assert.deepEqual(NODE5_CONVICTION_LEVELS, ['LOW','MEDIUM','HIGH']);
+assert.ok(NODE5_REGIME_STATES.includes('RISK_OFF'));
+assert.ok(NODE5_RISK_OWNERS.includes('SECTOR_MACRO'));
+assert.deepEqual(NODE5_HORIZONS, ['0-3M','3-12M','12M+']);
+
+function addAdaptiveCioSynthesis(result) {
+  const copy = structuredClone(result);
+  copy.outputs.node3.expectation_basis = [{
+    topic: 'Tăng trưởng lợi nhuận',
+    statement: 'Định giá hiện tại hàm ý tăng trưởng lợi nhuận khoảng 12%.',
+    expectation_basis: 'VALUATION_IMPLIED',
+    expected_value: 12,
+    expected_unit: '%',
+    analyst_view: 16,
+    gap_direction: 'ABOVE',
+    source_refs: ['valuation-implied-ref'],
+    as_of: '2026-10-04',
+    inference_label: 'INFERENCE',
+    investment_implication: 'Nếu tăng trưởng đạt 16%, dư địa định giá có thể mở rộng.'
+  }];
+
+  const n5 = copy.outputs.node5;
+  n5.ai_score.value = 70;
+  n5.confidence = {
+    value: 75.4,
+    method: 'EVIDENCE_QUALITY_V1',
+    components: {
+      data_completeness: 80,
+      source_quality: 85,
+      freshness: 75,
+      cross_source_consistency: 70,
+      method_suitability: 80,
+      key_uncertainty_coverage: 55
+    }
+  };
+  n5.thesis_conviction = {
+    level: 'MEDIUM',
+    rationale: 'Dữ liệu cốt lõi khá tốt nhưng còn một số bất định về catalyst và kỳ vọng định giá.',
+    expectation_basis_refs: [0],
+    supporting_evidence_refs: ['node1-fundamental','node3-valuation'],
+    contradictory_evidence_refs: ['node2-market-flow'],
+    catalyst_visibility: 'MEDIUM',
+    payoff_asymmetry: 'POSITIVE'
+  };
+  n5.decision_overlay = {
+    market_regime: {
+      regime_state: 'RISK_OFF',
+      evidence_refs: ['NODE2.market_context:breadth','NODE2.market_context:market_foreign_flow']
+    },
+    timing_effect: 'WAIT_FOR_ENTRY',
+    sizing_effect: 'REDUCE',
+    decision_effect: 'OVERRIDE',
+    pre_overlay_decision: 'BUY',
+    post_overlay_decision: 'HOLD',
+    override_rationale: 'Độ rộng và dòng vốn thị trường yếu làm giảm chất lượng điểm vào dù AI Score không đổi.',
+    ai_score_effect: 'NONE',
+    ai_score_reference: 70
+  };
+  n5.decision = 'HOLD';
+  n5.risk_attribution = [
+    {
+      driver: 'Chất lượng tài sản xấu đi',
+      primary_owner: 'FUNDAMENTAL',
+      residual_risk_effect: 'HIGH',
+      risk_score_treatment: 'RESIDUAL_TAIL_PENALTY',
+      rationale: 'Expected-case đã nằm ở Fundamental; Risk chỉ phản ánh tail loss nếu nợ xấu tăng mạnh hơn kịch bản cơ sở.',
+      evidence_refs: ['asset-quality-ref']
+    },
+    {
+      driver: 'Thanh khoản giao dịch thấp',
+      primary_owner: 'RISK',
+      residual_risk_effect: 'MEDIUM',
+      risk_score_treatment: 'PRIMARY_RISK_PENALTY',
+      rationale: 'Đây là fragility của khả năng thoát vị thế hơn là expected-case earnings driver.',
+      evidence_refs: ['liquidity-ref']
+    }
+  ];
+  n5.investment_horizon = {
+    bucket: '3-12M',
+    rationale: 'Catalyst chính cần vài quý để phản ánh vào lợi nhuận và định giá.'
+  };
+  n5.anti_thesis = 'NIM không phục hồi và credit cost tăng khiến ROE thấp hơn kỳ vọng trong nhiều quý.';
+  n5.variant_view = {
+    summary: 'Tăng trưởng lợi nhuận có thể cao hơn mức hàm ý trong định giá hiện tại.',
+    expectation_basis_refs: [0],
+    why_different: 'Biên lãi và chất lượng tài sản có khả năng cải thiện nhanh hơn mức giá đang phản ánh.',
+    payoff_if_right: 'ROE cải thiện có thể kéo P/B hợp lý lên cao hơn.',
+    what_proves_wrong: 'NIM giảm tiếp hoặc credit cost tăng vượt kế hoạch.'
+  };
+  n5.monitoring_kpis = [
+    {kpi:'NIM',current_state:'3.1%',watch_condition:'Dưới 3.0%',thesis_link:'Làm suy yếu luận điểm phục hồi biên lãi.',source_refs:['q3-filing']},
+    {kpi:'Credit cost',current_state:'1.0%',watch_condition:'Trên 1.4%',thesis_link:'Cho thấy chất lượng tài sản xấu hơn kỳ vọng.',source_refs:['q3-filing']},
+    {kpi:'Loan growth',current_state:'10%',watch_condition:'Dưới 8%',thesis_link:'Giảm động lực tăng trưởng thu nhập lãi.',source_refs:['q3-filing']}
+  ];
+  n5.what_would_change_my_mind = [
+    'NIM giảm dưới 3.0% trong hai quý liên tiếp.',
+    'Credit cost vượt 1.4% mà không có dấu hiệu tạo đỉnh.'
+  ];
+
+  copy.decision_record.ai_score = 70;
+  copy.decision_record.confidence = 75.4;
+  copy.decision_record.decision = 'HOLD';
+  copy.decision_record.thesis_conviction = 'MEDIUM';
+  copy.decision_record.market_regime = 'RISK_OFF';
+  copy.decision_record.investment_horizon = '3-12M';
+  return copy;
+}
+
+const adaptiveCio = addAdaptiveCioSynthesis(screened.result);
+assert.equal(validateAnalysisResult(adaptiveCio).valid, true);
+
+const changedAiScoreFormula = structuredClone(adaptiveCio);
+changedAiScoreFormula.outputs.node5.ai_score.value = 75;
+changedAiScoreFormula.decision_record.ai_score = 75;
+const changedAiScoreFormulaCheck = validateAnalysisResult(changedAiScoreFormula);
+assert.equal(changedAiScoreFormulaCheck.valid, false);
+assert.ok(changedAiScoreFormulaCheck.errors.some(error => error.includes('fixed six-factor AI Score formula')));
+
+const badEvidenceConfidence = structuredClone(adaptiveCio);
+badEvidenceConfidence.outputs.node5.confidence.value = 82;
+badEvidenceConfidence.decision_record.confidence = 82;
+const badEvidenceConfidenceCheck = validateAnalysisResult(badEvidenceConfidence);
+assert.equal(badEvidenceConfidenceCheck.valid, false);
+assert.ok(badEvidenceConfidenceCheck.errors.some(error => error.includes('fixed weighted evidence-quality formula')));
+
+const partialAdaptiveCio = structuredClone(adaptiveCio);
+delete partialAdaptiveCio.outputs.node5.risk_attribution;
+const partialAdaptiveCioCheck = validateAnalysisResult(partialAdaptiveCio);
+assert.equal(partialAdaptiveCioCheck.valid, false);
+assert.ok(partialAdaptiveCioCheck.errors.some(error => error.includes('adaptive CIO synthesis missing field: risk_attribution')));
+
+const overlayMutatesScore = structuredClone(adaptiveCio);
+overlayMutatesScore.outputs.node5.decision_overlay.ai_score_effect = 'REDUCE';
+const overlayMutatesScoreCheck = validateAnalysisResult(overlayMutatesScore);
+assert.equal(overlayMutatesScoreCheck.valid, false);
+assert.ok(overlayMutatesScoreCheck.errors.some(error => error.includes('ai_score_effect must equal NONE')));
+
+const silentDecisionOverride = structuredClone(adaptiveCio);
+silentDecisionOverride.outputs.node5.decision_overlay.decision_effect = 'NONE';
+const silentDecisionOverrideCheck = validateAnalysisResult(silentDecisionOverride);
+assert.equal(silentDecisionOverrideCheck.valid, false);
+assert.ok(silentDecisionOverrideCheck.errors.some(error => error.includes('decision enum may change only')));
+
+const overlayWithoutEvidence = structuredClone(adaptiveCio);
+overlayWithoutEvidence.outputs.node5.decision_overlay.market_regime.evidence_refs = [];
+const overlayWithoutEvidenceCheck = validateAnalysisResult(overlayWithoutEvidence);
+assert.equal(overlayWithoutEvidenceCheck.valid, false);
+assert.ok(overlayWithoutEvidenceCheck.errors.some(error => error.includes('effects require market_regime evidence_refs')));
+
+const duplicateExpectedCasePenalty = structuredClone(adaptiveCio);
+duplicateExpectedCasePenalty.outputs.node5.risk_attribution[0].residual_risk_effect = 'NONE';
+duplicateExpectedCasePenalty.outputs.node5.risk_attribution[0].risk_score_treatment = 'RESIDUAL_TAIL_PENALTY';
+const duplicateExpectedCasePenaltyCheck = validateAnalysisResult(duplicateExpectedCasePenalty);
+assert.equal(duplicateExpectedCasePenaltyCheck.valid, false);
+assert.ok(duplicateExpectedCasePenaltyCheck.errors.some(error => error.includes('NO_ADDITIONAL_PENALTY')));
+
+const wrongPrimaryRiskTreatment = structuredClone(adaptiveCio);
+wrongPrimaryRiskTreatment.outputs.node5.risk_attribution[1].risk_score_treatment = 'RESIDUAL_TAIL_PENALTY';
+const wrongPrimaryRiskTreatmentCheck = validateAnalysisResult(wrongPrimaryRiskTreatment);
+assert.equal(wrongPrimaryRiskTreatmentCheck.valid, false);
+assert.ok(wrongPrimaryRiskTreatmentCheck.errors.some(error => error.includes('PRIMARY_RISK_PENALTY')));
+
+const tooFewMonitoringKpis = structuredClone(adaptiveCio);
+tooFewMonitoringKpis.outputs.node5.monitoring_kpis = tooFewMonitoringKpis.outputs.node5.monitoring_kpis.slice(0,2);
+const tooFewMonitoringKpisCheck = validateAnalysisResult(tooFewMonitoringKpis);
+assert.equal(tooFewMonitoringKpisCheck.valid, false);
+assert.ok(tooFewMonitoringKpisCheck.errors.some(error => error.includes('3 to 5 entries')));
+
+const badExpectationRef = structuredClone(adaptiveCio);
+badExpectationRef.outputs.node5.thesis_conviction.expectation_basis_refs = [99];
+const badExpectationRefCheck = validateAnalysisResult(badExpectationRef);
+assert.equal(badExpectationRefCheck.valid, false);
+assert.ok(badExpectationRefCheck.errors.some(error => error.includes('existing Node3 expectation_basis')));
+
+const decisionRecordConvictionMismatch = structuredClone(adaptiveCio);
+decisionRecordConvictionMismatch.decision_record.thesis_conviction = 'HIGH';
+const decisionRecordConvictionMismatchCheck = validateAnalysisResult(decisionRecordConvictionMismatch);
+assert.equal(decisionRecordConvictionMismatchCheck.valid, false);
+assert.ok(decisionRecordConvictionMismatchCheck.errors.some(error => error.includes('decision_record.thesis_conviction')));
 
 console.log('CRSM migration contract tests passed.');
