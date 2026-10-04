@@ -900,7 +900,7 @@ function addAdaptiveCioSynthesis(result) {
   return copy;
 }
 
-const adaptiveCio = addAdaptiveCioSynthesis(screened.result);
+const adaptiveCio = addAdaptiveCioSynthesis(riskOnMarketContext);
 assert.equal(validateAnalysisResult(adaptiveCio).valid, true);
 
 const changedAiScoreFormula = structuredClone(adaptiveCio);
