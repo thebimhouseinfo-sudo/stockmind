@@ -40,7 +40,7 @@ Use these fixed component weights:
 - `method_suitability`: 15%
 - `key_uncertainty_coverage`: 10%
 
-`confidence.value` is the weighted result when all components are numeric. Legacy confidence remains readable.
+`confidence.value` is the weighted result when all components are numeric **for adaptive CP5 CIO synthesis**. If any weighted component is unavailable in an adaptive CP5 result, `confidence.value` is null. Immutable pre-CP5 results that already carry `method: EVIDENCE_QUALITY_V1` remain readable under their earlier range/shape semantics; do not retroactively recompute or reject them.
 
 ## Thesis conviction
 
