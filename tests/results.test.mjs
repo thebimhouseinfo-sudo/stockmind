@@ -48,7 +48,7 @@ newProfileResult.outputs.node2.ohlcv_source = {
 };
 newProfileResult.outputs.node2.sma_200_rel = null;
 newProfileResult.outputs.node5.confidence = {
-  value: 75.5,
+  value: 74,
   method: 'EVIDENCE_QUALITY_V1',
   components: {
     data_completeness: 72,
