@@ -972,4 +972,59 @@ const decisionRecordConvictionMismatchCheck = validateAnalysisResult(decisionRec
 assert.equal(decisionRecordConvictionMismatchCheck.valid, false);
 assert.ok(decisionRecordConvictionMismatchCheck.errors.some(error => error.includes('decision_record.thesis_conviction')));
 
+
+const adaptiveMissingFactor = structuredClone(adaptiveCio);
+adaptiveMissingFactor.outputs.node5.scores.technical = null;
+adaptiveMissingFactor.outputs.node5.ai_score.value = 70;
+adaptiveMissingFactor.outputs.node5.decision_overlay.ai_score_reference = 70;
+adaptiveMissingFactor.decision_record.ai_score = 70;
+const adaptiveMissingFactorCheck = validateAnalysisResult(adaptiveMissingFactor);
+assert.equal(adaptiveMissingFactorCheck.valid, false);
+assert.ok(adaptiveMissingFactorCheck.errors.some(error => error.includes('ai_score.value must be null when any six-factor score is unavailable')));
+
+const adaptiveMissingFactorHonest = structuredClone(adaptiveCio);
+adaptiveMissingFactorHonest.outputs.node5.scores.technical = null;
+adaptiveMissingFactorHonest.outputs.node5.ai_score.value = null;
+adaptiveMissingFactorHonest.outputs.node5.decision_overlay.ai_score_reference = null;
+adaptiveMissingFactorHonest.decision_record.ai_score = null;
+assert.equal(validateAnalysisResult(adaptiveMissingFactorHonest).valid, true);
+
+const incompleteEvidenceWithFalsePrecision = structuredClone(evidenceQualityConfidence);
+incompleteEvidenceWithFalsePrecision.outputs.node5.confidence.components.freshness = null;
+incompleteEvidenceWithFalsePrecision.outputs.node5.confidence.value = 75;
+const incompleteEvidenceWithFalsePrecisionCheck = validateAnalysisResult(incompleteEvidenceWithFalsePrecision);
+assert.equal(incompleteEvidenceWithFalsePrecisionCheck.valid, false);
+assert.ok(incompleteEvidenceWithFalsePrecisionCheck.errors.some(error => error.includes('confidence.value must be null when any weighted component is unavailable')));
+
+const convictionWithoutSupport = structuredClone(adaptiveCio);
+convictionWithoutSupport.outputs.node5.thesis_conviction.supporting_evidence_refs = [];
+const convictionWithoutSupportCheck = validateAnalysisResult(convictionWithoutSupport);
+assert.equal(convictionWithoutSupportCheck.valid, false);
+assert.ok(convictionWithoutSupportCheck.errors.some(error => error.includes('supporting_evidence_refs must be non-empty')));
+
+const convictionIgnoresAvailableExpectation = structuredClone(adaptiveCio);
+convictionIgnoresAvailableExpectation.outputs.node5.thesis_conviction.expectation_basis_refs = [];
+const convictionIgnoresAvailableExpectationCheck = validateAnalysisResult(convictionIgnoresAvailableExpectation);
+assert.equal(convictionIgnoresAvailableExpectationCheck.valid, false);
+assert.ok(convictionIgnoresAvailableExpectationCheck.errors.some(error => error.includes('must reference at least one Node3 expectation_basis')));
+
+const overlayCitesMissingNode2Capability = structuredClone(adaptiveCio);
+overlayCitesMissingNode2Capability.outputs.node2.market_context = structuredClone(degradedMarketContext.outputs.node2.market_context);
+overlayCitesMissingNode2Capability.outputs.node5.decision_overlay.market_regime.evidence_refs = ['NODE2.market_context:market_foreign_flow'];
+const overlayCitesMissingNode2CapabilityCheck = validateAnalysisResult(overlayCitesMissingNode2Capability);
+assert.equal(overlayCitesMissingNode2CapabilityCheck.valid, false);
+assert.ok(overlayCitesMissingNode2CapabilityCheck.errors.some(error => error.includes('cannot cite unavailable Node2 market capability')));
+
+const unexplainedRiskScore = structuredClone(adaptiveCio);
+unexplainedRiskScore.outputs.node5.risk_attribution = [];
+const unexplainedRiskScoreCheck = validateAnalysisResult(unexplainedRiskScore);
+assert.equal(unexplainedRiskScoreCheck.valid, false);
+assert.ok(unexplainedRiskScoreCheck.errors.some(error => error.includes('must explain a non-maximal Risk score')));
+
+const decisionRecordMissingAdaptiveScore = structuredClone(adaptiveCio);
+decisionRecordMissingAdaptiveScore.decision_record.ai_score = null;
+const decisionRecordMissingAdaptiveScoreCheck = validateAnalysisResult(decisionRecordMissingAdaptiveScore);
+assert.equal(decisionRecordMissingAdaptiveScoreCheck.valid, false);
+assert.ok(decisionRecordMissingAdaptiveScoreCheck.errors.some(error => error.includes('decision_record.ai_score must be numeric')));
+
 console.log('CRSM migration contract tests passed.');
