@@ -453,7 +453,7 @@ Each factor remains 0–20 with the existing weights:
 - Fundamental: 30%
 - Valuation: 20%
 - Technical: 15%
-- Flow: 15%
+- Money Flow: 15% (machine key: `flow`)
 - Sector/Macro: 10%
 - Risk: 10%
 
