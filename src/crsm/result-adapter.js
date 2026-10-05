@@ -252,7 +252,7 @@ function buildDeterministicDetailReport(result) {
     `- **Điểm AI:** ${md(d.ai_score)}/100 — giữ nguyên công thức sáu yếu tố CRSM.`,
     `- **Độ tin cậy bằng chứng:** ${percentMd(d.confidence)}`,
     `- **Độ thuyết phục luận điểm:** ${md(n5.thesis_conviction?.level ?? d.thesis_conviction)} — ${md(n5.thesis_conviction?.rationale)}`,
-    `- **Chế độ thị trường / overlay:** ${md(n5.decision_overlay?.market_regime?.regime_state ?? d.market_regime)}; timing = ${md(n5.decision_overlay?.timing_effect)}; sizing = ${md(n5.decision_overlay?.sizing_effect)}.`,
+    `- **Chế độ thị trường / lớp điều chỉnh:** ${md(n5.decision_overlay?.market_regime?.regime_state ?? d.market_regime)}; thời điểm = ${md(n5.decision_overlay?.timing_effect)}; quy mô = ${md(n5.decision_overlay?.sizing_effect)}.`,
     `- **Khung đầu tư:** ${md(n5.investment_horizon?.bucket ?? d.investment_horizon)} — ${md(n5.investment_horizon?.rationale)}`,
     '',
     mdParagraph('Luận điểm chính', n5.full_reasoning),
@@ -263,7 +263,7 @@ function buildDeterministicDetailReport(result) {
     '## 2. Luận điểm, kỳ vọng & quan điểm khác biệt',
     mdParagraph('Quan điểm khác biệt', n5.variant_view?.summary),
     mdParagraph('Vì sao khác kỳ vọng tham chiếu', n5.variant_view?.why_different),
-    mdParagraph('Payoff nếu đúng', n5.variant_view?.payoff_if_right),
+    mdParagraph('Kết quả nếu đúng', n5.variant_view?.payoff_if_right),
     mdParagraph('Điều gì chứng minh luận điểm sai', n5.variant_view?.what_proves_wrong),
     expectationTable(n3.expectation_basis),
     '',
@@ -279,9 +279,9 @@ function buildDeterministicDetailReport(result) {
     valuationMethodsTable(n3.sector_economics?.valuation_method_selection),
     scenarioTable(n4.risk_scenarios),
     '',
-    '## 5. Bối cảnh thị trường Việt Nam & timing',
+    '## 5. Bối cảnh thị trường Việt Nam & thời điểm',
     marketContextBlock(n2.market_context, n2),
-    mdParagraph('Hàm ý timing', joinParts([
+    mdParagraph('Hàm ý về thời điểm', joinParts([
       n5.decision_overlay?.override_rationale,
       n2.conclusion
     ])),
@@ -364,9 +364,9 @@ function valuationMethodsTable(items) {
 }
 
 function whatChangedTable(items) {
-  if (!Array.isArray(items) || !items.length) return '_Không có external-driver delta đủ bằng chứng để trình bày._';
+  if (!Array.isArray(items) || !items.length) return '_Không có thay đổi tác nhân bên ngoài đủ bằng chứng để trình bày._';
   return markdownTable(
-    ['Driver','Exposure','Prior → Current','Chiều','Mức độ','Lag','Cơ chế/hàm ý','Nguồn'],
+    ['Tác nhân','Mức độ phơi nhiễm','Trước → Hiện tại','Chiều','Mức độ','Độ trễ','Cơ chế/hàm ý','Nguồn'],
     items.map(item => [
       item.driver,
       item.exposure,
@@ -381,7 +381,7 @@ function whatChangedTable(items) {
 }
 
 function riskAttributionTable(items) {
-  if (!Array.isArray(items) || !items.length) return '_Chưa có bảng residual-risk attribution._';
+  if (!Array.isArray(items) || !items.length) return '_Chưa có bảng phân bổ rủi ro còn lại._';
   return markdownTable(
     ['Yếu tố rủi ro','Chủ sở hữu chính','Rủi ro còn lại','Cách xử lý trong điểm Risk','Lý do','Nguồn'],
     items.map(item => [item.driver,item.primary_owner,item.residual_risk_effect,item.risk_score_treatment,item.rationale,refsText(item.evidence_refs)])
@@ -389,16 +389,16 @@ function riskAttributionTable(items) {
 }
 
 function monitoringTable(items) {
-  if (!Array.isArray(items) || !items.length) return '_Chưa có monitoring KPI canonical._';
+  if (!Array.isArray(items) || !items.length) return '_Chưa có KPI theo dõi canonical._';
   return markdownTable(
-    ['KPI','Hiện tại','Điều kiện theo dõi','Liên kết với thesis','Nguồn'],
+    ['KPI','Hiện tại','Điều kiện theo dõi','Liên kết với luận điểm','Nguồn'],
     items.map(item => [item.kpi,item.current_state,item.watch_condition,item.thesis_link,refsText(item.source_refs)])
   );
 }
 
 function marketContextBlock(context, node2) {
   if (!context || typeof context !== 'object') {
-    return mdParagraph('Market context', joinParts([node2?.sector_vs_market, node2?.conclusion]));
+    return mdParagraph('Bối cảnh thị trường', joinParts([node2?.sector_vs_market, node2?.conclusion]));
   }
   const vn = context.benchmarks?.vnindex || {};
   const secondary = Array.isArray(context.benchmarks?.secondary) ? context.benchmarks.secondary[0] : null;
@@ -406,24 +406,24 @@ function marketContextBlock(context, node2) {
   const coverage = context.coverage || {};
   return [
     `- **VN-Index:** ${md(vn.performance_pct)} trong ${md(vn.period)}; xu hướng ${md(vn.trend)}.`,
-    `- **Benchmark phụ:** ${secondary ? md(secondary.name) + ' ' + md(secondary.performance_pct) + ' (' + md(secondary.period) + ')' : 'Chưa có dữ liệu'}.`,
+    `- **Chuẩn so sánh phụ:** ${secondary ? md(secondary.name) + ' ' + md(secondary.performance_pct) + ' (' + md(secondary.period) + ')' : 'Chưa có dữ liệu'}.`,
     `- **Độ rộng:** ${humanizeMd(context.breadth)}`,
     `- **Thanh khoản thị trường:** ${humanizeMd(context.turnover_liquidity)}`,
     `- **Luân chuyển dẫn dắt:** ${humanizeMd(context.leadership_rotation)}`,
     `- **Khối ngoại toàn thị trường:** ${humanizeMd(context.market_foreign_flow)}`,
     `- **Sức mạnh tương đối cổ phiếu:** ${humanizeMd(relative)}`,
-    `- **Coverage:** ${md(coverage.status)}; thiếu: ${refsText(coverage.missing_capabilities)}.`
+    `- **Mức độ bao phủ dữ liệu:** ${md(coverage.status)}; còn thiếu: ${refsText(coverage.missing_capabilities)}.`
   ].join('\n');
 }
 
 function sectorEconomicsBlock(economics, materialQuestions) {
   const parts = [];
   if (economics && typeof economics === 'object') {
-    parts.push(mdParagraph('Sector profile', economics.sector_profile));
-    parts.push(mdParagraph('Earnings bridge', humanizeMd(economics.earnings_bridge)));
-    parts.push(mdParagraph('Normalized earnings', humanizeMd(economics.normalized_earnings)));
-    parts.push(mdParagraph('Capital allocation', humanizeMd(economics.capital_allocation)));
-    parts.push(mdParagraph('Balance-sheet capacity', humanizeMd(economics.balance_sheet_capacity)));
+    parts.push(mdParagraph('Hồ sơ ngành', economics.sector_profile));
+    parts.push(mdParagraph('Cầu nối lợi nhuận', humanizeMd(economics.earnings_bridge)));
+    parts.push(mdParagraph('Lợi nhuận chuẩn hóa', humanizeMd(economics.normalized_earnings)));
+    parts.push(mdParagraph('Phân bổ vốn', humanizeMd(economics.capital_allocation)));
+    parts.push(mdParagraph('Sức chịu đựng bảng cân đối', humanizeMd(economics.balance_sheet_capacity)));
   }
   if (Array.isArray(materialQuestions) && materialQuestions.length) {
     parts.push(markdownTable(
@@ -431,7 +431,7 @@ function sectorEconomicsBlock(economics, materialQuestions) {
       materialQuestions.map(item => [item.question,item.status,item.answer,item.why_material,refsText(item.source_refs)])
     ));
   }
-  return parts.filter(Boolean).join('\n\n') || '_Chưa có sector-economics detail._';
+  return parts.filter(Boolean).join('\n\n') || '_Chưa có phân tích kinh tế ngành chi tiết._';
 }
 
 function scenarioTable(value) {
