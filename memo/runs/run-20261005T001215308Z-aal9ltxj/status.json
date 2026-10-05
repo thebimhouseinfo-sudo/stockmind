@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261005T001215308Z-aal9ltxj",
-  "state": "PROCESSING",
+  "state": "READY",
   "created_at": "2026-10-05T00:12:16.830Z",
-  "updated_at": "2026-10-05T00:36:00.000Z",
+  "updated_at": "2026-10-05T00:38:00.000Z",
   "items": [
     {
       "item_id": "item-b71852ce-8619-49fc-b4b1-c91336d185f6",
@@ -86,12 +86,12 @@
       "item_id": "item-94777517-af31-41fd-9730-a6097523af1b",
       "ticker": "HII",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261005T001215308Z-aal9ltxj/results/HII.json",
       "started_at": "2026-10-05T00:36:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-05T00:36:00.000Z"
+      "completed_at": "2026-10-05T00:38:00.000Z",
+      "updated_at": "2026-10-05T00:38:00.000Z"
     },
     {
       "item_id": "item-6a1ab1f2-d0b5-499b-8dbe-027c80456662",
