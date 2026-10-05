@@ -568,46 +568,70 @@ Legacy immutable results may still contain `outputs.node6a`; it is compatibility
 
 ---
 
-## Stage 5B — Node 6B: Detail Markdown
+## Stage 5B — Node 6B: Deep Detail Markdown
 
-Role: senior equity research writer who communicates the Node 1–5 synthesis, not a new scoring node.
+Role: senior buy-side research writer who communicates the completed Node 1–5 synthesis. Node 6B is not a new scoring node and is not a text clone of Node 6A.
 
-### Depth and writing standard
+### Purpose
 
-The report must read like a serious buy-side research note, not a schema dump. Each major section should connect **evidence → interpretation → investment implication**. Prioritize materiality: explain which 3–5 variables actually matter to the stock and why. Surface contradictions rather than smoothing them away. Distinguish company alpha from market/sector beta. State what appears priced in, what is not obviously priced in, and what catalyst could close that gap.
+Node 6A is the fast visual scan. Node 6B is the detailed investment memo. It uses the same canonical evidence/decision but must add:
+- cross-node synthesis;
+- expectation gap and variant-view reasoning;
+- company-specific causal transmission;
+- contradictions and unresolved uncertainty;
+- valuation asymmetry;
+- residual-risk ownership;
+- monitoring KPIs and explicit change-my-mind conditions.
 
-Do not pad the report with generic macro definitions, boilerplate risk language, or duplicated bullet points. A strong report should contain differentiated reasoning that would still be useful to a knowledgeable investor who already knows the headline financial figures.
+A report that simply converts the visual cards into Markdown is not acceptable.
 
-Language: natural Vietnamese throughout, except unavoidable proper nouns and standard finance abbreviations. Never emit alternating English/Vietnamese headings or untranslated template labels.
+### Adaptive structure
 
-Mandatory report source: `references/NODE6B-FULL-REPORT.md`. Follow its detailed Word-ready structure and tables. A condensed executive summary is not a valid Node 6B output.
+Mandatory report source: `references/NODE6B-FULL-REPORT.md`.
 
-Input: same completed Node1–5 outputs.
+Use its semantic core rather than a fixed checklist/table count:
+1. CIO summary & decision.
+2. Investment thesis, expectation gap & variant view.
+3. Business quality & earnings drivers.
+4. Valuation & asymmetry.
+5. Vietnam market context & timing.
+6. External drivers & causal transmission.
+7. Risks, anti-thesis & residual-risk ownership.
+8. Position strategy & risk control.
+9. Monitoring dashboard / what changes the decision.
+10. Sources & data limitations.
 
-Vietnamese structure:
-1. Quyết định đầu tư
-2. Screening Snapshot only for SCREENED_WEB, as contextual source—not score comparison
-3. Tín hiệu tổng hợp
-4. Vĩ mô & Ngành
-5. Doanh nghiệp & Chất lượng lợi nhuận
-6. Định giá & So sánh peer
-7. Kỹ thuật & Dòng tiền
-8. Rủi ro
-9. Phân tích nhân quả FACT / INFERENCE / ASSUMPTION
-10. Kịch bản
-11. Chiến lược giao dịch & Quản trị vị thế
-12. Nguồn dữ liệu
+Add Screening, peer, technical/VSA, forensics, DCF, policy, project-pipeline, commodity, bank, real-estate, utilities or geopolitical modules only when material and evidenced.
 
-For non-screened modes, omit the Screening Snapshot section and renumber naturally.
+### Depth standard
 
-Requirements:
-- Markdown only;
+Each material section should connect:
+
+`evidence → interpretation → mechanism → expectation gap → investment implication → monitoring trigger`
+
+Do not repeat the same fact across sections without adding a new implication. Explain alpha vs sector/market beta. State contradictions instead of smoothing them into one clean narrative.
+
+### Canonical ownership
+
+- Node 5 / decision_record owns decision, AI Score, confidence and trade levels.
+- Node 3 owns expectation provenance and valuation method selection.
+- Node 2 owns market-internal measurements.
+- Node 4 owns external-driver causal interpretation.
+- Node 6B synthesizes; it does not remeasure/recompute those authorities.
+
+### Writing requirements
+
+- Markdown only.
+- Vietnamese-first natural prose.
 - no unresolved placeholders;
-- upstream null => `Chưa có dữ liệu`;
-- real tables for peers, sensitivity and sources;
-- every quantitative claim anchored in upstream data;
-- one short personal-use disclaimer at end;
-- do not compute new score/decision/comparison in Node 6B.
+- upstream missing values remain unavailable; omit immaterial missing modules rather than filling pages with `Chưa có dữ liệu`;
+- quantitative claims retain source/period when available;
+- no report-side score/decision recomputation;
+- one short personal-use disclaimer at the end.
+
+### Deterministic fallback
+
+If model-generated Node 6B is missing, malformed or too presentation-poor, the webapp may build a deterministic detailed fallback from canonical Node 1–5. That fallback must remain semantically deeper than the visual report and must not invent analysis.
 
 ---
 

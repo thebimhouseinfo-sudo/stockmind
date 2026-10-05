@@ -23,6 +23,9 @@ for (const fixture of [screened, evidence, webOnly]) {
   assert.match(adapted.visualReport, /BÁO CÁO PHÂN TÍCH CHUYÊN SÂU/);
   assert.match(adapted.visualReport, new RegExp(fixture.result.ticker));
   assert.match(adapted.visualReport, new RegExp(String(fixture.result.outputs.node5.ai_score.value)));
+  assert.match(adapted.visualReport, /policy-row/);
+  assert.match(adapted.visualReport, /policy-value/);
+  assert.doesNotMatch(adapted.visualReport, /w-14 h-10 bg-red-50/);
   assert.doesNotMatch(adapted.visualReport, /Senior Equity Analyst|Key Insight|Volume Ratio|BULL CASE|BASE CASE|BEAR CASE|Target Price|Position Sizing/);
   assert.equal(adapted.detailReport, fixture.result.outputs.node6b);
   assert.equal(adapted.decisionRecord.ticker, fixture.result.ticker);
@@ -131,6 +134,19 @@ assert.equal(adaptedAdaptiveCio.marketRegime.regime_state, 'RISK_OFF');
 assert.equal(adaptedAdaptiveCio.investmentHorizon.bucket, '3-12M');
 assert.equal(adaptedAdaptiveCio.riskAttribution.length, 1);
 assert.equal(adaptedAdaptiveCio.monitoringKpis.length, 3);
+assert.match(adaptedAdaptiveCio.detailReport, /Phụ lục CIO & giám sát|Monitoring dashboard|Theo dõi/i);
+assert.match(adaptedAdaptiveCio.detailReport, /Kỳ vọng|expectation/i);
+assert.match(adaptedAdaptiveCio.detailReport, /Risk treatment|Residual|rủi ro/i);
+
+const missingNode6b = structuredClone(adaptiveCioResult);
+missingNode6b.outputs.node6b = null;
+const adaptedMissingNode6b = adaptMemoResult(missingNode6b);
+assert.match(adaptedMissingNode6b.detailReport, /## 1\. Tóm tắt CIO & quyết định đầu tư/);
+assert.match(adaptedMissingNode6b.detailReport, /## 2\. Luận điểm, kỳ vọng & quan điểm khác biệt/);
+assert.match(adaptedMissingNode6b.detailReport, /## 5\. Bối cảnh thị trường Việt Nam & thời điểm/);
+assert.match(adaptedMissingNode6b.detailReport, /## 9\. Bảng theo dõi/);
+assert.ok(adaptedMissingNode6b.detailReport.length > 2500, 'deterministic detail fallback should be materially deeper than a dashboard summary');
+
 
 
 

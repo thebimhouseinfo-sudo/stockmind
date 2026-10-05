@@ -140,7 +140,13 @@ assert.match(methodologyRef, /Mandatory language-normalization stage/);
 assert.match(methodologyRef, /renderer will translate analytical prose/i);
 assert.match(resultContract, /mandatory Vietnamese normalization pass/i);
 assert.match(node6bReport, /QUALITY BAR/);
-assert.match(node6bReport, /Vietnamese throughout|Vietnamese/i);
+assert.match(node6bReport, /Vietnamese throughout|Vietnamese-first|Vietnamese/i);
+assert.match(node6bReport, /ADAPTIVE SEMANTIC CORE/);
+assert.match(node6bReport, /analytically deeper than Node 6A visual output/i);
+assert.match(node6bReport, /Do not copy the visual card order 1:1/i);
+assert.match(node6bReport, /Monitoring dashboard/);
+assert.match(node6bReport, /residual-risk ownership/i);
+assert.doesNotMatch(node6bReport, /at least 3 Markdown tables|fewer than 3 Markdown tables/i);
 assert.match(node6aTemplate, /OUTPUT BOUNDARY/);
 assert.doesNotMatch(node6aTemplate, /FINAL EXECUTION RULE/);
 
