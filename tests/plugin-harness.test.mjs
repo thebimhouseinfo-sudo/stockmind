@@ -146,7 +146,7 @@ assert.match(node6bReport, /analytically deeper than Node 6A visual output/i);
 assert.match(node6bReport, /Do not copy the visual card order 1:1/i);
 assert.match(node6bReport, /Monitoring dashboard/);
 assert.match(node6bReport, /residual-risk ownership/i);
-assert.doesNotMatch(node6bReport, /fixed table count/i);
+assert.doesNotMatch(node6bReport, /at least 3 Markdown tables|fewer than 3 Markdown tables/i);
 assert.match(node6aTemplate, /OUTPUT BOUNDARY/);
 assert.doesNotMatch(node6aTemplate, /FINAL EXECUTION RULE/);
 
