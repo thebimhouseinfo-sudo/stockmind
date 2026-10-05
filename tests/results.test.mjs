@@ -143,8 +143,8 @@ missingNode6b.outputs.node6b = null;
 const adaptedMissingNode6b = adaptMemoResult(missingNode6b);
 assert.match(adaptedMissingNode6b.detailReport, /## 1\. Tóm tắt CIO & quyết định đầu tư/);
 assert.match(adaptedMissingNode6b.detailReport, /## 2\. Luận điểm, kỳ vọng & quan điểm khác biệt/);
-assert.match(adaptedMissingNode6b.detailReport, /## 5\. Bối cảnh thị trường Việt Nam & timing/);
-assert.match(adaptedMissingNode6b.detailReport, /## 9\. Monitoring dashboard/);
+assert.match(adaptedMissingNode6b.detailReport, /## 5\. Bối cảnh thị trường Việt Nam & thời điểm/);
+assert.match(adaptedMissingNode6b.detailReport, /## 9\. Bảng theo dõi/);
 assert.ok(adaptedMissingNode6b.detailReport.length > 2500, 'deterministic detail fallback should be materially deeper than a dashboard summary');
 
 
