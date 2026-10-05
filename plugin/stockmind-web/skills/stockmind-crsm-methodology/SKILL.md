@@ -188,6 +188,8 @@ Node 5 must use only decisions `BUY | HOLD | SELL | BUY ON DIP | WATCH`. Its six
 
 ## Result construction
 
+After Node 5 and the detailed Node 6B report are complete, build exactly one result. Node 6B is the **deep investment memo**, not a Markdown copy of Node 6A. It must follow `NODE6B-FULL-REPORT.md` and add synthesis/causal/expectation/monitoring depth beyond the visual renderer:
+
 After Node 5 and the detailed Node 6B report are complete, build exactly one result:
 
 ```json
