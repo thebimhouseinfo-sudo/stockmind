@@ -286,11 +286,11 @@ function buildDeterministicDetailReport(result) {
       n2.conclusion
     ])),
     '',
-    '## 6. External drivers & cơ chế truyền dẫn',
+    '## 6. Tác nhân bên ngoài & cơ chế truyền dẫn',
     whatChangedTable(n4.what_changed),
     mdParagraph('Kết luận vĩ mô/ngành', n4.conclusion ?? n4.company_impact),
     '',
-    '## 7. Rủi ro, phản luận & residual-risk ownership',
+    '## 7. Rủi ro, phản luận & phân bổ rủi ro còn lại',
     riskAttributionTable(n5.risk_attribution),
     mdParagraph('Thanh khoản', n5.liquidity_note),
     '',
@@ -303,7 +303,7 @@ function buildDeterministicDetailReport(result) {
     `- **Tỷ trọng tối đa:** ${md(n5.strategy?.max_portfolio_weight_pct)}`,
     mdParagraph('Kế hoạch giải ngân', humanizeMd(n5.strategy?.allocation_plan)),
     '',
-    '## 9. Monitoring dashboard — điều gì làm thay đổi quyết định',
+    '## 9. Bảng theo dõi — điều gì làm thay đổi quyết định',
     monitoringTable(n5.monitoring_kpis),
     changeMindList(n5.what_would_change_my_mind),
     '',
@@ -327,7 +327,7 @@ function buildDetailAppendix(result, flags) {
   const sections = ['## Phụ lục CIO & giám sát'];
 
   if (flags.needsExpectation) {
-    sections.push('### Kỳ vọng tham chiếu & variant view', expectationTable(n3.expectation_basis));
+    sections.push('### Kỳ vọng tham chiếu & quan điểm khác biệt', expectationTable(n3.expectation_basis));
   }
   if (flags.needsMarket) {
     sections.push('### Bối cảnh thị trường Việt Nam', marketContextBlock(n2.market_context, n2));
@@ -336,7 +336,7 @@ function buildDetailAppendix(result, flags) {
     sections.push('### Phân bổ rủi ro còn lại', riskAttributionTable(n5.risk_attribution));
   }
   if (flags.needsMonitoring) {
-    sections.push('### Monitoring dashboard', monitoringTable(n5.monitoring_kpis), changeMindList(n5.what_would_change_my_mind));
+    sections.push('### Bảng theo dõi quyết định', monitoringTable(n5.monitoring_kpis), changeMindList(n5.what_would_change_my_mind));
   }
   return sections.filter(Boolean).join('\n\n');
 }
@@ -383,7 +383,7 @@ function whatChangedTable(items) {
 function riskAttributionTable(items) {
   if (!Array.isArray(items) || !items.length) return '_Chưa có bảng residual-risk attribution._';
   return markdownTable(
-    ['Driver','Primary owner','Residual effect','Risk treatment','Rationale','Nguồn'],
+    ['Yếu tố rủi ro','Chủ sở hữu chính','Rủi ro còn lại','Cách xử lý trong điểm Risk','Lý do','Nguồn'],
     items.map(item => [item.driver,item.primary_owner,item.residual_risk_effect,item.risk_score_treatment,item.rationale,refsText(item.evidence_refs)])
   );
 }
@@ -489,13 +489,44 @@ function mdCell(value) {
   return md(value).replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>');
 }
 
+const DETAIL_KEY_LABELS = Object.freeze({
+  period: 'kỳ',
+  sector_perf_pct: 'hiệu suất ngành',
+  vnindex_perf_pct: 'hiệu suất VN-Index',
+  sector_strength_label: 'sức mạnh ngành',
+  performance_pct: 'hiệu suất',
+  trend: 'xu hướng',
+  advancers: 'số mã tăng',
+  decliners: 'số mã giảm',
+  unchanged: 'số mã đứng giá',
+  advance_decline_ratio: 'tỷ lệ tăng/giảm',
+  market_turnover_value: 'giá trị giao dịch',
+  change_vs_20d_pct: 'thay đổi so với 20 phiên',
+  leaders: 'nhóm dẫn dắt',
+  laggards: 'nhóm yếu',
+  net_value: 'giá trị ròng',
+  stock_perf_pct: 'hiệu suất cổ phiếu',
+  vs_vnindex_pct: 'chênh lệch so với VN-Index',
+  vs_secondary_benchmark_pct: 'chênh lệch so với benchmark phụ',
+  source: 'nguồn',
+  freshness: 'độ mới dữ liệu',
+  note: 'ghi chú',
+  status: 'trạng thái',
+  missing_capabilities: 'năng lực dữ liệu còn thiếu',
+  value: 'giá trị',
+  classification: 'phân loại',
+  rationale: 'lý do',
+  reason: 'lý do',
+  method: 'phương pháp'
+});
+
 function humanizeMd(value) {
   if (value == null || value === '') return 'Chưa có dữ liệu';
   if (Array.isArray(value)) return value.length ? value.map(humanizeMd).join('; ') : 'Chưa có dữ liệu';
   if (typeof value !== 'object') return md(value);
   const pairs = Object.entries(value)
     .filter(([, item]) => item != null && item !== '')
-    .map(([key, item]) => `${key.replace(/_/g, ' ')}: ${humanizeMd(item)}`);
+    .map(([key, item]) => `${DETAIL_KEY_LABELS[key] || key.replace(/_/g, ' ')}: ${humanizeMd(item)}`);
   return pairs.length ? pairs.join(' · ') : 'Chưa có dữ liệu';
 }
 
