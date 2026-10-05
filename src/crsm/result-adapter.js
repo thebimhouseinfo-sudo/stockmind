@@ -312,7 +312,7 @@ function buildDeterministicDetailReport(result) {
     mdParagraph('Giới hạn kỹ thuật', n2.technical_coverage?.note),
     mdParagraph('Giới hạn market context', n2.market_context?.coverage?.note),
     '',
-    '> Báo cáo chi tiết phục hồi deterministic từ dữ liệu CRSM canonical; không tạo thêm điểm số, quyết định hay số liệu ngoài Node 1–5.',
+    '> Đây là bản phục hồi deterministic chi tiết từ dữ liệu CRSM canonical; không tạo thêm điểm số, quyết định hay số liệu ngoài Node 1–5.',
     '',
     '*Báo cáo tự động, chỉ dùng tham khảo cá nhân.*'
   ];
