@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261005T001215308Z-aal9ltxj",
-  "state": "READY",
+  "state": "PROCESSING",
   "created_at": "2026-10-05T00:12:16.830Z",
-  "updated_at": "2026-10-05T00:38:00.000Z",
+  "updated_at": "2026-10-05T00:39:00.000Z",
   "items": [
     {
       "item_id": "item-b71852ce-8619-49fc-b4b1-c91336d185f6",
@@ -97,12 +97,12 @@
       "item_id": "item-6a1ab1f2-d0b5-499b-8dbe-027c80456662",
       "ticker": "VHM",
       "analysis_source": "SCREENED_WEB",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-10-05T00:39:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-05T00:12:16.830Z"
+      "updated_at": "2026-10-05T00:39:00.000Z"
     },
     {
       "item_id": "item-1218daf1-72c3-4b0a-bca0-c8392c948ffb",
