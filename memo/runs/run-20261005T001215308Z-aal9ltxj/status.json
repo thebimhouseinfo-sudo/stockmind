@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261005T001215308Z-aal9ltxj",
-  "state": "READY",
+  "state": "PROCESSING",
   "created_at": "2026-10-05T00:12:16.830Z",
-  "updated_at": "2026-10-05T00:19:00.000Z",
+  "updated_at": "2026-10-05T00:20:00.000Z",
   "items": [
     {
       "item_id": "item-b71852ce-8619-49fc-b4b1-c91336d185f6",
@@ -31,12 +31,12 @@
       "item_id": "item-d2bc0702-491a-47b6-98e6-737808ff140e",
       "ticker": "GMD",
       "analysis_source": "SCREENED_WEB",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-10-05T00:20:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-05T00:12:16.830Z"
+      "updated_at": "2026-10-05T00:20:00.000Z"
     },
     {
       "item_id": "item-661c52ac-eec6-4b0d-b5c2-d79b89101930",
