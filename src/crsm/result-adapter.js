@@ -206,13 +206,14 @@ function normalizeTicker(value) {
 
 function normalizeDetailReport(markdown, result) {
   const generated = typeof markdown === 'string' && markdown.trim()
-    ? markdown.trim()
+    ? markdown
     : buildDeterministicDetailReport(result);
   return ensureDetailDepth(generated, result);
 }
 
 function ensureDetailDepth(markdown, result) {
-  const text = String(markdown || '').trim();
+  const raw = String(markdown || '');
+  const text = raw.trim();
   if (!text) return buildDeterministicDetailReport(result);
 
   const needsExpectation = Array.isArray(result?.outputs?.node3?.expectation_basis)
@@ -227,10 +228,11 @@ function ensureDetailDepth(markdown, result) {
   const needsMarket = result?.outputs?.node2?.market_context
     && !/(vn-index|vnindex|bối cảnh thị trường việt nam|độ rộng thị trường|relative strength|sức mạnh tương đối)/i.test(text);
 
-  if (!needsExpectation && !needsRisk && !needsMonitoring && !needsMarket) return text;
+  if (!needsExpectation && !needsRisk && !needsMonitoring && !needsMarket) return raw;
 
   const appendix = buildDetailAppendix(result, { needsExpectation, needsRisk, needsMonitoring, needsMarket });
-  return appendix ? `${text}\n\n---\n\n${appendix}` : text;
+  const base = raw.replace(/\s*$/, '');
+  return appendix ? `${base}\n\n---\n\n${appendix}` : raw;
 }
 
 function buildDeterministicDetailReport(result) {
