@@ -1670,25 +1670,25 @@ function validateNode6BSemanticCore(markdown) {
 
 function validateNode6BPresentation(markdown) {
   const warnings = [];
-  const recommendedSections = [
-    '## 1. Quyết định đầu tư',
-    'Tín hiệu tổng hợp',
-    'Vĩ mô',
-    'Doanh nghiệp',
-    'Định giá',
-    'Kỹ thuật',
-    'Rủi ro',
-    'Phân tích nhân quả',
-    'Kịch bản',
-    'Chiến lược giao dịch',
-    'Nguồn dữ liệu'
+  const semanticSignals = [
+    ['decision', /quyết định đầu tư|tóm tắt cio/i],
+    ['thesis', /luận điểm|variant view|quan điểm khác biệt|kỳ vọng/i],
+    ['business', /doanh nghiệp|động lực lợi nhuận|chất lượng lợi nhuận/i],
+    ['valuation', /định giá|bất đối xứng/i],
+    ['market', /thị trường việt nam|vn-?index|timing/i],
+    ['risk', /rủi ro|phản luận|anti-thesis/i],
+    ['monitoring', /monitoring|theo dõi|thay đổi quan điểm/i],
+    ['sources', /nguồn|giới hạn dữ liệu/i]
   ];
-  for (const section of recommendedSections) {
-    if (!markdown.includes(section)) warnings.push('recommended full-report section missing: ' + section);
+  for (const [name, pattern] of semanticSignals) {
+    if (!pattern.test(markdown)) warnings.push('adaptive detail-report semantic module may be missing: ' + name);
   }
-  const tableSeparators = (markdown.match(/\|\s*---/g) || []).length;
-  if (tableSeparators < 3) {
-    warnings.push('full report has fewer than 3 Markdown tables; adaptive reports may omit immaterial modules');
+  const proseWords = markdown.replace(/[#|*_>\-]/g, ' ').split(/\s+/).filter(Boolean).length;
+  if (proseWords < 350) {
+    warnings.push('detail report is unusually short for a CIO memo; visual-card restatement may be too shallow');
+  }
+  if (/##\s*2\.\s*Screening Snapshot[\s\S]*##\s*3\.\s*Tín hiệu tổng hợp[\s\S]*##\s*4\.\s*Vĩ mô/i.test(markdown)) {
+    warnings.push('detail report appears to follow the old visual-like fixed checklist; adaptive semantic synthesis is preferred');
   }
   return warnings;
 }
