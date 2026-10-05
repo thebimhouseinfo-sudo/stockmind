@@ -1,9 +1,9 @@
 {
   "schema_version": "stockmind-memo.v1",
   "run_id": "run-20261005T001215308Z-aal9ltxj",
-  "state": "PROCESSING",
+  "state": "READY",
   "created_at": "2026-10-05T00:12:16.830Z",
-  "updated_at": "2026-10-05T00:23:00.000Z",
+  "updated_at": "2026-10-05T00:25:00.000Z",
   "items": [
     {
       "item_id": "item-b71852ce-8619-49fc-b4b1-c91336d185f6",
@@ -42,12 +42,12 @@
       "item_id": "item-661c52ac-eec6-4b0d-b5c2-d79b89101930",
       "ticker": "NTP",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261005T001215308Z-aal9ltxj/results/NTP.json",
       "started_at": "2026-10-05T00:23:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-05T00:23:00.000Z"
+      "completed_at": "2026-10-05T00:25:00.000Z",
+      "updated_at": "2026-10-05T00:25:00.000Z"
     },
     {
       "item_id": "item-3b7354c1-2e64-4543-8e0a-b040e3cf906a",
