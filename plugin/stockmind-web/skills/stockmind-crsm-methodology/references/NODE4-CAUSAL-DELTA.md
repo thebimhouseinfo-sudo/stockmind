@@ -36,6 +36,8 @@ Only capabilities actually available in Node 2 may be consumed.
 
 Do not start with a fixed macro checklist. Use four explicit steps.
 
+Canonical execution sequence: **exposure map → selected research targets → web evidence → causal delta**.
+
 ### Step A — build `external_exposure_map[]`
 
 Use company evidence already established by Node 1/Node 3. Do not search the current macro value yet.
