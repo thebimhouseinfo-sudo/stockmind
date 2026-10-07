@@ -1162,6 +1162,9 @@ function validateNode4CausalOutput(node, node2) {
       }
 
       if (entry.status === 'RESEARCHED') {
+        if (!Array.isArray(entry.attempts) || !entry.attempts.some(attempt => attempt?.status === 'FOUND')) {
+          errors.push(prefix + '.attempts must include at least one FOUND source for RESEARCHED target');
+        }
         if (!Array.isArray(entry.source_refs) || entry.source_refs.length === 0) {
           errors.push(prefix + '.source_refs must be non-empty for RESEARCHED target');
         } else {
@@ -1175,6 +1178,9 @@ function validateNode4CausalOutput(node, node2) {
         if (entry.failure_reason != null) errors.push(prefix + '.failure_reason must be null for RESEARCHED target');
       } else if (entry.status === 'UNAVAILABLE') {
         requireString(entry.failure_reason, prefix + '.failure_reason', errors);
+        if (Array.isArray(entry.attempts) && entry.attempts.some(attempt => attempt?.status === 'FOUND')) {
+          errors.push(prefix + '.attempts must not contain FOUND when status is UNAVAILABLE');
+        }
         if (entry.direction !== 'UNKNOWN') errors.push(prefix + '.direction must be UNKNOWN when status is UNAVAILABLE');
       }
 

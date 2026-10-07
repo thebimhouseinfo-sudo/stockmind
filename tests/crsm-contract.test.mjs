@@ -849,6 +849,12 @@ exposureFirstTransport.outputs.node4.what_changed = [{
 }];
 assert.equal(validateAnalysisResult(exposureFirstTransport).valid, true);
 
+const researchedWithoutFoundAttempt = structuredClone(exposureFirstTransport);
+researchedWithoutFoundAttempt.outputs.node4.research_targets[0].attempts = [{ source: 'EIA', status: 'NOT_FOUND' }];
+const researchedWithoutFoundAttemptCheck = validateAnalysisResult(researchedWithoutFoundAttempt);
+assert.equal(researchedWithoutFoundAttemptCheck.valid, false);
+assert.ok(researchedWithoutFoundAttemptCheck.errors.some(error => error.includes('at least one FOUND')));
+
 const searchedUnselectedDriver = structuredClone(exposureFirstTransport);
 searchedUnselectedDriver.outputs.node4.research_targets.push({
   target_id: 'us-inflation-current',

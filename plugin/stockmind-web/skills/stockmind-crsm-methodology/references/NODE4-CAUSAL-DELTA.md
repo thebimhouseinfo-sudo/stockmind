@@ -123,6 +123,8 @@ For each material external change, add a `what_changed[]` record:
 
 ```json
 {
+  "exposure_id": "fx-net-revenue",
+  "target_id": "usd-vnd-current",
   "driver": "USD/VND",
   "driver_type": "FX",
   "exposure": "Doanh thu USD lớn hơn chi phí USD.",
