@@ -70,6 +70,51 @@ assert.equal(adaptedNewProfile.detailReport, newProfileResult.outputs.node6b);
 assert.equal(adaptedNewProfile.outputs.node2.technical_coverage.coverage_model, 'CAPABILITY_BASED_V1');
 assert.equal(adaptedNewProfile.outputs.node5.confidence.method, 'EVIDENCE_QUALITY_V1');
 
+const dynamicExternalDrivers = structuredClone(newProfileResult);
+dynamicExternalDrivers.outputs.node4.external_exposure_map = [
+  {
+    exposure_id: 'fuel-cost', driver: 'Brent / nhiên liệu', driver_type: 'COMMODITY',
+    company_exposure: 'Nhiên liệu là đầu vào chi phí trực tiếp.',
+    transmission_mechanism: 'Giá nhiên liệu tác động biên lợi nhuận.',
+    transmission_targets: ['MARGIN'], materiality_hypothesis: 'HIGH',
+    research_required: true, selection_rationale: 'Chi phí nhiên liệu trọng yếu.'
+  },
+  {
+    exposure_id: 'war-route', driver: 'Rủi ro tuyến hàng hải', driver_type: 'GEOPOLITICAL',
+    company_exposure: 'Tuyến quốc tế có thể đi qua khu vực xung đột.',
+    transmission_mechanism: 'Đóng tuyến hoặc tăng phí bảo hiểm làm tăng chi phí và thời gian vận chuyển.',
+    transmission_targets: ['MARGIN','CASH_FLOW'], materiality_hypothesis: 'MEDIUM',
+    research_required: true, selection_rationale: 'Gián đoạn tuyến có thể ảnh hưởng trực tiếp hoạt động.'
+  }
+];
+dynamicExternalDrivers.outputs.node4.research_targets = [
+  {
+    target_id: 'fuel-current', exposure_id: 'fuel-cost', driver: 'Brent / nhiên liệu', driver_type: 'COMMODITY',
+    status: 'RESEARCHED', attempts: [{source:'EIA',status:'FOUND'}], source_refs:['eia-brent'],
+    as_of:'2026-10-06', freshness:'Mới nhất', prior_state:77.4, current_state:81.2, direction:'UP', failure_reason:null
+  },
+  {
+    target_id: 'war-current', exposure_id: 'war-route', driver: 'Rủi ro tuyến hàng hải', driver_type: 'GEOPOLITICAL',
+    status: 'UNAVAILABLE', attempts: [{source:'Reuters',status:'BLOCKED'}], source_refs:[], as_of:null,
+    freshness:'Chưa xác minh được sự kiện mới nhất', prior_state:null, current_state:null, direction:'UNKNOWN',
+    failure_reason:'Nguồn sự kiện hiện tại không truy cập được trong lần nghiên cứu này.'
+  }
+];
+dynamicExternalDrivers.outputs.node4.what_changed = [{
+  driver:'Brent / nhiên liệu', driver_type:'COMMODITY', exposure_id:'fuel-cost', target_id:'fuel-current',
+  exposure:'Nhiên liệu là đầu vào chi phí trực tiếp.', prior_state:77.4, current_state:81.2, direction:'UP',
+  materiality:'HIGH', transmission_lag:'Ngay đến 1 quý', source_refs:['eia-brent'], as_of:'2026-10-06',
+  transmission_targets:['MARGIN'], fact:'Giá Brent tăng so với mốc so sánh.',
+  inference:'Biên lợi nhuận có thể chịu áp lực nếu phụ phí không bù kịp.',
+  assumption:'Chính sách phụ phí không thay đổi đáng kể.', inference_confidence:78
+}];
+const adaptedDynamicExternalDrivers = adaptMemoResult(dynamicExternalDrivers);
+assert.match(adaptedDynamicExternalDrivers.visualReport, /Brent \/ nhiên liệu/);
+assert.match(adaptedDynamicExternalDrivers.visualReport, /Rủi ro tuyến hàng hải/);
+assert.match(adaptedDynamicExternalDrivers.visualReport, /Đã thử tìm nguồn/);
+assert.doesNotMatch(adaptedDynamicExternalDrivers.visualReport, /<h3[^>]*>Lạm phát Mỹ<\/h3>/);
+assert.doesNotMatch(adaptedDynamicExternalDrivers.visualReport, /<h3[^>]*>Lãi suất FED<\/h3>/);
+
 const adaptiveCioResult = structuredClone(newProfileResult);
 adaptiveCioResult.outputs.node3.expectation_basis = [{
   topic: 'Tăng trưởng lợi nhuận',

@@ -291,6 +291,9 @@ export function validateAnalysisResult(result) {
         node4: result.outputs.node4
       }).map(error => 'outputs.node5: ' + error));
     }
+    if (Array.isArray(result.outputs.node4?.external_exposure_map)) {
+      errors.push(...validateAdaptiveVietnameseReaderProse(result.outputs));
+    }
     if (typeof result.outputs.node6a === 'string' && result.outputs.node6a.trim()) {
       warnings.push(...validateNode6AReport(result.outputs.node6a).map(error => 'outputs.node6a: ' + error));
     }
@@ -335,8 +338,10 @@ export const NODE3_VALUATION_METHODS_BY_SECTOR = Object.freeze({
   CONSUMER: Object.freeze(['PE','EV_EBITDA','DCF']),
   GENERIC: Object.freeze(['PE','NORMALIZED_PE','PB','EV_EBITDA','DCF'])
 });
-export const NODE4_DRIVER_TYPES = Object.freeze(['MACRO','POLICY','RATES','FX','COMMODITY','REGULATORY','COMPANY_EXTERNAL']);
+export const NODE4_DRIVER_TYPES = Object.freeze(['MACRO','POLICY','RATES','FX','COMMODITY','REGULATORY','GEOPOLITICAL','DEMAND','LOGISTICS','LEGAL_PROJECT','COMPANY_EXTERNAL']);
 export const NODE4_DELTA_DIRECTIONS = Object.freeze(['UP','DOWN','UNCHANGED','MIXED','UNKNOWN']);
+export const NODE4_RESEARCH_STATUSES = Object.freeze(['RESEARCHED','UNAVAILABLE']);
+export const NODE4_RESEARCH_ATTEMPT_STATUSES = Object.freeze(['FOUND','NOT_FOUND','BLOCKED','ERROR']);
 export const NODE4_MATERIALITY = Object.freeze(['LOW','MEDIUM','HIGH']);
 export const NODE4_TRANSMISSION_TARGETS = Object.freeze(['REVENUE','MARGIN','CASH_FLOW','BALANCE_SHEET','VALUATION']);
 export const NODE5_AI_SCORE_WEIGHTS = Object.freeze({fundamental:30,valuation:20,technical:15,flow:15,sector_macro:10,risk:10});
@@ -1039,7 +1044,9 @@ function validateNode3AdaptiveOutput(node, node1) {
 
 function validateNode4CausalOutput(node, node2) {
   const errors = [];
-  const adaptiveNode4 = 'market_context_use' in node || 'what_changed' in node;
+  const adaptiveNode4 = 'market_context_use' in node || 'what_changed' in node
+    || 'external_exposure_map' in node || 'research_targets' in node;
+  const exposureMode = 'external_exposure_map' in node || 'research_targets' in node;
 
   if (adaptiveNode4 && isPlainObject(node.macro_indicators)) {
     for (const key of Object.keys(node.macro_indicators)) {
@@ -1054,25 +1061,16 @@ function validateNode4CausalOutput(node, node2) {
     if (!isPlainObject(use)) {
       errors.push('market_context_use must be an object');
     } else {
-      if (use.source !== 'NODE2.market_context') {
-        errors.push('market_context_use.source must equal NODE2.market_context');
-      }
-      if (use.measurement_policy !== 'CONSUME_ONLY') {
-        errors.push('market_context_use.measurement_policy must equal CONSUME_ONLY');
-      }
+      if (use.source !== 'NODE2.market_context') errors.push('market_context_use.source must equal NODE2.market_context');
+      if (use.measurement_policy !== 'CONSUME_ONLY') errors.push('market_context_use.measurement_policy must equal CONSUME_ONLY');
       if (!Array.isArray(use.consumed_capabilities)) {
         errors.push('market_context_use.consumed_capabilities must be an array');
       } else {
-        if (use.consumed_capabilities.length === 0) {
-          errors.push('market_context_use.consumed_capabilities must be non-empty when market_context_use is present');
-        }
-        if (new Set(use.consumed_capabilities).size !== use.consumed_capabilities.length) {
-          errors.push('market_context_use.consumed_capabilities must not contain duplicates');
-        }
+        if (use.consumed_capabilities.length === 0) errors.push('market_context_use.consumed_capabilities must be non-empty when market_context_use is present');
+        if (new Set(use.consumed_capabilities).size !== use.consumed_capabilities.length) errors.push('market_context_use.consumed_capabilities must not contain duplicates');
         const available = isPlainObject(node2?.market_context?.coverage)
           && Array.isArray(node2.market_context.coverage.available_capabilities)
-          ? node2.market_context.coverage.available_capabilities
-          : [];
+          ? node2.market_context.coverage.available_capabilities : [];
         use.consumed_capabilities.forEach((capability, index) => {
           if (!NODE2_MARKET_CONTEXT_CAPABILITIES.includes(capability)) {
             errors.push('market_context_use.consumed_capabilities[' + index + '] must be a canonical Node2 market capability');
@@ -1083,6 +1081,116 @@ function validateNode4CausalOutput(node, node2) {
       }
       requireString(use.interpretation, 'market_context_use.interpretation', errors);
     }
+  }
+
+  const exposuresById = new Map();
+  if (exposureMode) {
+    if (!Array.isArray(node.external_exposure_map)) {
+      errors.push('external_exposure_map must be an array when exposure-first research is used');
+    } else {
+      node.external_exposure_map.forEach((entry, index) => {
+        const prefix = 'external_exposure_map[' + index + ']';
+        if (!isPlainObject(entry)) {
+          errors.push(prefix + ' must be an object');
+          return;
+        }
+        requireString(entry.exposure_id, prefix + '.exposure_id', errors);
+        requireString(entry.driver, prefix + '.driver', errors);
+        if (!NODE4_DRIVER_TYPES.includes(entry.driver_type)) errors.push(prefix + '.driver_type must be a canonical external driver type');
+        requireString(entry.company_exposure, prefix + '.company_exposure', errors);
+        requireString(entry.transmission_mechanism, prefix + '.transmission_mechanism', errors);
+        requireString(entry.selection_rationale, prefix + '.selection_rationale', errors);
+        if (!NODE4_MATERIALITY.includes(entry.materiality_hypothesis)) errors.push(prefix + '.materiality_hypothesis must be LOW, MEDIUM, or HIGH');
+        if (typeof entry.research_required !== 'boolean') errors.push(prefix + '.research_required must be boolean');
+        validateNode4TransmissionTargets(entry.transmission_targets, prefix + '.transmission_targets', errors);
+        if (typeof entry.exposure_id === 'string' && entry.exposure_id.trim()) {
+          if (exposuresById.has(entry.exposure_id)) errors.push(prefix + '.exposure_id must be unique');
+          else exposuresById.set(entry.exposure_id, entry);
+        }
+      });
+    }
+
+    if (!Array.isArray(node.research_targets)) {
+      errors.push('research_targets must be an array when exposure-first research is used');
+    }
+  }
+
+  const targetsById = new Map();
+  const targetsByExposure = new Map();
+  if (Array.isArray(node.research_targets)) {
+    node.research_targets.forEach((entry, index) => {
+      const prefix = 'research_targets[' + index + ']';
+      if (!isPlainObject(entry)) {
+        errors.push(prefix + ' must be an object');
+        return;
+      }
+      requireString(entry.target_id, prefix + '.target_id', errors);
+      requireString(entry.exposure_id, prefix + '.exposure_id', errors);
+      requireString(entry.driver, prefix + '.driver', errors);
+      if (!NODE4_DRIVER_TYPES.includes(entry.driver_type)) errors.push(prefix + '.driver_type must be a canonical external driver type');
+      if (!NODE4_RESEARCH_STATUSES.includes(entry.status)) errors.push(prefix + '.status must be RESEARCHED or UNAVAILABLE');
+      if (!Array.isArray(entry.attempts) || entry.attempts.length === 0) {
+        errors.push(prefix + '.attempts must be a non-empty array');
+      } else {
+        entry.attempts.forEach((attempt, attemptIndex) => {
+          const attemptPrefix = prefix + '.attempts[' + attemptIndex + ']';
+          if (!isPlainObject(attempt)) {
+            errors.push(attemptPrefix + ' must be an object');
+            return;
+          }
+          requireString(attempt.source, attemptPrefix + '.source', errors);
+          if (!NODE4_RESEARCH_ATTEMPT_STATUSES.includes(attempt.status)) {
+            errors.push(attemptPrefix + '.status must be FOUND, NOT_FOUND, BLOCKED, or ERROR');
+          }
+        });
+      }
+      requireString(entry.freshness, prefix + '.freshness', errors);
+      if (!NODE4_DELTA_DIRECTIONS.includes(entry.direction)) errors.push(prefix + '.direction must be UP, DOWN, UNCHANGED, MIXED, or UNKNOWN');
+      const scalarOrNull = value => value == null || typeof value === 'string' || Number.isFinite(value);
+      if (!scalarOrNull(entry.prior_state)) errors.push(prefix + '.prior_state must be string, number, or null');
+      if (!scalarOrNull(entry.current_state)) errors.push(prefix + '.current_state must be string, number, or null');
+
+      const exposure = exposuresById.get(entry.exposure_id);
+      if (!exposure) {
+        errors.push(prefix + '.exposure_id must reference external_exposure_map');
+      } else {
+        if (exposure.research_required !== true) errors.push(prefix + ' cannot exist for exposure with research_required=false');
+        if (entry.driver !== exposure.driver) errors.push(prefix + '.driver must match selected exposure driver');
+        if (entry.driver_type !== exposure.driver_type) errors.push(prefix + '.driver_type must match selected exposure driver_type');
+      }
+
+      if (entry.status === 'RESEARCHED') {
+        if (!Array.isArray(entry.source_refs) || entry.source_refs.length === 0) {
+          errors.push(prefix + '.source_refs must be non-empty for RESEARCHED target');
+        } else {
+          entry.source_refs.forEach((ref, refIndex) => requireString(ref, prefix + '.source_refs[' + refIndex + ']', errors));
+        }
+        requireString(entry.as_of, prefix + '.as_of', errors);
+        if (entry.prior_state == null && entry.current_state == null) errors.push(prefix + ' must provide prior_state or current_state when RESEARCHED');
+        if (entry.direction !== 'UNKNOWN' && (entry.prior_state == null || entry.current_state == null)) {
+          errors.push(prefix + '.direction must be UNKNOWN when prior/current evidence is incomplete');
+        }
+        if (entry.failure_reason != null) errors.push(prefix + '.failure_reason must be null for RESEARCHED target');
+      } else if (entry.status === 'UNAVAILABLE') {
+        requireString(entry.failure_reason, prefix + '.failure_reason', errors);
+        if (entry.direction !== 'UNKNOWN') errors.push(prefix + '.direction must be UNKNOWN when status is UNAVAILABLE');
+      }
+
+      if (typeof entry.target_id === 'string' && entry.target_id.trim()) {
+        if (targetsById.has(entry.target_id)) errors.push(prefix + '.target_id must be unique');
+        else targetsById.set(entry.target_id, entry);
+      }
+      if (typeof entry.exposure_id === 'string' && entry.exposure_id.trim()) {
+        if (targetsByExposure.has(entry.exposure_id)) errors.push(prefix + '.exposure_id must have at most one research target');
+        else targetsByExposure.set(entry.exposure_id, entry);
+      }
+    });
+
+    exposuresById.forEach((exposure, exposureId) => {
+      const target = targetsByExposure.get(exposureId);
+      if (exposure.research_required === true && !target) errors.push('research_required exposure must have research target: ' + exposureId);
+      if (exposure.research_required === false && target) errors.push('non-selected exposure must not have research target: ' + exposureId);
+    });
   }
 
   if ('what_changed' in node) {
@@ -1099,57 +1207,40 @@ function validateNode4CausalOutput(node, node2) {
         if (typeof entry.driver === 'string' && looksLikeNode2MarketInternalMeasurement(entry.driver)) {
           errors.push(prefix + '.driver is a Node2-owned market-internal measurement and must be consumed via market_context_use');
         }
-        if (!NODE4_DRIVER_TYPES.includes(entry.driver_type)) {
-          errors.push(prefix + '.driver_type must be a canonical external driver type');
-        }
+        if (!NODE4_DRIVER_TYPES.includes(entry.driver_type)) errors.push(prefix + '.driver_type must be a canonical external driver type');
         requireString(entry.exposure, prefix + '.exposure', errors);
         if (!('prior_state' in entry)) errors.push(prefix + ' missing field: prior_state');
         if (!('current_state' in entry)) errors.push(prefix + ' missing field: current_state');
         const scalarOrNull = value => value == null || typeof value === 'string' || Number.isFinite(value);
         if (!scalarOrNull(entry.prior_state)) errors.push(prefix + '.prior_state must be string, number, or null');
         if (!scalarOrNull(entry.current_state)) errors.push(prefix + '.current_state must be string, number, or null');
-        if (entry.prior_state == null && entry.current_state == null) {
-          errors.push(prefix + ' must provide at least one of prior_state or current_state');
-        }
-        if (!NODE4_DELTA_DIRECTIONS.includes(entry.direction)) {
-          errors.push(prefix + '.direction must be UP, DOWN, UNCHANGED, MIXED, or UNKNOWN');
-        }
-        if (entry.direction !== 'UNKNOWN' && (entry.prior_state == null || entry.current_state == null)) {
-          errors.push(prefix + '.direction must be UNKNOWN when prior/current evidence is incomplete');
-        }
-        if (!NODE4_MATERIALITY.includes(entry.materiality)) {
-          errors.push(prefix + '.materiality must be LOW, MEDIUM, or HIGH');
-        }
+        if (entry.prior_state == null && entry.current_state == null) errors.push(prefix + ' must provide at least one of prior_state or current_state');
+        if (!NODE4_DELTA_DIRECTIONS.includes(entry.direction)) errors.push(prefix + '.direction must be UP, DOWN, UNCHANGED, MIXED, or UNKNOWN');
+        if (entry.direction !== 'UNKNOWN' && (entry.prior_state == null || entry.current_state == null)) errors.push(prefix + '.direction must be UNKNOWN when prior/current evidence is incomplete');
+        if (!NODE4_MATERIALITY.includes(entry.materiality)) errors.push(prefix + '.materiality must be LOW, MEDIUM, or HIGH');
         requireString(entry.transmission_lag, prefix + '.transmission_lag', errors);
         if (!Array.isArray(entry.source_refs) || entry.source_refs.length === 0) {
           errors.push(prefix + '.source_refs must be a non-empty array');
         } else {
-          entry.source_refs.forEach((ref, refIndex) => {
-            requireString(ref, prefix + '.source_refs[' + refIndex + ']', errors);
-          });
+          entry.source_refs.forEach((ref, refIndex) => requireString(ref, prefix + '.source_refs[' + refIndex + ']', errors));
         }
         requireString(entry.as_of, prefix + '.as_of', errors);
-        if (!Array.isArray(entry.transmission_targets) || entry.transmission_targets.length === 0) {
-          errors.push(prefix + '.transmission_targets must be a non-empty array');
-        } else {
-          if (new Set(entry.transmission_targets).size !== entry.transmission_targets.length) {
-            errors.push(prefix + '.transmission_targets must not contain duplicates');
-          }
-          entry.transmission_targets.forEach((target, targetIndex) => {
-            if (!NODE4_TRANSMISSION_TARGETS.includes(target)) {
-              errors.push(prefix + '.transmission_targets[' + targetIndex + '] must be a canonical company-economics target');
-            }
-          });
-        }
+        validateNode4TransmissionTargets(entry.transmission_targets, prefix + '.transmission_targets', errors);
         requireString(entry.fact, prefix + '.fact', errors);
         requireString(entry.inference, prefix + '.inference', errors);
-        if (!(entry.assumption == null || (typeof entry.assumption === 'string' && entry.assumption.trim()))) {
-          errors.push(prefix + '.assumption must be string or null');
-        }
-        if (!Number.isFinite(entry.inference_confidence)
-          || entry.inference_confidence < 0
-          || entry.inference_confidence > 100) {
-          errors.push(prefix + '.inference_confidence must be numeric from 0 to 100');
+        if (!(entry.assumption == null || (typeof entry.assumption === 'string' && entry.assumption.trim()))) errors.push(prefix + '.assumption must be string or null');
+        if (!Number.isFinite(entry.inference_confidence) || entry.inference_confidence < 0 || entry.inference_confidence > 100) errors.push(prefix + '.inference_confidence must be numeric from 0 to 100');
+
+        if (exposureMode) {
+          requireString(entry.exposure_id, prefix + '.exposure_id', errors);
+          requireString(entry.target_id, prefix + '.target_id', errors);
+          const exposure = exposuresById.get(entry.exposure_id);
+          const target = targetsById.get(entry.target_id);
+          if (!exposure) errors.push(prefix + '.exposure_id must reference external_exposure_map');
+          if (!target) errors.push(prefix + '.target_id must reference research_targets');
+          if (target && target.status !== 'RESEARCHED') errors.push(prefix + '.target_id must reference a RESEARCHED target');
+          if (target && target.exposure_id !== entry.exposure_id) errors.push(prefix + '.target_id must belong to the same exposure_id');
+          if (target && target.driver !== entry.driver) errors.push(prefix + '.driver must match research target driver');
         }
       });
     }
@@ -1158,6 +1249,75 @@ function validateNode4CausalOutput(node, node2) {
   return errors;
 }
 
+function validateNode4TransmissionTargets(value, label, errors) {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(label + ' must be a non-empty array');
+    return;
+  }
+  if (new Set(value).size !== value.length) errors.push(label + ' must not contain duplicates');
+  value.forEach((target, index) => {
+    if (!NODE4_TRANSMISSION_TARGETS.includes(target)) errors.push(label + '[' + index + '] must be a canonical company-economics target');
+  });
+}
+
+function validateAdaptiveVietnameseReaderProse(outputs) {
+  const errors = [];
+  const directPaths = [
+    'node2.conclusion',
+    'node3.conclusion',
+    'node3.moat',
+    'node4.macro_view',
+    'node4.industry_impact',
+    'node4.company_impact',
+    'node4.conclusion',
+    'node5.full_reasoning',
+    'node5.thesis_invalidation',
+    'node5.liquidity_note',
+    'node5.anti_thesis',
+    'node5.variant_view.summary',
+    'node5.variant_view.why_different',
+    'node5.variant_view.payoff_if_right',
+    'node5.variant_view.what_proves_wrong',
+    'node5.catalyst_horizon.nearest_catalyst',
+    'node5.strategy.position_size_note'
+  ];
+  directPaths.forEach(path => {
+    const value = readPath(outputs, path);
+    if (looksLikeEnglishReaderSentence(value)) errors.push(path + ' must be Vietnamese-first reader-facing prose');
+  });
+
+  const node4 = outputs?.node4 || {};
+  (Array.isArray(node4.external_exposure_map) ? node4.external_exposure_map : []).forEach((entry, index) => {
+    for (const key of ['company_exposure','transmission_mechanism','selection_rationale']) {
+      if (looksLikeEnglishReaderSentence(entry?.[key])) errors.push('node4.external_exposure_map[' + index + '].' + key + ' must be Vietnamese-first reader-facing prose');
+    }
+  });
+  (Array.isArray(node4.research_targets) ? node4.research_targets : []).forEach((entry, index) => {
+    if (looksLikeEnglishReaderSentence(entry?.failure_reason)) errors.push('node4.research_targets[' + index + '].failure_reason must be Vietnamese-first reader-facing prose');
+  });
+  (Array.isArray(node4.what_changed) ? node4.what_changed : []).forEach((entry, index) => {
+    for (const key of ['exposure','transmission_lag','fact','inference','assumption']) {
+      if (looksLikeEnglishReaderSentence(entry?.[key])) errors.push('node4.what_changed[' + index + '].' + key + ' must be Vietnamese-first reader-facing prose');
+    }
+  });
+  return errors;
+}
+
+function readPath(root, path) {
+  return String(path).split('.').reduce((value, key) => value == null ? undefined : value[key], root);
+}
+
+function looksLikeEnglishReaderSentence(value) {
+  if (typeof value !== 'string') return false;
+  const text = value.trim();
+  if (text.length < 28) return false;
+  if (/[ăâđêôơưáàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/i.test(text)) return false;
+  const words = text.toLowerCase().match(/[a-z]+/g) || [];
+  if (words.length < 6) return false;
+  const cues = new Set(['the','and','with','from','this','that','these','those','is','are','was','were','to','of','for','in','on','as','by','while','but','if','because','should','may','can','will','has','have','into','than','which','when','where']);
+  const cueCount = words.filter(word => cues.has(word)).length;
+  return cueCount >= 2 && cueCount / words.length >= 0.12;
+}
 
 function validateNode5Output(node, upstream = {}) {
   const errors = validateRequiredKeys(node, [

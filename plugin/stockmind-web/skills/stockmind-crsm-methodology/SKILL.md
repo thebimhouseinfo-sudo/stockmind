@@ -136,7 +136,17 @@ Any statement about consensus, guidance, what is priced, or a variant view must 
 
 ## Node 4 causal-delta routing
 
-Read `NODE4-CAUSAL-DELTA.md`. Start from the company's material exposures, not a fixed Fed/DXY/oil/GDP checklist. Add `what_changed[]` only for drivers with a credible company transmission path and preserve FACT/INFERENCE/ASSUMPTION separation.
+Read `NODE4-CAUSAL-DELTA.md`. Node 4 is **exposure-first, research-second**. Do not prefetch a universal Fed/CPI/USD/VND/Brent/DXY checklist.
+
+For each ticker use this order:
+1. use Node 1/Node 3 and company evidence to build `external_exposure_map[]`;
+2. decide which exposure candidates are material enough to become `research_targets[]`;
+3. only then use web research for those selected targets;
+4. turn verified target changes into `what_changed[]` only when the company transmission path is credible.
+
+Every selected target must have an auditable research state. `RESEARCHED` requires dated source provenance; `UNAVAILABLE` requires non-empty search attempts plus a failure reason. A variable that was not selected is **not missing data** and must not be shown as an empty report placeholder.
+
+Example: an international transport company may justify research into fuel/Brent, USD, funding rates and geopolitical route disruption when its cost structure, currency profile, debt or routes create those exposures. This is an example, not a fixed transport checklist.
 
 Node 4 may interpret available Node 2 `market_context` through `market_context_use`, but it must use `source: NODE2.market_context`, `measurement_policy: CONSUME_ONLY`, and must not remeasure breadth, turnover, leadership, volatility, market foreign flow, index returns or relative strength.
 

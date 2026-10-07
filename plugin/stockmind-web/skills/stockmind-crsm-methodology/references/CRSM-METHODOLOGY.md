@@ -385,16 +385,34 @@ Read `NODE4-CAUSAL-DELTA.md`.
 
 ### Start from exposure, not macro headlines
 
-Build the company exposure map first. Research only external variables with a plausible material path to the company's economics:
+Node 4 uses a strict **exposure map → selected research targets → web evidence → causal delta** sequence.
+
+First build `external_exposure_map[]` from company-specific evidence already established in Node 1/Node 3: business model, revenue/cost structure, input purchases, debt/funding, currency mismatch, operating geography, customers, regulation, project/legal dependencies and logistics.
+
+Each exposure candidate records:
+- stable `exposure_id`;
+- driver + canonical `driver_type`;
+- `company_exposure`;
+- `transmission_mechanism`;
+- company-economics `transmission_targets`;
+- `materiality_hypothesis`;
+- `research_required`;
+- `selection_rationale`.
+
+Only candidates with `research_required: true` enter `research_targets[]`. Then and only then perform web research. A selected target records its target/exposure IDs, status, source attempts, source refs when found, as-of/freshness, prior/current state and direction. `UNAVAILABLE` is valid only after real attempts and a non-empty `failure_reason`.
+
+Possible exposure classes include:
 - policy/regulation;
 - rates/funding;
 - FX;
 - commodity/input prices;
 - legal/project approvals;
 - customer/end-market demand;
-- supply/freight/logistics or other company-external variables.
+- geopolitics/war;
+- supply/freight/logistics;
+- other company-external variables.
 
-Fed, DXY, oil, GDP, credit and public investment are conditional inputs, not mandatory sections.
+Fed, DXY, oil, GDP, credit and public investment are conditional research targets, not mandatory sections. A variable rejected as immaterial is simply absent; it is not a missing-data error.
 
 ### Consume Node 2; never duplicate it
 

@@ -793,6 +793,119 @@ const duplicatedMarketFlowInLegacyMacroCheck = validateAnalysisResult(duplicated
 assert.equal(duplicatedMarketFlowInLegacyMacroCheck.valid, false);
 assert.ok(duplicatedMarketFlowInLegacyMacroCheck.errors.some(error => error.includes('macro_indicators must not duplicate Node2')));
 
+const exposureFirstTransport = structuredClone(causalDelta);
+exposureFirstTransport.outputs.node4.external_exposure_map = [
+  {
+    exposure_id: 'fuel-cost',
+    driver: 'Brent / nhiên liệu',
+    driver_type: 'COMMODITY',
+    company_exposure: 'Nhiên liệu là đầu vào chi phí trực tiếp của hoạt động vận tải quốc tế.',
+    transmission_mechanism: 'Giá nhiên liệu tăng làm tăng chi phí khai thác và gây áp lực lên biên lợi nhuận nếu phụ phí không bù kịp.',
+    transmission_targets: ['MARGIN','CASH_FLOW'],
+    materiality_hypothesis: 'HIGH',
+    research_required: true,
+    selection_rationale: 'Tỷ trọng nhiên liệu đủ lớn để thay đổi lợi nhuận.'
+  },
+  {
+    exposure_id: 'us-inflation',
+    driver: 'CPI Mỹ',
+    driver_type: 'MACRO',
+    company_exposure: 'Không có cơ chế trực tiếp đủ trọng yếu được xác minh.',
+    transmission_mechanism: 'Không xác định được cơ chế tác động trực tiếp đến kinh tế doanh nghiệp.',
+    transmission_targets: ['VALUATION'],
+    materiality_hypothesis: 'LOW',
+    research_required: false,
+    selection_rationale: 'Không nghiên cứu chỉ để hoàn thành một checklist vĩ mô.'
+  }
+];
+exposureFirstTransport.outputs.node4.research_targets = [{
+  target_id: 'fuel-cost-current',
+  exposure_id: 'fuel-cost',
+  driver: 'Brent / nhiên liệu',
+  driver_type: 'COMMODITY',
+  status: 'RESEARCHED',
+  attempts: [{ source: 'EIA', status: 'FOUND' }],
+  source_refs: ['eia-brent-2026-10-06'],
+  as_of: '2026-10-06',
+  freshness: 'Quan sát mới nhất được công bố',
+  prior_state: 77.4,
+  current_state: 81.2,
+  direction: 'UP',
+  failure_reason: null
+}];
+exposureFirstTransport.outputs.node4.what_changed = [{
+  ...exposureFirstTransport.outputs.node4.what_changed[0],
+  exposure_id: 'fuel-cost',
+  target_id: 'fuel-cost-current',
+  driver: 'Brent / nhiên liệu',
+  driver_type: 'COMMODITY',
+  exposure: 'Nhiên liệu là đầu vào chi phí trực tiếp của hoạt động vận tải quốc tế.',
+  prior_state: 77.4,
+  current_state: 81.2,
+  transmission_targets: ['MARGIN','CASH_FLOW'],
+  fact: 'Giá Brent tăng so với mốc so sánh.',
+  inference: 'Chi phí nhiên liệu tăng có thể gây áp lực lên biên lợi nhuận nếu doanh nghiệp chưa chuyển hết phần tăng chi phí sang phụ phí.',
+  assumption: 'Cơ chế mua nhiên liệu và phụ phí không thay đổi đáng kể.'
+}];
+assert.equal(validateAnalysisResult(exposureFirstTransport).valid, true);
+
+const searchedUnselectedDriver = structuredClone(exposureFirstTransport);
+searchedUnselectedDriver.outputs.node4.research_targets.push({
+  target_id: 'us-inflation-current',
+  exposure_id: 'us-inflation',
+  driver: 'CPI Mỹ',
+  driver_type: 'MACRO',
+  status: 'RESEARCHED',
+  attempts: [{ source: 'BLS', status: 'FOUND' }],
+  source_refs: ['bls-cpi'],
+  as_of: '2026-09',
+  freshness: 'Bản công bố mới nhất',
+  prior_state: 3.1,
+  current_state: 3.4,
+  direction: 'UP',
+  failure_reason: null
+});
+const searchedUnselectedDriverCheck = validateAnalysisResult(searchedUnselectedDriver);
+assert.equal(searchedUnselectedDriverCheck.valid, false);
+assert.ok(searchedUnselectedDriverCheck.errors.some(error => error.includes('research_required=false')));
+
+const selectedButSkippedResearch = structuredClone(exposureFirstTransport);
+selectedButSkippedResearch.outputs.node4.research_targets = [];
+const selectedButSkippedResearchCheck = validateAnalysisResult(selectedButSkippedResearch);
+assert.equal(selectedButSkippedResearchCheck.valid, false);
+assert.ok(selectedButSkippedResearchCheck.errors.some(error => error.includes('research_required exposure must have research target')));
+
+const selectedUnavailable = structuredClone(exposureFirstTransport);
+selectedUnavailable.outputs.node4.research_targets[0] = {
+  target_id: 'fuel-cost-current',
+  exposure_id: 'fuel-cost',
+  driver: 'Brent / nhiên liệu',
+  driver_type: 'COMMODITY',
+  status: 'UNAVAILABLE',
+  attempts: [{ source: 'EIA', status: 'BLOCKED' }, { source: 'FRED', status: 'NOT_FOUND' }],
+  source_refs: [],
+  as_of: null,
+  freshness: 'Không xác minh được dữ liệu mới nhất',
+  prior_state: null,
+  current_state: null,
+  direction: 'UNKNOWN',
+  failure_reason: 'Không thể xác minh cùng một chuỗi giá nhiên liệu từ các nguồn đã thử.'
+};
+selectedUnavailable.outputs.node4.what_changed = [];
+assert.equal(validateAnalysisResult(selectedUnavailable).valid, true);
+
+const unavailablePromotedToCausalDelta = structuredClone(selectedUnavailable);
+unavailablePromotedToCausalDelta.outputs.node4.what_changed = [exposureFirstTransport.outputs.node4.what_changed[0]];
+const unavailablePromotedCheck = validateAnalysisResult(unavailablePromotedToCausalDelta);
+assert.equal(unavailablePromotedCheck.valid, false);
+assert.ok(unavailablePromotedCheck.errors.some(error => error.includes('RESEARCHED target')));
+
+const englishLeakInAdaptiveResult = structuredClone(exposureFirstTransport);
+englishLeakInAdaptiveResult.outputs.node4.what_changed[0].inference = 'Fuel prices are rising and this will reduce margins for the company if surcharges cannot keep pace.';
+const englishLeakCheck = validateAnalysisResult(englishLeakInAdaptiveResult);
+assert.equal(englishLeakCheck.valid, false);
+assert.ok(englishLeakCheck.errors.some(error => error.includes('Vietnamese-first')));
+
 
 assert.deepEqual(NODE5_AI_SCORE_WEIGHTS, {
   fundamental:30, valuation:20, technical:15, flow:15, sector_macro:10, risk:10

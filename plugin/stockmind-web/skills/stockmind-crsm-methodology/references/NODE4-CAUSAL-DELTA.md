@@ -34,7 +34,27 @@ Only capabilities actually available in Node 2 may be consumed.
 
 ## Exposure-first research
 
-Do not start with a fixed macro checklist. Start with the company exposure map, then search only variables with a plausible material transmission channel.
+Do not start with a fixed macro checklist. Use four explicit steps.
+
+### Step A — build `external_exposure_map[]`
+
+Use company evidence already established by Node 1/Node 3. Do not search the current macro value yet.
+
+Each candidate:
+
+```json
+{
+  "exposure_id": "fuel-cost",
+  "driver": "Brent / jet fuel",
+  "driver_type": "COMMODITY",
+  "company_exposure": "Nhiên liệu là đầu vào chi phí trực tiếp của hoạt động vận tải.",
+  "transmission_mechanism": "Giá nhiên liệu thay đổi chi phí khai thác và biên lợi nhuận nếu phụ phí không bù kịp.",
+  "transmission_targets": ["MARGIN", "CASH_FLOW"],
+  "materiality_hypothesis": "HIGH",
+  "research_required": true,
+  "selection_rationale": "Tỷ trọng nhiên liệu đủ lớn để thay đổi lợi nhuận."
+}
+```
 
 Canonical external driver types:
 - `MACRO`
@@ -43,16 +63,59 @@ Canonical external driver types:
 - `FX`
 - `COMMODITY`
 - `REGULATORY`
+- `GEOPOLITICAL`
+- `DEMAND`
+- `LOGISTICS`
+- `LEGAL_PROJECT`
 - `COMPANY_EXTERNAL`
 
-Examples:
-- BANK: policy rates, credit growth policy, deposit/funding competition, FX if material.
-- REAL_ESTATE: legal approvals, mortgage/credit conditions, funding/refinancing, project infrastructure.
-- COMMODITY_CYCLICAL: selling-price spread, feedstock, supply additions, freight/FX.
-- TECHNOLOGY_SERVICES: client IT budgets, major-market growth, FX, wage/talent pressure.
-- UTILITIES_POWER: tariff/PPA, fuel/hydrology, regulation and payment/receivable conditions.
+### Step B — select `research_targets[]`
 
-Fed/DXY/oil/GDP/public investment are researched only when they materially connect to the company.
+Only material candidates with a plausible transmission mechanism are searched. A rejected/non-material candidate does not need current data.
+
+Examples:
+- international transport may select fuel/Brent, USD, funding rates and geopolitical route disruption when its actual costs, debt/currency profile and routes support those exposures;
+- BANK may select policy/funding/FX variables that affect its economics;
+- REAL_ESTATE may select legal approvals, mortgage/credit conditions, funding/refinancing and project infrastructure;
+- COMMODITY_CYCLICAL may select selling-price spread, feedstock, supply additions and freight/FX;
+- TECHNOLOGY_SERVICES may select client IT budgets, major-market growth, FX and wage/talent pressure;
+- UTILITIES_POWER may select tariff/PPA, fuel/hydrology, regulation and payment conditions.
+
+These are examples only. Do not turn them into sector checklists.
+
+### Step C — research selected targets
+
+Each selected target is auditable:
+
+```json
+{
+  "target_id": "fuel-cost-current",
+  "exposure_id": "fuel-cost",
+  "driver": "Brent / jet fuel",
+  "driver_type": "COMMODITY",
+  "status": "RESEARCHED",
+  "attempts": [
+    {"source": "EIA", "status": "FOUND"}
+  ],
+  "source_refs": ["eia-brent-2026-10-06"],
+  "as_of": "2026-10-06",
+  "freshness": "latest published observation",
+  "prior_state": 77.4,
+  "current_state": 81.2,
+  "direction": "UP",
+  "failure_reason": null
+}
+```
+
+Canonical target status: `RESEARCHED | UNAVAILABLE`.
+
+A `RESEARCHED` target needs dated sources. An `UNAVAILABLE` target needs non-empty attempts and a non-empty `failure_reason`. Never silently substitute a different measure just to fill the field.
+
+### Step D — promote verified changes into `what_changed[]`
+
+Only a researched target with a credible company transmission path may become a causal delta. Link every new adaptive `what_changed[]` record back to its `exposure_id` and `target_id`.
+
+Fed/DXY/oil/GDP/public investment are researched only when selected by this process.
 
 ## what_changed causal delta
 
