@@ -138,6 +138,8 @@ Any statement about consensus, guidance, what is priced, or a variant view must 
 
 Read `NODE4-CAUSAL-DELTA.md`. Node 4 is **exposure-first, research-second**. Do not prefetch a universal Fed/CPI/USD/VND/Brent/DXY checklist.
 
+Canonical sequence: **exposure map → selected research targets → web evidence → causal delta**. A candidate rejected as immaterial is **not a missing-data error**.
+
 For each ticker use this order:
 1. use Node 1/Node 3 and company evidence to build `external_exposure_map[]`;
 2. decide which exposure candidates are material enough to become `research_targets[]`;
