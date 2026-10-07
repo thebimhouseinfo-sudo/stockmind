@@ -279,10 +279,12 @@ export function validateAnalysisResult(result) {
     }
     if (isPlainObject(result.outputs.node4)) {
       errors.push(...validateNode4CausalOutput(result.outputs.node4, result.outputs.node2).map(error => 'outputs.node4: ' + error));
-      warnings.push(...validateRequiredKeys(
-        result.outputs.node4,
-        ['risk_regime','macro_indicators','company_specific_drivers','sensitivity_table','geopolitical_events','causal_chains','risk_scenarios','macro_view','industry_impact','company_impact','conclusion']
-      ).map(error => 'outputs.node4: ' + error));
+      if (!Array.isArray(result.outputs.node4.external_exposure_map)) {
+        warnings.push(...validateRequiredKeys(
+          result.outputs.node4,
+          ['risk_regime','macro_indicators','company_specific_drivers','sensitivity_table','geopolitical_events','causal_chains','risk_scenarios','macro_view','industry_impact','company_impact','conclusion']
+        ).map(error => 'outputs.node4: ' + error));
+      }
     }
     if (isPlainObject(result.outputs.node5)) {
       errors.push(...validateNode5Output(result.outputs.node5, {

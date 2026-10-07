@@ -112,6 +112,9 @@ const adaptedDynamicExternalDrivers = adaptMemoResult(dynamicExternalDrivers);
 assert.match(adaptedDynamicExternalDrivers.visualReport, /Brent \/ nhiên liệu/);
 assert.match(adaptedDynamicExternalDrivers.visualReport, /Rủi ro tuyến hàng hải/);
 assert.match(adaptedDynamicExternalDrivers.visualReport, /Đã thử tìm nguồn/);
+assert.match(adaptedDynamicExternalDrivers.visualReport, /Mức độ Cao/);
+assert.match(adaptedDynamicExternalDrivers.visualReport, /Tăng/);
+assert.doesNotMatch(adaptedDynamicExternalDrivers.visualReport, /Mức độ HIGH|\(UP\)/);
 assert.doesNotMatch(adaptedDynamicExternalDrivers.visualReport, /<h3[^>]*>Lạm phát Mỹ<\/h3>/);
 assert.doesNotMatch(adaptedDynamicExternalDrivers.visualReport, /<h3[^>]*>Lãi suất FED<\/h3>/);
 

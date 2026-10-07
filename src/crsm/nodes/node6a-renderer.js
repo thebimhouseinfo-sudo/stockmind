@@ -124,7 +124,7 @@ function externalDriverCards(n4) {
       .map(item => ({
         label: item?.driver,
         value: driverStateText(item?.prior_state, item?.current_state, item?.direction),
-        meta: [item?.materiality ? 'Mức độ ' + item.materiality : null, item?.as_of].filter(Boolean).join(' · '),
+        meta: [item?.materiality ? 'Mức độ ' + materialityLabel(item.materiality) : null, item?.as_of].filter(Boolean).join(' · '),
         detail: item?.inference || item?.fact || item?.exposure,
         sources: Array.isArray(item?.source_refs) ? item.source_refs : [],
         unavailable: false
@@ -158,10 +158,28 @@ function externalDriverCards(n4) {
 }
 
 function driverStateText(prior, current, direction) {
-  if (current != null && prior != null) return `${formatValue(prior)} → ${formatValue(current)} (${formatValue(direction)})`;
-  if (current != null) return `${formatValue(current)} (${formatValue(direction)})`;
-  if (prior != null) return `${formatValue(prior)} (${formatValue(direction)})`;
+  if (current != null && prior != null) return `${formatValue(prior)} → ${formatValue(current)} (${directionLabel(direction)})`;
+  if (current != null) return `${formatValue(current)} (${directionLabel(direction)})`;
+  if (prior != null) return `${formatValue(prior)} (${directionLabel(direction)})`;
   return MISSING_SHORT;
+}
+
+function directionLabel(value) {
+  const key = String(value || '').toUpperCase();
+  if (key === 'UP') return 'Tăng';
+  if (key === 'DOWN') return 'Giảm';
+  if (key === 'UNCHANGED') return 'Không đổi';
+  if (key === 'MIXED') return 'Đan xen';
+  if (key === 'UNKNOWN') return 'Chưa xác định';
+  return formatValue(value);
+}
+
+function materialityLabel(value) {
+  const key = String(value || '').toUpperCase();
+  if (key === 'HIGH') return 'Cao';
+  if (key === 'MEDIUM') return 'Trung bình';
+  if (key === 'LOW') return 'Thấp';
+  return formatValue(value);
 }
 
 function renderExternalDrivers(cards) {
