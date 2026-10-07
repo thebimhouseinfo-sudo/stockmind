@@ -140,6 +140,8 @@ Read `NODE4-CAUSAL-DELTA.md`. Node 4 is **exposure-first, research-second**. Do 
 
 Canonical sequence: **exposure map → selected research targets → web evidence → causal delta**. A candidate rejected as immaterial is **not a missing-data error**.
 
+All reader-facing output from this flow remains **Vietnamese-first**; source names, tickers, machine enums, formulas and standard finance abbreviations may remain unchanged.
+
 For each ticker use this order:
 1. use Node 1/Node 3 and company evidence to build `external_exposure_map[]`;
 2. decide which exposure candidates are material enough to become `research_targets[]`;
