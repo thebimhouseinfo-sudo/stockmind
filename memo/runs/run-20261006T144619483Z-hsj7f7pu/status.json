@@ -3,7 +3,7 @@
   "run_id": "run-20261006T144619483Z-hsj7f7pu",
   "state": "PROCESSING",
   "created_at": "2026-10-06T14:46:20.326Z",
-  "updated_at": "2026-10-07T03:51:00.000Z",
+  "updated_at": "2026-10-07T04:00:00.000Z",
   "items": [
     {
       "item_id": "item-fe3a16e7-a2e7-4ec4-a3f0-e50a93295e35",
@@ -31,23 +31,23 @@
       "item_id": "item-e3262bdd-fbee-41dd-87ee-5dd587bc1d62",
       "ticker": "VHM",
       "analysis_source": "SCREENED_WEB",
-      "state": "PROCESSING",
+      "state": "COMPLETED",
       "error": null,
-      "result_ref": null,
+      "result_ref": "memo/runs/run-20261006T144619483Z-hsj7f7pu/results/VHM.json",
       "started_at": "2026-10-07T03:51:00.000Z",
-      "completed_at": null,
-      "updated_at": "2026-10-07T03:51:00.000Z"
+      "completed_at": "2026-10-07T04:00:00.000Z",
+      "updated_at": "2026-10-07T04:00:00.000Z"
     },
     {
       "item_id": "item-3c886fc1-fa70-4b2c-a546-9f5f259f93db",
       "ticker": "HAG",
       "analysis_source": "SCREENED_WEB",
-      "state": "READY",
+      "state": "PROCESSING",
       "error": null,
       "result_ref": null,
-      "started_at": null,
+      "started_at": "2026-10-07T04:00:00.000Z",
       "completed_at": null,
-      "updated_at": "2026-10-06T14:46:20.326Z"
+      "updated_at": "2026-10-07T04:00:00.000Z"
     },
     {
       "item_id": "item-98d23fe3-0e78-48e0-bfaf-3186362dbd29",
