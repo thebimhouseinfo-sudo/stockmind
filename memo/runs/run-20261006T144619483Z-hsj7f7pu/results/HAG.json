@@ -1,0 +1,2302 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261006T144619483Z-hsj7f7pu",
+  "item_id": "item-3c886fc1-fa70-4b2c-a546-9f5f259f93db",
+  "ticker": "HAG",
+  "analysis_source": "SCREENED_WEB",
+  "outputs": {
+    "node1": {
+      "ticker": "HAG",
+      "sector_type": "Nông nghiệp (Screener đang ghi nhãn bất động sản cũ)",
+      "sector_profile": "GENERIC",
+      "timestamp": "2026-10-08T01:10:00.000Z",
+      "data_period": "Bán niên 2026; dữ liệu sàng lọc 06/10/2026",
+      "analysis_mode": "SCREENED",
+      "screening_metrics": {
+        "price": {
+          "field": "price",
+          "raw_value": 14550,
+          "value": 14550,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "high_52w": {
+          "field": "high_52w",
+          "raw_value": 19250,
+          "value": 19250,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "low_52w": {
+          "field": "low_52w",
+          "raw_value": 13250,
+          "value": 13250,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1w": {
+          "field": "perf_1w",
+          "raw_value": 3.93,
+          "value": 3.93,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1m": {
+          "field": "perf_1m",
+          "raw_value": 3.56,
+          "value": 3.56,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_3m": {
+          "field": "perf_3m",
+          "raw_value": -2.35,
+          "value": -2.35,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_6m": {
+          "field": "perf_6m",
+          "raw_value": -9.35,
+          "value": -9.35,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_1y": {
+          "field": "perf_1y",
+          "raw_value": -11.82,
+          "value": -11.82,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "perf_ytd": {
+          "field": "perf_ytd",
+          "raw_value": -17.09,
+          "value": -17.09,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "volume": {
+          "field": "volume",
+          "raw_value": 3840000,
+          "value": 3840000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "relative_volume": {
+          "field": "relative_volume",
+          "raw_value": 1.1,
+          "value": 1.1,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_10d": {
+          "field": "avg_volume_10d",
+          "raw_value": 3770000,
+          "value": 3770000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_30d": {
+          "field": "avg_volume_30d",
+          "raw_value": 2590000,
+          "value": 2590000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "avg_volume_60d": {
+          "field": "avg_volume_60d",
+          "raw_value": 2680000,
+          "value": 2680000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "market_cap": {
+          "field": "market_cap",
+          "raw_value": 18440000000000,
+          "value": 18440000000000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "roe_ttm": {
+          "field": "roe_ttm",
+          "raw_value": 26.71,
+          "value": 26.71,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "roa_ttm": {
+          "field": "roa_ttm",
+          "raw_value": 12.58,
+          "value": 12.58,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "revenue_growth_annual_yoy": {
+          "field": "revenue_growth_annual_yoy",
+          "raw_value": 28.52,
+          "value": 28.52,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "revenue_growth_quarterly_yoy": {
+          "field": "revenue_growth_quarterly_yoy",
+          "raw_value": -17.44,
+          "value": -17.44,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "eps_dil_growth_ttm_yoy": {
+          "field": "eps_dil_growth_ttm_yoy",
+          "raw_value": 114.85,
+          "value": 114.85,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "fcf_growth_ttm_yoy": {
+          "field": "fcf_growth_ttm_yoy",
+          "raw_value": null,
+          "value": null,
+          "observation_state": "MISSING",
+          "usage_state": "UNAVAILABLE",
+          "reason": "MISSING"
+        },
+        "gross_margin_ttm": {
+          "field": "gross_margin_ttm",
+          "raw_value": 34.77,
+          "value": 34.77,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "operating_margin_ttm": {
+          "field": "operating_margin_ttm",
+          "raw_value": 27.08,
+          "value": 27.08,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "net_margin_ttm": {
+          "field": "net_margin_ttm",
+          "raw_value": 45.86,
+          "value": 45.86,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "fcf_ttm": {
+          "field": "fcf_ttm",
+          "raw_value": 1000000000000,
+          "value": 1000000000000,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "debt_equity_fq": {
+          "field": "debt_equity_fq",
+          "raw_value": 0.55,
+          "value": 0.55,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "debt_equity_fy": {
+          "field": "debt_equity_fy",
+          "raw_value": 0.6,
+          "value": 0.6,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "current_ratio_fq": {
+          "field": "current_ratio_fq",
+          "raw_value": 1.18,
+          "value": 1.18,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "quick_ratio_fq": {
+          "field": "quick_ratio_fq",
+          "raw_value": 1.07,
+          "value": 1.07,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "pe": {
+          "field": "pe",
+          "raw_value": 5.28,
+          "value": 5.28,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "peg": {
+          "field": "peg",
+          "raw_value": 0.05,
+          "value": 0.05,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "pb": {
+          "field": "pb",
+          "raw_value": 1.17,
+          "value": 1.17,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ps": {
+          "field": "ps",
+          "raw_value": 2.48,
+          "value": 2.48,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ev_ebitda": {
+          "field": "ev_ebitda",
+          "raw_value": 8.38,
+          "value": 8.38,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        },
+        "ev_revenue": {
+          "field": "ev_revenue",
+          "raw_value": 3.15,
+          "value": 3.15,
+          "observation_state": "VALID",
+          "usage_state": "ELIGIBLE",
+          "reason": null
+        }
+      },
+      "screening_summary": {
+        "screen_score": 80.27,
+        "screen_rank": 5,
+        "screen_grade": "A",
+        "quality_score": 100,
+        "growth_score": 66.67,
+        "valuation_score": 82.63,
+        "micro_score": 89.66,
+        "momentum_score": 38.11,
+        "opportunity_score": 62.47,
+        "classification": "CORE"
+      },
+      "trusted_screener_snapshot": {
+        "source": "StockScreenerV2",
+        "ticker": "HAG",
+        "industry": "Real estate development",
+        "screening_as_of": "2026-10-06",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 80.27,
+          "screen_rank": 5,
+          "screen_grade": "A",
+          "quality_score": 100,
+          "growth_score": 66.67,
+          "valuation_score": 82.63,
+          "micro_score": 89.66,
+          "momentum_score": 38.11,
+          "opportunity_score": 62.47,
+          "classification": "CORE"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 14550,
+              "value": 14550,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 19250,
+              "value": 19250,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 13250,
+              "value": 13250,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": 3.93,
+              "value": 3.93,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": 3.56,
+              "value": 3.56,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": -2.35,
+              "value": -2.35,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": -9.35,
+              "value": -9.35,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": -11.82,
+              "value": -11.82,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": -17.09,
+              "value": -17.09,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 3840000,
+              "value": 3840000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 1.1,
+              "value": 1.1,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 3770000,
+              "value": 3770000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 2590000,
+              "value": 2590000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 2680000,
+              "value": 2680000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 18440000000000,
+              "value": 18440000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 26.71,
+              "value": 26.71,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 12.58,
+              "value": 12.58,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 28.52,
+              "value": 28.52,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": -17.44,
+              "value": -17.44,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 114.85,
+              "value": 114.85,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": null,
+              "value": null,
+              "observation_state": "MISSING",
+              "usage_state": "UNAVAILABLE",
+              "reason": "MISSING"
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 34.77,
+              "value": 34.77,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 27.08,
+              "value": 27.08,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 45.86,
+              "value": 45.86,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": 1000000000000,
+              "value": 1000000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.55,
+              "value": 0.55,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.6,
+              "value": 0.6,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 1.18,
+              "value": 1.18,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 1.07,
+              "value": 1.07,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 5.28,
+              "value": 5.28,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0.05,
+              "value": 0.05,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 1.17,
+              "value": 1.17,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 2.48,
+              "value": 2.48,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 8.38,
+              "value": 8.38,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 3.15,
+              "value": 3.15,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 14550,
+          "high_52w": 19250,
+          "low_52w": 13250
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 100,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 66.67,
+            "coverage": 75,
+            "status": "LIMITED",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 3
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 82.63,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 5
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 89.66,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 38.11,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 94.83,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 62.47,
+            "coverage": 91.67,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "FALSE",
+            "signals": []
+          },
+          "lineage": []
+        },
+        "classification": {
+          "classification": "CORE",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Strong quality and opportunity, no material soft risk",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 94.83,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 62.47,
+            "coverage": 91.67,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.244156,
+          "upside_to_52w_high": 0.323024,
+          "position_52w_range": 0.216667,
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "FALSE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": 3.93,
+          "perf_1m": 3.56,
+          "perf_3m": -2.35,
+          "perf_6m": -9.35,
+          "perf_1y": -11.82,
+          "perf_ytd": -17.09,
+          "volume": 3840000,
+          "relative_volume": 1.1,
+          "avg_volume_30d": 2590000,
+          "medium_momentum": -4.318,
+          "momentum_stack": 0.333333,
+          "volume_confirmation": "FALSE",
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "FALSE",
+            "weak_medium_momentum": "FALSE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "HAG",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 80.27,
+          "percentile": 93.94,
+          "rank_position": 5,
+          "rank_total": 67,
+          "rankable_denominator": 67,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "STRONG_BUSINESS_QUALITY",
+            "ATTRACTIVE_VALUATION"
+          ]
+        }
+      },
+      "screening_as_of": "2026-10-06",
+      "data_integrity": {
+        "coverage": 100,
+        "status": "DATA_OK",
+        "flags": [],
+        "missing_fields": [],
+        "observations": {
+          "price": {
+            "field": "price",
+            "raw_value": 14550,
+            "value": 14550,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "high_52w": {
+            "field": "high_52w",
+            "raw_value": 19250,
+            "value": 19250,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "low_52w": {
+            "field": "low_52w",
+            "raw_value": 13250,
+            "value": 13250,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1w": {
+            "field": "perf_1w",
+            "raw_value": 3.93,
+            "value": 3.93,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1m": {
+            "field": "perf_1m",
+            "raw_value": 3.56,
+            "value": 3.56,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_3m": {
+            "field": "perf_3m",
+            "raw_value": -2.35,
+            "value": -2.35,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_6m": {
+            "field": "perf_6m",
+            "raw_value": -9.35,
+            "value": -9.35,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1y": {
+            "field": "perf_1y",
+            "raw_value": -11.82,
+            "value": -11.82,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_ytd": {
+            "field": "perf_ytd",
+            "raw_value": -17.09,
+            "value": -17.09,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "volume": {
+            "field": "volume",
+            "raw_value": 3840000,
+            "value": 3840000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "relative_volume": {
+            "field": "relative_volume",
+            "raw_value": 1.1,
+            "value": 1.1,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_10d": {
+            "field": "avg_volume_10d",
+            "raw_value": 3770000,
+            "value": 3770000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_30d": {
+            "field": "avg_volume_30d",
+            "raw_value": 2590000,
+            "value": 2590000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_60d": {
+            "field": "avg_volume_60d",
+            "raw_value": 2680000,
+            "value": 2680000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "market_cap": {
+            "field": "market_cap",
+            "raw_value": 18440000000000,
+            "value": 18440000000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roe_ttm": {
+            "field": "roe_ttm",
+            "raw_value": 26.71,
+            "value": 26.71,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roa_ttm": {
+            "field": "roa_ttm",
+            "raw_value": 12.58,
+            "value": 12.58,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_annual_yoy": {
+            "field": "revenue_growth_annual_yoy",
+            "raw_value": 28.52,
+            "value": 28.52,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_quarterly_yoy": {
+            "field": "revenue_growth_quarterly_yoy",
+            "raw_value": -17.44,
+            "value": -17.44,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "eps_dil_growth_ttm_yoy": {
+            "field": "eps_dil_growth_ttm_yoy",
+            "raw_value": 114.85,
+            "value": 114.85,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_growth_ttm_yoy": {
+            "field": "fcf_growth_ttm_yoy",
+            "raw_value": null,
+            "value": null,
+            "observation_state": "MISSING",
+            "usage_state": "UNAVAILABLE",
+            "reason": "MISSING"
+          },
+          "gross_margin_ttm": {
+            "field": "gross_margin_ttm",
+            "raw_value": 34.77,
+            "value": 34.77,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "operating_margin_ttm": {
+            "field": "operating_margin_ttm",
+            "raw_value": 27.08,
+            "value": 27.08,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "net_margin_ttm": {
+            "field": "net_margin_ttm",
+            "raw_value": 45.86,
+            "value": 45.86,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_ttm": {
+            "field": "fcf_ttm",
+            "raw_value": 1000000000000,
+            "value": 1000000000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fq": {
+            "field": "debt_equity_fq",
+            "raw_value": 0.55,
+            "value": 0.55,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fy": {
+            "field": "debt_equity_fy",
+            "raw_value": 0.6,
+            "value": 0.6,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "current_ratio_fq": {
+            "field": "current_ratio_fq",
+            "raw_value": 1.18,
+            "value": 1.18,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "quick_ratio_fq": {
+            "field": "quick_ratio_fq",
+            "raw_value": 1.07,
+            "value": 1.07,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pe": {
+            "field": "pe",
+            "raw_value": 5.28,
+            "value": 5.28,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "peg": {
+            "field": "peg",
+            "raw_value": 0.05,
+            "value": 0.05,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pb": {
+            "field": "pb",
+            "raw_value": 1.17,
+            "value": 1.17,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ps": {
+            "field": "ps",
+            "raw_value": 2.48,
+            "value": 2.48,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_ebitda": {
+            "field": "ev_ebitda",
+            "raw_value": 8.38,
+            "value": 8.38,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_revenue": {
+            "field": "ev_revenue",
+            "raw_value": 3.15,
+            "value": 3.15,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          }
+        },
+        "issues": []
+      },
+      "market_data": {
+        "price": {
+          "value": 14550,
+          "source": "SCREENING",
+          "as_of": "2026-10-06"
+        },
+        "volume_20d_avg": {
+          "value": null
+        },
+        "avg_trading_value_20d": {
+          "value": null
+        },
+        "liquidity_flag": "Khối lượng giao dịch gần mức trung bình; RVOL 1,10.",
+        "foreign_net_flow_20d": {
+          "value": null
+        },
+        "foreign_room_remaining": {
+          "value": null
+        },
+        "market_cap": {
+          "value": 18440000000000,
+          "source": "SCREENING"
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": 5.28,
+        "pb_current": 1.17,
+        "dividend_yield": null
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 3707.14,
+          "unit": "tỷ đồng",
+          "period": "6T2026",
+          "verification_note": "Cần đối chiếu chi tiết với BCTC soát xét"
+        },
+        "npat": {
+          "value": 2300,
+          "unit": "tỷ đồng",
+          "period": "6T2026",
+          "approximate": true
+        },
+        "ebit": {
+          "value": null
+        },
+        "gross_margin": 34.77,
+        "debt_equity": 0.55,
+        "total_debt": {
+          "value": null
+        },
+        "total_equity": {
+          "value": null
+        },
+        "cash_and_equivalents": {
+          "value": null
+        },
+        "effective_tax_rate": {
+          "value": null
+        },
+        "cfo": {
+          "value": null
+        },
+        "capex": {
+          "value": null
+        },
+        "receivables": {
+          "value": null
+        },
+        "inventory": {
+          "value": null
+        },
+        "financial_income": {
+          "value": null
+        },
+        "financial_expense": {
+          "value": null
+        },
+        "other_income": {
+          "value": null
+        },
+        "other_expense": {
+          "value": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "Không đủ dữ liệu WACC chuẩn hóa và cấu trúc nợ sau tái cơ cấu.",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": {
+          "value": null
+        },
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": {
+          "value": null
+        }
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": {
+          "value": "Cần theo dõi các giao dịch liên quan, cấu trúc nợ và HGI."
+        }
+      },
+      "upcoming_events": [
+        {
+          "event": "BCTC Q3/9T2026",
+          "date": "Quý IV/2026",
+          "importance": "Kiểm tra lợi nhuận nông nghiệp sau khi tách miễn lãi vay."
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "signal": "INDUSTRY_MISMATCH",
+          "status": "ANSWERED",
+          "finding": "Screener gắn ngành bất động sản; hoạt động cốt lõi HAGL hiện là chuối, sầu riêng và kế hoạch cà phê.",
+          "source_refs": [
+            "HAG_IR",
+            "HAG_DURIAN"
+          ]
+        },
+        {
+          "signal": "ONE_OFF_EARNINGS",
+          "status": "ANSWERED",
+          "finding": "Hơn 1.500 tỷ đồng miễn giảm lãi trái phiếu giúp nâng đáng kể lợi nhuận 6T; không được xem là thu nhập vận hành thường xuyên.",
+          "source_refs": [
+            "HAG_Q2",
+            "HAG_BOND"
+          ]
+        },
+        {
+          "signal": "VALUATION_LOW_PE",
+          "status": "PARTIAL",
+          "finding": "P/E 5,28 lần trong Screener cần tái tính trên EPS chuẩn hóa, không dùng ngay để kết luận rẻ.",
+          "source_refs": [
+            "HAG_Q2"
+          ]
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [
+          "giá",
+          "giá cao/thấp 52 tuần",
+          "ROE",
+          "biên lợi nhuận",
+          "FCF TTM",
+          "P/E/P/B",
+          "khối lượng"
+        ],
+        "new_data_collected": [
+          "công bố bán niên",
+          "miễn giảm lãi vay",
+          "sản lượng sầu riêng",
+          "xuất khẩu sầu riêng",
+          "kế hoạch cà phê"
+        ],
+        "still_missing": [
+          "CFO và capex theo phân khúc đã xác thực",
+          "EPS cốt lõi sau điều chỉnh",
+          "OHLCV 200 phiên",
+          "dòng tiền nước ngoài 20 phiên"
+        ]
+      },
+      "material_questions": [
+        {
+          "question": "Bao nhiêu lợi nhuận là lợi nhuận vận hành có thể lặp lại?",
+          "why_material": "Miễn giảm lãi vay làm méo so sánh P/E và ROE.",
+          "status": "PARTIAL",
+          "answer": "Lãi vay được miễn trên 1.500 tỷ đồng; báo cáo 9T cần bóc tách lợi nhuận nông nghiệp sau yếu tố một lần.",
+          "source_refs": [
+            "HAG_Q2",
+            "HAG_BOND"
+          ],
+          "freshness": "2026-07"
+        },
+        {
+          "question": "Sầu riêng có đủ quy mô để dẫn dắt lợi nhuận tới?",
+          "why_material": "Sản lượng tăng nhanh nhưng tỷ trọng doanh thu vẫn khiêm tốn.",
+          "status": "ANSWERED",
+          "answer": "HAGL ghi nhận khoảng 7.500 tấn tính đến 23/09, gần gấp đôi sản lượng 2025; cần xác minh biên và dòng tiền từng vụ.",
+          "source_refs": [
+            "HAG_DURIAN"
+          ],
+          "freshness": "2026-09-23"
+        },
+        {
+          "question": "Rủi ro thị trường xuất khẩu và vốn đầu tư?",
+          "why_material": "Phụ thuộc Trung Quốc và nhu cầu vốn mở rộng cây lâu năm.",
+          "status": "PARTIAL",
+          "answer": "Sầu riêng xuất khẩu Việt Nam tăng nhưng hơn 90% giá trị tập trung ở Trung Quốc; công ty vẫn phải đầu tư lớn cho các vườn cây mới.",
+          "source_refs": [
+            "VN_DURIAN",
+            "HAG_COFFEE"
+          ],
+          "freshness": "2026-09"
+        }
+      ],
+      "sources": [
+        {
+          "id": "HAG_IR",
+          "title": "BCTC hợp nhất bán niên 2026 HAGL",
+          "url": "https://hagl.com.vn/co-dong",
+          "as_of": "2026-08-29"
+        },
+        {
+          "id": "HAG_Q2",
+          "title": "Lợi nhuận HAGL 6T2026 và miễn lãi vay",
+          "url": "https://vnexpress.net/cong-ty-cua-bau-duc-lai-gan-2-300-ty-dong-nua-dau-nam-5102947.html",
+          "as_of": "2026-07-30"
+        },
+        {
+          "id": "HAG_DURIAN",
+          "title": "Sản lượng sầu riêng HAGL 2026",
+          "url": "https://haglgroup.vn/truyen-thong/tin-tuc/sau-rieng-tu-nhung-mua-vu-dau-tien-den-buoc-tang-toc-san-luong",
+          "as_of": "2026-09-23"
+        },
+        {
+          "id": "HAG_COFFEE",
+          "title": "Chiến lược 20.000ha cà phê HAGL",
+          "url": "https://hagl.com.vn/",
+          "as_of": "2026-09-10"
+        },
+        {
+          "id": "VN_DURIAN",
+          "title": "Xuất khẩu sầu riêng Việt Nam 8T2026 và mã vùng trồng",
+          "url": "https://en.mae.gov.vn/Pages/chi-tiet-tin-Eng.aspx?ItemID=9617",
+          "as_of": "2026-09"
+        },
+        {
+          "id": "HAG_BOND",
+          "title": "HAG được miễn giảm 1.534 tỷ đồng lãi trái phiếu",
+          "url": "https://vnexpress.net/cong-ty-cua-bau-duc-duoc-giam-hon-1-500-ty-dong-tien-lai-trai-phieu-5056882.html",
+          "as_of": "2026-03-31"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "coverage_model": "CAPABILITY_BASED_V1",
+        "required_sessions": null,
+        "sessions_used": null,
+        "indicator_requirements": [
+          {
+            "capability": "short_term_return_snapshots",
+            "required_sessions": 30,
+            "satisfied": true
+          },
+          {
+            "capability": "sma200",
+            "required_sessions": 200,
+            "satisfied": false
+          },
+          {
+            "capability": "vsa_spread_volume_context",
+            "required_sessions": 60,
+            "satisfied": false
+          }
+        ],
+        "missing_capabilities": [
+          "sma200",
+          "vsa_spread_volume_context"
+        ],
+        "note": "Chỉ có snapshot, không có chuỗi OHLCV có thể kiểm chứng."
+      },
+      "ohlcv_source": {
+        "source": "StockScreenerV2 snapshot",
+        "sessions_used": null,
+        "date_range": "06/10/2026"
+      },
+      "trend_status": "Hồi ngắn hạn nhưng suy yếu trên 6–12 tháng.",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": 1.1,
+        "classification": "Khối lượng bình thường",
+        "vsa_signal_candidate": "Chưa thể kết luận VSA",
+        "supporting_evidence": [
+          "1 tháng +3,56%",
+          "6 tháng -9,35%"
+        ]
+      },
+      "smart_money_phase": {
+        "label": "Chưa đủ bằng chứng tích lũy lớn",
+        "evidence_status": "DEGRADED",
+        "supporting_evidence": [
+          "RVOL 1,10",
+          "1 năm -11,82%"
+        ]
+      },
+      "zones": {
+        "demand": "13.250–13.800 đồng (vùng theo đáy 52 tuần)",
+        "supply": "16.500–19.250 đồng (vùng tham chiếu phía trên)",
+        "is_fresh": false
+      },
+      "sector_benchmark": {
+        "method": "QUALITATIVE",
+        "name": "Nông nghiệp xuất khẩu Việt Nam",
+        "constituents_if_peer_basket": [],
+        "source": "VN_DURIAN",
+        "date": "2026-09"
+      },
+      "sector_vs_market": {
+        "period": "06/10/2026",
+        "sector_perf_pct": null,
+        "vnindex_perf_pct": null,
+        "sector_strength_label": "Chưa có dữ liệu đối chứng định lượng đủ chuẩn."
+      },
+      "screening_signal_analysis": "Hồi 1 tháng nhưng chưa vượt sức ép trung hạn; không có bằng chứng cho SMA200/VSA.",
+      "signal_strength": 43,
+      "conclusion": "Động lượng chưa đủ để xác nhận đảo chiều; kỹ thuật ở trạng thái DEGRADED."
+    },
+    "node3": {
+      "data_period": "Bán niên 2026",
+      "screening_flags": [
+        "INDUSTRY_MISMATCH",
+        "ONE_OFF_EARNINGS",
+        "ATTRACTIVE_VALUATION"
+      ],
+      "screening_metrics_used": {
+        "role": "Snapshot, không thay thế phân tích báo cáo tài chính.",
+        "pe": 5.28,
+        "pb": 1.17,
+        "ev_ebitda": 8.38,
+        "roe_ttm": 26.71,
+        "eps_dil_growth_ttm_yoy": 114.85,
+        "debt_equity_fq": 0.55
+      },
+      "capital_efficiency": {
+        "wacc": null,
+        "roic": null,
+        "economic_spread": null,
+        "reason": "Thiếu số liệu đầy đủ để chuẩn hóa lợi nhuận và chi phí vốn.",
+        "external_reference": null
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": {
+          "value": 1000000000000,
+          "note": "Số liệu FCF TTM từ Screener, chưa bóc tách từng phân khúc."
+        },
+        "accrual_ratio": null,
+        "review_adjustment": "Một phần lớn lợi nhuận 6T đến từ miễn giảm lãi vay; cần loại khoản bất thường khi chuẩn hóa EPS.",
+        "flag": "DEGRADED"
+      },
+      "earnings_sustainability": {
+        "classification": [
+          "Nông nghiệp",
+          "Thu nhập bất thường từ tái cơ cấu",
+          "Mở rộng vườn cây"
+        ],
+        "structural": [
+          "Diện tích sầu riêng đến tuổi khai thác tăng."
+        ],
+        "cyclical": [
+          "Giá bán chuối/sầu riêng và nhu cầu Trung Quốc thay đổi theo chu kỳ."
+        ],
+        "low_base": [
+          "So sánh EPS chịu ảnh hưởng khoản miễn lãi vay không thường xuyên."
+        ]
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Chưa đủ dữ liệu đầu vào để tính Piotroski/Beneish đáng tin cậy.",
+      "health_status": "Lợi nhuận báo cáo cao nhưng độ bền chưa rõ.",
+      "valuation": {
+        "current": {
+          "pe": 5.28,
+          "pb": 1.17,
+          "ev_ebitda": 8.38
+        },
+        "broker_references": [],
+        "reverse_dcf": null,
+        "conclusion": "P/E báo cáo thấp không đồng nghĩa cổ phiếu rẻ sau khi loại khoản miễn lãi; ưu tiên NORMALIZED_PE và PB."
+      },
+      "moat": "Quỹ đất và năng lực canh tác tại nhiều nước, quy mô trang trại, quy trình trồng và hệ thống phân phối nông sản tạo khả năng mở rộng; tính bền vững cần theo dõi.",
+      "conclusion": "Sầu riêng tạo động lực dài hạn nhưng chất lượng lợi nhuận 6T bị ảnh hưởng nặng bởi khoản thu một lần.",
+      "sector_economics": {
+        "sector_profile": "GENERIC",
+        "earnings_bridge": [
+          {
+            "driver": "Sản lượng sầu riêng tăng",
+            "effect": "Tích cực, dài hạn",
+            "evidence_ref": "HAG_DURIAN"
+          },
+          {
+            "driver": "Lãi vay được miễn",
+            "effect": "Tăng lợi nhuận một lần",
+            "evidence_ref": "HAG_BOND"
+          },
+          {
+            "driver": "Xuất khẩu sầu riêng Trung Quốc tăng",
+            "effect": "Tạo nền cầu thuận lợi",
+            "evidence_ref": "VN_DURIAN"
+          }
+        ],
+        "normalized_earnings": {
+          "view": "Không ngoại suy lợi nhuận báo cáo 6T sang cả năm; cần loại thu nhập miễn lãi và xem biên gộp nông nghiệp.",
+          "confidence": "LOW"
+        },
+        "capital_allocation": [
+          "Chiến lược mở rộng cà phê và sầu riêng có độ trễ sinh lợi.",
+          "Nợ và dòng tiền đầu tư cần theo dõi song song hiệu quả sản lượng."
+        ],
+        "balance_sheet_capacity": {
+          "debt_equity_screened": 0.55,
+          "current_ratio_screened": 1.18,
+          "note": "Tỷ lệ đòn bẩy theo Screener không phản ánh đầy đủ cấu trúc trái phiếu sau tái cơ cấu."
+        },
+        "valuation_method_selection": [
+          {
+            "method": "NORMALIZED_PE",
+            "status": "SELECTED",
+            "reason": "Loại lợi nhuận bất thường miễn lãi trước khi xem định giá.",
+            "evidence_refs": [
+              "HAG_Q2",
+              "HAG_BOND"
+            ]
+          },
+          {
+            "method": "PB",
+            "status": "SELECTED",
+            "reason": "Thước đo phụ khi lợi nhuận biến động mạnh.",
+            "evidence_refs": [
+              "SCREENING"
+            ]
+          },
+          {
+            "method": "EV_EBITDA",
+            "status": "CONDITIONAL",
+            "reason": "Chỉ dùng khi EBITDA nông nghiệp được xác thực độc lập.",
+            "evidence_refs": [
+              "HAG_IR"
+            ]
+          }
+        ]
+      },
+      "expectation_basis": [
+        {
+          "topic": "Kỳ vọng tăng trưởng nông nghiệp",
+          "statement": "SUY LUẬN: sản lượng sầu riêng tăng mạnh nhưng biên lợi nhuận và tỷ trọng đóng góp chưa đủ để định giá riêng.",
+          "expectation_basis": "PRICE_ACTION_INFERENCE",
+          "gap_direction": "UNCERTAIN",
+          "source_refs": [
+            "HAG_DURIAN",
+            "SCREENING"
+          ],
+          "as_of": "2026-09-23",
+          "expected_value": null,
+          "expected_unit": null,
+          "analyst_view": "Có tiềm năng nhưng đòi hỏi chứng cứ dòng tiền các vụ tiếp theo.",
+          "investment_implication": "Không nâng conviction chỉ vì tăng trưởng sản lượng.",
+          "inference_label": "INFERENCE"
+        }
+      ]
+    },
+    "node4": {
+      "risk_regime": "MIXED",
+      "macro_indicators": {},
+      "company_specific_drivers": [
+        {
+          "driver": "Nhu cầu sầu riêng Trung Quốc",
+          "impact": "Tích cực",
+          "source_ref": "VN_DURIAN"
+        },
+        {
+          "driver": "Quy định xuất khẩu",
+          "impact": "Vừa cơ hội vừa rủi ro",
+          "source_ref": "VN_DURIAN"
+        }
+      ],
+      "sensitivity_table": [],
+      "geopolitical_events": [],
+      "causal_chains": [
+        {
+          "chain": "Nhu cầu Trung Quốc tăng → giá/sản lượng sầu riêng → doanh thu nông nghiệp."
+        },
+        {
+          "chain": "Vườn cây mở rộng → capex trước → sản lượng sau nhiều vụ."
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Giá sầu riêng giảm",
+          "impact": "Biên lợi nhuận cốt lõi yếu đi."
+        },
+        {
+          "scenario": "Kiểm soát chất lượng chặt",
+          "impact": "Tồn kho và doanh thu xuất khẩu bị trì hoãn."
+        }
+      ],
+      "macro_view": "Nhu cầu sầu riêng xuất khẩu thuận lợi nhưng rủi ro tập trung thị trường vẫn lớn.",
+      "industry_impact": "Giá trị xuất khẩu tăng cùng yêu cầu truy xuất nguồn gốc chặt chẽ hơn.",
+      "company_impact": "HAGL được hưởng lợi từ sản lượng sầu riêng tăng, còn dòng tiền chịu độ trễ đầu tư vườn cây.",
+      "conclusion": "Điểm tích cực bên ngoài chưa bù được bất định lợi nhuận thường xuyên của HAG.",
+      "external_exposure_map": [
+        {
+          "exposure_id": "durian-demand",
+          "driver": "Nhu cầu sầu riêng Trung Quốc",
+          "driver_type": "DEMAND",
+          "company_exposure": "HAGL bán sầu riêng vào chuỗi xuất khẩu có thị trường Trung Quốc rất lớn.",
+          "transmission_mechanism": "Nhu cầu tăng có thể hỗ trợ giá bán và sản lượng xuất khẩu, từ đó cải thiện doanh thu và lợi nhuận.",
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "transmission_targets": [
+            "REVENUE",
+            "MARGIN",
+            "CASH_FLOW"
+          ],
+          "selection_rationale": "Sầu riêng đang gia tăng sản lượng và là động lực dài hạn."
+        },
+        {
+          "exposure_id": "export-quality",
+          "driver": "Yêu cầu truy xuất và mã vùng trồng",
+          "driver_type": "REGULATORY",
+          "company_exposure": "Chất lượng/mã vùng quyết định khả năng vào thị trường xuất khẩu.",
+          "transmission_mechanism": "Đáp ứng quy định giúp giảm rủi ro gián đoạn xuất khẩu; không tuân thủ có thể gây tồn hàng.",
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "transmission_targets": [
+            "REVENUE",
+            "MARGIN"
+          ],
+          "selection_rationale": "Thị trường đầu ra tập trung tại Trung Quốc."
+        },
+        {
+          "exposure_id": "coffee-expansion",
+          "driver": "Nhu cầu đầu tư và phát triển vùng cà phê",
+          "driver_type": "COMPANY_EXTERNAL",
+          "company_exposure": "Kế hoạch mở rộng cà phê cần vốn và chịu rủi ro khí hậu/giá nông sản.",
+          "transmission_mechanism": "Diện tích và suất đầu tư tăng tạo chi trước, chỉ chuyển thành doanh thu khi cây đạt năng suất.",
+          "materiality_hypothesis": "MEDIUM",
+          "research_required": true,
+          "transmission_targets": [
+            "CASH_FLOW",
+            "BALANCE_SHEET",
+            "VALUATION"
+          ],
+          "selection_rationale": "Chu kỳ đầu tư dài làm biến động dòng tiền."
+        }
+      ],
+      "research_targets": [
+        {
+          "target_id": "durian-data",
+          "exposure_id": "durian-demand",
+          "driver": "Nhu cầu sầu riêng Trung Quốc",
+          "driver_type": "DEMAND",
+          "status": "RESEARCHED",
+          "attempts": [
+            {
+              "source": "Bộ Nông nghiệp và Môi trường",
+              "status": "FOUND"
+            },
+            {
+              "source": "HAGL",
+              "status": "FOUND"
+            }
+          ],
+          "source_refs": [
+            "VN_DURIAN",
+            "HAG_DURIAN"
+          ],
+          "as_of": "2026-09",
+          "freshness": "Số liệu 8T và công bố 23/09/2026",
+          "prior_state": "8T2025 thấp hơn về giá trị xuất khẩu.",
+          "current_state": "8T2026 khoảng 1,97 tỷ USD, tăng 28,3%; HAGL ghi nhận khoảng 7.500 tấn đến 23/09.",
+          "direction": "UP",
+          "failure_reason": null
+        },
+        {
+          "target_id": "export-data",
+          "exposure_id": "export-quality",
+          "driver": "Yêu cầu truy xuất và mã vùng trồng",
+          "driver_type": "REGULATORY",
+          "status": "RESEARCHED",
+          "attempts": [
+            {
+              "source": "Bộ Nông nghiệp và Môi trường",
+              "status": "FOUND"
+            }
+          ],
+          "source_refs": [
+            "VN_DURIAN"
+          ],
+          "as_of": "2026-08-14",
+          "freshness": "Tháng 8/2026",
+          "prior_state": "Số mã đủ điều kiện thấp hơn trước.",
+          "current_state": "Trung Quốc cấp bổ sung 401 mã vùng trồng và 166 mã cơ sở đóng gói cho Việt Nam.",
+          "direction": "UP",
+          "failure_reason": null
+        },
+        {
+          "target_id": "coffee-data",
+          "exposure_id": "coffee-expansion",
+          "driver": "Nhu cầu đầu tư và phát triển vùng cà phê",
+          "driver_type": "COMPANY_EXTERNAL",
+          "status": "RESEARCHED",
+          "attempts": [
+            {
+              "source": "HAGL corporate update",
+              "status": "FOUND"
+            }
+          ],
+          "source_refs": [
+            "HAG_COFFEE"
+          ],
+          "as_of": "2026-09-10",
+          "freshness": "10/09/2026",
+          "prior_state": null,
+          "current_state": "Công ty công bố chiến lược 20.000ha cà phê và đánh giá thực địa.",
+          "direction": "UNKNOWN",
+          "failure_reason": null
+        }
+      ],
+      "what_changed": [
+        {
+          "exposure_id": "durian-demand",
+          "target_id": "durian-data",
+          "driver": "Nhu cầu sầu riêng Trung Quốc",
+          "driver_type": "DEMAND",
+          "exposure": "HAGL bán sầu riêng vào chuỗi xuất khẩu có thị trường Trung Quốc rất lớn.",
+          "prior_state": "8T2025 thấp hơn về giá trị xuất khẩu.",
+          "current_state": "8T2026 khoảng 1,97 tỷ USD, tăng 28,3%; HAGL ghi nhận khoảng 7.500 tấn đến 23/09.",
+          "direction": "UP",
+          "materiality": "HIGH",
+          "transmission_lag": "Trong 1–4 quý",
+          "source_refs": [
+            "VN_DURIAN",
+            "HAG_DURIAN"
+          ],
+          "as_of": "2026-09",
+          "transmission_targets": [
+            "REVENUE",
+            "MARGIN",
+            "CASH_FLOW"
+          ],
+          "fact": "Giá trị xuất khẩu sầu riêng Việt Nam và sản lượng HAGL đều tăng.",
+          "inference": "Nền cầu hỗ trợ khả năng tiêu thụ sầu riêng nhưng không bảo đảm biên lợi nhuận.",
+          "assumption": "Giá bán, chất lượng và điều kiện xuất khẩu ổn định.",
+          "inference_confidence": 80
+        },
+        {
+          "exposure_id": "export-quality",
+          "target_id": "export-data",
+          "driver": "Yêu cầu truy xuất và mã vùng trồng",
+          "driver_type": "REGULATORY",
+          "exposure": "Chất lượng/mã vùng quyết định khả năng vào thị trường xuất khẩu.",
+          "prior_state": "Số mã đủ điều kiện thấp hơn trước.",
+          "current_state": "Trung Quốc cấp bổ sung 401 mã vùng trồng và 166 mã cơ sở đóng gói cho Việt Nam.",
+          "direction": "UP",
+          "materiality": "HIGH",
+          "transmission_lag": "Trong 1–4 quý",
+          "source_refs": [
+            "VN_DURIAN"
+          ],
+          "as_of": "2026-08-14",
+          "transmission_targets": [
+            "REVENUE",
+            "MARGIN"
+          ],
+          "fact": "Trung Quốc đã duyệt thêm các mã vùng trồng và cơ sở đóng gói.",
+          "inference": "Quy định mở rộng cơ hội chung, chưa chứng minh từng vùng trồng HAGL đều đạt chuẩn.",
+          "assumption": "Vườn cây HAGL đủ hồ sơ và chất lượng xuất khẩu.",
+          "inference_confidence": 68
+        },
+        {
+          "exposure_id": "coffee-expansion",
+          "target_id": "coffee-data",
+          "driver": "Nhu cầu đầu tư và phát triển vùng cà phê",
+          "driver_type": "COMPANY_EXTERNAL",
+          "exposure": "Kế hoạch mở rộng cà phê cần vốn và chịu rủi ro khí hậu/giá nông sản.",
+          "prior_state": null,
+          "current_state": "Công ty công bố chiến lược 20.000ha cà phê và đánh giá thực địa.",
+          "direction": "UNKNOWN",
+          "materiality": "MEDIUM",
+          "transmission_lag": "Từ 2 đến 5 năm",
+          "source_refs": [
+            "HAG_COFFEE"
+          ],
+          "as_of": "2026-09-10",
+          "transmission_targets": [
+            "CASH_FLOW",
+            "BALANCE_SHEET",
+            "VALUATION"
+          ],
+          "fact": "HAGL công bố mở rộng chiến lược cà phê.",
+          "inference": "Đầu tư mới có thể nâng doanh thu dài hạn nhưng gây áp lực dòng tiền trước kỳ thu hoạch.",
+          "assumption": "Năng suất thực tế và nguồn tài trợ phù hợp với kế hoạch.",
+          "inference_confidence": 62
+        }
+      ]
+    },
+    "node5": {
+      "ticker": "HAG",
+      "data_period": "Bán niên 2026, giá ngày 06/10/2026",
+      "scores": {
+        "fundamental": 12,
+        "valuation": 13,
+        "technical": 9,
+        "flow": 11,
+        "sector_macro": 16,
+        "risk": 9
+      },
+      "ai_score": {
+        "value": 58.5,
+        "formula_shown": "12/20×30 + 13/20×20 + 9/20×15 + 11/20×15 + 16/20×10 + 9/20×10 = 58,50"
+      },
+      "confidence": {
+        "method": "EVIDENCE_QUALITY_V1",
+        "value": 75.15,
+        "components": {
+          "data_completeness": 70,
+          "source_quality": 81,
+          "freshness": 82,
+          "cross_source_consistency": 75,
+          "method_suitability": 76,
+          "key_uncertainty_coverage": 65
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🟡",
+        "technical": "🟡",
+        "macro": "🟢",
+        "liquidity": "🟡",
+        "signal_alignment": "2/4",
+        "alignment": "2/4",
+        "override_applied": "Khoản miễn lãi khiến P/E và tăng trưởng EPS báo cáo kém đại diện cho lợi nhuận cốt lõi."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "BCTC Q3/9T2026 tách lợi nhuận nông nghiệp khỏi miễn giảm lãi vay.",
+        "bucket": "0-30d"
+      },
+      "decision": "WATCH",
+      "drivers": [
+        "Sản lượng sầu riêng HAGL tăng nhanh.",
+        "Xuất khẩu sầu riêng Việt Nam sang Trung Quốc tăng trưởng.",
+        "Lãi vay được miễn làm méo lợi nhuận báo cáo và định giá."
+      ],
+      "thesis_invalidation": "Luận điểm nông nghiệp của HAG yếu đi nếu lợi nhuận trồng trọt tiếp tục giảm sau khi loại khoản miễn lãi, nợ và nhu cầu vốn tăng nhanh mà sầu riêng/cà phê không cải thiện dòng tiền.",
+      "trading_stop": {
+        "price": 11800,
+        "basis": "Mốc quản trị kỹ thuật thận trọng dưới đáy 52 tuần theo snapshot."
+      },
+      "liquidity_note": "Relative volume 1,10 lần không cho thấy xác nhận dòng tiền đột biến.",
+      "strategy": {
+        "entry_zone": "Chưa xác lập vùng mua; theo dõi 13.250–13.800 đồng và chỉ xét khi lợi nhuận cốt lõi Q3 cải thiện.",
+        "allocation_plan": {
+          "note": "Tạm thời quan sát, không mua khi chưa chuẩn hóa lợi nhuận.",
+          "steps": [
+            "Đối chiếu lợi nhuận thường xuyên Q3/9T.",
+            "Kiểm tra dòng tiền và nghĩa vụ nợ sau tái cơ cấu.",
+            "Đánh giá vùng giá mới khi đủ OHLCV."
+          ]
+        },
+        "tp1": {
+          "price": null,
+          "rationale": "Chưa đủ cơ sở chuẩn hóa để đưa ra mục tiêu giá."
+        },
+        "tp2": {
+          "price": null,
+          "rationale": "Không suy diễn mục tiêu từ P/E báo cáo."
+        },
+        "risk_per_trade_pct_nav": 0.5,
+        "position_size_note": "Giữ ở danh sách theo dõi; hạn chế rủi ro định giá và biến động lợi nhuận.",
+        "max_portfolio_weight_pct": 3,
+        "position_type": "Watchlist"
+      },
+      "localized_upstream": {
+        "fundamental": "Sản lượng sầu riêng tốt nhưng lợi nhuận 6T chịu tác động lớn của miễn lãi.",
+        "technical": "Hồi ngắn hạn, xu hướng trung hạn chưa rõ.",
+        "macro": "Cầu sầu riêng tích cực nhưng rủi ro Trung Quốc và vốn đầu tư cao."
+      },
+      "full_reasoning": "HAG có tiềm năng nông nghiệp thật, đặc biệt sầu riêng tăng sản lượng nhanh. Tuy nhiên khoản miễn lãi trái phiếu trên 1.500 tỷ đồng chiếm phần lớn lợi nhuận báo cáo 6T2026. P/E 5,28 lần và ROE cao vì vậy không phản ánh chắc chắn sức sinh lời thường xuyên. Dữ liệu kỹ thuật dài hạn, lợi nhuận từng cây trồng và dòng tiền thuần còn thiếu. Kết luận WATCH nhằm chờ BCTC Q3 và bằng chứng chuyển đổi sản lượng thành tiền, không đánh đồng điểm sàng lọc với luận điểm đầu tư.",
+      "thesis_conviction": {
+        "level": "LOW",
+        "rationale": "Nhu cầu xuất khẩu và sản lượng tốt nhưng lợi nhuận cốt lõi, dòng tiền và nợ chưa đủ rõ.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "supporting_evidence_refs": [
+          "HAG_DURIAN",
+          "VN_DURIAN"
+        ],
+        "contradictory_evidence_refs": [
+          "HAG_Q2",
+          "HAG_BOND"
+        ],
+        "catalyst_visibility": "HIGH",
+        "payoff_asymmetry": "UNCERTAIN"
+      },
+      "decision_overlay": {
+        "market_regime": {
+          "regime_state": "UNKNOWN",
+          "evidence_refs": []
+        },
+        "timing_effect": "NONE",
+        "sizing_effect": "NONE",
+        "decision_effect": "NONE",
+        "pre_overlay_decision": "WATCH",
+        "post_overlay_decision": "WATCH",
+        "override_rationale": null,
+        "ai_score_effect": "NONE",
+        "ai_score_reference": 58.5
+      },
+      "risk_attribution": [
+        {
+          "driver": "Miễn giảm lãi vay một lần",
+          "primary_owner": "FUNDAMENTAL",
+          "residual_risk_effect": "NONE",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Điều chỉnh sức sinh lời thường xuyên trong yếu tố Cơ bản.",
+          "evidence_refs": [
+            "HAG_Q2"
+          ]
+        },
+        {
+          "driver": "Nợ và vốn mở rộng vùng trồng",
+          "primary_owner": "RISK",
+          "residual_risk_effect": "MEDIUM",
+          "risk_score_treatment": "PRIMARY_RISK_PENALTY",
+          "rationale": "Dòng tiền từ cây trồng mới có độ trễ và nghĩa vụ tài trợ cần kiểm chứng.",
+          "evidence_refs": [
+            "HAG_COFFEE",
+            "HAG_IR"
+          ]
+        },
+        {
+          "driver": "Phụ thuộc xuất khẩu sang Trung Quốc",
+          "primary_owner": "SECTOR_MACRO",
+          "residual_risk_effect": "MEDIUM",
+          "risk_score_treatment": "RESIDUAL_TAIL_PENALTY",
+          "rationale": "Rủi ro gián đoạn thị trường đầu ra vượt kịch bản cơ sở.",
+          "evidence_refs": [
+            "VN_DURIAN"
+          ]
+        },
+        {
+          "driver": "Thiếu xu hướng kỹ thuật dài hạn",
+          "primary_owner": "TECHNICAL",
+          "residual_risk_effect": "NONE",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Đã giảm điểm Kỹ thuật và độ tin cậy.",
+          "evidence_refs": [
+            "SCREENING"
+          ]
+        }
+      ],
+      "investment_horizon": {
+        "bucket": "3-12M",
+        "rationale": "Cần ít nhất một đến ba kỳ báo cáo để đánh giá sức sinh lời sau điều chỉnh."
+      },
+      "anti_thesis": "Mã có thể là bẫy định giá khi lợi nhuận cao chủ yếu đến từ miễn lãi, còn nông nghiệp cần vốn lớn và dễ chịu biến động giá trái cây.",
+      "variant_view": {
+        "summary": "Sự tăng sản lượng sầu riêng có thể biến HAG thành doanh nghiệp nông nghiệp sinh tiền tốt hơn sau tái cơ cấu.",
+        "why_different": "Chỉ công nhận bước chuyển đổi khi lợi nhuận và dòng tiền cốt lõi tăng, không dựa vào EPS đã có khoản thu một lần.",
+        "payoff_if_right": "Lợi nhuận thường xuyên ổn định có thể cho phép định giá lại, nhưng hiện chưa đưa mục tiêu giá.",
+        "what_proves_wrong": "Sản lượng tăng mà biên, tiền thu và nợ không cải thiện.",
+        "expectation_basis_refs": [
+          0
+        ]
+      },
+      "monitoring_kpis": [
+        {
+          "kpi": "Lợi nhuận nông nghiệp sau điều chỉnh",
+          "current_state": "6T báo cáo lãi gần 2.300 tỷ, có khoản miễn lãi trên 1.500 tỷ",
+          "watch_condition": "Q3 cho thấy lợi nhuận thường xuyên không phục hồi",
+          "thesis_link": "Đánh giá sức sinh lời thực.",
+          "source_refs": [
+            "HAG_Q2"
+          ]
+        },
+        {
+          "kpi": "Sản lượng sầu riêng",
+          "current_state": "Khoảng 7.500 tấn đến 23/09",
+          "watch_condition": "Sản lượng và tiêu thụ không đi cùng doanh thu",
+          "thesis_link": "Xác nhận động lực tăng trưởng.",
+          "source_refs": [
+            "HAG_DURIAN"
+          ]
+        },
+        {
+          "kpi": "Xuất khẩu sang Trung Quốc",
+          "current_state": "8T2026 +29,9% giá trị YoY",
+          "watch_condition": "Tiếp cận thị trường bị gián đoạn",
+          "thesis_link": "Đầu ra trái cây.",
+          "source_refs": [
+            "VN_DURIAN"
+          ]
+        },
+        {
+          "kpi": "Dòng tiền và nợ vay",
+          "current_state": "FCF TTM theo Screener +1.000 tỷ, cần đối chiếu công bố",
+          "watch_condition": "Đầu tư/nợ tăng nhanh hơn tiền tạo ra",
+          "thesis_link": "Sức khỏe tài chính.",
+          "source_refs": [
+            "HAG_IR",
+            "SCREENING"
+          ]
+        },
+        {
+          "kpi": "Mở rộng cà phê",
+          "current_state": "Chiến lược 20.000ha",
+          "watch_condition": "Vượt ngân sách hay chậm tiến độ thu hoạch",
+          "thesis_link": "Hiệu quả phân bổ vốn.",
+          "source_refs": [
+            "HAG_COFFEE"
+          ]
+        }
+      ],
+      "what_would_change_my_mind": [
+        "BCTC Q3 chứng minh biên lợi nhuận nông nghiệp cải thiện sau loại khoản miễn lãi.",
+        "Dòng tiền thực và nợ ròng cùng cải thiện sau mở rộng.",
+        "Năng suất sầu riêng tăng nhưng doanh thu/biên không tăng sẽ giảm triển vọng.",
+        "Rủi ro mã vùng trồng hoặc thị trường Trung Quốc thay đổi nghiêm trọng."
+      ]
+    },
+    "node6b": "# BÁO CÁO ĐẦU TƯ CHUYÊN SÂU HAG — HOÀNG ANH GIA LAI\n\n**Ngày phân tích:** 08/10/2026. **Dữ liệu cổ phiếu:** snapshot 06/10/2026. **Quyết định:** WATCH. **AI Score:** 58,50/100. **Độ tin cậy:** 75.15/100.\n\n## 1. Tóm tắt CIO và quyết định\n\nHAG là trường hợp dễ nhầm lẫn giữa tăng trưởng lợi nhuận kế toán và chuyển biến kinh tế của hoạt động cốt lõi. Công ty hiện gắn chủ yếu với chuối, sầu riêng và đầu tư cà phê, không nên phân tích bằng logic nhà phát triển bất động sản dù dữ liệu sàng lọc đang còn nhãn ngành cũ.\n\nTheo báo cáo nửa đầu 2026, lợi nhuận sau thuế gần 2.300 tỷ đồng, song hơn 1.500 tỷ đồng đến từ miễn giảm lãi vay trái phiếu. Đây là một lợi ích thực đối với bảng cân đối, làm giảm nghĩa vụ tài chính, nhưng không phải khoản doanh thu từ khách hàng có thể xuất hiện mỗi năm. Vì vậy phải hạ trọng số của headline P/E 5,28 lần và EPS tăng mạnh trên Screener khi đánh giá định giá thực.\n\n## 2. Phản luận và chất lượng lợi nhuận\n\nLuận điểm thuận là doanh nghiệp đã tái cơ cấu, giảm áp lực nợ, sản lượng trái cây tăng, nền cầu Trung Quốc thuận lợi. Luận điểm nghịch là kết quả năm 2026 đang có khoản thu một lần quá lớn, trong khi doanh thu trái cây quý II giảm đáng kể so với cùng kỳ. Hai điều này có thể đồng thời đúng.\n\nPhải tách ba lớp dòng tiền: lợi nhuận nông nghiệp thường xuyên, thu nhập từ tái cơ cấu tài chính, và vốn đầu tư cây trồng mới. Khoản miễn lãi giúp giảm nợ phải trả không đồng nghĩa tạo thêm tiền mặt từ bán chuối/sầu riêng. Chênh lệch giữa lợi nhuận báo cáo và tiền thu thực tế là biến số quyết định khả năng phân phối lợi nhuận, trả nợ và tự tài trợ mở rộng.\n\nChưa có bộ dữ liệu CFO, capex theo phân khúc đủ hoàn chỉnh để tính tỷ lệ tiền từ kinh doanh trên lợi nhuận điều chỉnh. Việc để trống các tỷ lệ này là chủ ý bảo toàn độ tin cậy, không phải kết luận công ty có dòng tiền xấu.\n\n## 3. Động lực nông nghiệp và kỳ vọng\n\nHAGL thông báo sản lượng sầu riêng khoảng 7.500 tấn tính đến 23/09/2026, so với 3.975 tấn cả năm 2025. Đó là tăng trưởng sản lượng thật. Tuy nhiên chính công ty cho biết tỷ trọng doanh thu sầu riêng trong toàn tập đoàn còn khiêm tốn. Do đó không được dùng tăng trưởng tấn sầu riêng để giải thích toàn bộ tăng trưởng EPS.\n\nNhu cầu xuất khẩu là yếu tố hỗ trợ: Bộ Nông nghiệp và Môi trường ước tính giá trị sầu riêng xuất khẩu Việt Nam 8T2026 đạt khoảng 1,97 tỷ USD, tăng 28,3%, trong đó xuất sang Trung Quốc khoảng 1,85 tỷ USD. Đây là tín hiệu tốt về nền cầu nhưng cũng nhấn mạnh rủi ro thị trường tập trung. Cần theo dõi cả mức giá thực nhận, sản lượng đạt chuẩn và chi phí logistics, chứ không chỉ số tấn thu hoạch.\n\nChiến lược mở rộng cà phê 20.000ha bổ sung động lực nhiều năm, nhưng chu kỳ cây trồng tạo chênh lệch đáng kể giữa lúc giải ngân vốn và lúc có doanh thu. Bảng cân đối và chi phí vốn phải được kiểm soát song song tiến độ trồng mới.\n\n## 4. Định giá chuẩn hóa\n\nP/E 5,28x, P/B 1,17x và EV/EBITDA 8,38x từ Screener là điểm xuất phát, không phải kết luận. P/E dựa trên lợi nhuận đã bao gồm khoản miễn lãi sẽ phóng đại sức hấp dẫn nếu áp vào các năm sau. Cần dựng lại EPS thường xuyên, thử các kịch bản biên trái cây và chi phí vốn trước khi đưa ra giá mục tiêu nội tại.\n\nP/B có giá trị như phép kiểm chéo nhưng cũng chịu chất lượng ghi sổ tài sản/vườn cây. Vì chưa có thông tin đủ sạch, báo cáo này không xuất mức TP1/TP2 giả tạo chỉ để điền mẫu.\n\n## 5. Thị trường và kỹ thuật\n\nSnapshot ghi giá 14.550 đồng, hồi 3,56% một tháng nhưng giảm 9,35% sáu tháng và 11,82% một năm. Relative volume 1,10 cho thấy chưa có xác nhận dòng tiền đặc biệt. Không có OHLCV đủ để tính SMA200 hoặc cấu trúc VSA; đánh giá kỹ thuật giữ DEGRADED.\n\nQuan sát vùng đáy 52 tuần quanh 13.250 đồng như tham chiếu rủi ro, không mặc định đây là hỗ trợ đã kiểm nghiệm. Một điểm mua chỉ hình thành khi vừa có bằng chứng kết quả kinh doanh cốt lõi, vừa có tín hiệu giá xác nhận.\n\n## 6. Tác động bên ngoài và truyền dẫn\n\nCầu sầu riêng Trung Quốc tăng có thể nâng doanh thu sản phẩm xuất khẩu, nhưng tác động lên lợi nhuận tùy mức giá, cơ cấu phẩm cấp, hao hụt và logistics. Việc cấp thêm mã vùng trồng và cơ sở đóng gói mở cơ hội cho Việt Nam, không bảo đảm mọi vườn HAGL đã được chấp thuận.\n\nMở rộng cà phê tạo quyền chọn tăng trưởng nhưng đồng thời kéo dòng tiền ra trước; rủi ro thời tiết, năng suất và biến động giá cần đánh giá riêng khi cây vào tuổi thu hoạch. Không đưa lãi suất Fed hoặc dầu vào causal chain chỉ vì là chỉ báo toàn cầu nếu chưa chứng minh được đường truyền trực tiếp, dù bối cảnh vĩ mô nên được ghi nhận riêng khi dữ liệu đầy đủ.\n\n## 7. Quản trị rủi ro và điều kiện đảo chiều\n\nRủi ro lợi nhuận một lần đã được trừ trong Fundamental, không trừ kép trong Risk. Risk chủ yếu nắm phần mong manh của dòng tiền, nhu cầu vốn mở rộng và tập trung đầu ra. Theo dõi Q3/9T để xác định tăng trưởng vận hành, CFO, nợ ròng, tiến độ mùa vụ và giá xuất khẩu thực tế.\n\nKịch bản tích cực cần ba điều kiện cùng xảy ra: lợi nhuận trồng trọt sau điều chỉnh tăng, tiền mặt thu về thực cải thiện, và vốn đầu tư không khiến nợ tăng thiếu kiểm soát. Kịch bản tiêu cực là sản lượng tăng mà biên, tiền thu và khả năng trả nợ không tăng.\n\n## 8. Quyết định và theo dõi\n\n**WATCH** phản ánh khoảng trống chất lượng lợi nhuận, không phủ định thành tựu mở rộng nông nghiệp. Chưa mở vị thế theo CRSM tại giá tham chiếu. Cần thêm BCTC Q3/9T, cầu nối lợi nhuận thường xuyên và dòng tiền thực trước khi chuyển sang quyết định mua.\n\n## 9. Nguồn và giới hạn\n\nNguồn gồm BCTC/IR HAGL, tin công bố miễn lãi, cập nhật sản lượng từ doanh nghiệp và dữ liệu Bộ Nông nghiệp và Môi trường. Thông tin Screener giữ nguyên làm snapshot. Kết quả hiện không có RNAV/DCF hoặc mục tiêu giá định lượng đáng tin cậy vì dữ liệu cần thiết chưa đầy đủ."
+  },
+  "decision_record": {
+    "date": "08/10/2026",
+    "ticker": "HAG",
+    "price_at_analysis": 14550,
+    "decision": "WATCH",
+    "ai_score": 58.5,
+    "confidence": 75.15,
+    "entry_zone": "Chưa xác lập vùng mua; theo dõi 13.250–13.800 đồng và chỉ xét khi lợi nhuận cốt lõi Q3 cải thiện.",
+    "trading_stop": 11800,
+    "tp1": null,
+    "tp2": null,
+    "thesis_invalidation": "Luận điểm nông nghiệp của HAG yếu đi nếu lợi nhuận trồng trọt tiếp tục giảm sau khi loại khoản miễn lãi, nợ và nhu cầu vốn tăng nhanh mà sầu riêng/cà phê không cải thiện dòng tiền."
+  }
+}
