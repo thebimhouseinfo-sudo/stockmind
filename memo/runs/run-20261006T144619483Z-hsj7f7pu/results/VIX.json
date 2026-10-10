@@ -1,0 +1,2162 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261006T144619483Z-hsj7f7pu",
+  "item_id": "item-148213e7-e4d7-48b6-853b-2f2c701adbcd",
+  "ticker": "VIX",
+  "analysis_source": "SCREENED_WEB",
+  "outputs": {
+    "node1": {
+      "ticker": "VIX",
+      "sector_type": "Chứng khoán, tự doanh và cho vay ký quỹ",
+      "sector_profile": "SECURITIES",
+      "timestamp": "2026-10-10T06:00:10.981Z",
+      "data_period": "Q2/2026, giá 09/10/2026",
+      "analysis_mode": "SCREENED",
+      "screening_metrics": {
+        "price": 11900,
+        "high_52w": 32550,
+        "low_52w": 11000,
+        "perf_1w": -3.64,
+        "perf_1m": -15.3,
+        "perf_3m": -24.27,
+        "perf_6m": -29.8,
+        "perf_1y": -59.46,
+        "perf_ytd": -34.68,
+        "volume": 32840000.000000004,
+        "relative_volume": 1.05,
+        "avg_volume_10d": 30020000,
+        "avg_volume_30d": 43140000,
+        "avg_volume_60d": 46830000,
+        "market_cap": 30490000000000,
+        "roe_ttm": 15.67,
+        "roa_ttm": 12.55,
+        "revenue_growth_annual_yoy": 269.65,
+        "revenue_growth_quarterly_yoy": -6.94,
+        "eps_dil_growth_ttm_yoy": 102.08,
+        "fcf_growth_ttm_yoy": 181.29,
+        "gross_margin_ttm": 95.4,
+        "operating_margin_ttm": 149.17,
+        "net_margin_ttm": 108.85,
+        "fcf_ttm": 2790000000000,
+        "debt_equity_fq": 0.14,
+        "debt_equity_fy": 0.53,
+        "current_ratio_fq": 4.72,
+        "quick_ratio_fq": 4.72,
+        "pe": 5.73,
+        "peg": 0.06,
+        "pb": 0.94,
+        "ps": 8.4,
+        "ev_ebitda": 2.01,
+        "ev_revenue": 3
+      },
+      "screening_summary": {
+        "screen_score": 62.91,
+        "screen_rank": 50,
+        "screen_grade": "C",
+        "quality_score": 90.67,
+        "growth_score": 76.91,
+        "valuation_score": 79.13,
+        "micro_score": 45.3,
+        "momentum_score": 14.1,
+        "opportunity_score": 56.71,
+        "classification": "WATCH_NEUTRAL"
+      },
+      "trusted_screener_snapshot": {
+        "source": "StockScreenerV2",
+        "ticker": "VIX",
+        "industry": "Investment banks/Brokers",
+        "screening_as_of": "2026-10-06",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 62.91,
+          "screen_rank": 50,
+          "screen_grade": "C",
+          "quality_score": 90.67,
+          "growth_score": 76.91,
+          "valuation_score": 79.13,
+          "micro_score": 45.3,
+          "momentum_score": 14.1,
+          "opportunity_score": 56.71,
+          "classification": "WATCH_NEUTRAL"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 11900,
+              "value": 11900,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 32550,
+              "value": 32550,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 11000,
+              "value": 11000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": -3.64,
+              "value": -3.64,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": -15.3,
+              "value": -15.3,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": -24.27,
+              "value": -24.27,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": -29.8,
+              "value": -29.8,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": -59.46,
+              "value": -59.46,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": -34.68,
+              "value": -34.68,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 32840000.000000004,
+              "value": 32840000.000000004,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 1.05,
+              "value": 1.05,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 30020000,
+              "value": 30020000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 43140000,
+              "value": 43140000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 46830000,
+              "value": 46830000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 30490000000000,
+              "value": 30490000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 15.67,
+              "value": 15.67,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 12.55,
+              "value": 12.55,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 269.65,
+              "value": 269.65,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": -6.94,
+              "value": -6.94,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 102.08,
+              "value": 102.08,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": 181.29,
+              "value": 181.29,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 95.4,
+              "value": 95.4,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 149.17,
+              "value": 149.17,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 108.85,
+              "value": 108.85,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": 2790000000000,
+              "value": 2790000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.14,
+              "value": 0.14,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.53,
+              "value": 0.53,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 4.72,
+              "value": 4.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 4.72,
+              "value": 4.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 5.73,
+              "value": 5.73,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0.06,
+              "value": 0.06,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 0.94,
+              "value": 0.94,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 8.4,
+              "value": 8.4,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 2.01,
+              "value": 2.01,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 3,
+              "value": 3,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 11900,
+          "high_52w": 32550,
+          "low_52w": 11000
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 90.67,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 76.91,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 4
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 79.13,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 5
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 45.3,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 14.1,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 67.99,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 56.71,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "TRUE",
+            "signals": [
+              "SEVERE_DRAWDOWN",
+              "WEAK_MEDIUM_MOMENTUM"
+            ]
+          },
+          "lineage": [
+            "SEVERE_DRAWDOWN",
+            "WEAK_MEDIUM_MOMENTUM"
+          ]
+        },
+        "classification": {
+          "classification": "WATCH_NEUTRAL",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Mixed or unresolved sandbox evidence",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 67.99,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 56.71,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [
+              "MOMENTUM"
+            ],
+            "profile": "MIXED_WITH_WEAK_MEMBER"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.634409,
+          "upside_to_52w_high": 1.735294,
+          "position_52w_range": 0.041763,
+          "signals": [
+            "SEVERE_DRAWDOWN"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "TRUE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": -3.64,
+          "perf_1m": -15.3,
+          "perf_3m": -24.27,
+          "perf_6m": -29.8,
+          "perf_1y": -59.46,
+          "perf_ytd": -34.68,
+          "volume": 32840000.000000004,
+          "relative_volume": 1.05,
+          "avg_volume_30d": 43140000,
+          "medium_momentum": -24.9645,
+          "momentum_stack": 0,
+          "volume_confirmation": "FALSE",
+          "signals": [
+            "WEAK_MEDIUM_MOMENTUM"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "FALSE",
+            "weak_medium_momentum": "TRUE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "VIX",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 62.91,
+          "percentile": 25.76,
+          "rank_position": 50,
+          "rank_total": 67,
+          "rankable_denominator": 67,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "SEVERE_DRAWDOWN",
+            "WEAK_MEDIUM_MOMENTUM",
+            "STRONG_BUSINESS_QUALITY",
+            "ATTRACTIVE_VALUATION"
+          ]
+        }
+      },
+      "screening_as_of": "2026-10-06",
+      "data_integrity": {
+        "coverage": 100,
+        "status": "DATA_OK",
+        "flags": [],
+        "missing_fields": [],
+        "observations": {
+          "price": {
+            "field": "price",
+            "raw_value": 11900,
+            "value": 11900,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "high_52w": {
+            "field": "high_52w",
+            "raw_value": 32550,
+            "value": 32550,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "low_52w": {
+            "field": "low_52w",
+            "raw_value": 11000,
+            "value": 11000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1w": {
+            "field": "perf_1w",
+            "raw_value": -3.64,
+            "value": -3.64,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1m": {
+            "field": "perf_1m",
+            "raw_value": -15.3,
+            "value": -15.3,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_3m": {
+            "field": "perf_3m",
+            "raw_value": -24.27,
+            "value": -24.27,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_6m": {
+            "field": "perf_6m",
+            "raw_value": -29.8,
+            "value": -29.8,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1y": {
+            "field": "perf_1y",
+            "raw_value": -59.46,
+            "value": -59.46,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_ytd": {
+            "field": "perf_ytd",
+            "raw_value": -34.68,
+            "value": -34.68,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "volume": {
+            "field": "volume",
+            "raw_value": 32840000.000000004,
+            "value": 32840000.000000004,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "relative_volume": {
+            "field": "relative_volume",
+            "raw_value": 1.05,
+            "value": 1.05,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_10d": {
+            "field": "avg_volume_10d",
+            "raw_value": 30020000,
+            "value": 30020000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_30d": {
+            "field": "avg_volume_30d",
+            "raw_value": 43140000,
+            "value": 43140000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_60d": {
+            "field": "avg_volume_60d",
+            "raw_value": 46830000,
+            "value": 46830000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "market_cap": {
+            "field": "market_cap",
+            "raw_value": 30490000000000,
+            "value": 30490000000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roe_ttm": {
+            "field": "roe_ttm",
+            "raw_value": 15.67,
+            "value": 15.67,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roa_ttm": {
+            "field": "roa_ttm",
+            "raw_value": 12.55,
+            "value": 12.55,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_annual_yoy": {
+            "field": "revenue_growth_annual_yoy",
+            "raw_value": 269.65,
+            "value": 269.65,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_quarterly_yoy": {
+            "field": "revenue_growth_quarterly_yoy",
+            "raw_value": -6.94,
+            "value": -6.94,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "eps_dil_growth_ttm_yoy": {
+            "field": "eps_dil_growth_ttm_yoy",
+            "raw_value": 102.08,
+            "value": 102.08,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_growth_ttm_yoy": {
+            "field": "fcf_growth_ttm_yoy",
+            "raw_value": 181.29,
+            "value": 181.29,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "gross_margin_ttm": {
+            "field": "gross_margin_ttm",
+            "raw_value": 95.4,
+            "value": 95.4,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "operating_margin_ttm": {
+            "field": "operating_margin_ttm",
+            "raw_value": 149.17,
+            "value": 149.17,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "net_margin_ttm": {
+            "field": "net_margin_ttm",
+            "raw_value": 108.85,
+            "value": 108.85,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_ttm": {
+            "field": "fcf_ttm",
+            "raw_value": 2790000000000,
+            "value": 2790000000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fq": {
+            "field": "debt_equity_fq",
+            "raw_value": 0.14,
+            "value": 0.14,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fy": {
+            "field": "debt_equity_fy",
+            "raw_value": 0.53,
+            "value": 0.53,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "current_ratio_fq": {
+            "field": "current_ratio_fq",
+            "raw_value": 4.72,
+            "value": 4.72,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "quick_ratio_fq": {
+            "field": "quick_ratio_fq",
+            "raw_value": 4.72,
+            "value": 4.72,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pe": {
+            "field": "pe",
+            "raw_value": 5.73,
+            "value": 5.73,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "peg": {
+            "field": "peg",
+            "raw_value": 0.06,
+            "value": 0.06,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pb": {
+            "field": "pb",
+            "raw_value": 0.94,
+            "value": 0.94,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ps": {
+            "field": "ps",
+            "raw_value": 8.4,
+            "value": 8.4,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_ebitda": {
+            "field": "ev_ebitda",
+            "raw_value": 2.01,
+            "value": 2.01,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_revenue": {
+            "field": "ev_revenue",
+            "raw_value": 3,
+            "value": 3,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          }
+        },
+        "issues": []
+      },
+      "market_data": {
+        "price": {
+          "value": 11650,
+          "date": "2026-10-09",
+          "source": "vix-price"
+        },
+        "volume_20d_avg": {
+          "value": null,
+          "date": null,
+          "source": null
+        },
+        "avg_trading_value_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "liquidity_flag": "Hồi 3,10% ngày 09/10, 45,7143 triệu cổ phiếu; chưa xác nhận đảo chiều",
+        "foreign_net_flow_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "foreign_room_remaining": {
+          "value": null,
+          "unit": "%",
+          "date": null,
+          "source": null
+        },
+        "market_cap": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": null,
+        "pb_current": null,
+        "dividend_yield": null
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 1349.3,
+          "period": "Q2/2026 doanh thu hoạt động",
+          "yoy": -31.7,
+          "source": "vix-q2"
+        },
+        "npat": {
+          "value": 75.9,
+          "period": "Q2/2026",
+          "yoy": -94.17,
+          "source": "vix-q2"
+        },
+        "ebit": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "gross_margin": null,
+        "debt_equity": null,
+        "total_debt": null,
+        "total_equity": null,
+        "cash_and_equivalents": null,
+        "effective_tax_rate": null,
+        "cfo": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "capex": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "receivables": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "inventory": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "financial_income": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "financial_expense": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "other_income": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "other_expense": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "Công ty chứng khoán không dùng chi phí vốn công nghiệp để thay normalized ROE",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": null,
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": null
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": null
+      },
+      "upcoming_events": [
+        {
+          "event": "BCTC quý III và phân rã FVTPL, margin",
+          "date": null,
+          "source": null
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "LNST Q2 giảm ~94% trong khi P/E 5,73x trên Screener",
+          "status": "PARTIAL",
+          "conclusion": "Lãi tự doanh 2025 lớn làm TTM P/E có thể đánh lừa.",
+          "source_refs": [
+            "vix-q2",
+            "vix-2025"
+          ]
+        },
+        {
+          "issue": "PBT Q2 75,3 tỷ nhưng NPAT 75,9 tỷ",
+          "status": "UNRESOLVED",
+          "conclusion": "Cần kiểm tra thuyết minh thuế, không tự suy diễn.",
+          "source_refs": [
+            "vix-q2"
+          ]
+        },
+        {
+          "issue": "Chào bán cổ phần tháng 4/2026",
+          "status": "PARTIAL",
+          "conclusion": "Cần tính lại lượng cổ phiếu EPS/ROE/PB đồng kỳ.",
+          "source_refs": [
+            "vix-rights"
+          ]
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [
+          "price",
+          "high_52w",
+          "low_52w",
+          "perf_1w",
+          "perf_1m",
+          "perf_3m",
+          "perf_6m",
+          "perf_1y",
+          "perf_ytd",
+          "volume",
+          "relative_volume",
+          "avg_volume_10d",
+          "avg_volume_30d",
+          "avg_volume_60d",
+          "market_cap",
+          "roe_ttm",
+          "roa_ttm",
+          "revenue_growth_annual_yoy",
+          "revenue_growth_quarterly_yoy",
+          "eps_dil_growth_ttm_yoy",
+          "fcf_growth_ttm_yoy",
+          "gross_margin_ttm",
+          "operating_margin_ttm",
+          "net_margin_ttm",
+          "fcf_ttm",
+          "debt_equity_fq",
+          "debt_equity_fy",
+          "current_ratio_fq",
+          "quick_ratio_fq",
+          "pe",
+          "peg",
+          "pb",
+          "ps",
+          "ev_ebitda",
+          "ev_revenue"
+        ],
+        "new_data_collected": [
+          "Giá 09/10",
+          "BCTC tổng hợp Q2",
+          "Nguồn 2025 FVTPL",
+          "Sự kiện chào bán"
+        ],
+        "still_missing": [
+          "Danh mục FVTPL Q2 sau điều chỉnh, lãi/lỗ realized vs unrealized",
+          "Dư nợ margin và rủi ro tập trung",
+          "Số cổ phiếu bình quân sau phát hành",
+          "ROE normalized và giá trị vốn chủ mới",
+          "OHLCV200 phiên",
+          "BCTC Q3"
+        ]
+      },
+      "material_questions": [
+        {
+          "question": "P/E TTM rẻ hay lãi 2025 bất thường?",
+          "why_material": "P/E thấp nếu mẫu số chứa lãi tự doanh đỉnh chu kỳ sẽ tạo bẫy định giá.",
+          "status": "PARTIAL",
+          "answer": "Theo bảng quý II: LNST 75,9 tỷ so 1.301,6 tỷ Q2/2025; PBT Q3/2025 3.047,9 tỷ và Q4/2025 1.601,4 tỷ, khiến TTM chứa quý đột biến.",
+          "source_refs": [
+            "vix-q2",
+            "vix-2025"
+          ],
+          "freshness": "Q2/2026"
+        },
+        {
+          "question": "Phần lãi nào từ FVTPL vs môi giới, cho vay margin?",
+          "why_material": "Nguồn lãi có tính lặp lại rất khác giữa đánh giá lại tài sản và cho vay.",
+          "status": "MISSING",
+          "answer": null,
+          "source_refs": [],
+          "freshness": null
+        },
+        {
+          "question": "Phát hành làm thay đổi sức sinh lời vốn chủ?",
+          "why_material": "Vốn sau chào bán thay đổi EPS/ROE/PB và khả năng margin.",
+          "status": "PARTIAL",
+          "answer": "HOSE có công bố kết quả chào bán cổ phiếu tháng 4/2026, chưa xác minh tất cả lượng cổ phiếu lưu hành và normalized ROE mới.",
+          "source_refs": [
+            "vix-rights"
+          ],
+          "freshness": "2026-04-22"
+        }
+      ],
+      "sources": [
+        {
+          "id": "vix-price",
+          "title": "Simplize lịch sử VIX",
+          "url": "https://simplize.vn/co-phieu/VIX/lich-su-gia",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "vix-q2",
+          "title": "24HMoney bảng tài chính VIX Q2/2026",
+          "url": "https://24hmoney.vn/stock/VIX",
+          "date": "2026-07-30",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "vix-2025",
+          "title": "VIX thuyết minh tài chính quý II/2025",
+          "url": "https://vixs.vn/wp-content/uploads/2025/07/20250718-VIX-Baoaotaichinh-Quy-2.2025-VIE.pdf",
+          "date": "2025-07-18",
+          "tier": "TIER_1"
+        },
+        {
+          "id": "vix-q1",
+          "title": "BCTC VIX Q1/2026",
+          "url": "https://static2.vietstock.vn/vietstock/2026/4/20/20260417___vix___bao_cao_tai_chinh_quy_i_2026__kem_cv_giai_trinh_.pdf",
+          "date": "2026-04-20",
+          "tier": "TIER_1"
+        },
+        {
+          "id": "vix-rights",
+          "title": "HOSE báo cáo kết quả chào bán VIX 22/04/2026",
+          "url": "https://staticfile.hsx.vn/Uploads/UploadDocuments/2456198/20260422%20-%20VIX%20-%20Reporting%20materials%20on%20the%20results%20of%20the%20public%20offering%20of%20shares.pdf",
+          "date": "2026-04-22",
+          "tier": "TIER_1"
+        },
+        {
+          "id": "market",
+          "title": "Stockbiz thị trường 09/10/2026",
+          "url": "https://web.stockbiz.vn/IndicesStats.aspx",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "breadth",
+          "title": "VNINDEX độ rộng ngày 09/10",
+          "url": "https://vnindex.ai/vnindex-hom-nay",
+          "date": "2026-10-09",
+          "tier": "TIER_3"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "coverage_model": "CAPABILITY_BASED_V1",
+        "required_sessions": null,
+        "sessions_used": 4,
+        "indicator_requirements": [
+          {
+            "capability": "recent_prices",
+            "required_sessions": 4,
+            "satisfied": true
+          },
+          {
+            "capability": "sma200",
+            "required_sessions": 200,
+            "satisfied": false
+          },
+          {
+            "capability": "vsa_spread_volume_context",
+            "required_sessions": 60,
+            "satisfied": false
+          }
+        ],
+        "missing_capabilities": [
+          "sma200",
+          "vsa_spread_volume_context"
+        ],
+        "note": "Lịch sử dài không kiểm chứng đủ."
+      },
+      "ohlcv_source": {
+        "source": "vix-price",
+        "sessions_used": 4,
+        "date_range": "2026-10-06–2026-10-09"
+      },
+      "trend_status": "09/10 tăng 3,10%, nhưng snapshot 06/10 1 tháng -15,3% và 1 năm -59,46%.",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": 1.059673157162726,
+        "classification": "Khối lượng cao hơn TB30 snapshot nhưng không khẳng định tích lũy.",
+        "vsa_signal_candidate": "none",
+        "supporting_evidence": [
+          "09/10 45.714.300 cổ phiếu, giá 11.650"
+        ]
+      },
+      "smart_money_phase": null,
+      "zones": {
+        "demand": "11.000–11.300 chỉ là mốc quan sát",
+        "supply": "11.900–12.000 thử lại, chưa xác nhận",
+        "is_fresh": false
+      },
+      "sector_benchmark": {
+        "method": "UNAVAILABLE",
+        "name": null,
+        "constituents_if_peer_basket": [],
+        "source": null,
+        "date": null
+      },
+      "sector_vs_market": {
+        "period": "1D 09/10",
+        "sector_perf_pct": null,
+        "vnindex_perf_pct": -0.22,
+        "sector_strength_label": "VIX +3,10% so VNINDEX -0,22%, không phải đảo chiều dài hạn."
+      },
+      "screening_signal_analysis": "Screener severe drawdown nhưng nhịp hồi 1 phiên; chưa chứng minh tích lũy.",
+      "signal_strength": 38,
+      "conclusion": "Kỹ thuật DEGRADED, xu hướng trung hạn vẫn yếu.",
+      "market_context": {
+        "as_of": "2026-10-09",
+        "benchmarks": {
+          "vnindex": {
+            "name": "VNINDEX",
+            "period": "1D 09/10",
+            "performance_pct": -0.22,
+            "trend": "Giảm",
+            "source": "market",
+            "freshness": "2026-10-09"
+          },
+          "secondary": [
+            {
+              "name": "VN30",
+              "kind": "INDEX",
+              "period": "1D 09/10",
+              "performance_pct": -0.19,
+              "source": "market",
+              "freshness": "2026-10-09",
+              "constituents": []
+            }
+          ]
+        },
+        "breadth": {
+          "advancers": 129,
+          "decliners": 175,
+          "unchanged": 100,
+          "advance_decline_ratio": 0.7371428571428571,
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "turnover_liquidity": {
+          "market_turnover_value": 27542.82,
+          "unit": "Bn VND",
+          "change_vs_20d_pct": null,
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "leadership_rotation": {
+          "leaders": [
+            "HDB",
+            "VPB",
+            "TCB"
+          ],
+          "laggards": [
+            "VIC",
+            "BSR",
+            "GVR"
+          ],
+          "note": "Mã ảnh hưởng chỉ số; không phải rổ chứng khoán",
+          "source_refs": [
+            "breadth"
+          ],
+          "freshness": "2026-10-09"
+        },
+        "volatility": {
+          "measure": "Biên VNINDEX nội phiên",
+          "value": 20.72,
+          "period": "điểm 09/10",
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "market_foreign_flow": {
+          "net_value": -9735.11,
+          "unit": "Bn VND",
+          "period": "HOSE 09/10",
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "stock_relative_strength": {
+          "period": "1D 09/10",
+          "stock_perf_pct": 3.1,
+          "vnindex_perf_pct": -0.22,
+          "secondary_benchmark_name": "VN30",
+          "secondary_benchmark_perf_pct": -0.19,
+          "vs_vnindex_pct": 3.32,
+          "vs_secondary_benchmark_pct": 3.29,
+          "source_refs": [
+            "vix-price",
+            "market"
+          ]
+        },
+        "coverage": {
+          "status": "FULL",
+          "available_capabilities": [
+            "vnindex_baseline",
+            "secondary_benchmark",
+            "breadth",
+            "turnover_liquidity",
+            "leadership_rotation",
+            "volatility",
+            "market_foreign_flow",
+            "stock_relative_strength"
+          ],
+          "missing_capabilities": [],
+          "provenance": [
+            {
+              "capability": "vnindex_baseline",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "secondary_benchmark",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "breadth",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "turnover_liquidity",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "leadership_rotation",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "volatility",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "market_foreign_flow",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "stock_relative_strength",
+              "source": "vix-price;market",
+              "as_of": "2026-10-09"
+            }
+          ],
+          "note": "VN30 benchmark thị trường, không phải chỉ số ngành chứng khoán."
+        }
+      }
+    },
+    "node3": {
+      "data_period": "Q2/2026",
+      "screening_flags": [
+        "SEVERE_DRAWDOWN",
+        "WEAK_MEDIUM_MOMENTUM",
+        "STRONG_BUSINESS_QUALITY",
+        "ATTRACTIVE_VALUATION"
+      ],
+      "screening_metrics_used": {
+        "role": "Only screening triggers",
+        "pe": 5.73,
+        "pb": 0.94,
+        "ev_ebitda": 2.01,
+        "roe_ttm": 15.67,
+        "debt_equity_fq": 0.14
+      },
+      "capital_efficiency": {
+        "wacc": null,
+        "roic": null,
+        "economic_spread": null,
+        "reason": "SECURITIES: dùng normalized ROE/PB; không dùng ROIC/WACC công nghiệp.",
+        "external_reference": null
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "review_adjustment": "Chưa phân rã FVTPL realized/unrealized, PBT Q2 75,3 tỷ và chi phí hoạt động 1.155,2 tỷ.",
+        "flag": "VOLATILE_FVTPL"
+      },
+      "earnings_sustainability": {
+        "classification": "CYCLICAL_MARK_TO_MARKET",
+        "structural": "Cho vay margin và môi giới mang nguồn lãi phí nếu vốn đủ.",
+        "cyclical": "Tự doanh FVTPL nhạy giá chứng khoán.",
+        "low_base": "TTM bao gồm các quý lãi 2025 đặc biệt cao và Q2/2026 giảm khoảng 94%."
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Không áp Piotroski công nghiệp cho công ty chứng khoán.",
+      "health_status": "Lợi nhuận Q2 suy giảm; cần biết độ tập trung FVTPL và margin.",
+      "valuation": {
+        "current": {
+          "price": 11650,
+          "screening_pe": 5.73,
+          "screening_pb": 0.94,
+          "screening_ev_ebitda": 2.01
+        },
+        "broker_references": [],
+        "reverse_dcf": null,
+        "conclusion": "P/B và normalized ROE sau phát hành thay cho trailing P/E và EV/EBITDA."
+      },
+      "moat": "Khách hàng môi giới và khả năng cho vay ký quỹ có giá trị nhưng chưa đủ chứng minh moat qua biến động tự doanh.",
+      "conclusion": "P/E có nguy cơ là bẫy lợi nhuận quá khứ 2025.",
+      "sector_economics": {
+        "sector_profile": "SECURITIES",
+        "earnings_bridge": [
+          {
+            "driver": "FVTPL",
+            "fact": "Q2/2026 PBT 75,3 tỷ so quý III/2025 PBT hơn 3.000 tỷ theo bảng tổng hợp",
+            "implication": "Không lấy lãi biến động làm normalized earnings."
+          },
+          {
+            "driver": "Cho vay margin",
+            "fact": "Chưa có phân rã dư nợ và tài sản thế chấp Q2",
+            "implication": "Cần đánh giá lợi nhuận lõi và tail risk."
+          },
+          {
+            "driver": "Phát hành",
+            "fact": "Có công bố HOSE tháng 4/2026",
+            "implication": "Tính lại EPS/ROE theo vốn chủ."
+          }
+        ],
+        "normalized_earnings": null,
+        "capital_allocation": [
+          {
+            "event": "Chào bán cổ phiếu 2026",
+            "implication": "Mở rộng vốn nhưng cần đạt ROE trên vốn mới."
+          }
+        ],
+        "balance_sheet_capacity": "D/E Screener 0,14 không thay đánh giá tài sản tự doanh và nợ ký quỹ.",
+        "valuation_method_selection": [
+          {
+            "method": "PB",
+            "status": "SELECTED",
+            "reason": "Phù hợp công ty chứng khoán với vốn chủ và normalized ROE.",
+            "evidence_refs": [
+              "vix-q1",
+              "vix-q2",
+              "vix-rights"
+            ]
+          },
+          {
+            "method": "NORMALIZED_PE",
+            "status": "CONDITIONAL",
+            "reason": "Chỉ dùng sau loại biến động FVTPL và hiệu chỉnh cổ phần.",
+            "evidence_refs": [
+              "vix-q2",
+              "vix-2025"
+            ]
+          }
+        ]
+      },
+      "expectation_basis": [
+        {
+          "topic": "P/E trailing",
+          "statement": "P/E thấp trong snapshot có thể hàm ý kỳ vọng lãi quá khứ kéo dài, nhưng đây là suy luận từ số liệu TTM chứa quý tự doanh 2025.",
+          "expectation_basis": "VALUATION_IMPLIED",
+          "expected_value": null,
+          "expected_unit": null,
+          "analyst_view": "ROE 2026–2027 cần bình thường hóa và kiểm tra vốn mới.",
+          "gap_direction": "UNCERTAIN",
+          "source_refs": [
+            "vix-q2",
+            "vix-2025"
+          ],
+          "as_of": "2026-10-09",
+          "inference_label": "INFERENCE",
+          "investment_implication": "Không đủ căn cứ mua chỉ vì P/E 5,73."
+        }
+      ]
+    },
+    "node4": {
+      "risk_regime": "MIXED",
+      "macro_indicators": {},
+      "company_specific_drivers": [
+        {
+          "driver": "Giá danh mục FVTPL",
+          "impact": "Lãi/lỗ đánh giá lại quyết định lợi nhuận ngắn kỳ.",
+          "evidence_refs": [
+            "vix-q2",
+            "vix-2025"
+          ]
+        },
+        {
+          "driver": "Dư nợ margin",
+          "impact": "Rủi ro tín dụng và lãi cho vay cần xem thuyết minh.",
+          "evidence_refs": [
+            "vix-q1"
+          ]
+        }
+      ],
+      "sensitivity_table": [],
+      "geopolitical_events": [],
+      "causal_chains": [
+        {
+          "chain": "Thị giá chứng khoán→lãi/lỗ FVTPL→PBT→ROE",
+          "confidence": "HIGH",
+          "source_refs": [
+            "vix-2025",
+            "vix-q2"
+          ]
+        },
+        {
+          "chain": "Tài sản margin suy giảm→đòi bổ sung bảo đảm→chất lượng tiền/cho vay",
+          "confidence": "MEDIUM",
+          "source_refs": [
+            "vix-q1"
+          ]
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Thuận",
+          "conditions": "Tự doanh ổn định, margin chất lượng và môi giới tăng",
+          "effect": "ROE bình thường hóa cải thiện",
+          "probability": null
+        },
+        {
+          "scenario": "Nghịch",
+          "conditions": "Danh mục FVTPL giảm giá, khoản vay ký quỹ gặp vấn đề",
+          "effect": "Vốn chủ chịu áp lực, P/B không còn rẻ",
+          "probability": null
+        }
+      ],
+      "macro_view": "Chỉ đánh giá yếu tố trực tiếp tới giá danh mục, dòng giao dịch và tài trợ, không dùng Fed/dầu chung.",
+      "industry_impact": "Doanh thu môi giới và tự doanh phụ thuộc chu kỳ thị trường.",
+      "company_impact": "Chi phí hoạt động 1.155,2 tỷ Q2/2026; tự doanh cần minh bạch cơ cấu.",
+      "conclusion": "Bất định FVTPL và margin khiến chuỗi lãi 2025 không đủ để đầu tư hiện tại.",
+      "external_exposure_map": [
+        {
+          "exposure_id": "fvtpl",
+          "driver": "Thị giá chứng khoán tự doanh",
+          "driver_type": "DEMAND",
+          "company_exposure": "Danh mục FVTPL",
+          "transmission_mechanism": "Lãi/lỗ đánh giá lại → PBT → ROE/vốn chủ.",
+          "transmission_targets": [
+            "MARGIN",
+            "BALANCE_SHEET",
+            "VALUATION"
+          ],
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "selection_rationale": "Lợi nhuận VIX nhạy biến động danh mục."
+        },
+        {
+          "exposure_id": "margin",
+          "driver": "Tài sản thế chấp cho vay margin",
+          "driver_type": "RATES",
+          "company_exposure": "Nguồn thu lãi và rủi ro credit",
+          "transmission_mechanism": "Giá tài sản giảm làm tăng khoản cần bổ sung tài sản, ảnh hưởng dòng tiền và nợ xấu.",
+          "transmission_targets": [
+            "CASH_FLOW",
+            "BALANCE_SHEET"
+          ],
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "selection_rationale": "Khả năng bảo toàn vốn."
+        },
+        {
+          "exposure_id": "issuance",
+          "driver": "Phát hành cổ phiếu",
+          "driver_type": "COMPANY_EXTERNAL",
+          "company_exposure": "Vốn chủ và EPS",
+          "transmission_mechanism": "Vốn tăng trước lợi nhuận tái đầu tư có thể làm giảm ROE.",
+          "transmission_targets": [
+            "BALANCE_SHEET",
+            "VALUATION"
+          ],
+          "materiality_hypothesis": "MEDIUM",
+          "research_required": true,
+          "selection_rationale": "Sự kiện HOSE tháng 4."
+        }
+      ],
+      "research_targets": [
+        {
+          "target_id": "fvtpl-q2",
+          "exposure_id": "fvtpl",
+          "driver": "Phân rã FVTPL Q2/2026",
+          "driver_type": "DEMAND",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "Bảng tài chính Q2",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Chưa đối chiếu danh mục và realized/unrealized từng mã."
+        },
+        {
+          "target_id": "margin-q2",
+          "exposure_id": "margin",
+          "driver": "Dư nợ và chất lượng khoản vay margin",
+          "driver_type": "RATES",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "BCTC Q1 và Q2 tổng hợp",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Không có bảng nợ theo tập trung/tài sản thế chấp đồng kỳ."
+        },
+        {
+          "target_id": "issue-2026",
+          "exposure_id": "issuance",
+          "driver": "Chào bán 2026",
+          "driver_type": "COMPANY_EXTERNAL",
+          "status": "RESEARCHED",
+          "attempts": [
+            {
+              "source": "HOSE 22/04/2026",
+              "status": "FOUND"
+            }
+          ],
+          "source_refs": [
+            "vix-rights"
+          ],
+          "as_of": "2026-04-22",
+          "freshness": "Sự kiện tháng 4",
+          "prior_state": null,
+          "current_state": "HOSE báo kết quả chào bán",
+          "direction": "UNKNOWN",
+          "failure_reason": null
+        }
+      ],
+      "what_changed": [],
+      "market_context_use": {
+        "source": "NODE2.market_context",
+        "measurement_policy": "CONSUME_ONLY",
+        "consumed_capabilities": [
+          "vnindex_baseline",
+          "market_foreign_flow",
+          "stock_relative_strength"
+        ],
+        "interpretation": "VIX hồi 3,10% nhưng hiệu suất trung hạn yếu, HOSE ngoại bán ròng."
+      }
+    },
+    "node5": {
+      "ticker": "VIX",
+      "data_period": "Q2/2026; giá 09/10",
+      "scores": {
+        "fundamental": 7,
+        "valuation": 6,
+        "technical": 8,
+        "flow": 7,
+        "sector_macro": 7,
+        "risk": 5
+      },
+      "ai_score": {
+        "value": 33.75,
+        "formula_shown": "F/20×30+V/20×20+T/20×15+Flow/20×15+SectorMacro/20×10+Risk/20×10"
+      },
+      "confidence": {
+        "method": "EVIDENCE_QUALITY_V1",
+        "value": 73.3,
+        "components": {
+          "data_completeness": 73,
+          "source_quality": 77,
+          "freshness": 75,
+          "cross_source_consistency": 72,
+          "method_suitability": 80,
+          "key_uncertainty_coverage": 56
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🔴",
+        "technical": "🟡",
+        "macro": "🟡",
+        "liquidity": "🟡",
+        "signal_alignment": "0/4",
+        "alignment": "0/4",
+        "override_applied": "P/E TTM chứa đỉnh lãi 2025; không mua chỉ vì giá hồi."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "BCTC Q3 và chất lượng FVTPL/margin",
+        "bucket": "0-30d"
+      },
+      "decision": "WATCH",
+      "drivers": [
+        "LNST Q2/2026 ~75,9 tỷ so Q2/2025 1.301,6 tỷ.",
+        "P/E TTM trông thấp nhờ quý lãi đột biến 2025.",
+        "Phát hành 2026 thay đổi normalized ROE/EPS."
+      ],
+      "thesis_invalidation": "Thesis mất hiệu lực nếu PBT tự doanh tiếp tục yếu, danh mục FVTPL mất giá kéo vốn chủ giảm, margin khó thu hồi hoặc ROE không cải thiện trên vốn mới.",
+      "trading_stop": {
+        "price": 11000,
+        "basis": "Mốc quan sát tuần gần đây, chưa backtest hoặc đủ 200 phiên."
+      },
+      "liquidity_note": "45,7143 triệu cổ phiếu 09/10, chưa đủ chứng cứ dòng tiền tổ chức.",
+      "strategy": {
+        "entry_zone": "Chưa bắt đáy khi chưa có BCTC Q3 phân rã tự doanh FVTPL và nợ margin; giá hồi 1 phiên không đủ.",
+        "allocation_plan": {
+          "note": "WATCH, chưa mua.",
+          "steps": [
+            "Phân rã FVTPL Q3, realized/unrealized và lợi nhuận môi giới.",
+            "Đối chiếu dư nợ margin và tài sản bảo đảm.",
+            "Tính normalized ROE/PB sau phát hành và theo dõi giá nhiều phiên."
+          ]
+        },
+        "tp1": {
+          "price": null,
+          "rationale": "Chưa định giá vốn chủ bình thường hóa."
+        },
+        "tp2": {
+          "price": null,
+          "rationale": "P/E TTM không đại diện lợi nhuận mới."
+        },
+        "risk_per_trade_pct_nav": 0.25,
+        "position_size_note": "Chỉ ví dụ tỷ trọng 1% NAV nếu luận điểm sau này rõ.",
+        "max_portfolio_weight_pct": 1,
+        "position_type": "Watchlist"
+      },
+      "full_reasoning": "VIX Q2/2026 PBT 75,3 tỷ, LNST 75,9 tỷ, suy giảm rất mạnh so Q2/2025. Sự nhảy vọt lợi nhuận tự doanh 2025 tạo rủi ro bẫy P/E. Sau phát hành, normalized ROE và P/B cần tính lại, cùng rủi ro danh mục tự doanh và khoản vay ký quỹ. Động lượng giá một phiên không đủ xóa rủi ro kết quả Q3. WATCH.",
+      "thesis_conviction": {
+        "level": "LOW",
+        "rationale": "Lợi nhuận tự doanh biến động, danh mục/nợ margin còn thiếu thông tin.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "supporting_evidence_refs": [
+          "vix-q2",
+          "vix-rights"
+        ],
+        "contradictory_evidence_refs": [
+          "vix-2025",
+          "vix-price"
+        ],
+        "catalyst_visibility": "MEDIUM",
+        "payoff_asymmetry": "UNCERTAIN"
+      },
+      "decision_overlay": {
+        "market_regime": {
+          "regime_state": "MIXED",
+          "evidence_refs": [
+            "NODE2.market_context:market_foreign_flow",
+            "NODE2.market_context:stock_relative_strength"
+          ]
+        },
+        "timing_effect": "WAIT_FOR_ENTRY",
+        "sizing_effect": "CAP",
+        "decision_effect": "NONE",
+        "pre_overlay_decision": "WATCH",
+        "post_overlay_decision": "WATCH",
+        "override_rationale": "Môi trường giá cổ phiếu biến động và chất lượng PBT chưa rõ.",
+        "ai_score_effect": "NONE",
+        "ai_score_reference": 33.75
+      },
+      "risk_attribution": [
+        {
+          "driver": "Kết quả tự doanh FVTPL biến động",
+          "primary_owner": "FUNDAMENTAL",
+          "residual_risk_effect": "MEDIUM",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Đã phản ánh tại Fundamental.",
+          "evidence_refs": [
+            "vix-q2",
+            "vix-2025"
+          ]
+        },
+        {
+          "driver": "Tập trung danh mục FVTPL và rủi ro margin có thể gây giảm vốn",
+          "primary_owner": "RISK",
+          "residual_risk_effect": "HIGH",
+          "risk_score_treatment": "PRIMARY_RISK_PENALTY",
+          "rationale": "Chỉ phần sự cố nghiêm trọng ảnh hưởng khả năng chống chịu, không trừ lãi thông thường lần nữa.",
+          "evidence_refs": [
+            "vix-q1"
+          ]
+        },
+        {
+          "driver": "Giá hồi ngắn hạn sau giảm sâu",
+          "primary_owner": "TECHNICAL",
+          "residual_risk_effect": "LOW",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Giới hạn timing trong Technical.",
+          "evidence_refs": [
+            "vix-price"
+          ]
+        }
+      ],
+      "investment_horizon": {
+        "bucket": "3-12M",
+        "rationale": "Chờ tự doanh Q3 và ROE sau tăng vốn."
+      },
+      "anti_thesis": "Lợi nhuận năm 2025 chủ yếu hưởng lợi từ tự doanh, không lặp lại; vốn mới chưa tăng ROE, nên P/E thấp là bẫy giá trị.",
+      "variant_view": {
+        "summary": "Giá thấp và trailing P/E 5,73 không đủ chứng minh VIX rẻ.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "why_different": "Định giá theo vốn chủ/ROE bình thường, tách lãi FVTPL.",
+        "payoff_if_right": "FVTPL ổn định, lãi margin và môi giới tăng đều trên vốn mới.",
+        "what_proves_wrong": "Thesis mất hiệu lực nếu PBT tự doanh tiếp tục yếu, danh mục FVTPL mất giá kéo vốn chủ giảm, margin khó thu hồi hoặc ROE không cải thiện trên vốn mới."
+      },
+      "monitoring_kpis": [
+        {
+          "kpi": "PBT/NPAT Q3",
+          "current_state": "Q2/2026 75,3/75,9 tỷ",
+          "watch_condition": "Q3 tiếp tục thấp khi loại lãi đánh giá lại",
+          "thesis_link": "Không đạt normalized ROE.",
+          "source_refs": [
+            "vix-q2"
+          ]
+        },
+        {
+          "kpi": "Danh mục FVTPL",
+          "current_state": "Chưa có phân rã Q2 đã đối chiếu",
+          "watch_condition": "Lỗ đánh giá lại hoặc tập trung lớn",
+          "thesis_link": "Chất lượng tài sản và lãi.",
+          "source_refs": [
+            "vix-2025"
+          ]
+        },
+        {
+          "kpi": "Margin và nợ",
+          "current_state": "Chưa xác minh Q2 theo khoản",
+          "watch_condition": "Tài sản đảm bảo giảm hoặc nợ khó đòi",
+          "thesis_link": "Vốn chủ và tail risk.",
+          "source_refs": [
+            "vix-q1"
+          ]
+        },
+        {
+          "kpi": "ROE sau phát hành",
+          "current_state": "Có sự kiện chào bán 22/04",
+          "watch_condition": "ROE trên vốn mới suy giảm",
+          "thesis_link": "P/B không còn hấp dẫn.",
+          "source_refs": [
+            "vix-rights"
+          ]
+        },
+        {
+          "kpi": "Giá",
+          "current_state": "11.650, +3,10% ngày 09/10",
+          "watch_condition": "Không giữ 11.000 hoặc lấy lại 12.000 với PBT tốt",
+          "thesis_link": "Timing.",
+          "source_refs": [
+            "vix-price"
+          ]
+        }
+      ],
+      "what_would_change_my_mind": [
+        "Q3 xác nhận thu nhập môi giới/margin có tính lặp lại.",
+        "FVTPL rõ cấu trúc, rủi ro tập trung có thể định lượng.",
+        "ROE/PB tính lại theo vốn mới và EPS chuẩn hóa.",
+        "Xu hướng giá phục hồi có xác nhận dài hơn một phiên."
+      ]
+    },
+    "node6b": "# BÁO CÁO PHÂN TÍCH VIX — CHỨNG KHOÁN VIX\nNgày 10/10/2026 | SCREENED_WEB | Công ty chứng khoán | Dữ liệu quý II/2026 và giá 09/10/2026.\n\n## 1. Tóm tắt CIO\n**WATCH — AI Score 33.75/100, độ tin cậy 73.3/100, conviction thấp.** Phiên 09/10 VIX đóng 11.650 đồng, +3,10%, khối lượng 45,7143 triệu cổ phiếu. Tuy nhiên snapshot sàng lọc 06/10 ghi mức giảm 1 tháng 15,3%, 3 tháng 24,27% và 1 năm 59,46%. Một phiên hồi chưa xác lập xu hướng đảo chiều.\nKết quả quý II/2026 theo bảng 24HMoney: doanh thu hoạt động 1.349,3 tỷ, chi phí 1.155,2 tỷ, PBT 75,3 tỷ và LNST 75,9 tỷ. LNST Q2/2025 tới 1.301,6 tỷ, nên lợi nhuận giảm xấp xỉ 94%. Sự chênh lệch giữa PBT và LNST nhỏ 0,6 tỷ cần kiểm tra chính xác khoản thuế kỳ này.\nVIX có mô hình tự doanh FVTPL, môi giới, cho vay ký quỹ. Cần phân tách doanh thu môi giới và lãi margin có khả năng lặp lại khỏi lãi biến động thị giá tài sản. Các quý 2025 từng ghi lợi nhuận rất cao nên P/E trailing trong screening không phản ánh chắc chắn sức sinh lời bình thường.\nCông ty có hồ sơ chào bán cổ phiếu năm 2026 tại HOSE; cổ phiếu lưu hành và vốn chủ sau phát hành phải được thống nhất để đánh giá EPS, ROE và P/B mới. Chưa định lượng biên an toàn hay đặt TP trước khi có bản thuyết minh FVTPL, số nợ margin và giá trị vốn chủ cập nhật.\n\n## 2. Luận điểm và kỳ vọng\nChỉ báo P/E 5,73x screening có thể cho cảm giác rẻ, nhưng mẫu số lợi nhuận TTM có quý tự doanh 2025 đột biến. Đây là suy luận từ dữ liệu lịch sử, không được gán là consensus thị trường.\nLuận điểm thuận: nếu thu nhập môi giới, cho vay margin tăng và danh mục FVTPL kiểm soát lỗ, ROE bình thường hóa trên vốn mới có thể phục hồi. Điểm còn thiếu là rủi ro danh mục và phí sử dụng vốn mới.\nLuận điểm phản biện: những khoản lãi do định giá thị trường trong năm 2025 không lặp lại, khi thanh khoản và giá tài sản đổi chiều thì lợi nhuận thuần biến động lớn. Giá giảm sâu trong screening có thể là phản ứng với điều này, chứ không nhất thiết là sai định giá.\nCRSM giữ WATCH và không cố lập một upside giả từ P/E lịch sử. Cần Q3 chứng minh lợi nhuận lặp lại và vốn chủ duy trì trước khi nâng conviction.\n\n## 3. Cầu nối kết quả và earnings quality\nDoanh thu hoạt động Q2/2026 1.349,3 tỷ so khoảng 1.976,2 tỷ Q2/2025 (-31,7%). Chi phí hoạt động 1.155,2 tỷ so khoảng 288,6 tỷ. Đây là thay đổi mạnh cùng sự đảo chiều LNST từ 1.301,6 tỷ xuống 75,9 tỷ.\nLãi tự doanh cần tách phần đã bán với phần đánh giá lại FVTPL chưa thực hiện; bảng tổng hợp theo quý chưa đủ để kết luận tài sản nào tăng/giảm. Giải trình VIX Q2/2025 ghi nhận ảnh hưởng giao dịch chứng khoán trong giai đoạn thị trường thuận lợi, nhưng không được sao chép thành cấu trúc năm 2026 mà chưa đọc thuyết minh.\nCần kiểm tra riêng phí môi giới, lợi tức cho vay margin, chi phí lãi và mức sử dụng vốn sau phát hành. Current ratio 4,72 và D/E 0,14 screening không trực tiếp chứng minh danh mục FVTPL thanh khoản tốt hay khoản vay margin an toàn.\nTrên nền lợi nhuận bị chi phối thị giá, normalized ROE là chỉ tiêu phù hợp hơn tốc độ EPS TTM; việc chưa xác định được chỉ tiêu này là lý do confidence/conviction thận trọng.\n\n## 4. Định giá và bất đối xứng\nCông ty chứng khoán cần P/B đối chiếu ROE vốn chủ bình thường, rủi ro tài sản và lợi nhuận môi giới/margin. P/E chỉ là phép bổ trợ khi loại phần lợi nhuận bất thường, và EPS trên đúng số lượng cổ phiếu sau phát hành.\nScreener ghi P/E 5,73x, P/B 0,94x, EV/EBITDA 2,01x. Không dùng EV/EBITDA công nghiệp cho môi giới chứng khoán; P/E TTM có thể chứa đỉnh 2025. Không gọi P/B thấp là rẻ khi chưa biết tổn thất có thể có tại FVTPL và khả năng sinh lời trên vốn mới.\nKịch bản thuận là Q3–Q4 cho thấy lợi nhuận môi giới/margin bền, tự doanh ổn định. Kịch bản cơ sở là lợi nhuận tự doanh biến động, chưa đủ căn cứ phục hồi ROE nhanh. Kịch bản nghịch là tài sản tự doanh giảm giá và margin chịu sức ép, xói mòn vốn.\nChưa có valuation nội bộ đủ chứng cứ nên TP1/TP2 để trống, tránh độ chính xác giả.\n\n## 5. Kỹ thuật và thị trường Việt Nam\nNgày 09/10 VNINDEX -0,22%, VN30 -0,19%; VIX +3,10% tương ứng mạnh hơn hai chỉ số +3,32 và +3,29 điểm %. Đây chỉ là một phiên, không đảo ngược giảm trung hạn. HOSE có 129 mã tăng, 175 mã giảm; giá trị giao dịch gần 27.543 tỷ, khối ngoại bán ròng toàn sàn khoảng 9.735 tỷ đồng.\nKhối ngoại toàn HOSE không được dùng như dòng khối ngoại VIX; Node1 thiếu trường mã riêng nên để null. Kỹ thuật DEGRADED vì OHLCV 200 phiên và VSA chưa được kiểm chứng đầy đủ.\nKhối lượng 45,7143 triệu cổ phiếu cao hơn trung bình 30 phiên snapshot cũ nhưng không chứng minh có dòng tiền tổ chức. Nếu giá giữ 11.000 và tiếp tục hồi cùng lợi nhuận Q3, timing có thể cải thiện, nhưng không tự thay đổi lợi nhuận hay mức giá trị nội tại.\n\n## 6. Phơi nhiễm ngoại sinh và causal delta\nFVTPL chịu ảnh hưởng giá chứng khoán trong danh mục: biến động thị giá → lãi/lỗ đánh giá lại hoặc đã bán → PBT → ROE/vốn chủ. FACT: lợi nhuận Q2/2026 thấp hơn rất nhiều Q2/2025. INFERENCE: giá tài sản và chính sách ghi nhận FVTPL có thể đóng góp lớn; ASSUMPTION: chưa có thay đổi kế toán lớn. Thiếu tỷ trọng mã và giá gốc nên không định lượng tác động cụ thể.\nCho vay margin: giá tài sản đảm bảo giảm làm tăng nhu cầu bổ sung thế chấp, có thể ảnh hưởng chất lượng tiền và khả năng cho vay. Chưa biết dư nợ theo đối tượng hay concentration thì không thể suy đoán nợ xấu từ một phiên giảm giá.\nPhát hành cổ phần 2026 có thể bổ sung năng lực cho vay nhưng EPS/ROE dễ pha loãng nếu vốn mới chưa được triển khai hiệu quả. Hồ sơ HOSE chứng minh sự kiện, không chứng minh suất sinh lời tương lai.\nFed, Brent hay USD không nằm trong danh sách nghiên cứu nếu không chứng minh cấu trúc nợ hoặc tài sản trực tiếp có phơi nhiễm. Node4 chỉ diễn giải bối cảnh thị trường có đo lường ở Node2.\n\n## 7. Rủi ro và phản luận\nFVTPL gây biến động kết quả kỳ thường xuyên thuộc Fundamental; trailing P/E chứa thu nhập khác kỳ thuộc Valuation; giá giảm sâu và hồi một phiên thuộc Technical. Không phạt ba lần vào Risk.\nRisk giữ trường hợp đuôi: danh mục lớn mất thanh khoản, đòn bẩy margin và tài sản đảm bảo suy yếu nghiêm trọng làm vốn chủ tổn thương. Chưa có bằng chứng khẳng định tình huống đuôi xảy ra, nên cần xem báo cáo khoản vay/thuyết minh thực tế.\nAnti-thesis mạnh: PBT 2026 đang rất thấp khi 2025 nhiều quý lãi hàng nghìn tỷ, vì vậy multiple thấp có thể là bẫy từ lợi nhuận lịch sử. Nên chờ bức tranh normalized ROE thay vì mua vì tài sản có vẻ giảm giá.\n\n## 8. Chiến lược vị thế\n**WATCH**, Chưa bắt đáy khi chưa có BCTC Q3 phân rã tự doanh FVTPL và nợ margin; giá hồi 1 phiên không đủ. Không phát lệnh; mốc 11.000 chỉ là tham chiếu kỹ thuật gần nhất, chưa có backtest. TP1/TP2 không có vì chưa thể tính normalized book value/ROE.\nNếu tương lai đủ bằng chứng để mở vị thế, minh họa rủi ro tối đa 0,25% NAV trên giao dịch và tỷ trọng tối đa 1% NAV. Đây không phải đề xuất phân bổ tài sản cá nhân.\nInvalidation kinh tế là Thesis mất hiệu lực nếu PBT tự doanh tiếp tục yếu, danh mục FVTPL mất giá kéo vốn chủ giảm, margin khó thu hồi hoặc ROE không cải thiện trên vốn mới. Khác với dừng lỗ khi giá mất vùng kỹ thuật.\n\n## 9. Bảng theo dõi thay đổi quyết định\n| KPI | Hiện tại | Điều kiện quan sát | Luận điểm |\n|---|---|---|---|\n| PBT/NPAT | Q2 75,3/75,9 tỷ | Q3 không cải thiện lợi nhuận thường xuyên | ROE |\n| FVTPL | Chưa có phân rã danh mục 2026 | Lỗ đánh giá lại tiếp diễn/tập trung cao | Vốn chủ |\n| Dư nợ margin | Chưa kiểm chứng Q2 | Khoản vay khó thu hồi và tài sản bảo đảm giảm | Tail risk |\n| Vốn mới | Có công bố HOSE tháng 4 | Normalized ROE giảm sau phát hành | Định giá P/B |\n| Giá | 11.650, +3,10% 09/10 | Không giữ 11.000 hoặc phục hồi có lãi lõi | Timing |\nNâng quan điểm nếu Q3 chứng minh thu nhập môi giới/margin bền, FVTPL không tổn hại vốn và normalized ROE tốt. Hạ quan điểm nếu lợi nhuận không hồi, tổn thất FVTPL và margin phình lớn.\n\n## 10. Nguồn và giới hạn\nNguồn 24HMoney BCTC quý II/2026, tài liệu công ty VIX 2025, BCTC Q1/2026, hồ sơ HOSE chào bán tháng 4/2026, giá Simplize và thị trường ngày 09/10. Các đường dẫn/date và mức nguồn trong Node1.\nCòn thiếu: kiểm tra nguyên bản BCTC Q2, khoản thuế làm NPAT cao hơn PBT nhẹ, danh mục FVTPL từng mã, realized/unrealized, dư nợ ký quỹ, vốn chủ và lượng cổ phiếu bình quân sau phát hành, OHLCV 200 phiên. Không biến dữ liệu thiếu thành con số ước đoán.\nTài liệu nghiên cứu, không phải lời khuyên đầu tư cá nhân."
+  },
+  "decision_record": {
+    "date": "10/10/2026",
+    "ticker": "VIX",
+    "price_at_analysis": 11650,
+    "decision": "WATCH",
+    "ai_score": 33.75,
+    "confidence": 73.3,
+    "entry_zone": "Chưa bắt đáy khi chưa có BCTC Q3 phân rã tự doanh FVTPL và nợ margin; giá hồi 1 phiên không đủ.",
+    "trading_stop": 11000,
+    "tp1": null,
+    "tp2": null,
+    "thesis_invalidation": "Thesis mất hiệu lực nếu PBT tự doanh tiếp tục yếu, danh mục FVTPL mất giá kéo vốn chủ giảm, margin khó thu hồi hoặc ROE không cải thiện trên vốn mới."
+  }
+}
