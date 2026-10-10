@@ -1,0 +1,2058 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261006T144619483Z-hsj7f7pu",
+  "item_id": "item-afa4aaba-d7c7-434a-8bcc-0e0584b2b401",
+  "ticker": "HII",
+  "analysis_source": "SCREENED_WEB",
+  "outputs": {
+    "node1": {
+      "ticker": "HII",
+      "sector_type": "Hạt nhựa, compound và vật liệu polymer",
+      "sector_profile": "COMMODITY_CYCLICAL",
+      "timestamp": "2026-10-10T05:53:30.861Z",
+      "data_period": "Q2/2026; giá 09/10",
+      "analysis_mode": "SCREENED",
+      "screening_metrics": {
+        "price": 8690,
+        "high_52w": 11800,
+        "low_52w": 4490,
+        "perf_1w": -9.48,
+        "perf_1m": -2.36,
+        "perf_3m": 47.29,
+        "perf_6m": 66.48,
+        "perf_1y": 85.68,
+        "perf_ytd": 41.3,
+        "volume": 424090,
+        "relative_volume": 0.56,
+        "avg_volume_10d": 688820,
+        "avg_volume_30d": 739410,
+        "avg_volume_60d": 640000,
+        "market_cap": 646760000000,
+        "roe_ttm": 23.38,
+        "roa_ttm": 11.72,
+        "revenue_growth_annual_yoy": 4.62,
+        "revenue_growth_quarterly_yoy": 96.07,
+        "eps_dil_growth_ttm_yoy": 1331.25,
+        "fcf_growth_ttm_yoy": 87.02,
+        "gross_margin_ttm": 9.58,
+        "operating_margin_ttm": 3.39,
+        "net_margin_ttm": 2.4,
+        "fcf_ttm": 114220000000,
+        "debt_equity_fq": 0.44,
+        "debt_equity_fy": 0.44,
+        "current_ratio_fq": 1.66,
+        "quick_ratio_fq": 1.37,
+        "pe": 2.73,
+        "peg": 0,
+        "pb": 0.58,
+        "ps": 0.07,
+        "ev_ebitda": 2.25,
+        "ev_revenue": 0.09
+      },
+      "screening_summary": {
+        "screen_score": 76.38,
+        "screen_rank": 13,
+        "screen_grade": "A",
+        "quality_score": 54.52,
+        "growth_score": 85.44,
+        "valuation_score": 100,
+        "micro_score": 90.91,
+        "momentum_score": 57.1,
+        "opportunity_score": 80.85,
+        "classification": "CORE"
+      },
+      "trusted_screener_snapshot": {
+        "source": "StockScreenerV2",
+        "ticker": "HII",
+        "industry": "Chemicals: specialty",
+        "screening_as_of": "2026-10-06",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 76.38,
+          "screen_rank": 13,
+          "screen_grade": "A",
+          "quality_score": 54.52,
+          "growth_score": 85.44,
+          "valuation_score": 100,
+          "micro_score": 90.91,
+          "momentum_score": 57.1,
+          "opportunity_score": 80.85,
+          "classification": "CORE"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 8690,
+              "value": 8690,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 11800,
+              "value": 11800,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 4490,
+              "value": 4490,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": -9.48,
+              "value": -9.48,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": -2.36,
+              "value": -2.36,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": 47.29,
+              "value": 47.29,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": 66.48,
+              "value": 66.48,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": 85.68,
+              "value": 85.68,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": 41.3,
+              "value": 41.3,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 424090,
+              "value": 424090,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 0.56,
+              "value": 0.56,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 688820,
+              "value": 688820,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 739410,
+              "value": 739410,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 640000,
+              "value": 640000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 646760000000,
+              "value": 646760000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 23.38,
+              "value": 23.38,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 11.72,
+              "value": 11.72,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 4.62,
+              "value": 4.62,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": 96.07,
+              "value": 96.07,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 1331.25,
+              "value": 1331.25,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": 87.02,
+              "value": 87.02,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 9.58,
+              "value": 9.58,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 3.39,
+              "value": 3.39,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 2.4,
+              "value": 2.4,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": 114220000000,
+              "value": 114220000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.44,
+              "value": 0.44,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.44,
+              "value": 0.44,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 1.66,
+              "value": 1.66,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 1.37,
+              "value": 1.37,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 2.73,
+              "value": 2.73,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0,
+              "value": 0,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 0.58,
+              "value": 0.58,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 0.07,
+              "value": 0.07,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 2.25,
+              "value": 2.25,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 0.09,
+              "value": 0.09,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 8690,
+          "high_52w": 11800,
+          "low_52w": 4490
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 54.52,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 85.44,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 4
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 100,
+            "coverage": 80,
+            "status": "LIMITED",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 4
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 90.91,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 57.1,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 72.72,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 80.85,
+            "coverage": 93.33,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "FALSE",
+            "signals": []
+          },
+          "lineage": [
+            "STRONG_MEDIUM_MOMENTUM"
+          ]
+        },
+        "classification": {
+          "classification": "CORE",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Strong quality and opportunity, no material soft risk",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 72.72,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 80.85,
+            "coverage": 93.33,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.263559,
+          "upside_to_52w_high": 0.357883,
+          "position_52w_range": 0.574555,
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "FALSE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": -9.48,
+          "perf_1m": -2.36,
+          "perf_3m": 47.29,
+          "perf_6m": 66.48,
+          "perf_1y": 85.68,
+          "perf_ytd": 41.3,
+          "volume": 424090,
+          "relative_volume": 0.56,
+          "avg_volume_30d": 739410,
+          "medium_momentum": 45.9955,
+          "momentum_stack": 0.666667,
+          "volume_confirmation": "FALSE",
+          "signals": [
+            "STRONG_MEDIUM_MOMENTUM"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "TRUE",
+            "weak_medium_momentum": "FALSE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "HII",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 76.38,
+          "percentile": 81.82,
+          "rank_position": 13,
+          "rank_total": 67,
+          "rankable_denominator": 67,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "STRONG_MEDIUM_MOMENTUM",
+            "ATTRACTIVE_VALUATION"
+          ]
+        }
+      },
+      "screening_as_of": "2026-10-06",
+      "data_integrity": {
+        "coverage": 100,
+        "status": "DATA_OK",
+        "flags": [],
+        "missing_fields": [],
+        "observations": {
+          "price": {
+            "field": "price",
+            "raw_value": 8690,
+            "value": 8690,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "high_52w": {
+            "field": "high_52w",
+            "raw_value": 11800,
+            "value": 11800,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "low_52w": {
+            "field": "low_52w",
+            "raw_value": 4490,
+            "value": 4490,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1w": {
+            "field": "perf_1w",
+            "raw_value": -9.48,
+            "value": -9.48,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1m": {
+            "field": "perf_1m",
+            "raw_value": -2.36,
+            "value": -2.36,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_3m": {
+            "field": "perf_3m",
+            "raw_value": 47.29,
+            "value": 47.29,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_6m": {
+            "field": "perf_6m",
+            "raw_value": 66.48,
+            "value": 66.48,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1y": {
+            "field": "perf_1y",
+            "raw_value": 85.68,
+            "value": 85.68,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_ytd": {
+            "field": "perf_ytd",
+            "raw_value": 41.3,
+            "value": 41.3,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "volume": {
+            "field": "volume",
+            "raw_value": 424090,
+            "value": 424090,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "relative_volume": {
+            "field": "relative_volume",
+            "raw_value": 0.56,
+            "value": 0.56,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_10d": {
+            "field": "avg_volume_10d",
+            "raw_value": 688820,
+            "value": 688820,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_30d": {
+            "field": "avg_volume_30d",
+            "raw_value": 739410,
+            "value": 739410,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_60d": {
+            "field": "avg_volume_60d",
+            "raw_value": 640000,
+            "value": 640000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "market_cap": {
+            "field": "market_cap",
+            "raw_value": 646760000000,
+            "value": 646760000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roe_ttm": {
+            "field": "roe_ttm",
+            "raw_value": 23.38,
+            "value": 23.38,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roa_ttm": {
+            "field": "roa_ttm",
+            "raw_value": 11.72,
+            "value": 11.72,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_annual_yoy": {
+            "field": "revenue_growth_annual_yoy",
+            "raw_value": 4.62,
+            "value": 4.62,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_quarterly_yoy": {
+            "field": "revenue_growth_quarterly_yoy",
+            "raw_value": 96.07,
+            "value": 96.07,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "eps_dil_growth_ttm_yoy": {
+            "field": "eps_dil_growth_ttm_yoy",
+            "raw_value": 1331.25,
+            "value": 1331.25,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_growth_ttm_yoy": {
+            "field": "fcf_growth_ttm_yoy",
+            "raw_value": 87.02,
+            "value": 87.02,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "gross_margin_ttm": {
+            "field": "gross_margin_ttm",
+            "raw_value": 9.58,
+            "value": 9.58,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "operating_margin_ttm": {
+            "field": "operating_margin_ttm",
+            "raw_value": 3.39,
+            "value": 3.39,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "net_margin_ttm": {
+            "field": "net_margin_ttm",
+            "raw_value": 2.4,
+            "value": 2.4,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_ttm": {
+            "field": "fcf_ttm",
+            "raw_value": 114220000000,
+            "value": 114220000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fq": {
+            "field": "debt_equity_fq",
+            "raw_value": 0.44,
+            "value": 0.44,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fy": {
+            "field": "debt_equity_fy",
+            "raw_value": 0.44,
+            "value": 0.44,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "current_ratio_fq": {
+            "field": "current_ratio_fq",
+            "raw_value": 1.66,
+            "value": 1.66,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "quick_ratio_fq": {
+            "field": "quick_ratio_fq",
+            "raw_value": 1.37,
+            "value": 1.37,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pe": {
+            "field": "pe",
+            "raw_value": 2.73,
+            "value": 2.73,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "peg": {
+            "field": "peg",
+            "raw_value": 0,
+            "value": 0,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pb": {
+            "field": "pb",
+            "raw_value": 0.58,
+            "value": 0.58,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ps": {
+            "field": "ps",
+            "raw_value": 0.07,
+            "value": 0.07,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_ebitda": {
+            "field": "ev_ebitda",
+            "raw_value": 2.25,
+            "value": 2.25,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_revenue": {
+            "field": "ev_revenue",
+            "raw_value": 0.09,
+            "value": 0.09,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          }
+        },
+        "issues": []
+      },
+      "market_data": {
+        "price": {
+          "value": 8810,
+          "date": "2026-10-09",
+          "source": "price"
+        },
+        "volume_20d_avg": {
+          "value": null,
+          "date": null,
+          "source": null
+        },
+        "avg_trading_value_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "liquidity_flag": "09/10 396500 cổ phiếu, 0%",
+        "foreign_net_flow_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "foreign_room_remaining": {
+          "value": null,
+          "unit": "%",
+          "date": null,
+          "source": null
+        },
+        "market_cap": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": null,
+        "pb_current": null,
+        "dividend_yield": null
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 3913.6,
+          "period": "Q2/2026",
+          "source": "finance"
+        },
+        "npat": {
+          "value": 162.1,
+          "period": "Q2/2026",
+          "source": "finance"
+        },
+        "ebit": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "gross_margin": null,
+        "debt_equity": null,
+        "total_debt": null,
+        "total_equity": null,
+        "cash_and_equivalents": null,
+        "effective_tax_rate": null,
+        "cfo": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "capex": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "receivables": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "inventory": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "financial_income": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "financial_expense": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "other_income": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "other_expense": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "Thiếu chứng cứ WACC và chi phí vốn.",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": null,
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": null
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": null
+      },
+      "upcoming_events": [
+        {
+          "event": "BCTC Q3; kiểm chứng Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+          "date": null,
+          "source": "company"
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "Tăng trưởng lợi nhuận cần chuẩn hóa chu kỳ và cash conversion",
+          "status": "PARTIAL",
+          "conclusion": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+          "source_refs": [
+            "finance"
+          ]
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [
+          "price",
+          "high_52w",
+          "low_52w",
+          "perf_1w",
+          "perf_1m",
+          "perf_3m",
+          "perf_6m",
+          "perf_1y",
+          "perf_ytd",
+          "volume",
+          "relative_volume",
+          "avg_volume_10d",
+          "avg_volume_30d",
+          "avg_volume_60d",
+          "market_cap",
+          "roe_ttm",
+          "roa_ttm",
+          "revenue_growth_annual_yoy",
+          "revenue_growth_quarterly_yoy",
+          "eps_dil_growth_ttm_yoy",
+          "fcf_growth_ttm_yoy",
+          "gross_margin_ttm",
+          "operating_margin_ttm",
+          "net_margin_ttm",
+          "fcf_ttm",
+          "debt_equity_fq",
+          "debt_equity_fy",
+          "current_ratio_fq",
+          "quick_ratio_fq",
+          "pe",
+          "peg",
+          "pb",
+          "ps",
+          "ev_ebitda",
+          "ev_revenue"
+        ],
+        "new_data_collected": [
+          "Giá 09/10",
+          "Kết quả Q2/6T",
+          "Nguồn IR"
+        ],
+        "still_missing": [
+          "CFO trực tiếp kỳ 6T",
+          "Các khoản bất thường và bên liên quan",
+          "Giá đầu vào tháng 10",
+          "SMA200 và VSA dài hạn",
+          "So sánh peer nhóm ngành"
+        ]
+      },
+      "material_questions": [
+        {
+          "question": "Biên lợi nhuận tăng có bền?",
+          "why_material": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+          "status": "PARTIAL",
+          "answer": "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+          "source_refs": [
+            "finance"
+          ],
+          "freshness": "Q2/2026"
+        },
+        {
+          "question": "Vốn lưu động có theo kịp lợi nhuận?",
+          "why_material": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+          "status": "MISSING",
+          "answer": null,
+          "source_refs": [],
+          "freshness": null
+        },
+        {
+          "question": "Giá nguyên liệu ảnh hưởng lợi nhuận?",
+          "why_material": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm",
+          "status": "MISSING",
+          "answer": null,
+          "source_refs": [],
+          "freshness": null
+        }
+      ],
+      "sources": [
+        {
+          "id": "price",
+          "title": "Simplize HII 09/10",
+          "url": "https://simplize.vn/co-phieu/HII/lich-su-gia",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "finance",
+          "title": "HII BCTC quý II",
+          "url": "https://cophieu68.vn/quote/financial_detail.php?id=hii&less=0",
+          "date": "2026-07-30",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "company",
+          "title": "An Tiến báo cáo soát xét 6T2026",
+          "url": "https://antienindustries.com/bao-cao-dinh-ky",
+          "date": "2026-08-28",
+          "tier": "TIER_1"
+        },
+        {
+          "id": "review",
+          "title": "iShareInvest bóc tách thu nhập HII",
+          "url": "https://ishareinvest.com/vi/insights/stocks/hii/",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "market",
+          "title": "Stockbiz VNINDEX 09/10",
+          "url": "https://web.stockbiz.vn/IndicesStats.aspx",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "breadth",
+          "title": "VNINDEX độ rộng 09/10",
+          "url": "https://vnindex.ai/vnindex-hom-nay",
+          "date": "2026-10-09",
+          "tier": "TIER_3"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "coverage_model": "CAPABILITY_BASED_V1",
+        "required_sessions": null,
+        "sessions_used": 4,
+        "indicator_requirements": [
+          {
+            "capability": "recent_prices",
+            "required_sessions": 4,
+            "satisfied": true
+          },
+          {
+            "capability": "sma200",
+            "required_sessions": 200,
+            "satisfied": false
+          },
+          {
+            "capability": "vsa_spread_volume_context",
+            "required_sessions": 60,
+            "satisfied": false
+          }
+        ],
+        "missing_capabilities": [
+          "sma200",
+          "vsa_spread_volume_context"
+        ],
+        "note": "Thiếu chuỗi 200 phiên được kiểm chứng."
+      },
+      "ohlcv_source": {
+        "source": "price",
+        "sessions_used": 4,
+        "date_range": "2026-10-06→2026-10-09"
+      },
+      "trend_status": "09/10 0% giá 8810.",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": 0.5362383521997268,
+        "classification": "So bình quân Screener 06/10 khác thời điểm; không kết luận dòng tiền tổ chức.",
+        "vsa_signal_candidate": "none",
+        "supporting_evidence": [
+          "09/10: 396500 CP, 0%"
+        ]
+      },
+      "smart_money_phase": null,
+      "zones": {
+        "demand": "8300 mốc quan sát chưa xác nhận",
+        "supply": "Chưa có kháng cự dài hạn xác minh",
+        "is_fresh": false
+      },
+      "sector_benchmark": {
+        "method": "UNAVAILABLE",
+        "name": null,
+        "constituents_if_peer_basket": [],
+        "source": null,
+        "date": null
+      },
+      "sector_vs_market": {
+        "period": "1D 09/10",
+        "sector_perf_pct": null,
+        "vnindex_perf_pct": -0.22,
+        "sector_strength_label": "0% so VNINDEX -0,22%, không phải chỉ số ngành."
+      },
+      "screening_signal_analysis": "Không suy diễn trend tháng 10 từ Screener 06/10.",
+      "signal_strength": 40,
+      "conclusion": "DEGRADED; cần thêm OHLCV và peer.",
+      "market_context": {
+        "as_of": "2026-10-09",
+        "benchmarks": {
+          "vnindex": {
+            "name": "VNINDEX",
+            "period": "1D 09/10",
+            "performance_pct": -0.22,
+            "trend": "Giảm nhẹ",
+            "source": "market",
+            "freshness": "2026-10-09"
+          },
+          "secondary": [
+            {
+              "name": "VN30",
+              "kind": "INDEX",
+              "period": "1D 09/10",
+              "performance_pct": -0.19,
+              "source": "market",
+              "freshness": "2026-10-09",
+              "constituents": []
+            }
+          ]
+        },
+        "breadth": {
+          "advancers": 129,
+          "decliners": 175,
+          "unchanged": 100,
+          "advance_decline_ratio": 0.7371428571428571,
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "turnover_liquidity": {
+          "market_turnover_value": 27542.82,
+          "unit": "Bn VND",
+          "change_vs_20d_pct": null,
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "leadership_rotation": {
+          "leaders": [
+            "HDB",
+            "VPB",
+            "TCB"
+          ],
+          "laggards": [
+            "VIC",
+            "BSR",
+            "GVR"
+          ],
+          "note": "Theo đóng góp chỉ số 09/10, không phải ngành",
+          "source_refs": [
+            "breadth"
+          ],
+          "freshness": "2026-10-09"
+        },
+        "volatility": {
+          "measure": "Biên độ VNINDEX phiên",
+          "value": 20.72,
+          "period": "1D điểm",
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "market_foreign_flow": {
+          "net_value": -9735.11,
+          "unit": "Bn VND",
+          "period": "HOSE 09/10",
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "stock_relative_strength": {
+          "period": "1D 09/10",
+          "stock_perf_pct": 0,
+          "vnindex_perf_pct": -0.22,
+          "secondary_benchmark_name": "VN30",
+          "secondary_benchmark_perf_pct": -0.19,
+          "vs_vnindex_pct": 0.22,
+          "vs_secondary_benchmark_pct": 0.19,
+          "source_refs": [
+            "price",
+            "market"
+          ]
+        },
+        "coverage": {
+          "status": "FULL",
+          "available_capabilities": [
+            "vnindex_baseline",
+            "secondary_benchmark",
+            "breadth",
+            "turnover_liquidity",
+            "leadership_rotation",
+            "volatility",
+            "market_foreign_flow",
+            "stock_relative_strength"
+          ],
+          "missing_capabilities": [],
+          "provenance": [
+            {
+              "capability": "vnindex_baseline",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "secondary_benchmark",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "breadth",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "turnover_liquidity",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "leadership_rotation",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "volatility",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "market_foreign_flow",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "stock_relative_strength",
+              "source": "price;market",
+              "as_of": "2026-10-09"
+            }
+          ],
+          "note": "VN30 benchmark thị trường, chưa có rổ cổ phiếu cùng ngành."
+        }
+      }
+    },
+    "node3": {
+      "data_period": "Q2/2026",
+      "screening_flags": [
+        "STRONG_MEDIUM_MOMENTUM",
+        "ATTRACTIVE_VALUATION"
+      ],
+      "screening_metrics_used": {
+        "role": "Trigger only",
+        "pe": 2.73,
+        "pb": 0.58,
+        "ev_ebitda": 2.25,
+        "roe_ttm": 23.38,
+        "debt_equity_fq": 0.44
+      },
+      "capital_efficiency": {
+        "wacc": null,
+        "roic": null,
+        "economic_spread": null,
+        "reason": "Chưa có WACC và chi tiết vốn quay vòng.",
+        "external_reference": null
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "review_adjustment": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+        "flag": "NEEDS_CASH_CONVERSION"
+      },
+      "earnings_sustainability": {
+        "classification": "CYCLICAL",
+        "structural": "Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+        "cyclical": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm",
+        "low_base": "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%."
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Thiếu đủ số liệu kiểm chứng forensic.",
+      "health_status": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+      "valuation": {
+        "current": {
+          "price": 8810,
+          "screening_pe": 2.73,
+          "screening_pb": 0.58,
+          "screening_ev_ebitda": 2.25
+        },
+        "broker_references": [],
+        "reverse_dcf": null,
+        "conclusion": "EV/EBITDA giữa chu kỳ, P/B kiểm tra ROE và capital efficiency"
+      },
+      "moat": "Thương hiệu và mạng khách hàng có thể hữu ích, nhưng biên lợi nhuận qua chu kỳ cần được xác minh.",
+      "conclusion": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+      "sector_economics": {
+        "sector_profile": "COMMODITY_CYCLICAL",
+        "earnings_bridge": [
+          {
+            "driver": "Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+            "fact": "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%.",
+            "implication": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền."
+          },
+          {
+            "driver": "Vốn",
+            "fact": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+            "implication": "Biên tăng phải chuyển hóa thành CFO."
+          }
+        ],
+        "normalized_earnings": null,
+        "capital_allocation": [
+          {
+            "event": "Vốn lưu động và năng lực sản xuất/phân phối",
+            "implication": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ."
+          }
+        ],
+        "balance_sheet_capacity": "Screener D/E và current ratio không thay thế bảng cân đối mới.",
+        "valuation_method_selection": [
+          {
+            "method": "MID_CYCLE_EV_EBITDA",
+            "status": "SELECTED",
+            "reason": "EV/EBITDA giữa chu kỳ, P/B kiểm tra ROE và capital efficiency",
+            "evidence_refs": [
+              "finance"
+            ]
+          },
+          {
+            "method": "DCF",
+            "status": "CONDITIONAL",
+            "reason": "Chỉ khi kiểm chứng working capital/chu kỳ.",
+            "evidence_refs": [
+              "company"
+            ]
+          }
+        ]
+      },
+      "expectation_basis": [
+        {
+          "topic": "Giá hiện tại và thị trường",
+          "statement": "Giá HII ngày 09/10 thể hiện kỳ vọng thị trường nhưng không phải analyst consensus.",
+          "expectation_basis": "PRICE_ACTION_INFERENCE",
+          "expected_value": null,
+          "expected_unit": null,
+          "analyst_view": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+          "gap_direction": "UNCERTAIN",
+          "source_refs": [
+            "price",
+            "finance"
+          ],
+          "as_of": "2026-10-09",
+          "inference_label": "INFERENCE",
+          "investment_implication": "Không ngoại suy giá thành mức lãi dự phóng."
+        }
+      ]
+    },
+    "node4": {
+      "risk_regime": "MIXED",
+      "macro_indicators": {},
+      "company_specific_drivers": [
+        {
+          "driver": "Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+          "impact": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Cơ cấu vốn",
+          "impact": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+          "evidence_refs": [
+            "finance"
+          ]
+        }
+      ],
+      "sensitivity_table": [],
+      "geopolitical_events": [],
+      "causal_chains": [
+        {
+          "chain": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm → giá vốn/giá bán → biên gộp → CFO",
+          "confidence": "MEDIUM",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "chain": "Doanh số → khoản phải thu/tồn kho → nhu cầu tài trợ → chi phí lãi",
+          "confidence": "MEDIUM",
+          "source_refs": [
+            "finance"
+          ]
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Thuận",
+          "conditions": "Biên gộp duy trì, vốn lưu động kiểm soát",
+          "effect": "LNST và CFO cải thiện",
+          "probability": null
+        },
+        {
+          "scenario": "Nghịch",
+          "conditions": "Giá đầu vào tăng nhanh hơn giá bán, CFO yếu",
+          "effect": "Chi phí vốn tăng, định giá giảm",
+          "probability": null
+        }
+      ],
+      "macro_view": "Theo cơ chế giá hàng hóa đầu vào, không lấy dữ liệu Brent/Fed thay thế nếu không rõ tỷ trọng exposure.",
+      "industry_impact": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm",
+      "company_impact": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+      "conclusion": "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+      "external_exposure_map": [
+        {
+          "exposure_id": "raw-material",
+          "driver": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm",
+          "driver_type": "COMMODITY",
+          "company_exposure": "Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+          "transmission_mechanism": "Giá đầu vào và cấu trúc hàng tồn kho quyết định biên gộp và vốn lưu động.",
+          "transmission_targets": [
+            "MARGIN",
+            "CASH_FLOW"
+          ],
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "selection_rationale": "Là nguồn rủi ro vận hành trực tiếp."
+        },
+        {
+          "exposure_id": "finance",
+          "driver": "Lãi suất và tín dụng vốn lưu động",
+          "driver_type": "RATES",
+          "company_exposure": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+          "transmission_mechanism": "Cần tài trợ công nợ/tồn kho; chi phí vốn làm giảm lợi nhuận.",
+          "transmission_targets": [
+            "CASH_FLOW",
+            "BALANCE_SHEET"
+          ],
+          "materiality_hypothesis": "MEDIUM",
+          "research_required": true,
+          "selection_rationale": "Vòng quay vốn biến động khi doanh thu tăng."
+        }
+      ],
+      "research_targets": [
+        {
+          "target_id": "raw-material-target",
+          "exposure_id": "raw-material",
+          "driver": "Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm",
+          "driver_type": "COMMODITY",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "Nguồn ngành và BCTC 6T",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Chưa có chuỗi giá nguyên liệu/cấu trúc tài trợ đồng kỳ để xác lập delta."
+        },
+        {
+          "target_id": "finance-target",
+          "exposure_id": "finance",
+          "driver": "Lãi suất và tín dụng vốn lưu động",
+          "driver_type": "RATES",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "Nguồn ngành và BCTC 6T",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Chưa có chuỗi giá nguyên liệu/cấu trúc tài trợ đồng kỳ để xác lập delta."
+        }
+      ],
+      "what_changed": [],
+      "market_context_use": {
+        "source": "NODE2.market_context",
+        "measurement_policy": "CONSUME_ONLY",
+        "consumed_capabilities": [
+          "vnindex_baseline",
+          "stock_relative_strength",
+          "market_foreign_flow"
+        ],
+        "interpretation": "Điểm vào thận trọng trong phiên HOSE bán ròng ngoại."
+      }
+    },
+    "node5": {
+      "ticker": "HII",
+      "data_period": "Q2/2026; giá 09/10",
+      "scores": {
+        "fundamental": 13,
+        "valuation": 12,
+        "technical": 8,
+        "flow": 7,
+        "sector_macro": 10,
+        "risk": 9
+      },
+      "ai_score": {
+        "value": 52.25,
+        "formula_shown": "F/20×30+V/20×20+T/20×15+Flow/20×15+SectorMacro/20×10+Risk/20×10"
+      },
+      "confidence": {
+        "method": "EVIDENCE_QUALITY_V1",
+        "value": 72,
+        "components": {
+          "data_completeness": 71,
+          "source_quality": 79,
+          "freshness": 72,
+          "cross_source_consistency": 70,
+          "method_suitability": 77,
+          "key_uncertainty_coverage": 56
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🟡",
+        "technical": "🟡",
+        "macro": "🟡",
+        "liquidity": "🟡",
+        "signal_alignment": "0/4",
+        "alignment": "0/4",
+        "override_applied": "Thiếu CFO/đầu vào nguyên liệu để xác nhận mức lãi đang được định giá."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "BCTC Q3 và biến Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng",
+        "bucket": "0-30d"
+      },
+      "decision": "WATCH",
+      "drivers": [
+        "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%.",
+        "Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền.",
+        "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ."
+      ],
+      "thesis_invalidation": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Luận điểm không còn nếu biên Q3 đảo chiều và CFO yếu kéo dài.",
+      "trading_stop": {
+        "price": 8300,
+        "basis": "Mốc tham khảo, chưa có SMA200."
+      },
+      "liquidity_note": "09/10 khớp 396500 CP, không gán hành vi tổ chức.",
+      "strategy": {
+        "entry_zone": "Chờ Q3 duy trì biên gộp và CFO theo kịp lợi nhuận; không kết luận rẻ chỉ vì P/E 2,73.",
+        "allocation_plan": {
+          "note": "Chưa mua từ Screener.",
+          "steps": [
+            "Kiểm tra biên Q3 và CFO.",
+            "Đối chiếu vốn lưu động/chi phí vốn.",
+            "Chờ xác nhận xu hướng kỹ thuật."
+          ]
+        },
+        "tp1": {
+          "price": null,
+          "rationale": "Chưa đủ dự phóng bình thường hóa."
+        },
+        "tp2": {
+          "price": null,
+          "rationale": "Không có mô hình định giá độc lập."
+        },
+        "risk_per_trade_pct_nav": 0.5,
+        "position_size_note": "Chỉ cân nhắc tỷ trọng nhỏ khi xác nhận.",
+        "max_portfolio_weight_pct": 2,
+        "position_type": "Watchlist"
+      },
+      "full_reasoning": "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền. Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. AI Score đánh giá bối cảnh hiện hành và giảm conviction do thiếu CFO/giá nguyên liệu.",
+      "thesis_conviction": {
+        "level": "LOW",
+        "rationale": "Lợi nhuận tăng nhưng lỗ hổng dòng tiền và giá nguyên liệu còn đáng kể.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "supporting_evidence_refs": [
+          "finance"
+        ],
+        "contradictory_evidence_refs": [
+          "price",
+          "finance"
+        ],
+        "catalyst_visibility": "MEDIUM",
+        "payoff_asymmetry": "UNCERTAIN"
+      },
+      "decision_overlay": {
+        "market_regime": {
+          "regime_state": "MIXED",
+          "evidence_refs": [
+            "NODE2.market_context:market_foreign_flow",
+            "NODE2.market_context:stock_relative_strength"
+          ]
+        },
+        "timing_effect": "WAIT_FOR_ENTRY",
+        "sizing_effect": "CAP",
+        "decision_effect": "NONE",
+        "pre_overlay_decision": "WATCH",
+        "post_overlay_decision": "WATCH",
+        "override_rationale": "CFO và vốn lưu động chưa xác minh; thị trường có bán ròng ngoại mạnh.",
+        "ai_score_effect": "NONE",
+        "ai_score_reference": 52.25
+      },
+      "risk_attribution": [
+        {
+          "driver": "Biên và giá đầu vào chu kỳ",
+          "primary_owner": "FUNDAMENTAL",
+          "residual_risk_effect": "MEDIUM",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Biên kỳ vọng đã phản ánh ở Fundamental.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Thiếu hụt vốn lưu động nghiêm trọng",
+          "primary_owner": "RISK",
+          "residual_risk_effect": "HIGH",
+          "risk_score_treatment": "PRIMARY_RISK_PENALTY",
+          "rationale": "Risk chỉ giữ khả năng chống chịu stress thanh khoản.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Giá chưa xác nhận trend",
+          "primary_owner": "TECHNICAL",
+          "residual_risk_effect": "LOW",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Thuộc technical và timing.",
+          "evidence_refs": [
+            "price"
+          ]
+        }
+      ],
+      "investment_horizon": {
+        "bucket": "3-12M",
+        "rationale": "Theo dõi biến giá nguyên liệu và báo cáo Q3."
+      },
+      "anti_thesis": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.",
+      "variant_view": {
+        "summary": "Định giá hiện tại có thể chưa phản ánh sự đảo chiều lợi nhuận nếu biên không duy trì.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "why_different": "Không xem P/E thấp là tín hiệu mua độc lập.",
+        "what_proves_wrong": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Luận điểm không còn nếu biên Q3 đảo chiều và CFO yếu kéo dài."
+      },
+      "monitoring_kpis": [
+        {
+          "kpi": "Lợi nhuận và biên",
+          "current_state": "Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%.",
+          "watch_condition": "Biên Q3 giảm đáng kể",
+          "thesis_link": "Động lực giá bán–nguyên liệu suy yếu.",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "Giá đầu vào",
+          "current_state": "Chưa có báo giá đồng kỳ",
+          "watch_condition": "Đầu vào tăng nhanh hơn giá bán",
+          "thesis_link": "Thu hẹp lợi nhuận.",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "CFO, vốn lưu động",
+          "current_state": "Chưa xác minh đủ",
+          "watch_condition": "Tồn kho/phải thu và nợ tăng",
+          "thesis_link": "Cash conversion.",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "Giá",
+          "current_state": "8810 ngày 09/10",
+          "watch_condition": "Giá không giữ 8300",
+          "thesis_link": "Timing.",
+          "source_refs": [
+            "price"
+          ]
+        }
+      ],
+      "what_would_change_my_mind": [
+        "Q3 tăng lãi lõi và CFO cùng hướng.",
+        "Biên gộp duy trì dù giá nguyên liệu đổi.",
+        "Công nợ và lãi vay giảm tương quan doanh thu.",
+        "Kỹ thuật giá đạt xác nhận dữ liệu dài hơn."
+      ]
+    },
+    "node6b": "# CRSM HII — An Tiến Industries\nNgày 10/10/2026 | Hạt nhựa, compound và vật liệu polymer | Kết quả Q2/2026, giá 09/10/2026.\n\n## 1. Tóm tắt CIO\n**WATCH — AI Score 52.25/100; độ tin cậy 72/100, conviction thấp.** Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. Giá đóng ngày 09/10 là 8810 đồng (0%), khớp 396500 cổ phiếu.\nCâu hỏi quyết định: Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền. Phản luận chính: Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Screener 06/10 chỉ là trigger nghiên cứu; kết quả Q3/cash conversion là điều kiện trước khi xem xét vị thế.\n\n## 2. Luận điểm và expectation gap\nKỳ vọng tăng trưởng thể hiện qua Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. nhưng đó là số thực tế kỳ trước, không phải đồng thuận chuyên gia về tương lai. Hướng tích cực nếu biên duy trì khi sản lượng tăng và chi phí vốn không phình to.\nAnti-thesis: Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. CRSM không gán một giá trị kỳ vọng giả tạo hoặc giá mục tiêu môi giới không tồn tại. Nếu Q3 cho thấy biên trở lại mức thấp và CFO không theo kịp, luận điểm tăng trưởng giảm mạnh.\n\n## 3. Chất lượng kinh doanh, earnings bridge\nQ2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền. Số doanh thu và LNST chưa nói hết về cash conversion: cần kiểm tra phải thu, tồn kho, chi phí bán hàng, lãi vay, các khoản không lặp lại và khả năng ghi nhận từ liên kết.\nScreener D/E 0.44, current ratio 1.66 (kỳ 06/10) phải được đối chiếu BCTC soát xét. Không dùng tỷ suất sinh lời từ nền thấp thay cho sức mạnh kinh tế bền. Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ.\nCầu nối ưu tiên là giá bán ròng trừ giá mua nguyên liệu, tác động cơ cấu sản phẩm, chi phí phân phối và dòng tiền vốn lưu động. Không có CFO đầy đủ được xác minh thì Node3 phải ghi NEEDS_CASH_CONVERSION.\n\n## 4. Định giá và margin of safety\nScreener P/E 2.73, P/B 0.58, EV/EBITDA 2.25. EV/EBITDA giữa chu kỳ, P/B kiểm tra ROE và capital efficiency. Chỉ số rẻ bề ngoài có thể đến từ lợi nhuận chu kỳ hoặc khoản không lặp lại.\nCần bình thường hóa EPS, kiểm tra vốn chủ và cash conversion. Kịch bản thuận khi biên và doanh thu duy trì, kịch bản xấu là tăng vốn lưu động và đầu vào nguyên liệu làm CFO đi ngược LNST.\nKhông có WACC và chuỗi giá nguyên liệu đủ đồng kỳ nên không xác lập TP1, TP2 hoặc bất đối xứng định lượng giả. Số liệu khác nguồn được giữ theo ngày/định nghĩa.\n\n## 5. Kỹ thuật và thị trường\nPhiên 09/10 VNINDEX -0,22%, VN30 -0,19%, HII 0%, chênh VNINDEX 0.22 điểm %. HOSE 129 mã tăng và 175 giảm; khối ngoại bán ròng toàn HOSE khoảng 9.735 tỷ đồng, không phải dòng ngoại riêng HII.\nGiá tại 09/10 8810, thanh khoản 396500; chưa có chuỗi OHLCV 200 phiên đã kiểm định nên SMA200, VSA và kết luận Smart Money đều chưa được xác lập. Node2 DEGRADED.\nTính thanh khoản thị trường và tâm lý giao dịch chi phối timing, không thay cho luận điểm lợi nhuận doanh nghiệp.\n\n## 6. External drivers và nhân quả\nExposure: Giá hạt nhựa nguyên sinh và tiêu thụ nhựa thành phẩm; ảnh hưởng qua Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng rồi đến doanh thu, chi phí và CFO.\nFACT: Q2/2026 doanh thu 3.913,6 tỷ, gần gấp đôi Q2/2025 là 1.996 tỷ; LNST 162,1 tỷ so 59,1 tỷ, biên gộp khoảng 11,5% so 6,7%. INFERENCE: Biên gộp cải thiện là động lực thực nhưng chi phí bán hàng Q2 238,7 tỷ so 89,4 tỷ cùng kỳ và lợi nhuận công ty liên kết đóng góp tăng, nên tốc độ EPS chưa chắc bền. ASSUMPTION: các mức giá mua/bán hiện tại tiếp diễn và không có thay đổi cơ cấu lớn. Chưa có chuỗi giá ngoại sinh tháng 10 có thể kiểm chứng cùng cơ cấu mua hàng; không tự gán “UP/DOWN” hoặc tác động bao nhiêu phần trăm.\nVốn lưu động phản ứng với doanh số và giá nhập: phải thu/tồn kho tăng khiến lãi vay ảnh hưởng lợi nhuận. Phải xác nhận lãi vay, trạng thái nợ, tỷ trọng hàng nhập trước khi áp bất kỳ biến Fed hoặc tỷ giá nào.\nBối cảnh thị trường ngày 09/10 chỉ tiêu thụ từ Node2, không đo lại trong Node4.\n\n## 7. Risk và phản luận\nBiên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Biên nguyên liệu chu kỳ thuộc Fundamental và không phạt kép trong Risk. Risk chỉ giữ đuôi thanh khoản và khả năng tái cấp vốn dưới stress; Technical chứa biến giá.\nRủi ro không xác định không được thay bằng con số tưởng tượng, nhưng cần giảm evidence confidence. Nếu lợi nhuận đẹp mà dòng tiền xấu kéo dài, chính mâu thuẫn này là căn cứ hạ conviction và thu hẹp tỷ trọng.\nLuận điểm mất hiệu lực: Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Luận điểm không còn nếu biên Q3 đảo chiều và CFO yếu kéo dài.\n\n## 8. Chiến lược vị thế\nQuyết định WATCH; Chờ Q3 duy trì biên gộp và CFO theo kịp lợi nhuận; không kết luận rẻ chỉ vì P/E 2,73. Không mua theo tiêu chí P/E thấp thuần túy.\nMốc kỹ thuật tham khảo 8300 đồng chưa backtest; khác với điều kiện vô hiệu doanh nghiệp là lợi nhuận/cash conversion xấu. Khi đủ dữ liệu Q3, chỉ minh họa rủi ro giao dịch 0,5% NAV và tỷ trọng tối đa 2% NAV nếu quyết định thay đổi.\nTP1/TP2 chưa có do thiếu biên an toàn định lượng được kiểm chứng; không sử dụng mục tiêu tự tạo từ multiple Screener.\n\n## 9. KPI và tín hiệu thay đổi\n| KPI | Hiện tại | Ngưỡng quan sát | Liên hệ |\n|---|---|---|---|\n| Biên và lợi nhuận | Q2/2026: doanh thu 3913.6 tỷ, lãi 162.1 tỷ | Q3 biên giảm đáng kể | Khả năng giữ spread |\n| Driver ngành | Chênh giá nguyên liệu polymer, cơ cấu sản phẩm và chi phí bán hàng | Giá mua tăng nhanh hơn giá bán | CFO và EBITDA |\n| Dòng tiền | Chưa xác minh đủ CFO kỳ 6T | Phải thu/tồn kho tăng, nợ tăng | Biên an toàn |\n| Giá | 8810 ngày 09/10 | Mất mốc 8300 hoặc ổn định lại | Timing |\nĐiều cần cập nhật là báo cáo Q3, biên theo ngành và vòng quay vốn; tín hiệu mua chỉ có nghĩa khi lợi nhuận lõi và tiền mặt cùng xác nhận.\n\n## 10. Nguồn và giới hạn\nBCTC và thông tin doanh nghiệp theo các URL được lưu ở Node1, kết hợp dữ liệu giao dịch phiên 09/10. Thiếu giá nguyên liệu tháng 10, CFO, chi tiết nợ và cơ cấu doanh thu, benchmark ngành và OHLCV 200 phiên.\nKhông kết luận “không có ảnh hưởng” khi chưa xác minh exposure. Báo cáo nghiên cứu, không phải tư vấn cá nhân."
+  },
+  "decision_record": {
+    "date": "10/10/2026",
+    "ticker": "HII",
+    "price_at_analysis": 8810,
+    "decision": "WATCH",
+    "ai_score": 52.25,
+    "confidence": 72,
+    "entry_zone": "Chờ Q3 duy trì biên gộp và CFO theo kịp lợi nhuận; không kết luận rẻ chỉ vì P/E 2,73.",
+    "trading_stop": 8300,
+    "tp1": null,
+    "tp2": null,
+    "thesis_invalidation": "Biên lợi nhuận ròng Q2 chỉ ~4,14%, nhạy giá resin, công nợ và vòng quay tồn kho; P/E dưới 3 có thể phản ánh đỉnh lợi nhuận ngắn kỳ. Luận điểm không còn nếu biên Q3 đảo chiều và CFO yếu kéo dài."
+  }
+}
