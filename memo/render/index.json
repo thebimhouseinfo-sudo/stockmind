@@ -1,28 +1,29 @@
 {
   "schema_version": "stockmind-render-index.v1",
-  "date": "2026-10-05",
-  "updated_at": "2026-10-05T00:44:00.000Z",
+  "date": "2026-10-10",
+  "updated_at": "2026-10-10T06:01:56.868Z",
   "runs": [
     {
-      "run_id": "run-20261005T001215308Z-aal9ltxj",
-      "created_at": "2026-10-05T00:12:15.309Z",
-      "completed_at": "2026-10-05T00:44:00.000Z",
+      "run_id": "run-20261006T144619483Z-hsj7f7pu",
+      "created_at": "2026-10-06T14:46:20.326Z",
+      "completed_at": "2026-10-10T06:00:27.059Z",
       "tickers": [
         "NT2",
         "DXP",
-        "GMD",
-        "NTP",
-        "DHC",
-        "PVT",
-        "PVP",
-        "HII",
         "VHM",
-        "ANV"
+        "HAG",
+        "DHC",
+        "GMD",
+        "PVP",
+        "PVT",
+        "ASP",
+        "HII",
+        "VIX"
       ],
-      "item_count": 10,
-      "completed_count": 10,
+      "item_count": 11,
+      "completed_count": 11,
       "failed_count": 0,
-      "result_ref": "memo/render/runs/run-20261005T001215308Z-aal9ltxj.json"
+      "result_ref": "memo/render/runs/run-20261006T144619483Z-hsj7f7pu.json"
     }
   ]
 }
