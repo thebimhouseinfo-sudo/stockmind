@@ -1,0 +1,2067 @@
+{
+  "result_version": "crsm-result.v1",
+  "pipeline_version": "crsm-pipeline.v1",
+  "run_id": "run-20261006T144619483Z-hsj7f7pu",
+  "item_id": "item-7ee54378-ca30-48b3-9ca4-05f01d9be837",
+  "ticker": "PVT",
+  "analysis_source": "SCREENED_WEB",
+  "outputs": {
+    "node1": {
+      "ticker": "PVT",
+      "sector_type": "Tàu vận tải dầu khí và logistics",
+      "sector_profile": "INDUSTRIAL_LOGISTICS",
+      "timestamp": "2026-10-10T05:51:02.389Z",
+      "data_period": "Q2/2026; giá 09/10/2026",
+      "analysis_mode": "SCREENED",
+      "screening_metrics": {
+        "price": 24500,
+        "high_52w": 29750,
+        "low_52w": 14950,
+        "perf_1w": 3.59,
+        "perf_1m": 19.51,
+        "perf_3m": 26.29,
+        "perf_6m": 23.62,
+        "perf_1y": 51.4,
+        "perf_ytd": 44.89,
+        "volume": 6300000,
+        "relative_volume": 0.74,
+        "avg_volume_10d": 7970000,
+        "avg_volume_30d": 6750000,
+        "avg_volume_60d": 5280000,
+        "market_cap": 12510000000000,
+        "roe_ttm": 16.14,
+        "roa_ttm": 6.34,
+        "revenue_growth_annual_yoy": 36.49,
+        "revenue_growth_quarterly_yoy": 31.29,
+        "eps_dil_growth_ttm_yoy": 29.28,
+        "fcf_growth_ttm_yoy": null,
+        "gross_margin_ttm": 15.03,
+        "operating_margin_ttm": 12.04,
+        "net_margin_ttm": 7.46,
+        "fcf_ttm": 582500000000,
+        "debt_equity_fq": 0.75,
+        "debt_equity_fy": 0.88,
+        "current_ratio_fq": 1.89,
+        "quick_ratio_fq": 1.78,
+        "pe": 9.04,
+        "peg": 0.3,
+        "pb": 1.36,
+        "ps": 0.67,
+        "ev_ebitda": 3.7,
+        "ev_revenue": 0.88
+      },
+      "screening_summary": {
+        "screen_score": 77.61,
+        "screen_rank": 9,
+        "screen_grade": "A",
+        "quality_score": 51.75,
+        "growth_score": 99.4,
+        "valuation_score": 91.01,
+        "micro_score": 87.39,
+        "momentum_score": 71.88,
+        "opportunity_score": 87.43,
+        "classification": "CORE"
+      },
+      "trusted_screener_snapshot": {
+        "source": "StockScreenerV2",
+        "ticker": "PVT",
+        "industry": "Marine shipping",
+        "screening_as_of": "2026-10-06",
+        "registry": {
+          "registry_id": "screener-v2-sandbox",
+          "registry_version": "2026-08-14.d1-d3-momentum-volume-sandbox",
+          "calibration_status": "SANDBOX",
+          "evaluation_version": "screener-v2-sandbox-price-dislocation-momentum-volume",
+          "classification_version": "sandbox-classification-v1"
+        },
+        "screening_summary": {
+          "screen_score": 77.61,
+          "screen_rank": 9,
+          "screen_grade": "A",
+          "quality_score": 51.75,
+          "growth_score": 99.4,
+          "valuation_score": 91.01,
+          "micro_score": 87.39,
+          "momentum_score": 71.88,
+          "opportunity_score": 87.43,
+          "classification": "CORE"
+        },
+        "data_integrity": {
+          "coverage": 100,
+          "status": "DATA_OK",
+          "flags": [],
+          "missing_fields": [],
+          "observations": {
+            "price": {
+              "field": "price",
+              "raw_value": 24500,
+              "value": 24500,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "high_52w": {
+              "field": "high_52w",
+              "raw_value": 29750,
+              "value": 29750,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "low_52w": {
+              "field": "low_52w",
+              "raw_value": 14950,
+              "value": 14950,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1w": {
+              "field": "perf_1w",
+              "raw_value": 3.59,
+              "value": 3.59,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1m": {
+              "field": "perf_1m",
+              "raw_value": 19.51,
+              "value": 19.51,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_3m": {
+              "field": "perf_3m",
+              "raw_value": 26.29,
+              "value": 26.29,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_6m": {
+              "field": "perf_6m",
+              "raw_value": 23.62,
+              "value": 23.62,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_1y": {
+              "field": "perf_1y",
+              "raw_value": 51.4,
+              "value": 51.4,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "perf_ytd": {
+              "field": "perf_ytd",
+              "raw_value": 44.89,
+              "value": 44.89,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "volume": {
+              "field": "volume",
+              "raw_value": 6300000,
+              "value": 6300000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "relative_volume": {
+              "field": "relative_volume",
+              "raw_value": 0.74,
+              "value": 0.74,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_10d": {
+              "field": "avg_volume_10d",
+              "raw_value": 7970000,
+              "value": 7970000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_30d": {
+              "field": "avg_volume_30d",
+              "raw_value": 6750000,
+              "value": 6750000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "avg_volume_60d": {
+              "field": "avg_volume_60d",
+              "raw_value": 5280000,
+              "value": 5280000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "market_cap": {
+              "field": "market_cap",
+              "raw_value": 12510000000000,
+              "value": 12510000000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roe_ttm": {
+              "field": "roe_ttm",
+              "raw_value": 16.14,
+              "value": 16.14,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "roa_ttm": {
+              "field": "roa_ttm",
+              "raw_value": 6.34,
+              "value": 6.34,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_annual_yoy": {
+              "field": "revenue_growth_annual_yoy",
+              "raw_value": 36.49,
+              "value": 36.49,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "revenue_growth_quarterly_yoy": {
+              "field": "revenue_growth_quarterly_yoy",
+              "raw_value": 31.29,
+              "value": 31.29,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "eps_dil_growth_ttm_yoy": {
+              "field": "eps_dil_growth_ttm_yoy",
+              "raw_value": 29.28,
+              "value": 29.28,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_growth_ttm_yoy": {
+              "field": "fcf_growth_ttm_yoy",
+              "raw_value": null,
+              "value": null,
+              "observation_state": "MISSING",
+              "usage_state": "UNAVAILABLE",
+              "reason": "MISSING"
+            },
+            "gross_margin_ttm": {
+              "field": "gross_margin_ttm",
+              "raw_value": 15.03,
+              "value": 15.03,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "operating_margin_ttm": {
+              "field": "operating_margin_ttm",
+              "raw_value": 12.04,
+              "value": 12.04,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "net_margin_ttm": {
+              "field": "net_margin_ttm",
+              "raw_value": 7.46,
+              "value": 7.46,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "fcf_ttm": {
+              "field": "fcf_ttm",
+              "raw_value": 582500000000,
+              "value": 582500000000,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fq": {
+              "field": "debt_equity_fq",
+              "raw_value": 0.75,
+              "value": 0.75,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "debt_equity_fy": {
+              "field": "debt_equity_fy",
+              "raw_value": 0.88,
+              "value": 0.88,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "current_ratio_fq": {
+              "field": "current_ratio_fq",
+              "raw_value": 1.89,
+              "value": 1.89,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "quick_ratio_fq": {
+              "field": "quick_ratio_fq",
+              "raw_value": 1.78,
+              "value": 1.78,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pe": {
+              "field": "pe",
+              "raw_value": 9.04,
+              "value": 9.04,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "peg": {
+              "field": "peg",
+              "raw_value": 0.3,
+              "value": 0.3,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "pb": {
+              "field": "pb",
+              "raw_value": 1.36,
+              "value": 1.36,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ps": {
+              "field": "ps",
+              "raw_value": 0.67,
+              "value": 0.67,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_ebitda": {
+              "field": "ev_ebitda",
+              "raw_value": 3.7,
+              "value": 3.7,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            },
+            "ev_revenue": {
+              "field": "ev_revenue",
+              "raw_value": 0.88,
+              "value": 0.88,
+              "observation_state": "VALID",
+              "usage_state": "ELIGIBLE",
+              "reason": null
+            }
+          },
+          "issues": []
+        },
+        "raw_metrics": {
+          "price": 24500,
+          "high_52w": 29750,
+          "low_52w": 14950
+        },
+        "factors": {
+          "QUALITY": {
+            "factor": "QUALITY",
+            "score": 51.75,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "roe_ttm",
+              "roa_ttm",
+              "operating_margin_ttm",
+              "net_margin_ttm"
+            ],
+            "available_count": 4
+          },
+          "GROWTH": {
+            "factor": "GROWTH",
+            "score": 99.4,
+            "coverage": 75,
+            "status": "LIMITED",
+            "intended_fields": [
+              "revenue_growth_annual_yoy",
+              "revenue_growth_quarterly_yoy",
+              "eps_dil_growth_ttm_yoy",
+              "fcf_growth_ttm_yoy"
+            ],
+            "available_count": 3
+          },
+          "VALUATION": {
+            "factor": "VALUATION",
+            "score": 91.01,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "pe",
+              "peg",
+              "pb",
+              "ps",
+              "ev_ebitda"
+            ],
+            "available_count": 5
+          },
+          "SAFETY": {
+            "factor": "SAFETY",
+            "score": 87.39,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "debt_equity_fq",
+              "current_ratio_fq",
+              "quick_ratio_fq",
+              "fcf_ttm"
+            ],
+            "available_count": 4
+          },
+          "MOMENTUM": {
+            "factor": "MOMENTUM",
+            "score": 71.88,
+            "coverage": 100,
+            "status": "FULL",
+            "intended_fields": [
+              "perf_1m",
+              "perf_3m",
+              "perf_6m",
+              "relative_volume"
+            ],
+            "available_count": 3
+          }
+        },
+        "axes": {
+          "QUALITY_AXIS": {
+            "axis": "QUALITY_AXIS",
+            "score": 69.57,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "OPPORTUNITY_AXIS": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 87.43,
+            "coverage": 91.67,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          }
+        },
+        "risk_gate": {
+          "state": "PASS",
+          "failed_reason": null,
+          "coverage": 100,
+          "soft_risk_profile": {
+            "material": "FALSE",
+            "signals": []
+          },
+          "lineage": [
+            "STRONG_MEDIUM_MOMENTUM"
+          ]
+        },
+        "classification": {
+          "classification": "CORE",
+          "classification_version": "sandbox-classification-v1",
+          "reason": "Strong quality and opportunity, no material soft risk",
+          "quality_axis": {
+            "axis": "QUALITY_AXIS",
+            "score": 69.57,
+            "coverage": 100,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "opportunity_axis": {
+            "axis": "OPPORTUNITY_AXIS",
+            "score": 87.43,
+            "coverage": 91.67,
+            "status": "FULL",
+            "weak_members": [],
+            "profile": "BALANCED"
+          },
+          "risk_state": "PASS",
+          "band_versions": [
+            "sandbox-bands-v1"
+          ]
+        },
+        "price_dislocation": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "drawdown_52w": -0.176471,
+          "upside_to_52w_high": 0.214286,
+          "position_52w_range": 0.64527,
+          "signals": [],
+          "quality_flags": [],
+          "decision_inputs": {
+            "severe_drawdown": "FALSE",
+            "near_52w_high": "FALSE",
+            "price_above_stored_52w_high": "FALSE",
+            "narrow_52w_range": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "drawdown_52w",
+                "upside_to_52w_high"
+              ],
+              "relationship_type": "NONLINEAR_MONOTONIC_SAME_PRICE_TO_HIGH_EVIDENCE",
+              "scoring_policy": "DO_NOT_COUNT_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "price",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "drawdown_52w",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "upside_to_52w_high",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "price",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "high_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "low_52w",
+              "target": "position_52w_range",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_REQUIRED",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "PRICE_TO_52W_REFERENCE",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "momentum_volume": {
+          "profile": "PROFILE_ONLY",
+          "computability_state": "AVAILABLE",
+          "perf_1w": 3.59,
+          "perf_1m": 19.51,
+          "perf_3m": 26.29,
+          "perf_6m": 23.62,
+          "perf_1y": 51.4,
+          "perf_ytd": 44.89,
+          "volume": 6300000,
+          "relative_volume": 0.74,
+          "avg_volume_30d": 6750000,
+          "medium_momentum": 23.7325,
+          "momentum_stack": 1,
+          "volume_confirmation": "FALSE",
+          "signals": [
+            "STRONG_MEDIUM_MOMENTUM"
+          ],
+          "quality_flags": [],
+          "decision_inputs": {
+            "strong_medium_momentum": "TRUE",
+            "weak_medium_momentum": "FALSE",
+            "volume_confirmation": "FALSE",
+            "low_relative_volume": "FALSE"
+          },
+          "structural_relationships": [
+            {
+              "metrics": [
+                "perf_1w",
+                "perf_1m",
+                "perf_3m",
+                "perf_6m",
+                "perf_1y",
+                "perf_ytd"
+              ],
+              "relationship_type": "OVERLAPPING_PERFORMANCE_WINDOWS",
+              "scoring_policy": "DO_NOT_COUNT_ALL_PERIODS_AS_INDEPENDENT_SCORING_EVIDENCE"
+            }
+          ],
+          "lineage": [
+            {
+              "source": "perf_1m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "medium_momentum",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1w",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1y",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_ytd",
+              "target": "momentum_stack",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "relative_volume",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_1m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_3m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            },
+            {
+              "source": "perf_6m",
+              "target": "volume_confirmation",
+              "target_type": "DERIVED_METRIC",
+              "contribution_type": "LINEAGE_ONLY",
+              "condition": "INPUT_AVAILABLE",
+              "unknown_policy": "PROPAGATE_UNKNOWN",
+              "transformation": "FORMULA",
+              "bounded_effect": "NO_SCORE_EFFECT",
+              "impact_group": "MOMENTUM_VOLUME_CONTEXT",
+              "aggregation_policy": "NONE"
+            }
+          ]
+        },
+        "ranking": {
+          "ticker": "PVT",
+          "ranking_key": "COMPOSITE_RANKING",
+          "raw_score": 77.61,
+          "percentile": 87.88,
+          "rank_position": 9,
+          "rank_total": 67,
+          "rankable_denominator": 67,
+          "universe_id": "displayed-universe-current",
+          "displayed_universe_id": "displayed-universe-current",
+          "tie_policy_version": "sandbox-shared-rank-v1",
+          "rankability": "RANKABLE",
+          "partial_status": "DATA_OK"
+        },
+        "verification_request": {
+          "enabled": true,
+          "rule": "Screener V2 is a sandbox-calibrated quantitative pre-screen. Verify important raw inputs, investigate signals/anomalies, and do not treat sandbox score/classification as a final investment thesis.",
+          "fields": [],
+          "signals": [
+            "STRONG_MEDIUM_MOMENTUM",
+            "ATTRACTIVE_VALUATION"
+          ]
+        }
+      },
+      "screening_as_of": "2026-10-06",
+      "data_integrity": {
+        "coverage": 100,
+        "status": "DATA_OK",
+        "flags": [],
+        "missing_fields": [],
+        "observations": {
+          "price": {
+            "field": "price",
+            "raw_value": 24500,
+            "value": 24500,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "high_52w": {
+            "field": "high_52w",
+            "raw_value": 29750,
+            "value": 29750,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "low_52w": {
+            "field": "low_52w",
+            "raw_value": 14950,
+            "value": 14950,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1w": {
+            "field": "perf_1w",
+            "raw_value": 3.59,
+            "value": 3.59,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1m": {
+            "field": "perf_1m",
+            "raw_value": 19.51,
+            "value": 19.51,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_3m": {
+            "field": "perf_3m",
+            "raw_value": 26.29,
+            "value": 26.29,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_6m": {
+            "field": "perf_6m",
+            "raw_value": 23.62,
+            "value": 23.62,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_1y": {
+            "field": "perf_1y",
+            "raw_value": 51.4,
+            "value": 51.4,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "perf_ytd": {
+            "field": "perf_ytd",
+            "raw_value": 44.89,
+            "value": 44.89,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "volume": {
+            "field": "volume",
+            "raw_value": 6300000,
+            "value": 6300000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "relative_volume": {
+            "field": "relative_volume",
+            "raw_value": 0.74,
+            "value": 0.74,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_10d": {
+            "field": "avg_volume_10d",
+            "raw_value": 7970000,
+            "value": 7970000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_30d": {
+            "field": "avg_volume_30d",
+            "raw_value": 6750000,
+            "value": 6750000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "avg_volume_60d": {
+            "field": "avg_volume_60d",
+            "raw_value": 5280000,
+            "value": 5280000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "market_cap": {
+            "field": "market_cap",
+            "raw_value": 12510000000000,
+            "value": 12510000000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roe_ttm": {
+            "field": "roe_ttm",
+            "raw_value": 16.14,
+            "value": 16.14,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "roa_ttm": {
+            "field": "roa_ttm",
+            "raw_value": 6.34,
+            "value": 6.34,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_annual_yoy": {
+            "field": "revenue_growth_annual_yoy",
+            "raw_value": 36.49,
+            "value": 36.49,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "revenue_growth_quarterly_yoy": {
+            "field": "revenue_growth_quarterly_yoy",
+            "raw_value": 31.29,
+            "value": 31.29,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "eps_dil_growth_ttm_yoy": {
+            "field": "eps_dil_growth_ttm_yoy",
+            "raw_value": 29.28,
+            "value": 29.28,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_growth_ttm_yoy": {
+            "field": "fcf_growth_ttm_yoy",
+            "raw_value": null,
+            "value": null,
+            "observation_state": "MISSING",
+            "usage_state": "UNAVAILABLE",
+            "reason": "MISSING"
+          },
+          "gross_margin_ttm": {
+            "field": "gross_margin_ttm",
+            "raw_value": 15.03,
+            "value": 15.03,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "operating_margin_ttm": {
+            "field": "operating_margin_ttm",
+            "raw_value": 12.04,
+            "value": 12.04,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "net_margin_ttm": {
+            "field": "net_margin_ttm",
+            "raw_value": 7.46,
+            "value": 7.46,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "fcf_ttm": {
+            "field": "fcf_ttm",
+            "raw_value": 582500000000,
+            "value": 582500000000,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fq": {
+            "field": "debt_equity_fq",
+            "raw_value": 0.75,
+            "value": 0.75,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "debt_equity_fy": {
+            "field": "debt_equity_fy",
+            "raw_value": 0.88,
+            "value": 0.88,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "current_ratio_fq": {
+            "field": "current_ratio_fq",
+            "raw_value": 1.89,
+            "value": 1.89,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "quick_ratio_fq": {
+            "field": "quick_ratio_fq",
+            "raw_value": 1.78,
+            "value": 1.78,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pe": {
+            "field": "pe",
+            "raw_value": 9.04,
+            "value": 9.04,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "peg": {
+            "field": "peg",
+            "raw_value": 0.3,
+            "value": 0.3,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "pb": {
+            "field": "pb",
+            "raw_value": 1.36,
+            "value": 1.36,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ps": {
+            "field": "ps",
+            "raw_value": 0.67,
+            "value": 0.67,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_ebitda": {
+            "field": "ev_ebitda",
+            "raw_value": 3.7,
+            "value": 3.7,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          },
+          "ev_revenue": {
+            "field": "ev_revenue",
+            "raw_value": 0.88,
+            "value": 0.88,
+            "observation_state": "VALID",
+            "usage_state": "ELIGIBLE",
+            "reason": null
+          }
+        },
+        "issues": []
+      },
+      "market_data": {
+        "price": {
+          "value": 25200,
+          "date": "2026-10-09",
+          "source": "price"
+        },
+        "volume_20d_avg": {
+          "value": null,
+          "date": null,
+          "source": null
+        },
+        "avg_trading_value_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "liquidity_flag": "09/10 khớp 7.094.800 cổ phiếu, thay đổi -1.37%",
+        "foreign_net_flow_20d": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        },
+        "foreign_room_remaining": {
+          "value": null,
+          "unit": "%",
+          "date": null,
+          "source": null
+        },
+        "market_cap": {
+          "value": null,
+          "unit": "Bn VND",
+          "date": null,
+          "source": null
+        }
+      },
+      "valuation_multiples": {
+        "pe_ttm": null,
+        "pb_current": null,
+        "dividend_yield": null
+      },
+      "financial_core_raw": {
+        "revenue": {
+          "value": 5577.33,
+          "period": "Q2/2026",
+          "source": "finance"
+        },
+        "npat": {
+          "value": 553,
+          "period": "Q2/2026",
+          "source": "finance"
+        },
+        "ebit": {
+          "value": null,
+          "period": "Q2/2026",
+          "source": null
+        },
+        "gross_margin": null,
+        "debt_equity": null,
+        "total_debt": null,
+        "total_equity": null,
+        "cash_and_equivalents": null,
+        "effective_tax_rate": null,
+        "cfo": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "capex": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "receivables": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "inventory": {
+          "value": null,
+          "period": "6T2026",
+          "yoy": null,
+          "source": null
+        },
+        "financial_income": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "financial_expense": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "other_income": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        },
+        "other_expense": {
+          "value": null,
+          "period": "6T2026",
+          "source": null
+        }
+      },
+      "cost_of_capital_raw_inputs": {
+        "note": "WACC và đầu vào nợ chưa đối chiếu.",
+        "risk_free_rate_10y_vn_bond": null,
+        "beta": null,
+        "equity_risk_premium_vn": null,
+        "avg_cost_of_debt": null
+      },
+      "ownership_insider": {
+        "major_shareholders": [],
+        "recent_insider_transactions": [],
+        "related_party_flag": null
+      },
+      "upcoming_events": [
+        {
+          "event": "BCTC Q3/2026 cập nhật Lợi nhuận vận tải lõi, CFO và chi phí tàu mới",
+          "date": null,
+          "source": "company"
+        }
+      ],
+      "anomaly_investigation": [
+        {
+          "issue": "Lợi nhuận báo cáo có thể thiếu bền vững",
+          "status": "PARTIAL",
+          "conclusion": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "issue": "Bội số Screen so dữ liệu hiện tại khác thời điểm",
+          "status": "UNRESOLVED",
+          "conclusion": "Không nâng P/E từ screening thành định giá nội bộ.",
+          "source_refs": [
+            "price",
+            "finance"
+          ]
+        }
+      ],
+      "data_completion": {
+        "provided_by_screening": [
+          "price",
+          "high_52w",
+          "low_52w",
+          "perf_1w",
+          "perf_1m",
+          "perf_3m",
+          "perf_6m",
+          "perf_1y",
+          "perf_ytd",
+          "volume",
+          "relative_volume",
+          "avg_volume_10d",
+          "avg_volume_30d",
+          "avg_volume_60d",
+          "market_cap",
+          "roe_ttm",
+          "roa_ttm",
+          "revenue_growth_annual_yoy",
+          "revenue_growth_quarterly_yoy",
+          "eps_dil_growth_ttm_yoy",
+          "fcf_growth_ttm_yoy",
+          "gross_margin_ttm",
+          "operating_margin_ttm",
+          "net_margin_ttm",
+          "fcf_ttm",
+          "debt_equity_fq",
+          "debt_equity_fy",
+          "current_ratio_fq",
+          "quick_ratio_fq",
+          "pe",
+          "peg",
+          "pb",
+          "ps",
+          "ev_ebitda",
+          "ev_revenue"
+        ],
+        "new_data_collected": [
+          "Giá 09/10",
+          "BCTC Q2/6T2026",
+          "Bối cảnh thị trường"
+        ],
+        "still_missing": [
+          "CFO/FY2026 chi tiết đã kiểm chứng",
+          "Cấu trúc nợ và kỳ hạn",
+          "Chuỗi OHLCV 200 phiên",
+          "Năng lực/giá đầu vào theo ngành",
+          "Nghiên cứu peer tương đồng"
+        ]
+      },
+      "material_questions": [
+        {
+          "question": "Lợi nhuận kỳ gần nhất có bền?",
+          "why_material": "Mẫu số định giá dễ sai nếu chu kỳ/lãi một lần.",
+          "status": "PARTIAL",
+          "answer": "Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%). Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+          "source_refs": [
+            "finance"
+          ],
+          "freshness": "Q2/2026"
+        },
+        {
+          "question": "Bảng cân đối, dòng tiền có hỗ trợ tăng lãi?",
+          "why_material": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+          "status": "MISSING",
+          "answer": null,
+          "source_refs": [],
+          "freshness": null
+        },
+        {
+          "question": "Biến bên ngoài quan trọng đến đâu?",
+          "why_material": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+          "status": "PARTIAL",
+          "answer": "Đã xác định cơ chế ngành; thiếu chuỗi giá/khối lượng ngoại sinh đủ tin cậy đến 10/10 để định lượng.",
+          "source_refs": [
+            "finance"
+          ],
+          "freshness": "Q2/2026"
+        }
+      ],
+      "sources": [
+        {
+          "id": "price",
+          "title": "Simplize giá PVT 09/10",
+          "url": "https://simplize.vn/co-phieu/PVT/lich-su-gia",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "finance",
+          "title": "PVT BCTC doanh thu Q2 2026",
+          "url": "https://cophieu68.vn/quote/financial_detail.php?id=pvt",
+          "date": "2026-07-30",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "company",
+          "title": "PVTrans công bố lãi Q2/2026",
+          "url": "https://www.pvtrans.vn/blog/tin-hoat-ong-pvtrans-11/post/hang-tau-dau-pvtrans-lai-ky-luc-tren-550-ty-trong-quy-2-co-phieu-kich-tran-5622",
+          "date": "2026-07-30",
+          "tier": "TIER_1"
+        },
+        {
+          "id": "fleet",
+          "title": "PVTrans đội tàu 68 chiếc tháng 8",
+          "url": "https://www.pvtrans.com/blog/tin-hoat-ong-pvtrans-11/post/pvtrans-tiep-nhan-them-01-tau-moi-tang-cuong-nang-luc-van-tai-quoc-te-5637",
+          "date": "2026-08-15",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "market",
+          "title": "Stockbiz VNINDEX 09/10",
+          "url": "https://web.stockbiz.vn/IndicesStats.aspx",
+          "date": "2026-10-09",
+          "tier": "TIER_2"
+        },
+        {
+          "id": "breadth",
+          "title": "Độ rộng VNINDEX 09/10",
+          "url": "https://vnindex.ai/vnindex-hom-nay",
+          "date": "2026-10-09",
+          "tier": "TIER_3"
+        }
+      ]
+    },
+    "node2": {
+      "technical_coverage": {
+        "status": "DEGRADED",
+        "coverage_model": "CAPABILITY_BASED_V1",
+        "required_sessions": null,
+        "sessions_used": 4,
+        "indicator_requirements": [
+          {
+            "capability": "recent_price_snapshots",
+            "required_sessions": 4,
+            "satisfied": true
+          },
+          {
+            "capability": "sma200",
+            "required_sessions": 200,
+            "satisfied": false
+          },
+          {
+            "capability": "vsa_spread_volume_context",
+            "required_sessions": 60,
+            "satisfied": false
+          }
+        ],
+        "missing_capabilities": [
+          "sma200",
+          "vsa_spread_volume_context"
+        ],
+        "note": "Không có đủ 200 phiên giá đáng tin để xác nhận SMA200."
+      },
+      "ohlcv_source": {
+        "source": "price",
+        "sessions_used": 4,
+        "date_range": "2026-10-06 tới 2026-10-09"
+      },
+      "trend_status": "PVT -1.37% ngày 09/10, giá 25.200 đồng.",
+      "sma_200_rel": null,
+      "volume_analysis": {
+        "ratio": 1.0510814814814815,
+        "classification": "Khối lượng tương đối so screening 06/10; độ lệch thời điểm.",
+        "vsa_signal_candidate": "none",
+        "supporting_evidence": [
+          "09/10 7.094.800 cổ phiếu, -1.37%"
+        ]
+      },
+      "smart_money_phase": null,
+      "zones": {
+        "demand": "Mốc thấp phiên chưa xác nhận; theo dõi quanh 24.500",
+        "supply": "Chưa đủ OHLCV để xác lập kháng cự",
+        "is_fresh": false
+      },
+      "sector_benchmark": {
+        "method": "UNAVAILABLE",
+        "name": null,
+        "constituents_if_peer_basket": [],
+        "source": null,
+        "date": null
+      },
+      "sector_vs_market": {
+        "period": "1D 09/10",
+        "sector_perf_pct": null,
+        "vnindex_perf_pct": -0.22,
+        "sector_strength_label": "PVT -1.37%, VNINDEX -0,22%."
+      },
+      "screening_signal_analysis": "Screening 06/10 là tín hiệu ứng viên, không xác nhận xu hướng 09/10.",
+      "signal_strength": 50,
+      "conclusion": "Kỹ thuật DEGRADED do thiếu dữ liệu dài hạn.",
+      "market_context": {
+        "as_of": "2026-10-09",
+        "benchmarks": {
+          "vnindex": {
+            "name": "VNINDEX",
+            "period": "1D",
+            "performance_pct": -0.22,
+            "trend": "Giảm",
+            "source": "market",
+            "freshness": "2026-10-09"
+          },
+          "secondary": [
+            {
+              "name": "VN30",
+              "kind": "INDEX",
+              "period": "1D",
+              "performance_pct": -0.19,
+              "source": "market",
+              "freshness": "2026-10-09",
+              "constituents": []
+            }
+          ]
+        },
+        "breadth": {
+          "advancers": 129,
+          "decliners": 175,
+          "unchanged": 100,
+          "advance_decline_ratio": 0.7371428571428571,
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "turnover_liquidity": {
+          "market_turnover_value": 27542.82,
+          "unit": "Bn VND",
+          "change_vs_20d_pct": null,
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "leadership_rotation": {
+          "leaders": [
+            "HDB",
+            "VPB",
+            "TCB"
+          ],
+          "laggards": [
+            "VIC",
+            "BSR",
+            "GVR"
+          ],
+          "note": "Ảnh hưởng VNINDEX ngày 09/10",
+          "source_refs": [
+            "breadth"
+          ],
+          "freshness": "2026-10-09"
+        },
+        "volatility": {
+          "measure": "Biên độ VNINDEX nội phiên",
+          "value": 20.72,
+          "period": "1D điểm",
+          "source": "breadth",
+          "freshness": "2026-10-09"
+        },
+        "market_foreign_flow": {
+          "net_value": -9735.11,
+          "unit": "Bn VND",
+          "period": "HOSE 09/10",
+          "source": "market",
+          "freshness": "2026-10-09"
+        },
+        "stock_relative_strength": {
+          "period": "1D 09/10",
+          "stock_perf_pct": -1.37,
+          "vnindex_perf_pct": -0.22,
+          "secondary_benchmark_name": "VN30",
+          "secondary_benchmark_perf_pct": -0.19,
+          "vs_vnindex_pct": -1.15,
+          "vs_secondary_benchmark_pct": -1.18,
+          "source_refs": [
+            "price",
+            "market"
+          ]
+        },
+        "coverage": {
+          "status": "FULL",
+          "available_capabilities": [
+            "vnindex_baseline",
+            "secondary_benchmark",
+            "breadth",
+            "turnover_liquidity",
+            "leadership_rotation",
+            "volatility",
+            "market_foreign_flow",
+            "stock_relative_strength"
+          ],
+          "missing_capabilities": [],
+          "provenance": [
+            {
+              "capability": "vnindex_baseline",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "secondary_benchmark",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "breadth",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "turnover_liquidity",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "leadership_rotation",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "volatility",
+              "source": "breadth",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "market_foreign_flow",
+              "source": "market",
+              "as_of": "2026-10-09"
+            },
+            {
+              "capability": "stock_relative_strength",
+              "source": "price;market",
+              "as_of": "2026-10-09"
+            }
+          ],
+          "note": "VN30 là tham chiếu thị trường, không thay thế rổ cùng ngành."
+        }
+      }
+    },
+    "node3": {
+      "data_period": "Q2/2026",
+      "screening_flags": [
+        "STRONG_MEDIUM_MOMENTUM",
+        "ATTRACTIVE_VALUATION"
+      ],
+      "screening_metrics_used": {
+        "role": "Trigger only",
+        "pe": 9.04,
+        "pb": 1.36,
+        "ev_ebitda": 3.7,
+        "roe_ttm": 16.14,
+        "debt_equity_fq": 0.75
+      },
+      "capital_efficiency": {
+        "wacc": null,
+        "roic": null,
+        "economic_spread": null,
+        "reason": "Thiếu đầu vào WACC và dòng tiền chi tiết.",
+        "external_reference": null
+      },
+      "earnings_quality": {
+        "cfo_npat": null,
+        "fcf_npat": null,
+        "accrual_ratio": null,
+        "review_adjustment": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+        "flag": "NEEDS_NORMALIZATION"
+      },
+      "earnings_sustainability": {
+        "classification": "CYCLICAL_OR_MIX_DEPENDENT",
+        "structural": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+        "cyclical": "Tuyến vận tải dầu khí và tăng số tàu",
+        "low_base": "Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%)."
+      },
+      "f_score": null,
+      "m_score": null,
+      "m_score_note": "Thiếu dữ liệu đầy đủ để chấm forensic.",
+      "health_status": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+      "valuation": {
+        "current": {
+          "price": 25200,
+          "screening_pe": 9.04,
+          "screening_pb": 1.36,
+          "screening_ev_ebitda": 3.7
+        },
+        "broker_references": [],
+        "reverse_dcf": null,
+        "conclusion": "Định giá cần chuẩn hóa lợi nhuận và vốn lưu động; không suy từ screening."
+      },
+      "moat": "Tàu vận tải dầu khí và logistics có tài sản/quan hệ khách hàng, nhưng lợi thế bền vững chưa kiểm chứng.",
+      "conclusion": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+      "sector_economics": {
+        "sector_profile": "INDUSTRIAL_LOGISTICS",
+        "earnings_bridge": [
+          {
+            "driver": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+            "fact": "Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%).",
+            "implication": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý."
+          },
+          {
+            "driver": "Vốn và chu kỳ",
+            "fact": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+            "implication": "Phải kiểm chứng dòng tiền sau đầu tư và biên thông thường."
+          }
+        ],
+        "normalized_earnings": null,
+        "capital_allocation": [
+          {
+            "event": "Hoạt động và đầu tư ngành",
+            "implication": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải."
+          }
+        ],
+        "balance_sheet_capacity": "CFO/nợ ròng cần đối chiếu trực tiếp; D/E Screener không thay bằng số BCTC.",
+        "valuation_method_selection": [
+          {
+            "method": "EV_EBITDA",
+            "status": "SELECTED",
+            "reason": "Phù hợp mô hình lợi nhuận ngành",
+            "evidence_refs": [
+              "finance"
+            ]
+          },
+          {
+            "method": "DCF",
+            "status": "CONDITIONAL",
+            "reason": "Chỉ dùng khi đủ dữ liệu đầu vào và chuẩn hóa",
+            "evidence_refs": [
+              "finance"
+            ]
+          }
+        ]
+      },
+      "expectation_basis": [
+        {
+          "topic": "Giá và kết quả tài chính kỳ gần nhất",
+          "statement": "Diễn biến giá PVT ngày 09/10 gợi ý đánh giá lại kỳ vọng, nhưng không chứng minh đồng thuận lợi nhuận.",
+          "expectation_basis": "PRICE_ACTION_INFERENCE",
+          "expected_value": null,
+          "expected_unit": null,
+          "analyst_view": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+          "gap_direction": "UNCERTAIN",
+          "source_refs": [
+            "price",
+            "finance"
+          ],
+          "as_of": "2026-10-09",
+          "inference_label": "INFERENCE",
+          "investment_implication": "Không biến giá thành nhận định đồng thuận."
+        }
+      ]
+    },
+    "node4": {
+      "risk_regime": "MIXED",
+      "macro_indicators": {},
+      "company_specific_drivers": [
+        {
+          "driver": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+          "impact": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Dòng tiền/vốn",
+          "impact": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+          "evidence_refs": [
+            "finance"
+          ]
+        }
+      ],
+      "sensitivity_table": [],
+      "geopolitical_events": [],
+      "causal_chains": [
+        {
+          "chain": "Tuyến vận tải dầu khí và tăng số tàu → Cước tanker/LPG, ngày khai thác và năng lực đội tàu → biên và dòng tiền",
+          "confidence": "MEDIUM",
+          "source_refs": [
+            "finance"
+          ]
+        }
+      ],
+      "risk_scenarios": [
+        {
+          "scenario": "Thuận",
+          "conditions": "Động lực hiện tại kéo dài và CFO chuyển hóa tốt",
+          "effect": "Lợi nhuận lõi được xác nhận",
+          "probability": null
+        },
+        {
+          "scenario": "Nghịch",
+          "conditions": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+          "effect": "Biên và định giá suy yếu",
+          "probability": null
+        }
+      ],
+      "macro_view": "Chỉ nghiên cứu Tuyến vận tải dầu khí và tăng số tàu khi có dữ liệu trực tiếp.",
+      "industry_impact": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+      "company_impact": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+      "conclusion": "Không dùng tin Fed/dầu/ngoại hối chung để suy diễn công ty thiếu evidence.",
+      "external_exposure_map": [
+        {
+          "exposure_id": "core",
+          "driver": "Tuyến vận tải dầu khí và tăng số tàu",
+          "driver_type": "DEMAND",
+          "company_exposure": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+          "transmission_mechanism": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+          "transmission_targets": [
+            "REVENUE",
+            "MARGIN",
+            "CASH_FLOW"
+          ],
+          "materiality_hypothesis": "HIGH",
+          "research_required": true,
+          "selection_rationale": "Tác động trực tiếp kết quả theo ngành."
+        },
+        {
+          "exposure_id": "funding",
+          "driver": "Chi phí vốn và bảng cân đối",
+          "driver_type": "RATES",
+          "company_exposure": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+          "transmission_mechanism": "Chi phí vốn, tồn kho hoặc capex ảnh hưởng lợi nhuận và khả năng tái đầu tư.",
+          "transmission_targets": [
+            "CASH_FLOW",
+            "BALANCE_SHEET",
+            "VALUATION"
+          ],
+          "materiality_hypothesis": "MEDIUM",
+          "research_required": true,
+          "selection_rationale": "Cần xem nợ/CFO khi kết quả biến động mạnh."
+        }
+      ],
+      "research_targets": [
+        {
+          "target_id": "core-202610",
+          "exposure_id": "core",
+          "driver": "Tuyến vận tải dầu khí và tăng số tàu",
+          "driver_type": "DEMAND",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "Báo cáo doanh nghiệp Q2 và nguồn ngành",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Chưa kiểm chứng được chuỗi ngoại sinh đồng kỳ và mức phơi nhiễm đủ để lượng hóa tác động."
+        },
+        {
+          "target_id": "funding-202610",
+          "exposure_id": "funding",
+          "driver": "Chi phí vốn và bảng cân đối",
+          "driver_type": "RATES",
+          "status": "UNAVAILABLE",
+          "attempts": [
+            {
+              "source": "BCTC và điều kiện thị trường",
+              "status": "INSUFFICIENT"
+            }
+          ],
+          "source_refs": [],
+          "as_of": null,
+          "freshness": null,
+          "prior_state": null,
+          "current_state": null,
+          "direction": "UNKNOWN",
+          "failure_reason": "Chưa kiểm chứng được chuỗi ngoại sinh đồng kỳ và mức phơi nhiễm đủ để lượng hóa tác động."
+        }
+      ],
+      "what_changed": [],
+      "market_context_use": {
+        "source": "NODE2.market_context",
+        "measurement_policy": "CONSUME_ONLY",
+        "consumed_capabilities": [
+          "vnindex_baseline",
+          "market_foreign_flow",
+          "stock_relative_strength"
+        ],
+        "interpretation": "PVT -1.37% 09/10; bối cảnh HOSE bán ròng ngoại tạo rủi ro điểm vào."
+      }
+    },
+    "node5": {
+      "ticker": "PVT",
+      "data_period": "Q2/2026; giá 09/10/2026",
+      "scores": {
+        "fundamental": 15,
+        "valuation": 14,
+        "technical": 10,
+        "flow": 13,
+        "sector_macro": 13,
+        "risk": 11
+      },
+      "ai_score": {
+        "value": 65.75,
+        "formula_shown": "F/20×30+V/20×20+T/20×15+Flow/20×15+SectorMacro/20×10+Risk/20×10"
+      },
+      "confidence": {
+        "method": "EVIDENCE_QUALITY_V1",
+        "value": 76.8,
+        "components": {
+          "data_completeness": 77,
+          "source_quality": 85,
+          "freshness": 74,
+          "cross_source_consistency": 73,
+          "method_suitability": 80,
+          "key_uncertainty_coverage": 65
+        }
+      },
+      "conflict_detector": {
+        "fundamental": "🟡",
+        "technical": "🟡",
+        "macro": "🟡",
+        "liquidity": "🟡",
+        "signal_alignment": "0/4",
+        "alignment": "0/4",
+        "override_applied": "Kết quả kinh doanh và động lượng chưa có xác nhận tiền mặt."
+      },
+      "catalyst_horizon": {
+        "nearest_catalyst": "Lợi nhuận vận tải lõi, CFO và chi phí tàu mới tại báo cáo Q3/2026",
+        "bucket": "0-30d"
+      },
+      "decision": "WATCH",
+      "drivers": [
+        "Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%).",
+        "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+        "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải."
+      ],
+      "thesis_invalidation": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Nếu điều kiện này kéo dài qua các kỳ và làm dòng tiền/lợi nhuận lõi đi xuống, luận điểm bị vô hiệu.",
+      "trading_stop": {
+        "price": 24500,
+        "basis": "Mốc tham khảo kỹ thuật, chưa xác minh thống kê đủ."
+      },
+      "liquidity_note": "09/10 khớp 7.094.800 cổ phiếu, khối lượng không đủ khẳng định dòng tiền tổ chức.",
+      "strategy": {
+        "entry_zone": "Theo dõi 24.500–25.000 đồng; chờ số liệu khai thác và dòng tiền Q3.",
+        "allocation_plan": {
+          "note": "WATCH; chỉ nghiên cứu vị thế sau khi nguồn doanh thu được chuyển thành CFO.",
+          "steps": [
+            "Xác minh biên Q3 và khoản một lần.",
+            "Rà soát nợ, capex, CFO và định giá chuẩn hóa.",
+            "Chờ tín hiệu giá/khối lượng với lịch sử tin cậy."
+          ]
+        },
+        "tp1": {
+          "price": null,
+          "rationale": "Thiếu định giá độc lập."
+        },
+        "tp2": {
+          "price": null,
+          "rationale": "Không ngoại suy bội số Screener."
+        },
+        "risk_per_trade_pct_nav": 0.5,
+        "position_size_note": "Tạm chưa mở vị thế.",
+        "max_portfolio_weight_pct": 4,
+        "position_type": "Watchlist"
+      },
+      "full_reasoning": "Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%). Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Giá 25.200 đồng ngày 09/10 (-1.37%) khác thời điểm screening. WATCH vì thiếu độ bền CFO và diễn biến thực tế các biến ngoại sinh, không dùng AI Score sàng lọc làm quyết định.",
+      "thesis_conviction": {
+        "level": "LOW",
+        "rationale": "Bằng chứng hiện tại không đủ xác lập bất đối xứng tốt và nguồn tăng lãi bền vững.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "supporting_evidence_refs": [
+          "finance"
+        ],
+        "contradictory_evidence_refs": [
+          "price",
+          "finance"
+        ],
+        "catalyst_visibility": "MEDIUM",
+        "payoff_asymmetry": "UNCERTAIN"
+      },
+      "decision_overlay": {
+        "market_regime": {
+          "regime_state": "MIXED",
+          "evidence_refs": [
+            "NODE2.market_context:market_foreign_flow",
+            "NODE2.market_context:stock_relative_strength"
+          ]
+        },
+        "timing_effect": "WAIT_FOR_ENTRY",
+        "sizing_effect": "CAP",
+        "decision_effect": "NONE",
+        "pre_overlay_decision": "WATCH",
+        "post_overlay_decision": "WATCH",
+        "override_rationale": "Thị trường biến động và dữ liệu về dòng tiền/lợi nhuận lõi chưa đầy đủ.",
+        "ai_score_effect": "NONE",
+        "ai_score_reference": 65.75
+      },
+      "risk_attribution": [
+        {
+          "driver": "Động lực lợi nhuận ngành biến động",
+          "primary_owner": "FUNDAMENTAL",
+          "residual_risk_effect": "MEDIUM",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Đã phản ánh ở Fundamental.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Nhu cầu vốn làm suy yếu khả năng thanh toán trong kịch bản cực đoan",
+          "primary_owner": "RISK",
+          "residual_risk_effect": "HIGH",
+          "risk_score_treatment": "PRIMARY_RISK_PENALTY",
+          "rationale": "Risk chỉ phản ánh khả năng chống chịu trường hợp tail, không trừ biên kỳ vọng lần nữa.",
+          "evidence_refs": [
+            "finance"
+          ]
+        },
+        {
+          "driver": "Giá kỹ thuật thiếu xác nhận",
+          "primary_owner": "TECHNICAL",
+          "residual_risk_effect": "LOW",
+          "risk_score_treatment": "NO_ADDITIONAL_PENALTY",
+          "rationale": "Thuộc technical/timing.",
+          "evidence_refs": [
+            "price"
+          ]
+        }
+      ],
+      "investment_horizon": {
+        "bucket": "3-12M",
+        "rationale": "Chờ Q3 và xác minh lợi nhuận lõi."
+      },
+      "anti_thesis": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.",
+      "variant_view": {
+        "summary": "Không mặc nhiên coi multiple thấp trong Screener là định giá rẻ.",
+        "expectation_basis_refs": [
+          0
+        ],
+        "why_different": "Kỳ vọng giá chưa có nguồn quan sát đồng thuận.",
+        "payoff_if_right": "Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý.",
+        "what_proves_wrong": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải."
+      },
+      "monitoring_kpis": [
+        {
+          "kpi": "Doanh thu/lợi nhuận lõi",
+          "current_state": "Q2/2026: 5.577,33/553 tỷ VND",
+          "watch_condition": "Q3 giảm và không có nguyên nhân một lần tích cực",
+          "thesis_link": "Bền vững lợi nhuận",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "Biên và động lực ngành",
+          "current_state": "Cước tanker/LPG, ngày khai thác và năng lực đội tàu",
+          "watch_condition": "Biên xấu liên tiếp hoặc nhu cầu đảo chiều",
+          "thesis_link": "Giá trị vận hành",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "CFO và nợ",
+          "current_state": "Chưa xác minh đủ bảng soát xét",
+          "watch_condition": "CFO yếu và nợ tăng",
+          "thesis_link": "Khả năng tạo tiền",
+          "source_refs": [
+            "finance"
+          ]
+        },
+        {
+          "kpi": "Giá cổ phiếu",
+          "current_state": "25.200 đồng 09/10",
+          "watch_condition": "Không giữ 24.500 đồng",
+          "thesis_link": "Timing",
+          "source_refs": [
+            "price"
+          ]
+        }
+      ],
+      "what_would_change_my_mind": [
+        "Q3 xác nhận lợi nhuận lõi và dòng tiền cải thiện.",
+        "Rủi ro vốn lưu động/đầu tư giảm và số liệu mới rõ ràng.",
+        "Biến ngành công bố trực tiếp chứng thực truyền dẫn tích cực.",
+        "Giá ổn định và kỹ thuật dài hạn được kiểm chứng."
+      ]
+    },
+    "node6b": "# BÁO CÁO CRSM PVT — Tổng công ty Vận tải Dầu khí PVTrans\nNgày 10/10/2026 | SCREENED_WEB | Tàu vận tải dầu khí và logistics | Q2/2026; giá ngày 09/10/2026.\n\n## 1. Tóm tắt CIO\n**WATCH — AI Score 65.75/100; độ tin cậy bằng chứng 76.8/100; thesis conviction thấp.** Giá 25.200 đồng, biến động -1.37% ngày 09/10, khớp 7.094.800 cổ phiếu. Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%).\nTín hiệu thuận: Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. Nhưng luận điểm rủi ro là Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Tỷ suất sinh lời sau vốn lưu động, chi phí tài trợ và biến động ngành quyết định sức bền, không phải riêng tăng trưởng EPS.\nNguồn Screener 06/10 chỉ giúp chọn ứng viên; Node1–5 phân tích lại, không lấy điểm Screener làm AI Score. Quyết định WATCH đòi hỏi xác minh doanh thu, dòng tiền và biến ngành thực tế trước giải ngân.\n\n## 2. Luận điểm đầu tư và kỳ vọng\nKỳ vọng có nguồn công bố: Kế hoạch doanh thu 2026 16.500 tỷ và LNST cổ đông mẹ ~1.200 tỷ; đội tàu 68 chiếc gần 2,1 triệu DWT vào 08/2026. Đây là thông tin kế hoạch hoặc số thực tế, chưa phải đồng thuận định giá từ nhiều nhà phân tích. Một biến động giá tăng hoặc giảm không phải bằng chứng trực tiếp về consensus.\n**Luận điểm thuận:** Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. **Quan điểm đối lập:** Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Phần khác biệt CRSM là không dùng kết quả tăng trưởng cao ở một kỳ làm suất sinh lời bình thường dài hạn.\nNếu số liệu Q3 và CFO cùng cải thiện, luận điểm được củng cố; nếu lợi nhuận phụ thuộc các yếu tố không lặp lại hoặc vốn tăng vượt dòng tiền, mức hấp dẫn của cổ phiếu suy giảm bất chấp P/E thấp.\n\n## 3. Cơ chế kinh doanh và chất lượng lợi nhuận\nQ2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%). Kế hoạch doanh thu 2026 16.500 tỷ và LNST cổ đông mẹ ~1.200 tỷ; đội tàu 68 chiếc gần 2,1 triệu DWT vào 08/2026. Các chỉ số phản ánh kỳ gần nhất, không tự chứng minh hiệu quả trong 2027. Doanh nghiệp cần tách phần lợi nhuận thuần cốt lõi khỏi tác động chu kỳ, thay đổi chính sách kế toán, lãi chuyển nhượng hay định giá lại tài sản khi thích hợp.\nCước tanker/LPG, ngày khai thác và năng lực đội tàu là biến chi phối sinh lời của doanh nghiệp. Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. Cần so sánh doanh thu, lãi gộp và chi phí tài chính cùng kỳ để xác nhận cầu nối tăng trưởng.\nRủi ro về độ tin cậy dữ liệu: CFO, biến động phải thu/tồn kho, nợ ròng, chi phí tài trợ và giải trình bất thường chưa được kiểm chứng đầy đủ ở thời điểm phân tích. Số FCF Screener không được nâng cấp thành dòng tiền đã kiểm toán.\nĐây là điểm chặn trước khi khẳng định chất lượng lợi nhuận bền vững và chấp nhận vị thế lớn.\n\n## 4. Định giá và lợi nhuận bình thường hóa\nScreener 06/10: P/E 9,04x, P/B 1,36x, EV/EBITDA 3,7x. Các chỉ tiêu có kỳ và nguồn tính khác dữ liệu được kiểm tra tới 09/10; chỉ dùng làm trigger để tìm bất thường, không được sao chép thành giá trị nội tại.\nPhương pháp kinh tế phù hợp nhất cho Tàu vận tải dầu khí và logistics là EV_EBITDA, với DCF như phương án có điều kiện khi bổ sung đầu vào. Việc lợi nhuận tăng mạnh do nền thấp hay một khoản không lặp lại khiến P/E hiện hành bị méo.\nBull: Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. Base: xu hướng trở về nhịp tăng trưởng bình thường và CFO vừa phải. Bear: Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Chưa có kịch bản WACC/capex đủ để tạo TP1/TP2 hoặc xác suất giả.\nDo đó CRSM tạm thời không đưa giá trị hợp lý cố định; giá trị của báo cáo là nhận diện chứng cứ và điều kiện phản biện có thể quan sát.\n\n## 5. Kỹ thuật, dòng tiền và thị trường\nNgày 09/10 VNINDEX -0,22%, VN30 -0,19%; PVT -1.37%. Cổ phiếu chênh -1.15 điểm % so VNINDEX chỉ trong một phiên; không khẳng định sức mạnh ngành từ một ngày.\nHOSE 129 mã tăng, 175 giảm, 100 mã đứng giá; giá trị khớp khoảng 27.543 tỷ đồng, khối ngoại bán ròng toàn sàn khoảng 9.735 tỷ. Những con số đó không phải số dòng ngoại riêng PVT; Node2 quản lý, Node4 chỉ diễn giải tác động.\nKỹ thuật DEGRADED: chưa thẩm định đủ chuỗi OHLCV cho SMA200/VSA/Smart Money. Khối lượng 7.094.800 so KLTB30 screening cũ chỉ là bối cảnh tương đối, không chứng minh giao dịch của tổ chức.\nKhông đưa mốc hỗ trợ vào luận điểm doanh nghiệp; nếu giá không giữ 24.500 thì cần đánh giá timing, không tự cho rằng lợi nhuận cơ bản đã đổi.\n\n## 6. Ngoại sinh và cơ chế nhân quả\n**Exposure thiết yếu: Tuyến vận tải dầu khí và tăng số tàu.** Cơ chế kỳ vọng: yếu tố ngành đi vào Cước tanker/LPG, ngày khai thác và năng lực đội tàu rồi thay đổi doanh thu, biên, CFO, cuối cùng mới tác động bội số định giá.\nFACT: Q2 doanh thu thuần từ bảng BCTC 5.577,3 tỷ (+~29,3% YoY); PVTrans công bố lợi nhuận ròng khoảng 553 tỷ (+87%). INFERENCE: Đội tàu mới khai thác và mảng vận tải mang gần 92% lợi nhuận gộp trong khi đóng góp khoảng 54% doanh thu quý. ASSUMPTION: động lực hiện tại duy trì và doanh nghiệp không có khoản bất thường trọng yếu. Không có chuỗi đo ngoại sinh đến tháng 10 đồng bộ với bảng doanh thu và trạng thái phơi nhiễm, nên Node4 đặt target UNAVAILABLE thay vì bịa prior/current.\n**Nguồn vốn:** Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Khi lãi suất, USD hay hàng hóa ảnh hưởng thật tới cơ cấu nợ/hàng mua, cần xác định tỷ trọng và lag; không tự điền lãi suất Fed/Brent chỉ vì có sẵn trên Internet.\nĐộ rộng, dòng ngoại và biến động chỉ số không được thu thập lại ở Node4; chúng được tiêu thụ từ Node2 và ảnh hưởng đến thời điểm giải ngân.\n\n## 7. Phản luận và rủi ro không trừ hai lần\nPhản luận mạnh nhất: Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải.. Động lực lợi nhuận chu kỳ thông thường được chấm ở Fundamental, giá cổ phiếu ở Technical, multiple ở Valuation. Risk chỉ dành cho khả năng chống chịu trong tình huống tail như đứt dòng tiền/không tài trợ được vốn.\nThiếu chứng cứ không mặc định nghĩa doanh nghiệp xấu, nhưng phải giảm evidence confidence và thesis conviction. Cần các điều kiện kiểm chứng bằng nguồn công bố, không sử dụng diễn đạt “không có ảnh hưởng vĩ mô” khi thực tế có exposure chưa lượng hóa.\nNếu Q3 xác nhận lãi nhưng CFO không chuyển hóa, cần giảm niềm tin vào định giá, ngay cả khi giá vẫn tăng.\n\n## 8. Chiến lược, quy mô và điều kiện dừng\nQuyết định WATCH, vùng vào có điều kiện: Theo dõi 24.500–25.000 đồng; chờ số liệu khai thác và dòng tiền Q3. Không có lệnh mua đang phát. Nếu chứng cứ tốt hơn, xây dựng vị thế theo từng đợt nhỏ và giới hạn rủi ro giả định 0.5% NAV mỗi giao dịch, tỷ trọng tối đa 4% NAV.\nMốc 24.500 đồng chỉ là kỹ thuật tham khảo, không phải stop được backtest. TP1/TP2 chưa xác lập do thiếu định giá độc lập. Luận điểm kinh tế mất hiệu lực nếu Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Nếu điều kiện này kéo dài qua các kỳ và làm dòng tiền/lợi nhuận lõi đi xuống, luận điểm bị vô hiệu.\nQuyết định mới phải nêu rõ giá/khối lượng, dữ liệu Q3 và cập nhật tính chu kỳ; tránh nhầm tăng giá với chất lượng lợi nhuận.\n\n## 9. Monitoring và điều kiện đổi quan điểm\n| KPI | Trạng thái | Điều kiện | Ý nghĩa |\n|---|---|---|---|\n| Kết quả lõi | Q2/2026: doanh thu 5.577,33 tỷ, lãi 553 tỷ | Q3 không duy trì động lực hoặc xuất hiện khoản một lần | Chất lượng lợi nhuận |\n| Driver ngành | Cước tanker/LPG, ngày khai thác và năng lực đội tàu | Biên xấu liên tiếp, đầu vào/bán hàng đảo chiều | Dòng tiền hoạt động |\n| CFO và nợ | Chưa đủ dữ liệu đã xác minh | CFO kém khi nợ và nhu cầu vốn tăng | Sức chống chịu |\n| Giá và thanh khoản | 25.200 đồng; 7.094.800 CP 09/10 | Không giữ 24.500 hoặc ổn định trở lại | Điểm vào, tỷ trọng |\nKế hoạch nghiên cứu tiếp theo: Lợi nhuận vận tải lõi, CFO và chi phí tàu mới. Điểm đổi ý theo hướng tích cực là số hoạt động lõi và CFO cùng xác nhận; theo hướng tiêu cực là tăng trưởng báo cáo không thành tiền và vốn tài trợ vượt lợi ích.\n\n## 10. Nguồn, sai số và giới hạn\nSố kỳ gần nhất đối chiếu với báo cáo doanh nghiệp và bộ giá 09/10; mọi URL, source date và tier nằm trong Node1. Báo cáo chưa đủ CFO, cấu trúc nợ/vốn mới, chuỗi OHLCV 200 phiên, chỉ số ngành và nguồn giá đầu vào cập nhật đồng kỳ.\nKhông định lượng biến thiếu bằng một lời đoán, không lấy Screener là nguồn thẩm định và không tạo consensus không tồn tại. Nội dung phục vụ nghiên cứu, không phải tư vấn giao dịch cá nhân."
+  },
+  "decision_record": {
+    "date": "10/10/2026",
+    "ticker": "PVT",
+    "price_at_analysis": 25200,
+    "decision": "WATCH",
+    "ai_score": 65.75,
+    "confidence": 76.8,
+    "entry_zone": "Theo dõi 24.500–25.000 đồng; chờ số liệu khai thác và dòng tiền Q3.",
+    "trading_stop": 24500,
+    "tp1": null,
+    "tp2": null,
+    "thesis_invalidation": "Đầu tư đội tàu làm tăng giá trị tài sản nhưng cũng tăng dư nợ, khấu hao và rủi ro giá thuê; doanh thu thương mại biên thấp không đánh đồng EBITDA vận tải. Nếu điều kiện này kéo dài qua các kỳ và làm dòng tiền/lợi nhuận lõi đi xuống, luận điểm bị vô hiệu."
+  }
+}
